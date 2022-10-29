@@ -15,6 +15,20 @@ const columns = (
     renderCell: renderDayCell(rows, setRows),
   },
   {
+    field: 'starts',
+    headerName: 'Starts',
+    sortable: false,
+    editable: true,
+    width: 100,
+  },
+  {
+    field: 'ends',
+    headerName: 'Ends',
+    sortable: false,
+    editable: true,
+    width: 100,
+  },
+  {
     field: 'subject',
     headerName: 'Subject',
     sortable: false,

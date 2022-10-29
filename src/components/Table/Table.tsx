@@ -1,23 +1,36 @@
 import Box from '@mui/material/Box'
-import { DataGrid } from '@mui/x-data-grid'
+import { DataGrid, GridEventListener } from '@mui/x-data-grid'
 import { useState } from 'react'
 import initialRows from './constants/initialRows'
-import updateSubject from './functions/updateSubject'
+import updateRow from './functions/updateRow'
 import columns from './helpers/columns'
 
 const Table = () => {
   const [rows, setRows] = useState(initialRows)
 
+  const handleCellEditCommit:
+    | GridEventListener<'cellEditCommit'>
+    | undefined = ({ id, value, field }) =>
+    setRows(updateRow(id, rows, field, value))
+
   return (
     <Box
-      sx={{ width: '100%', maxWidth: 1000, height: 600, mx: 'auto', mt: 10 }}
+      sx={{
+        width: '100%',
+        maxWidth: 1000,
+        height: 56 + 52 * rows.length + 53,
+        mx: 'auto',
+        mt: 10,
+        overflow: 'hidden',
+        '.MuiDataGrid-virtualScroller': {
+          overflowY: 'hidden',
+        },
+      }}
     >
       <DataGrid
         columns={columns(rows, setRows)}
         rows={rows}
-        onCellEditCommit={({ id, value }) =>
-          setRows(updateSubject(id, rows, value))
-        }
+        onCellEditCommit={handleCellEditCommit}
       />
     </Box>
   )
