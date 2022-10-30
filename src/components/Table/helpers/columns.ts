@@ -29,11 +29,19 @@ const columns = (
     width: 100,
   },
   {
+    field: 'room',
+    headerName: 'Room',
+    sortable: false,
+    editable: true,
+    width: 125,
+  },
+  {
     field: 'subject',
     headerName: 'Subject',
     sortable: false,
     editable: true,
-    width: 200,
+    flex: 1,
+    minWidth: 400,
   },
 ]
 

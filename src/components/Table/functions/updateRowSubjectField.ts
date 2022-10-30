@@ -4,17 +4,16 @@ import { Row } from '../Table.types'
 import findRowIndexById from './findRowIndexById'
 
 /**
- * Updates `row[field]` with `value`
+ * Updates value of `row.subject`
  *
  * @param id
  * @param rows
- * @param field
- * @param value
+ * @param subject
  * @returns updated `rows` array
  */
-const updateRow = (id: GridRowId, rows: Row[], field: string, value: any) => {
+const updateRowSubjectField = (id: GridRowId, rows: Row[], subject: any) => {
   const index = findRowIndexById(id, rows)
-  return update(index, { ...rows[index], [field]: value }, rows)
+  return update(index, { ...rows[index], subject }, rows)
 }
 
-export default updateRow
+export default updateRowSubjectField

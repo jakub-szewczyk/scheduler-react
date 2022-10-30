@@ -2,7 +2,7 @@ import Box from '@mui/material/Box'
 import { DataGrid, GridEventListener } from '@mui/x-data-grid'
 import { useState } from 'react'
 import initialRows from './constants/initialRows'
-import updateRow from './functions/updateRow'
+import updateRowField from './functions/updateRowField'
 import columns from './helpers/columns'
 
 const Table = () => {
@@ -11,7 +11,7 @@ const Table = () => {
   const handleCellEditCommit:
     | GridEventListener<'cellEditCommit'>
     | undefined = ({ id, value, field }) =>
-    setRows(updateRow(id, rows, field, value))
+    setRows(updateRowField(id, rows, field, value))
 
   return (
     <Box
