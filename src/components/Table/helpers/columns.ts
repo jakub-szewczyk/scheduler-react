@@ -2,6 +2,7 @@ import { GridColDef } from '@mui/x-data-grid'
 import { Dispatch, SetStateAction } from 'react'
 import { Row } from '../Table.types'
 import renderDayCell from './renderDayCell'
+import renderNotificationCell from './renderNotificationCell'
 
 const columns = (
   rows: Row[],
@@ -40,8 +41,14 @@ const columns = (
     headerName: 'Subject',
     sortable: false,
     editable: true,
-    flex: 1,
     minWidth: 400,
+  },
+  {
+    field: 'notification',
+    headerName: 'Notification',
+    sortable: false,
+    editable: false,
+    renderCell: renderNotificationCell(rows, setRows),
   },
 ]
 
