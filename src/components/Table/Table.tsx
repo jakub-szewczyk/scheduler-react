@@ -1,20 +1,18 @@
 import Box from '@mui/material/Box'
 import { DataGrid, GridEventListener } from '@mui/x-data-grid'
+import { constant } from 'fp-ts/lib/function'
 import { useState } from 'react'
 import { useUpdateEffect } from 'usehooks-ts'
 import initialRows from './constants/initialRows'
 import updateRowField from './functions/updateRowField'
 import columns from './helpers/columns'
+import getRowsFromLocalStorage from './helpers/getRowsFromLocalStorage'
+import saveRowsToLocalStorage from './helpers/saveRowsToLocalStorage'
 
 const Table = () => {
-  const [rows, setRows] = useState(
-    JSON.parse(localStorage.getItem('rows')!) || initialRows
-  )
+  const [rows, setRows] = useState(getRowsFromLocalStorage() || initialRows)
 
-  useUpdateEffect(
-    () => localStorage.setItem('rows', JSON.stringify(rows)),
-    [rows]
-  )
+  useUpdateEffect(constant(saveRowsToLocalStorage(rows)), [rows])
 
   const handleCellEditCommit:
     | GridEventListener<'cellEditCommit'>
