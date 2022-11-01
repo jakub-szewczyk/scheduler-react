@@ -3,14 +3,13 @@ import { DataGrid, GridEventListener } from '@mui/x-data-grid'
 import { constant } from 'fp-ts/lib/function'
 import { useState } from 'react'
 import { useUpdateEffect } from 'usehooks-ts'
-import initialRows from './constants/initialRows'
+import getInitialRows from './functions/getInitialRows'
 import updateRowField from './functions/updateRowField'
 import columns from './helpers/columns'
-import getRowsFromLocalStorage from './helpers/getRowsFromLocalStorage'
 import saveRowsToLocalStorage from './helpers/saveRowsToLocalStorage'
 
 const Table = () => {
-  const [rows, setRows] = useState(getRowsFromLocalStorage() || initialRows)
+  const [rows, setRows] = useState(getInitialRows())
 
   useUpdateEffect(constant(saveRowsToLocalStorage(rows)), [rows])
 
