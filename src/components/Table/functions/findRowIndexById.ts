@@ -1,7 +1,7 @@
 import { GridRowId } from '@mui/x-data-grid'
 import { pipe } from 'fp-ts/lib/function'
 import { curry, findIndex } from 'ramda'
-import { Row } from '../Table.types'
+import { Row } from '../types/Table.types'
 import equalsToRowId from './equalsToRowId'
 
 /**

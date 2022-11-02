@@ -1,7 +1,7 @@
 import { GridRowId } from '@mui/x-data-grid'
 import { nanoid } from 'nanoid'
 import { insert } from 'ramda'
-import { Row } from '../Table.types'
+import { Row } from '../types/Table.types'
 import calculateNewRowIndex from './calculateNewRowIndex'
 
 /**

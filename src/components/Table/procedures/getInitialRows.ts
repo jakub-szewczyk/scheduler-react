@@ -5,7 +5,6 @@ import getRowsFromLocalStorage from './getRowsFromLocalStorage'
 
 const getInitialRows = pipe(
   getRowsFromLocalStorage,
-  IOOption.map(JSON.parse),
   IOOption.getOrElse(constant(constant(initialRows)))
 )
 

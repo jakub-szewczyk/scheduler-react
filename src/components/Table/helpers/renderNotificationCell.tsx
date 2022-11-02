@@ -5,7 +5,7 @@ import { GridColDef } from '@mui/x-data-grid'
 import { Dispatch, SetStateAction } from 'react'
 import findRowIndexById from '../functions/findRowIndexById'
 import updateRowField from '../functions/updateRowField'
-import { Row } from '../Table.types'
+import { Row } from '../types/Table.types'
 
 const renderNotificationCell =
   (

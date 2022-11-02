@@ -1,6 +1,6 @@
 import { GridColDef } from '@mui/x-data-grid'
 import { Dispatch, SetStateAction } from 'react'
-import { Row } from '../Table.types'
+import { Row } from '../types/Table.types'
 import renderDayCell from './renderDayCell'
 import renderNotificationCell from './renderNotificationCell'
 

@@ -1,4 +1,4 @@
-import { Row } from '../Table.types'
+import { Row } from '../types/Table.types'
 
 const initialRows: Row[] = [
   { id: 'Monday', day: 'Monday' },

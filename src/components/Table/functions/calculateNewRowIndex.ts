@@ -1,7 +1,7 @@
 import { GridRowId } from '@mui/x-data-grid'
 import { pipe } from 'fp-ts/lib/function'
 import { add } from 'ramda'
-import { Day, Row } from '../Table.types'
+import { Day, Row } from '../types/Table.types'
 import countRowsPerDay from './countRowsPerDay'
 import findRowIndexById from './findRowIndexById'
 

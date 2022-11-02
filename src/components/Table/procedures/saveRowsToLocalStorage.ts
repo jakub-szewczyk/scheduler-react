@@ -1,10 +1,5 @@
-import { Row } from '../Table.types'
+import { Row } from '../types/Table.types'
 
-/**
- * TODO:
- * Impure function.
- * Lift to IO monad.
- */
 const saveRowsToLocalStorage = (rows: Row[]) =>
   localStorage.setItem('rows', JSON.stringify(rows))
 
