@@ -7,6 +7,16 @@ import findRowIndexById from '../functions/findRowIndexById'
 import updateRowField from '../functions/updateRowField'
 import { Row } from '../types/Table.types'
 
+const notify = (title: string, options?: NotificationOptions) => {
+  if (Notification.permission === 'granted')
+    return new Notification(title, options)
+
+  if (Notification.permission !== 'denied')
+    return Notification.requestPermission().then((permission) =>
+      permission === 'granted' ? new Notification(title, options) : null
+    )
+}
+
 const renderNotificationCell =
   (
     rows: Row[],
@@ -24,9 +34,9 @@ const renderNotificationCell =
       >
         <IconButton
           size='small'
-          onClick={() =>
-            setRows(updateRowField(id, rows, field, !notification))
-          }
+          onClick={() => {
+            setRows(updateRowField(field, !notification, id, rows))
+          }}
         >
           {notification ? (
             <NotificationsIcon fontSize='small' />

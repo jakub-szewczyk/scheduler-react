@@ -12,10 +12,6 @@ import calculateNewRowIndex from './calculateNewRowIndex'
  * @returns updated `rows` array
  */
 const addRow = (id: GridRowId, rows: Row[]) =>
-  insert(
-    calculateNewRowIndex(id, rows),
-    { id: `${id}${nanoid()}`, subject: '' },
-    rows
-  )
+  insert(calculateNewRowIndex(id, rows), { id: `${id}${nanoid()}` }, rows)
 
 export default addRow
