@@ -1,8 +1,8 @@
 import { GridColDef } from '@mui/x-data-grid'
 import { Dispatch, SetStateAction } from 'react'
+import DayCell from '../DayCell'
+import NotificationCell from '../NotificationCell'
 import { Row } from '../types/Table.types'
-import renderDayCell from './renderDayCell'
-import renderNotificationCell from './renderNotificationCell'
 
 const columns = (
   rows: Row[],
@@ -13,7 +13,9 @@ const columns = (
     headerName: 'Day',
     sortable: false,
     width: 150,
-    renderCell: renderDayCell(rows, setRows),
+    renderCell: (params) => (
+      <DayCell {...params} rows={rows} setRows={setRows} />
+    ),
   },
   {
     field: 'starts',
@@ -48,7 +50,9 @@ const columns = (
     headerName: 'Notification',
     sortable: false,
     editable: false,
-    renderCell: renderNotificationCell(rows, setRows),
+    renderCell: (params) => (
+      <NotificationCell {...params} rows={rows} setRows={setRows} />
+    ),
   },
 ]
 

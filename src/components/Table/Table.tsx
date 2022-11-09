@@ -1,26 +1,24 @@
-import { DataGrid } from '@mui/x-data-grid'
-import { constant } from 'fp-ts/lib/function'
-import { useState } from 'react'
-import { useUpdateEffect } from 'usehooks-ts'
+import { DataGrid, GridEventListener } from '@mui/x-data-grid'
+import { useLocalStorage } from 'usehooks-ts'
+import initialRows from './constants/initialRows'
 import updateRowField from './functions/updateRowField'
 import columns from './helpers/columns'
-import getInitialRows from './procedures/getInitialRows'
-import saveRowsToLocalStorage from './procedures/saveRowsToLocalStorage'
 import DataGridWrapper from './styled/DataGridWrapper.styled'
 
 const Table = () => {
-  const [rows, setRows] = useState(getInitialRows())
+  const [rows, setRows] = useLocalStorage('rows', initialRows)
 
-  useUpdateEffect(constant(saveRowsToLocalStorage(rows)), [rows])
+  const handleCellEditCommit:
+    | GridEventListener<'cellEditCommit'>
+    | undefined = ({ field, value, id }) =>
+    setRows(updateRowField(field, value, id, rows))
 
   return (
     <DataGridWrapper height={56 + 52 * rows.length + 53}>
       <DataGrid
         columns={columns(rows, setRows)}
         rows={rows}
-        onCellEditCommit={({ field, value, id }) =>
-          setRows(updateRowField(field, value, id, rows))
-        }
+        onCellEditCommit={handleCellEditCommit}
       />
     </DataGridWrapper>
   )
