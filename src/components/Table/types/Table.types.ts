@@ -2,7 +2,7 @@ import { GridRowId } from '@mui/x-data-grid'
 
 type Day = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday'
 
-interface Row {
+type Row = Readonly<{
   id: GridRowId
   day?: Day
   starts?: string
@@ -10,6 +10,6 @@ interface Row {
   room?: string
   subject?: string
   notification?: boolean
-}
+}>
 
 export type { Day, Row }
