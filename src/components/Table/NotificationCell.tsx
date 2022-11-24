@@ -2,12 +2,12 @@ import NotificationsIcon from '@mui/icons-material/Notifications'
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone'
 import { IconButton, Stack } from '@mui/material'
 import { GridRenderCellParams } from '@mui/x-data-grid'
-import { format } from 'date-fns'
 import { none } from 'fp-ts/lib/Option'
 import { once } from 'ramda'
 import { Dispatch, MouseEventHandler, SetStateAction, useCallback } from 'react'
 import { useInterval } from 'usehooks-ts'
-import findRowIndexById from './functions/findRowIndexById'
+import findRowById from './functions/findRowById'
+import matchesHour from './functions/matchesHour'
 import notify from './functions/notify'
 import updateRowField from './functions/updateRowField'
 import { Row } from './types/Table.types'
@@ -23,8 +23,7 @@ const NotificationCell = ({
   rows,
   setRows,
 }: NotificationCellProps) => {
-  // TODO: Create find `findRowIndexById` and replace `findRowIndexById` where it suits better.
-  const { starts, subject, notification } = rows[findRowIndexById(id, rows)]
+  const { starts, subject, notification } = findRowById(id, rows)!
 
   const notifyOnce = useCallback(once(notify), [starts])
 
@@ -70,9 +69,6 @@ const NotificationCell = ({
 
 const title = (starts: Row['starts'], subject: Row['subject']) =>
   starts && subject ? `${subject} starts at ${starts}` : 'Notification'
-
-const matchesHour = (starts: string | undefined) =>
-  starts === format(Date.now(), 'HH:mm')
 
 const triggerCondition = (
   starts: Row['starts'],
