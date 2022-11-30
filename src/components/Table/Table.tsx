@@ -1,72 +1,32 @@
-import { DataGrid, GridEventListener } from '@mui/x-data-grid'
+import { DataGrid } from '@mui/x-data-grid'
 import { useLocalStorage } from 'usehooks-ts'
+import headerHeight from './constants/headerHeight'
 import initialRows from './constants/initialRows'
-import DayCell from './DayCell'
+import rowHeight from './constants/rowHeight'
+import calculateTableHeight from './functions/calculateTableHeight'
+import calculateTableMaxWidth from './functions/calculateTableMaxWidth'
 import updateRowField from './functions/updateRowField'
-import NotificationCell from './NotificationCell'
+import createColumns from './helpers/createColumns'
 import DataGridWrapper from './styled/DataGridWrapper.styled'
 
 const Table = () => {
   const [rows, setRows] = useLocalStorage('rows', initialRows)
 
-  const handleCellEditCommit:
-    | GridEventListener<'cellEditCommit'>
-    | undefined = ({ field, value, id }) =>
-    setRows(updateRowField(field, value, id, rows))
+  const columns = createColumns(rows, setRows)
 
   return (
-    <DataGridWrapper height={56 + 52 * rows.length + 53}>
+    <DataGridWrapper
+      height={calculateTableHeight(rows)}
+      maxWidth={calculateTableMaxWidth(columns)}
+    >
       <DataGrid
-        columns={[
-          {
-            field: 'day',
-            headerName: 'Day',
-            sortable: false,
-            width: 150,
-            renderCell: (params) => (
-              <DayCell {...params} rows={rows} setRows={setRows} />
-            ),
-          },
-          {
-            field: 'starts',
-            headerName: 'Starts',
-            sortable: false,
-            editable: true,
-            width: 100,
-          },
-          {
-            field: 'ends',
-            headerName: 'Ends',
-            sortable: false,
-            editable: true,
-            width: 100,
-          },
-          {
-            field: 'room',
-            headerName: 'Room',
-            sortable: false,
-            editable: true,
-            width: 125,
-          },
-          {
-            field: 'subject',
-            headerName: 'Subject',
-            sortable: false,
-            editable: true,
-            minWidth: 400,
-          },
-          {
-            field: 'notification',
-            headerName: 'Notification',
-            sortable: false,
-            editable: false,
-            renderCell: (params) => (
-              <NotificationCell {...params} rows={rows} setRows={setRows} />
-            ),
-          },
-        ]}
+        headerHeight={headerHeight}
+        rowHeight={rowHeight}
+        columns={columns}
         rows={rows}
-        onCellEditCommit={handleCellEditCommit}
+        onCellEditCommit={({ field, value, id }) =>
+          setRows(updateRowField(field, value, id, rows))
+        }
       />
     </DataGridWrapper>
   )

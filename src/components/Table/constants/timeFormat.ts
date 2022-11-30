@@ -1,3 +1,3 @@
-const timeFormat = 'HH:mm'
+const timeFormat = 'hh:mm aaa'
 
 export default timeFormat
