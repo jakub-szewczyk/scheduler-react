@@ -5,18 +5,21 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Box,
   Button,
   IconButton,
   MenuItem,
   Stack,
+  TextField,
+  Tooltip,
   Typography,
 } from '@mui/material'
 import { GridRenderCellParams } from '@mui/x-data-grid'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { Field, Form, Formik } from 'formik'
-import { Select } from 'formik-mui'
-import { TimePicker } from 'formik-mui-x-date-pickers'
+import { Select, TextFieldProps } from 'formik-mui'
+import { DesktopTimePicker } from 'formik-mui-x-date-pickers'
 import { none } from 'fp-ts/lib/Option'
 import { once } from 'ramda'
 import {
@@ -32,11 +35,23 @@ import findRowById from './functions/findRowById'
 import matchesTime from './functions/matchesTime'
 import notify from './functions/notify'
 import updateRowField from './functions/updateRowField'
+import TextSummaryDetail from './TextSummaryDetail'
+import TimeSummaryDetail from './TimeSummaryDetail'
 import { Row } from './types/Table.types'
 
 interface NotificationCellProps extends GridRenderCellParams {
   rows: Row[]
   setRows: Dispatch<SetStateAction<Row[]>>
+}
+
+interface InitialValues {
+  notification: 0 | 5 | 10 | 15 | 'custom'
+  time: string | null
+}
+
+const initialValues: InitialValues = {
+  notification: 0,
+  time: null,
 }
 
 const NotificationCell = ({
@@ -55,7 +70,7 @@ const NotificationCell = ({
   useInterval(
     () =>
       notification && matchesTime(starts, Date.now())
-        ? notifyOnce(notificationTitle(starts, subject))()
+        ? notifyOnce('NOTIFICATION_TITLE_PLACEHOLDER')()
         : none,
     1000
   )
@@ -79,17 +94,25 @@ const NotificationCell = ({
         alignItems='center'
         width='100%'
       >
-        <IconButton
-          size='small'
-          onClick={handleNotificationIconButtonClick}
-          onContextMenu={handleNotificationIconButtonContextMenu}
+        <Tooltip
+          title={!starts && 'Set start time to enable notification'}
+          placement='left'
         >
-          {notification ? (
-            <NotificationsIcon fontSize='small' />
-          ) : (
-            <NotificationsNoneIcon fontSize='small' />
-          )}
-        </IconButton>
+          <Box>
+            <IconButton
+              size='small'
+              disabled={!starts}
+              onClick={handleNotificationIconButtonClick}
+              onContextMenu={handleNotificationIconButtonContextMenu}
+            >
+              {notification ? (
+                <NotificationsIcon fontSize='small' />
+              ) : (
+                <NotificationsNoneIcon fontSize='small' />
+              )}
+            </IconButton>
+          </Box>
+        </Tooltip>
       </Stack>
       <DraggableDialog
         open={isNotificationDialogOpen}
@@ -100,18 +123,7 @@ const NotificationCell = ({
             <Typography>
               Change notification settings. Set time and subject details.
             </Typography>
-            <Formik
-              /**
-               * TODO:
-               * Refactor.
-               * Improve dialog content.
-               */
-              initialValues={{
-                notification: 0,
-                time: null,
-              }}
-              onSubmit={() => {}}
-            >
+            <Formik initialValues={initialValues} onSubmit={() => {}}>
               {({ values }) => (
                 <Form>
                   <Stack direction='row' columnGap={1.5}>
@@ -131,12 +143,26 @@ const NotificationCell = ({
                     {values.notification === 'custom' && (
                       <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <Field
-                          component={TimePicker}
+                          component={DesktopTimePicker}
                           name='time'
-                          label='Time'
-                          TextFieldProps={{
+                          renderInput={(params: TextFieldProps) => (
+                            <TextField
+                              {...params}
+                              size='small'
+                              label='Time'
+                              sx={{ width: '50%' }}
+                              inputProps={{
+                                ...params.inputProps,
+                                placeholder: '',
+                              }}
+                            />
+                          )}
+                          OpenPickerButtonProps={{
                             size: 'small',
-                            sx: { width: '50%' },
+                            sx: {
+                              translate: 6,
+                              svg: { width: 20, height: 20 },
+                            },
                           }}
                         />
                       </LocalizationProvider>
@@ -149,7 +175,6 @@ const NotificationCell = ({
                       boxShadow: 'none',
                       borderRadius: 1,
                       mt: 1.5,
-
                       '&::before': {
                         display: 'none',
                       },
@@ -159,16 +184,17 @@ const NotificationCell = ({
                       <Typography>Summary</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
-                      {subject && <Typography>Subject: {subject}</Typography>}
-                      {room && <Typography>Room: {room}</Typography>}
-                      {starts && <Typography>Starts: {starts}</Typography>}
-                      {ends && <Typography>Ends: {ends}</Typography>}
-                      {/* <Typography>
-                        Notification:{' '}
-                        {values.notification === 'custom'
-                          ? values.time
-                          : ` ${values.notification} minutes before`}
-                      </Typography> */}
+                      <TextSummaryDetail label='Subject'>
+                        {subject}
+                      </TextSummaryDetail>
+                      <TextSummaryDetail label='Room'>{room}</TextSummaryDetail>
+                      <TimeSummaryDetail label='Starts'>
+                        {starts}
+                      </TimeSummaryDetail>
+                      <TimeSummaryDetail label='Ends'>{ends}</TimeSummaryDetail>
+                      <TimeSummaryDetail label='Notification'>
+                        {starts}
+                      </TimeSummaryDetail>
                     </AccordionDetails>
                   </Accordion>
                 </Form>
@@ -196,12 +222,5 @@ const NotificationCell = ({
     </>
   )
 }
-
-/**
- * TODO:
- * Improve notification title.
- */
-const notificationTitle = (starts: Row['starts'], subject: Row['subject']) =>
-  starts && subject ? `${subject} starts at ${starts}` : 'Notification'
 
 export default NotificationCell

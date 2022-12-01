@@ -1,14 +1,14 @@
 import { GridRowId } from '@mui/x-data-grid'
 
-type Time = string | number | undefined
+type Time = number | string | null | undefined
 
 type Day = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday'
 
 type Row = Readonly<{
   id: GridRowId
   day?: Day
-  starts?: string
-  ends?: string
+  starts?: string | null
+  ends?: string | null
   room?: string
   subject?: string
   notification?: boolean
