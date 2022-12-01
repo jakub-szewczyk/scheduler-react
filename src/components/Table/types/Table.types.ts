@@ -1,5 +1,7 @@
 import { GridRowId } from '@mui/x-data-grid'
 
+type Time = string | number | undefined
+
 type Day = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday'
 
 type Row = Readonly<{
@@ -12,4 +14,4 @@ type Row = Readonly<{
   notification?: boolean
 }>
 
-export type { Day, Row }
+export type { Time, Day, Row }

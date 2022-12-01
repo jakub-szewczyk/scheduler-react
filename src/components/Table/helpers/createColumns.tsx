@@ -13,7 +13,7 @@ const createColumns = (
     field: 'day',
     headerName: 'Day',
     sortable: false,
-    width: 150,
+    width: 155,
     renderCell: (params) => (
       <DayCell {...params} rows={rows} setRows={setRows} />
     ),
@@ -41,7 +41,7 @@ const createColumns = (
     headerName: 'Room',
     sortable: false,
     editable: true,
-    width: 125,
+    width: 155,
   },
   {
     field: 'subject',

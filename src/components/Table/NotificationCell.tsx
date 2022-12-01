@@ -29,8 +29,8 @@ import {
 import { useInterval } from 'usehooks-ts'
 import DraggableDialog from '../layout/DraggableDialog/DraggableDialog'
 import findRowById from './functions/findRowById'
+import matchesTime from './functions/matchesTime'
 import notify from './functions/notify'
-import shouldNotificationTrigger from './functions/shouldNotificationTrigger'
 import updateRowField from './functions/updateRowField'
 import { Row } from './types/Table.types'
 
@@ -54,7 +54,7 @@ const NotificationCell = ({
 
   useInterval(
     () =>
-      shouldNotificationTrigger(starts, notification)
+      notification && matchesTime(starts, Date.now())
         ? notifyOnce(notificationTitle(starts, subject))()
         : none,
     1000
@@ -197,6 +197,10 @@ const NotificationCell = ({
   )
 }
 
+/**
+ * TODO:
+ * Improve notification title.
+ */
 const notificationTitle = (starts: Row['starts'], subject: Row['subject']) =>
   starts && subject ? `${subject} starts at ${starts}` : 'Notification'
 

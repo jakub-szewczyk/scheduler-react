@@ -7,7 +7,7 @@ import calculateTableHeight from './functions/calculateTableHeight'
 import calculateTableMaxWidth from './functions/calculateTableMaxWidth'
 import updateRowField from './functions/updateRowField'
 import createColumns from './helpers/createColumns'
-import DataGridWrapper from './styled/DataGridWrapper.styled'
+import DataGridWrapper from './styles/DataGridWrapper.styled'
 
 const Table = () => {
   const [rows, setRows] = useLocalStorage('rows', initialRows)
