@@ -43,4 +43,6 @@ const PaperComponent = (props: PaperProps) => (
   </Draggable>
 )
 
+export type { DraggableDialogProps }
+
 export default DraggableDialog
