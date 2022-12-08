@@ -4,12 +4,12 @@ import { none } from 'fp-ts/lib/Option'
 import { once } from 'ramda'
 import { Dispatch, MouseEventHandler, SetStateAction, useCallback } from 'react'
 import { useBoolean, useInterval } from 'usehooks-ts'
-import matchesTime from './functions/matchesTime'
-import notify from './functions/notify'
-import updateRowField from './functions/updateRowField'
-import NotificationDialog from './NotificationDialog'
-import NotificationIcon from './NotificationIcon'
-import { Row } from './types/Table.types'
+import matchesTime from '../../Table/functions/matchesTime'
+import notify from '../../Table/functions/notify'
+import updateRowField from '../../Table/functions/updateRowField'
+import NotificationDialog from '../../Table/NotificationDialog'
+import NotificationIcon from '../../Table/NotificationIcon'
+import { Row } from '../../Table/types/Table.types'
 
 interface NotificationCellProps extends GridRenderCellParams<any, Row> {
   rows: Row[]
@@ -29,13 +29,15 @@ const NotificationCell = ({
     setTrue: openNotificationDialog,
   } = useBoolean(false)
 
-  const { starts, notification } = row
-
-  const notifyOnce = useCallback(once(notify), [starts])
+  const notifyOnce = useCallback(once(notify), [
+    row.starts,
+    row.notification?.time,
+  ])
 
   useInterval(
     () =>
-      notification && matchesTime(starts, Date.now())
+      row.notification?.active &&
+      matchesTime(row.notification?.time, Date.now())
         ? notifyOnce('NOTIFICATION_TITLE_PLACEHOLDER')()
         : none,
     1000
@@ -43,7 +45,18 @@ const NotificationCell = ({
 
   const handleNotificationIconButtonClick:
     | MouseEventHandler<HTMLButtonElement>
-    | undefined = () => setRows(updateRowField(field, !notification, id, rows))
+    | undefined = () =>
+    setRows(
+      updateRowField(
+        field,
+        {
+          time: row.notification?.time || row.starts,
+          active: !row.notification?.active,
+        },
+        id,
+        rows
+      )
+    )
 
   const handleNotificationIconButtonContextMenu:
     | MouseEventHandler<HTMLButtonElement>
@@ -61,17 +74,17 @@ const NotificationCell = ({
         width='100%'
       >
         <Tooltip
-          title={!starts && 'Set start time to enable notification'}
+          title={!row.starts && 'Set start time to enable notification'}
           placement='left'
         >
           <Box>
             <IconButton
               size='small'
-              disabled={!starts}
+              disabled={!row.starts}
               onClick={handleNotificationIconButtonClick}
               onContextMenu={handleNotificationIconButtonContextMenu}
             >
-              <NotificationIcon active={notification} />
+              <NotificationIcon active={row.notification?.active} />
             </IconButton>
           </Box>
         </Tooltip>

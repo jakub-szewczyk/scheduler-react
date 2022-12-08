@@ -12,9 +12,9 @@ import findRowIndexById from './findRowIndexById'
  * @param rows
  * @returns updated `rows` array
  */
-const updateRowField = (
+const updateRowField = <T>(
   field: string,
-  value: any,
+  value: T,
   id: GridRowId,
   rows: Row[]
 ) => {

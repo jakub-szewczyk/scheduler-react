@@ -11,7 +11,15 @@ type Row = Readonly<{
   ends?: string | null
   room?: string
   subject?: string
-  notification?: boolean
+  notification?: {
+    active: boolean
+    time: string | null
+  }
 }>
 
-export type { Time, Day, Row }
+interface NotificationConfiguration {
+  notification: 0 | 5 | 10 | 15 | 'custom'
+  time: string | null
+}
+
+export type { Time, Day, Row, NotificationConfiguration }

@@ -1,7 +1,7 @@
 import { GridColDef } from '@mui/x-data-grid'
 import { Dispatch, SetStateAction } from 'react'
 import DayCell from '../DayCell'
-import NotificationCell from '../NotificationCell'
+import NotificationCell from '../../layout/NotificationIcon/NotificationCell'
 import TimeCell from '../TimeCell'
 import { Row } from '../types/Table.types'
 

@@ -11,13 +11,15 @@ import {
 } from '@mui/material'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
-import { Field, Form, Formik } from 'formik'
+import { Field, Form, Formik, isNaN } from 'formik'
 import { Select, TextFieldProps } from 'formik-mui'
 import { DesktopTimePicker } from 'formik-mui-x-date-pickers'
 import { MouseEventHandler } from 'react'
 import DraggableDialog, {
   DraggableDialogProps,
 } from '../layout/DraggableDialog/DraggableDialog'
+import calculateNotificationConfiguration from './functions/calculateNotificationConfiguration'
+import subtractMinutes from './functions/subtractMinutes'
 import TextSummaryDetail from './TextSummaryDetail'
 import TimeSummaryDetail from './TimeSummaryDetail'
 import { Row } from './types/Table.types'
@@ -28,18 +30,8 @@ interface NotificationDialogProps extends DraggableDialogProps {
   onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
 
-interface InitialValues {
-  notification: 0 | 5 | 10 | 15 | 'custom'
-  time: string | null
-}
-
-const initialValues: InitialValues = {
-  notification: 0,
-  time: null,
-}
-
 const NotificationDialog = ({
-  row: { starts, ends, room, subject },
+  row,
   onClose,
   onSave = onClose as MouseEventHandler<HTMLButtonElement> | undefined,
   onCancel = onClose as MouseEventHandler<HTMLButtonElement> | undefined,
@@ -54,7 +46,13 @@ const NotificationDialog = ({
         <Typography>
           Change notification settings. Set time and subject details.
         </Typography>
-        <Formik initialValues={initialValues} onSubmit={() => {}}>
+        <Formik
+          initialValues={calculateNotificationConfiguration(
+            row.starts!,
+            row.notification?.time
+          )}
+          onSubmit={() => {}}
+        >
           {({ values }) => (
             <Form>
               <Stack direction='row' columnGap={1.5}>
@@ -116,13 +114,17 @@ const NotificationDialog = ({
                 </AccordionSummary>
                 <AccordionDetails>
                   <TextSummaryDetail label='Subject'>
-                    {subject}
+                    {row.subject}
                   </TextSummaryDetail>
-                  <TextSummaryDetail label='Room'>{room}</TextSummaryDetail>
-                  <TimeSummaryDetail label='Starts'>{starts}</TimeSummaryDetail>
-                  <TimeSummaryDetail label='Ends'>{ends}</TimeSummaryDetail>
+                  <TextSummaryDetail label='Room'>{row.room}</TextSummaryDetail>
+                  <TimeSummaryDetail label='Starts'>
+                    {row.starts}
+                  </TimeSummaryDetail>
+                  <TimeSummaryDetail label='Ends'>{row.ends}</TimeSummaryDetail>
                   <TimeSummaryDetail label='Notification'>
-                    {starts}
+                    {isNaN(+values.notification)
+                      ? values.time
+                      : subtractMinutes(row.starts!, +values.notification)}
                   </TimeSummaryDetail>
                 </AccordionDetails>
               </Accordion>
