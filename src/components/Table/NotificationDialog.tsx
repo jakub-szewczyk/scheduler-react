@@ -11,29 +11,33 @@ import {
 } from '@mui/material'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
-import { Field, Form, Formik, isNaN } from 'formik'
+import { Field, Form, Formik, FormikHelpers } from 'formik'
 import { Select, TextFieldProps } from 'formik-mui'
 import { DesktopTimePicker } from 'formik-mui-x-date-pickers'
 import { MouseEventHandler } from 'react'
 import DraggableDialog, {
   DraggableDialogProps,
 } from '../layout/DraggableDialog/DraggableDialog'
+import validationSchema from './constants/validationSchema'
 import calculateNotificationConfiguration from './functions/calculateNotificationConfiguration'
-import subtractMinutes from './functions/subtractMinutes'
+import calculateNotificationTime from './functions/calculateNotificationTime'
 import TextSummaryDetail from './TextSummaryDetail'
 import TimeSummaryDetail from './TimeSummaryDetail'
-import { Row } from './types/Table.types'
+import { NotificationConfiguration, Row } from './types/Table.types'
 
 interface NotificationDialogProps extends DraggableDialogProps {
-  row: Row
-  onSave?: MouseEventHandler<HTMLButtonElement> | undefined
+  row: Row & { starts: string }
+  onSave: (
+    values: NotificationConfiguration,
+    formikHelpers: FormikHelpers<NotificationConfiguration>
+  ) => void
   onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
 
 const NotificationDialog = ({
   row,
+  onSave,
   onClose,
-  onSave = onClose as MouseEventHandler<HTMLButtonElement> | undefined,
   onCancel = onClose as MouseEventHandler<HTMLButtonElement> | undefined,
   ...props
 }: NotificationDialogProps) => (
@@ -48,13 +52,14 @@ const NotificationDialog = ({
         </Typography>
         <Formik
           initialValues={calculateNotificationConfiguration(
-            row.starts!,
+            row.starts,
             row.notification?.time
           )}
-          onSubmit={() => {}}
+          validationSchema={validationSchema}
+          onSubmit={onSave}
         >
-          {({ values }) => (
-            <Form>
+          {({ values, touched, errors }) => (
+            <Form id='notification'>
               <Stack direction='row' columnGap={1.5}>
                 <Field
                   component={Select}
@@ -77,8 +82,13 @@ const NotificationDialog = ({
                       renderInput={(params: TextFieldProps) => (
                         <TextField
                           {...params}
+                          name='time'
                           size='small'
                           label='Time'
+                          error={touched['time'] && !!errors['time']}
+                          helperText={
+                            touched['time'] ? errors['time'] : undefined
+                          }
                           sx={{ width: '50%' }}
                           inputProps={{
                             ...params.inputProps,
@@ -122,9 +132,7 @@ const NotificationDialog = ({
                   </TimeSummaryDetail>
                   <TimeSummaryDetail label='Ends'>{row.ends}</TimeSummaryDetail>
                   <TimeSummaryDetail label='Notification'>
-                    {isNaN(+values.notification)
-                      ? values.time
-                      : subtractMinutes(row.starts!, +values.notification)}
+                    {calculateNotificationTime(row.starts, values)}
                   </TimeSummaryDetail>
                 </AccordionDetails>
               </Accordion>
@@ -138,7 +146,7 @@ const NotificationDialog = ({
         <Button variant='outlined' onClick={onCancel}>
           Cancel
         </Button>
-        <Button variant='outlined' onClick={onSave}>
+        <Button type='submit' form='notification' variant='outlined'>
           Save
         </Button>
       </>

@@ -4,12 +4,13 @@ import { none } from 'fp-ts/lib/Option'
 import { once } from 'ramda'
 import { Dispatch, MouseEventHandler, SetStateAction, useCallback } from 'react'
 import { useBoolean, useInterval } from 'usehooks-ts'
+import calculateNotificationTime from '../../Table/functions/calculateNotificationTime'
 import matchesTime from '../../Table/functions/matchesTime'
 import notify from '../../Table/functions/notify'
 import updateRowField from '../../Table/functions/updateRowField'
 import NotificationDialog from '../../Table/NotificationDialog'
 import NotificationIcon from '../../Table/NotificationIcon'
-import { Row } from '../../Table/types/Table.types'
+import { NotificationConfiguration, Row } from '../../Table/types/Table.types'
 
 interface NotificationCellProps extends GridRenderCellParams<any, Row> {
   rows: Row[]
@@ -65,6 +66,23 @@ const NotificationCell = ({
     openNotificationDialog()
   }
 
+  const handleNotificationConfigurationSave = (
+    values: NotificationConfiguration
+  ) => {
+    setRows(
+      updateRowField(
+        'notification',
+        {
+          active: !!row.notification?.active,
+          time: calculateNotificationTime(row.starts!, values),
+        },
+        id,
+        rows
+      )
+    )
+    closeNotificationDialog()
+  }
+
   return (
     <>
       <Stack
@@ -90,9 +108,10 @@ const NotificationCell = ({
         </Tooltip>
       </Stack>
       <NotificationDialog
-        row={row}
         open={isNotificationDialogOpen}
         onClose={closeNotificationDialog}
+        row={row as Row & { starts: string }}
+        onSave={handleNotificationConfigurationSave}
       />
     </>
   )
