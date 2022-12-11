@@ -6,7 +6,7 @@ import { Dispatch, MouseEventHandler, SetStateAction, useCallback } from 'react'
 import { useBoolean, useInterval } from 'usehooks-ts'
 import calculateNotificationTime from '../../Table/functions/calculateNotificationTime'
 import matchesTime from '../../Table/functions/matchesTime'
-import notify from '../../Table/functions/notify'
+import notify from '../../Table/helpers/notify'
 import updateRowField from '../../Table/functions/updateRowField'
 import NotificationDialog from '../../Table/NotificationDialog'
 import NotificationIcon from '../../Table/NotificationIcon'
@@ -39,7 +39,7 @@ const NotificationCell = ({
     () =>
       row.notification?.active &&
       matchesTime(row.notification?.time, Date.now())
-        ? notifyOnce('NOTIFICATION_TITLE_PLACEHOLDER')()
+        ? notifyOnce('NOTIFICATION_TITLE_PLACEHOLDER')
         : none,
     1000
   )
