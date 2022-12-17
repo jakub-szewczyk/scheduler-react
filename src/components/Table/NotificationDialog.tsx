@@ -6,13 +6,13 @@ import {
   Button,
   MenuItem,
   Stack,
-  TextField,
+  TextField as MuiTextField,
   Typography,
 } from '@mui/material'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { Field, Form, Formik, FormikHelpers } from 'formik'
-import { Select, TextFieldProps } from 'formik-mui'
+import { Select, TextField, TextFieldProps } from 'formik-mui'
 import { DesktopTimePicker } from 'formik-mui-x-date-pickers'
 import { MouseEventHandler } from 'react'
 import DraggableDialog, {
@@ -53,7 +53,8 @@ const NotificationDialog = ({
         <Formik
           initialValues={calculateNotificationConfiguration(
             row.starts,
-            row.notification?.time
+            row.notification?.time,
+            row.notification?.title
           )}
           validationSchema={validationSchema}
           onSubmit={onSave}
@@ -80,7 +81,7 @@ const NotificationDialog = ({
                       component={DesktopTimePicker}
                       name='time'
                       renderInput={(params: TextFieldProps) => (
-                        <TextField
+                        <MuiTextField
                           {...params}
                           name='time'
                           size='small'
@@ -107,6 +108,15 @@ const NotificationDialog = ({
                   </LocalizationProvider>
                 )}
               </Stack>
+              <Field
+                component={TextField}
+                name='title'
+                size='small'
+                label='Title'
+                margin='normal'
+                helperText='Set notification title'
+                fullWidth
+              />
               <Accordion
                 disableGutters
                 sx={{

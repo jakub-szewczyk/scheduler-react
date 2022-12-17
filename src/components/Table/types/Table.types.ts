@@ -14,12 +14,14 @@ type Row = Readonly<{
   notification?: {
     active: boolean
     time: string | null
+    title: string
   }
 }>
 
 interface NotificationConfiguration {
   notification: 0 | 5 | 10 | 15 | 'custom'
   time: string | null
+  title: string
 }
 
 export type { Time, Day, Row, NotificationConfiguration }

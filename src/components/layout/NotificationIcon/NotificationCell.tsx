@@ -1,12 +1,12 @@
 import { Box, IconButton, Stack, Tooltip } from '@mui/material'
 import { GridRenderCellParams } from '@mui/x-data-grid'
 import { none } from 'fp-ts/lib/Option'
-import { once } from 'ramda'
+import { once, trim } from 'ramda'
 import { Dispatch, MouseEventHandler, SetStateAction, useCallback } from 'react'
 import { useBoolean, useInterval } from 'usehooks-ts'
 import calculateNotificationTime from '../../Table/functions/calculateNotificationTime'
 import matchesTime from '../../Table/functions/matchesTime'
-import notify from '../../Table/helpers/notify'
+import notify from '../../Table/functions/notify'
 import updateRowField from '../../Table/functions/updateRowField'
 import NotificationDialog from '../../Table/NotificationDialog'
 import NotificationIcon from '../../Table/NotificationIcon'
@@ -31,10 +31,9 @@ const NotificationCell = ({
     setTrue: openNotificationDialog,
   } = useBoolean(false)
 
-  const notifyOnce = useCallback(
-    pipe('NOTIFICATION_TITLE_PLACEHOLDER', notify, once),
-    [row.notification?.time]
-  )
+  const notifyOnce = useCallback(pipe(row.notification?.title!, notify, once), [
+    row.notification?.time,
+  ])
 
   useInterval(
     () =>
@@ -76,6 +75,7 @@ const NotificationCell = ({
         {
           active: !!row.notification?.active,
           time: calculateNotificationTime(row.starts!, values),
+          title: trim(values.title) || 'Notification',
         },
         id,
         rows
