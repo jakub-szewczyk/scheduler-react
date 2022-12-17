@@ -1,5 +1,5 @@
 import { equals, isNil } from 'ramda'
-import { NotificationConfiguration } from '../types/Table.types'
+import { NotificationConfiguration } from '../types/Schedule.types'
 import subtractMinutes from './subtractMinutes'
 
 const calculateNotificationConfiguration = (

@@ -1,7 +1,7 @@
 import { format, isValid } from 'date-fns'
 import { none, some } from 'fp-ts/lib/Option'
 import timeFormat from '../constants/timeFormat'
-import { Time } from '../types/Table.types'
+import { Time } from '../types/Schedule.types'
 
 const toTimeFormat = (time: Time) =>
   time && isValid(new Date(time))

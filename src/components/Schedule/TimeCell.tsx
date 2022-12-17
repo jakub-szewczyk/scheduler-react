@@ -4,7 +4,7 @@ import { DesktopTimePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { Dispatch, SetStateAction } from 'react'
 import updateRowField from './functions/updateRowField'
-import { Row } from './types/Table.types'
+import { Row } from './types/Schedule.types'
 
 interface TimeCellProps extends GridRenderCellParams<any, Row> {
   rows: Row[]

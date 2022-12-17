@@ -1,4 +1,4 @@
-import { Schedule } from '../types/Table.types'
+import { Schedule } from '../types/Schedule.types'
 
 const initialSchedules: Schedule[] = [
   {

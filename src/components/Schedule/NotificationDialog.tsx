@@ -23,7 +23,7 @@ import calculateNotificationConfiguration from './functions/calculateNotificatio
 import calculateNotificationTime from './functions/calculateNotificationTime'
 import TextSummaryDetail from './TextSummaryDetail'
 import TimeSummaryDetail from './TimeSummaryDetail'
-import { NotificationConfiguration, Row } from './types/Table.types'
+import { NotificationConfiguration, Row } from './types/Schedule.types'
 
 interface NotificationDialogProps extends DraggableDialogProps {
   row: Row & { starts: string }

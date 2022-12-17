@@ -5,7 +5,7 @@ import { GridRenderCellParams } from '@mui/x-data-grid'
 import { Dispatch, SetStateAction } from 'react'
 import addRow from './functions/addRow'
 import removeRow from './functions/removeRow'
-import { Row } from './types/Table.types'
+import { Row } from './types/Schedule.types'
 
 interface DayCellProps extends GridRenderCellParams {
   rows: Row[]

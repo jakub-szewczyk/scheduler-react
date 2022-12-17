@@ -1,7 +1,7 @@
 import { prop } from 'fp-ts-ramda'
 import { pipe } from 'fp-ts/lib/function'
 import { count, includes, map } from 'ramda'
-import { Day, Row } from '../types/Table.types'
+import { Day, Row } from '../types/Schedule.types'
 
 type T = (x: Row[]) => (string | readonly string[])[]
 

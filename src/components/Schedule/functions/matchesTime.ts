@@ -1,7 +1,7 @@
 import { constant, pipe } from 'fp-ts/lib/function'
 import { ap, getOrElse, of } from 'fp-ts/lib/Option'
 import { equals } from 'ramda'
-import { Time } from '../types/Table.types'
+import { Time } from '../types/Schedule.types'
 import toTimeFormat from './toTimeFormat'
 
 const matchesTime = (t0: Time, t1: Time) =>

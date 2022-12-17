@@ -4,13 +4,16 @@ import { none } from 'fp-ts/lib/Option'
 import { once, trim } from 'ramda'
 import { Dispatch, MouseEventHandler, SetStateAction, useCallback } from 'react'
 import { useBoolean, useInterval } from 'usehooks-ts'
-import calculateNotificationTime from '../../Table/functions/calculateNotificationTime'
-import matchesTime from '../../Table/functions/matchesTime'
-import notify from '../../Table/functions/notify'
-import updateRowField from '../../Table/functions/updateRowField'
-import NotificationDialog from '../../Table/NotificationDialog'
-import NotificationIcon from '../../Table/NotificationIcon'
-import { NotificationConfiguration, Row } from '../../Table/types/Table.types'
+import calculateNotificationTime from '../../Schedule/functions/calculateNotificationTime'
+import matchesTime from '../../Schedule/functions/matchesTime'
+import notify from '../../Schedule/functions/notify'
+import updateRowField from '../../Schedule/functions/updateRowField'
+import NotificationDialog from '../../Schedule/NotificationDialog'
+import NotificationIcon from '../../Schedule/NotificationIcon'
+import {
+  NotificationConfiguration,
+  Row,
+} from '../../Schedule/types/Schedule.types'
 import { pipe } from 'fp-ts/lib/function'
 
 interface NotificationCellProps extends GridRenderCellParams<any, Row> {

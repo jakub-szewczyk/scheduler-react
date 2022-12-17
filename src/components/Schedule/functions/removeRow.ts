@@ -1,6 +1,6 @@
 import { GridRowId } from '@mui/x-data-grid'
 import { remove } from 'ramda'
-import { Row } from '../types/Table.types'
+import { Row } from '../types/Schedule.types'
 import findRowIndexById from './findRowIndexById'
 
 /**

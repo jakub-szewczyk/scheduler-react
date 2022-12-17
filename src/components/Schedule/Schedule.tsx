@@ -1,33 +1,21 @@
 import { DataGrid } from '@mui/x-data-grid'
-import { lensProp, map, prop, set, when } from 'ramda'
 import { Dispatch, SetStateAction } from 'react'
-import { useLocalStorage } from 'usehooks-ts'
 import headerHeight from './constants/headerHeight'
-import initialSchedules from './constants/initialSchedules'
 import rowHeight from './constants/rowHeight'
 import calculateTableHeight from './functions/calculateTableHeight'
 import calculateTableMaxWidth from './functions/calculateTableMaxWidth'
-import findSelectedSchedule from './functions/findSelectedSchedule'
 import updateRowField from './functions/updateRowField'
 import createColumns from './helpers/createColumns'
 import DataGridWrapper from './styles/DataGridWrapper.styled'
-import { Row } from './types/Table.types'
+import { Row } from './types/Schedule.types'
 
-const Table = () => {
-  const [schedules, setSchedules] = useLocalStorage(
-    'schedules',
-    initialSchedules
-  )
+interface ScheduleProps {
+  rows: Row[]
+  setRows: Dispatch<SetStateAction<Row[]>>
+}
 
-  const { rows } = findSelectedSchedule(schedules)!
-
-  const setRows = (rows: Row[]) =>
-    setSchedules(map(when(prop('selected'), set(lensProp('rows'), rows))))
-
-  const columns = createColumns(
-    rows,
-    setRows as Dispatch<SetStateAction<Row[]>>
-  )
+const Schedule = ({ rows, setRows }: ScheduleProps) => {
+  const columns = createColumns(rows, setRows)
 
   return (
     <DataGridWrapper
@@ -54,4 +42,4 @@ const Table = () => {
   )
 }
 
-export default Table
+export default Schedule
