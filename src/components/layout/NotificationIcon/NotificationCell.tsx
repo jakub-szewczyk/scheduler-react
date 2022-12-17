@@ -93,7 +93,11 @@ const NotificationCell = ({
         width='100%'
       >
         <Tooltip
-          title={!row.starts && 'Set start time to enable notification'}
+          title={
+            row.starts
+              ? 'Right-click to configure'
+              : 'Set start time to enable notification'
+          }
           placement='left'
         >
           <Box>

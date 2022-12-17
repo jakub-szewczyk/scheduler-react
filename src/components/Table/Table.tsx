@@ -27,6 +27,13 @@ const Table = () => {
         onCellEditCommit={({ field, value, id }) =>
           setRows(updateRowField(field, value, id, rows))
         }
+        sx={{
+          fontSize: 16,
+          '.MuiTablePagination-selectLabel, .MuiToolbar-root, .MuiTablePagination-displayedRows':
+            {
+              fontSize: 16,
+            },
+        }}
       />
     </DataGridWrapper>
   )
