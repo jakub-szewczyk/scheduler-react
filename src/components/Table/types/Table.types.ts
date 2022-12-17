@@ -4,7 +4,7 @@ type Time = number | string | null | undefined
 
 type Day = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday'
 
-type Row = Readonly<{
+interface Row {
   id: GridRowId
   day?: Day
   starts?: string | null
@@ -16,7 +16,13 @@ type Row = Readonly<{
     time: string | null
     title: string
   }
-}>
+}
+
+interface Schedule {
+  name: string
+  selected: boolean
+  rows: Row[]
+}
 
 interface NotificationConfiguration {
   notification: 0 | 5 | 10 | 15 | 'custom'
@@ -24,4 +30,4 @@ interface NotificationConfiguration {
   title: string
 }
 
-export type { Time, Day, Row, NotificationConfiguration }
+export type { Time, Day, Row, Schedule, NotificationConfiguration }

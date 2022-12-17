@@ -19,7 +19,7 @@ const Navbar = () => (
           sx={{ mx: 'auto' }}
         >
           <ViewListIcon />
-          <Typography fontStyle='italic'>Tough Mondays</Typography>
+          <Typography fontStyle='italic'>unsaved*</Typography>
         </Stack>
       </Toolbar>
     </AppBar>

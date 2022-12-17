@@ -1,18 +1,33 @@
 import { DataGrid } from '@mui/x-data-grid'
+import { lensProp, map, prop, set, when } from 'ramda'
+import { Dispatch, SetStateAction } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 import headerHeight from './constants/headerHeight'
-import initialRows from './constants/initialRows'
+import initialSchedules from './constants/initialSchedules'
 import rowHeight from './constants/rowHeight'
 import calculateTableHeight from './functions/calculateTableHeight'
 import calculateTableMaxWidth from './functions/calculateTableMaxWidth'
+import findSelectedSchedule from './functions/findSelectedSchedule'
 import updateRowField from './functions/updateRowField'
 import createColumns from './helpers/createColumns'
 import DataGridWrapper from './styles/DataGridWrapper.styled'
+import { Row } from './types/Table.types'
 
 const Table = () => {
-  const [rows, setRows] = useLocalStorage('rows', initialRows)
+  const [schedules, setSchedules] = useLocalStorage(
+    'schedules',
+    initialSchedules
+  )
 
-  const columns = createColumns(rows, setRows)
+  const { rows } = findSelectedSchedule(schedules)!
+
+  const setRows = (rows: Row[]) =>
+    setSchedules(map(when(prop('selected'), set(lensProp('rows'), rows))))
+
+  const columns = createColumns(
+    rows,
+    setRows as Dispatch<SetStateAction<Row[]>>
+  )
 
   return (
     <DataGridWrapper
