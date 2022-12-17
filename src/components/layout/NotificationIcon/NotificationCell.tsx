@@ -11,6 +11,7 @@ import updateRowField from '../../Table/functions/updateRowField'
 import NotificationDialog from '../../Table/NotificationDialog'
 import NotificationIcon from '../../Table/NotificationIcon'
 import { NotificationConfiguration, Row } from '../../Table/types/Table.types'
+import { pipe } from 'fp-ts/lib/function'
 
 interface NotificationCellProps extends GridRenderCellParams<any, Row> {
   rows: Row[]
@@ -30,16 +31,16 @@ const NotificationCell = ({
     setTrue: openNotificationDialog,
   } = useBoolean(false)
 
-  const notifyOnce = useCallback(once(notify), [
-    row.starts,
-    row.notification?.time,
-  ])
+  const notifyOnce = useCallback(
+    pipe('NOTIFICATION_TITLE_PLACEHOLDER', notify, once),
+    [row.notification?.time]
+  )
 
   useInterval(
     () =>
       row.notification?.active &&
       matchesTime(row.notification?.time, Date.now())
-        ? notifyOnce('NOTIFICATION_TITLE_PLACEHOLDER')
+        ? notifyOnce()
         : none,
     1000
   )
