@@ -45,10 +45,10 @@ const NotificationDialog = ({
     {...props}
     onClose={onClose}
     dialogTitle='Configure notification'
-    dialogContentText={
+    dialogContent={
       <Stack spacing={3}>
         <Typography>
-          Change notification settings. Set time and subject details.
+          Change notification settings. Set time and title details.
         </Typography>
         <Formik
           initialValues={calculateNotificationConfiguration(

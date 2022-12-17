@@ -9,13 +9,13 @@ import Draggable from 'react-draggable'
 
 interface DraggableDialogProps extends DialogProps {
   dialogTitle?: ReactNode
-  dialogContentText?: ReactNode
+  dialogContent?: ReactNode
   dialogActions?: ReactNode
 }
 
 const DraggableDialog = ({
   dialogTitle,
-  dialogContentText,
+  dialogContent,
   dialogActions,
   ...props
 }: DraggableDialogProps) => (
@@ -28,7 +28,7 @@ const DraggableDialog = ({
       {dialogTitle}
     </DialogTitle>
     <DialogContent>
-      <DialogContentText>{dialogContentText}</DialogContentText>
+      <DialogContentText>{dialogContent}</DialogContentText>
     </DialogContent>
     <DialogActions>{dialogActions}</DialogActions>
   </Dialog>

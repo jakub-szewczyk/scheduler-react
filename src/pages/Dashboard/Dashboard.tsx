@@ -2,7 +2,7 @@ import { lensProp, map, prop, set, when } from 'ramda'
 import { Dispatch, SetStateAction } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 import Navbar from '../../components/layout/Navbar/Navbar'
-import SpeedDial from '../../components/layout/SpeedDial/SpeedDial'
+import ScheduleActions from '../../components/ScheduleActions/ScheduleActions'
 import initialSchedules from '../../components/Schedule/constants/initialSchedules'
 import findSelectedSchedule from '../../components/Schedule/functions/findSelectedSchedule'
 import Schedule from '../../components/Schedule/Schedule'
@@ -14,19 +14,19 @@ const Dashboard = () => {
     initialSchedules
   )
 
-  const { rows } = findSelectedSchedule(schedules)!
+  const schedule = findSelectedSchedule(schedules)!
 
   const setRows = (rows: Row[]) =>
     setSchedules(map(when(prop('selected'), set(lensProp('rows'), rows))))
 
   return (
     <>
-      <Navbar />
+      <Navbar scheduleName={schedule.name} />
       <Schedule
-        rows={rows}
+        rows={schedule.rows}
         setRows={setRows as Dispatch<SetStateAction<Row[]>>}
       />
-      <SpeedDial />
+      <ScheduleActions schedule={schedule} setSchedules={setSchedules} />
     </>
   )
 }

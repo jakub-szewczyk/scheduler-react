@@ -1,8 +1,14 @@
 import PendingActionsIcon from '@mui/icons-material/PendingActions'
 import ViewListIcon from '@mui/icons-material/ViewList'
 import { AppBar, Box, Stack, Toolbar, Typography } from '@mui/material'
+import { pipe } from 'fp-ts/lib/function'
+import { concat, equals, when, __ } from 'ramda'
 
-const Navbar = () => (
+interface NavbarProps {
+  scheduleName: string
+}
+
+const Navbar = ({ scheduleName }: NavbarProps) => (
   <Box sx={{ flexGrow: 1 }}>
     <AppBar position='static' color='transparent' elevation={0}>
       <Toolbar>
@@ -19,7 +25,9 @@ const Navbar = () => (
           sx={{ mx: 'auto' }}
         >
           <ViewListIcon />
-          <Typography fontStyle='italic'>unsaved*</Typography>
+          <Typography fontStyle='italic'>
+            {pipe(scheduleName, when(equals('unsaved'), concat(__, '*')))}
+          </Typography>
         </Stack>
       </Toolbar>
     </AppBar>
