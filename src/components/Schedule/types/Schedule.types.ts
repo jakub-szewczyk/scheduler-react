@@ -21,6 +21,7 @@ interface Row {
 interface Schedule {
   name: string
   selected: boolean
+  createdAt: string
   rows: Row[]
 }
 

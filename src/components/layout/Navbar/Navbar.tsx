@@ -1,8 +1,7 @@
 import PendingActionsIcon from '@mui/icons-material/PendingActions'
 import ViewListIcon from '@mui/icons-material/ViewList'
 import { AppBar, Box, Stack, Toolbar, Typography } from '@mui/material'
-import { pipe } from 'fp-ts/lib/function'
-import { concat, equals, when, __ } from 'ramda'
+import unsavedScheduleAsteriskSuffix from '../../ScheduleActions/functions/unsavedScheduleAsteriskSuffix'
 
 interface NavbarProps {
   scheduleName: string
@@ -26,7 +25,7 @@ const Navbar = ({ scheduleName }: NavbarProps) => (
         >
           <ViewListIcon />
           <Typography fontStyle='italic'>
-            {pipe(scheduleName, when(equals('unsaved'), concat(__, '*')))}
+            {unsavedScheduleAsteriskSuffix(scheduleName)}
           </Typography>
         </Stack>
       </Toolbar>

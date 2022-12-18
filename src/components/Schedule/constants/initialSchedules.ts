@@ -4,6 +4,7 @@ const initialSchedules: Schedule[] = [
   {
     name: 'unsaved',
     selected: true,
+    createdAt: new Date().toISOString(),
     rows: [
       { id: 'Monday', day: 'Monday' },
       { id: 'Tuesday', day: 'Tuesday' },

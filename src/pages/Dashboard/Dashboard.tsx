@@ -26,7 +26,11 @@ const Dashboard = () => {
         rows={schedule.rows}
         setRows={setRows as Dispatch<SetStateAction<Row[]>>}
       />
-      <ScheduleActions schedule={schedule} setSchedules={setSchedules} />
+      <ScheduleActions
+        schedule={schedule}
+        schedules={schedules}
+        setSchedules={setSchedules}
+      />
     </>
   )
 }
