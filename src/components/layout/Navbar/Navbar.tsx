@@ -1,7 +1,7 @@
 import PendingActionsIcon from '@mui/icons-material/PendingActions'
 import ViewListIcon from '@mui/icons-material/ViewList'
 import { AppBar, Box, Stack, Toolbar, Typography } from '@mui/material'
-import unsavedScheduleAsteriskSuffix from '../../ScheduleActions/functions/unsavedScheduleAsteriskSuffix'
+import * as SCHEDULE from '../../../modules/schedule'
 
 interface NavbarProps {
   scheduleName: string
@@ -25,7 +25,7 @@ const Navbar = ({ scheduleName }: NavbarProps) => (
         >
           <ViewListIcon />
           <Typography fontStyle='italic'>
-            {unsavedScheduleAsteriskSuffix(scheduleName)}
+            {SCHEDULE.asteriskSuffix(scheduleName)}
           </Typography>
         </Stack>
       </Toolbar>

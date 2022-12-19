@@ -7,8 +7,8 @@ import DraggableDialog, {
 } from '../layout/DraggableDialog/DraggableDialog'
 import { Schedule } from '../Schedule/types/Schedule.types'
 import validationSchema from './constants/validationSchema'
-import isUnsavedSchedule from './functions/isUnsavedSchedule'
 import { SaveSchedule } from './types/ScheduleActions.types'
+import * as SCHEDULE from '../../modules/schedule'
 
 interface SaveDialogProps extends DraggableDialogProps {
   schedule: Schedule
@@ -30,14 +30,14 @@ const SaveDialog = ({
     {...props}
     onClose={onClose}
     dialogTitle={
-      isUnsavedSchedule(schedule) ? 'Save schedule' : 'Rename schedule'
+      SCHEDULE.isUnsaved(schedule) ? 'Save schedule' : 'Rename schedule'
     }
     dialogContent={
       <Stack spacing={3}>
         <Typography>Choose a name for your schedule.</Typography>
         <Formik
           initialValues={{
-            name: isUnsavedSchedule(schedule) ? '' : schedule.name,
+            name: SCHEDULE.isUnsaved(schedule) ? '' : schedule.name,
           }}
           validationSchema={validationSchema}
           onSubmit={onSave}

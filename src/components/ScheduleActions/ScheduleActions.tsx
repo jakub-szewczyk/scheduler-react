@@ -10,10 +10,7 @@ import { cond, either, equals, map, path } from 'ramda'
 import { Dispatch, SetStateAction } from 'react'
 import { useBoolean } from 'usehooks-ts'
 import { Schedule } from '../Schedule/types/Schedule.types'
-import addSchedule from './functions/addSchedule'
-import isUnsavedSchedule from './functions/isUnsavedSchedule'
-import removeSchedule from './functions/removeSchedule'
-import saveSchedule from './functions/saveSchedule'
+import * as SCHEDULE from '../../modules/schedule'
 import SaveDialog from './SaveDialog'
 import SavesDrawer from './SavesDrawer'
 import { SaveSchedule } from './types/ScheduleActions.types'
@@ -50,17 +47,17 @@ const ScheduleActions = ({
   )
 
   const handleSave = ({ name }: SaveSchedule) => {
-    setSchedules(saveSchedule(name))
+    setSchedules(SCHEDULE.save(name))
     closeSaveDialog()
   }
 
   const handleCreate = () => {
-    setSchedules(addSchedule)
+    setSchedules(SCHEDULE.add)
     closeDrawer()
   }
 
   const handleDelete = (name: string) => {
-    setSchedules(removeSchedule(name))
+    setSchedules(SCHEDULE.remove(name))
     closeDrawer()
   }
 
@@ -84,8 +81,8 @@ const ScheduleActions = ({
             { name: 'Download', icon: <DownloadIcon /> },
             { name: 'Print', icon: <PrintIcon /> },
             {
-              name: isUnsavedSchedule(schedule) ? 'Save' : 'Rename',
-              icon: isUnsavedSchedule(schedule) ? <SaveIcon /> : <EditIcon />,
+              name: SCHEDULE.isUnsaved(schedule) ? 'Save' : 'Rename',
+              icon: SCHEDULE.isUnsaved(schedule) ? <SaveIcon /> : <EditIcon />,
             },
             { name: 'Schedules', icon: <ViewListIcon /> },
           ]

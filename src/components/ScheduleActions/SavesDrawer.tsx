@@ -20,8 +20,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { any, map } from 'ramda'
 import { MouseEventHandler } from 'react'
 import { Schedule } from '../Schedule/types/Schedule.types'
-import isUnsavedSchedule from './functions/isUnsavedSchedule'
-import unsavedScheduleAsteriskSuffix from './functions/unsavedScheduleAsteriskSuffix'
+import * as SCHEDULE from '../../modules/schedule'
 
 interface SavesDrawerProps extends DrawerProps {
   schedule: Schedule
@@ -65,7 +64,7 @@ const SavesDrawer = ({
                     </Avatar>
                   </ListItemAvatar>
                   <ListItemText
-                    primary={unsavedScheduleAsteriskSuffix(schedule.name)}
+                    primary={SCHEDULE.asteriskSuffix(schedule.name)}
                     secondary={formatDistanceToNow(
                       new Date(schedule.createdAt),
                       {
@@ -99,7 +98,7 @@ const SavesDrawer = ({
       </Stack>
       <Tooltip
         title={
-          isUnsavedSchedule(schedule) &&
+          SCHEDULE.isUnsaved(schedule) &&
           'All schedules must be saved before creating a new one'
         }
       >
@@ -107,7 +106,7 @@ const SavesDrawer = ({
           <Button
             variant='outlined'
             endIcon={<AddIcon />}
-            disabled={any(isUnsavedSchedule, schedules)}
+            disabled={any(SCHEDULE.isUnsaved, schedules)}
             onClick={onCreate}
             fullWidth
           >
