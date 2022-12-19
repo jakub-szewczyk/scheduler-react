@@ -5,6 +5,7 @@ import {
   concat,
   equals,
   filter,
+  find,
   last,
   lensProp,
   map,
@@ -15,14 +16,28 @@ import {
   when,
   __,
 } from 'ramda'
-import initialSchedules from '../components/Schedule/constants/initialSchedules'
 import { Schedule } from '../components/Schedule/types/Schedule.types'
 
 type SchedulesEndomorphism = (schedules: Schedule[]) => Schedule[]
 
+const INITIAL_VALUES: Schedule[] = [
+  {
+    name: 'unsaved',
+    selected: true,
+    createdAt: new Date().toISOString(),
+    rows: [
+      { id: 'Monday', day: 'Monday' },
+      { id: 'Tuesday', day: 'Tuesday' },
+      { id: 'Wednesday', day: 'Wednesday' },
+      { id: 'Thursday', day: 'Thursday' },
+      { id: 'Friday', day: 'Friday' },
+    ],
+  },
+]
+
 const add: SchedulesEndomorphism = flow(
   map(set(lensProp('selected'), false)),
-  concat(__, initialSchedules)
+  concat(__, INITIAL_VALUES)
 )
 
 const remove = (name: string): SchedulesEndomorphism =>
@@ -47,4 +62,14 @@ const isUnsaved: (schedule: Schedule) => boolean = flow(
 
 const asteriskSuffix = when(equals('unsaved'), concat(__, '*'))
 
-export { add, remove, save, isUnsaved, asteriskSuffix }
+const findSelected = find<Schedule>(prop('selected'))
+
+export {
+  INITIAL_VALUES,
+  add,
+  remove,
+  save,
+  isUnsaved,
+  asteriskSuffix,
+  findSelected,
+}

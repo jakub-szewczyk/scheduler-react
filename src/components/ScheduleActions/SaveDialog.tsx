@@ -6,7 +6,7 @@ import DraggableDialog, {
   DraggableDialogProps,
 } from '../layout/DraggableDialog/DraggableDialog'
 import { Schedule } from '../Schedule/types/Schedule.types'
-import validationSchema from './constants/validationSchema'
+import validationSchema from './validation/validationSchema'
 import { SaveSchedule } from './types/ScheduleActions.types'
 import * as SCHEDULE from '../../modules/schedule'
 

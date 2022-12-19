@@ -1,5 +1,5 @@
 import { Box, styled } from '@mui/material'
-import footerHeight from '../constants/footerHeight'
+import * as TABLE from '../../../modules/table'
 
 const DataGridWrapper = styled(Box)<{ height: number }>(({ height }) => ({
   width: '100%',
@@ -11,7 +11,7 @@ const DataGridWrapper = styled(Box)<{ height: number }>(({ height }) => ({
     overflowY: 'hidden',
   },
   '.MuiDataGrid-footerContainer': {
-    height: footerHeight,
+    height: TABLE.FOOTER_HEIGHT,
   },
 }))
 

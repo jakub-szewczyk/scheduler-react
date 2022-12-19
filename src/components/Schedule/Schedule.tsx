@@ -1,10 +1,7 @@
 import { DataGrid } from '@mui/x-data-grid'
 import { Dispatch, SetStateAction } from 'react'
-import headerHeight from './constants/headerHeight'
-import rowHeight from './constants/rowHeight'
-import calculateTableHeight from './functions/calculateTableHeight'
-import calculateTableMaxWidth from './functions/calculateTableMaxWidth'
-import updateRowField from './functions/updateRowField'
+import * as ROW from '../../modules/row'
+import * as TABLE from '../../modules/table'
 import createColumns from './helpers/createColumns'
 import DataGridWrapper from './styles/DataGridWrapper.styled'
 import { Row } from './types/Schedule.types'
@@ -19,16 +16,16 @@ const Schedule = ({ rows, setRows }: ScheduleProps) => {
 
   return (
     <DataGridWrapper
-      height={calculateTableHeight(rows)}
-      maxWidth={calculateTableMaxWidth(columns)}
+      height={TABLE.calculateHeight(rows)}
+      maxWidth={TABLE.calculateMaxWidth(columns)}
     >
       <DataGrid
-        headerHeight={headerHeight}
-        rowHeight={rowHeight}
+        headerHeight={TABLE.HEADER_HEIGHT}
+        rowHeight={TABLE.ROW_HEIGHT}
         columns={columns}
         rows={rows}
         onCellEditCommit={({ field, value, id }) =>
-          setRows(updateRowField(field, value, id, rows))
+          setRows(ROW.update(field, value, id, rows))
         }
         sx={{
           fontSize: 16,

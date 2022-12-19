@@ -3,8 +3,7 @@ import RemoveIcon from '@mui/icons-material/Remove'
 import { IconButton, Stack, Typography } from '@mui/material'
 import { GridRenderCellParams } from '@mui/x-data-grid'
 import { Dispatch, SetStateAction } from 'react'
-import addRow from './functions/addRow'
-import removeRow from './functions/removeRow'
+import * as ROW from '../../modules/row'
 import { Row } from './types/Schedule.types'
 
 interface DayCellProps extends GridRenderCellParams {
@@ -21,11 +20,11 @@ const DayCell = ({ id, value, rows, setRows }: DayCellProps) => (
   >
     <Typography>{value}</Typography>
     {id === value ? (
-      <IconButton size='small' onClick={() => setRows(addRow(id, rows))}>
+      <IconButton size='small' onClick={() => setRows(ROW.add(id, rows))}>
         <AddIcon fontSize='small' />
       </IconButton>
     ) : (
-      <IconButton size='small' onClick={() => setRows(removeRow(id, rows))}>
+      <IconButton size='small' onClick={() => setRows(ROW.remove(id, rows))}>
         <RemoveIcon fontSize='small' />
       </IconButton>
     )}

@@ -3,7 +3,7 @@ import { GridRenderCellParams } from '@mui/x-data-grid'
 import { DesktopTimePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { Dispatch, SetStateAction } from 'react'
-import updateRowField from './functions/updateRowField'
+import * as ROW from '../../modules/row'
 import { Row } from './types/Schedule.types'
 
 interface TimeCellProps extends GridRenderCellParams<any, Row> {
@@ -15,7 +15,7 @@ const TimeCell = ({ id, field, row, rows, setRows }: TimeCellProps) => (
   <LocalizationProvider dateAdapter={AdapterDateFns}>
     <DesktopTimePicker
       value={row[field as keyof Row] || null}
-      onChange={(value) => setRows(updateRowField(field, value, id, rows))}
+      onChange={(value) => setRows(ROW.update(field, value, id, rows))}
       renderInput={(params) => (
         <TextField
           {...params}

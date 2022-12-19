@@ -2,19 +2,18 @@ import { lensProp, map, prop, set, when } from 'ramda'
 import { Dispatch, SetStateAction } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 import Navbar from '../../components/layout/Navbar/Navbar'
-import ScheduleActions from '../../components/ScheduleActions/ScheduleActions'
-import initialSchedules from '../../components/Schedule/constants/initialSchedules'
-import findSelectedSchedule from '../../components/Schedule/functions/findSelectedSchedule'
 import Schedule from '../../components/Schedule/Schedule'
 import { Row } from '../../components/Schedule/types/Schedule.types'
+import ScheduleActions from '../../components/ScheduleActions/ScheduleActions'
+import * as SCHEDULE from '../../modules/schedule'
 
 const Dashboard = () => {
   const [schedules, setSchedules] = useLocalStorage(
     'schedules',
-    initialSchedules
+    SCHEDULE.INITIAL_VALUES
   )
 
-  const schedule = findSelectedSchedule(schedules)!
+  const schedule = SCHEDULE.findSelected(schedules)!
 
   const setRows = (rows: Row[]) =>
     setSchedules(map(when(prop('selected'), set(lensProp('rows'), rows))))

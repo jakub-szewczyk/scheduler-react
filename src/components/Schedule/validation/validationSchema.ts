@@ -1,7 +1,7 @@
 import { flow } from 'fp-ts/lib/function'
 import { isSome } from 'fp-ts/lib/Option'
 import { object, string } from 'yup'
-import toTimeFormat from '../functions/toTimeFormat'
+import * as TIME from '../../../modules/time'
 
 const validationSchema = object({
   notification: string().oneOf(
@@ -16,7 +16,7 @@ const validationSchema = object({
       .test(
         'matches-time-format',
         'Invalid date format',
-        flow(toTimeFormat, isSome)
+        flow(TIME.format, isSome)
       ),
     otherwise: string().notRequired(),
   }),

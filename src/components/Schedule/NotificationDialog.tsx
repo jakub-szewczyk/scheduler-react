@@ -15,12 +15,11 @@ import { Field, Form, Formik, FormikHelpers } from 'formik'
 import { Select, TextField, TextFieldProps } from 'formik-mui'
 import { DesktopTimePicker } from 'formik-mui-x-date-pickers'
 import { MouseEventHandler } from 'react'
+import * as NOTIFICATION from '../../modules/notification'
 import DraggableDialog, {
   DraggableDialogProps,
 } from '../layout/DraggableDialog/DraggableDialog'
-import validationSchema from './constants/validationSchema'
-import calculateNotificationConfiguration from './functions/calculateNotificationConfiguration'
-import calculateNotificationTime from './functions/calculateNotificationTime'
+import validationSchema from './validation/validationSchema'
 import TextSummaryDetail from './TextSummaryDetail'
 import TimeSummaryDetail from './TimeSummaryDetail'
 import { NotificationConfiguration, Row } from './types/Schedule.types'
@@ -51,7 +50,7 @@ const NotificationDialog = ({
           Change notification settings. Set time and title details.
         </Typography>
         <Formik
-          initialValues={calculateNotificationConfiguration(
+          initialValues={NOTIFICATION.calculateConfiguration(
             row.starts,
             row.notification?.time,
             row.notification?.title
@@ -142,7 +141,7 @@ const NotificationDialog = ({
                   </TimeSummaryDetail>
                   <TimeSummaryDetail label='Ends'>{row.ends}</TimeSummaryDetail>
                   <TimeSummaryDetail label='Notification'>
-                    {calculateNotificationTime(row.starts, values)}
+                    {NOTIFICATION.calculateTime(row.starts, values)}
                   </TimeSummaryDetail>
                 </AccordionDetails>
               </Accordion>

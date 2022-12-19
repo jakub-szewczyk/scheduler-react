@@ -2,7 +2,7 @@ import { Typography } from '@mui/material'
 import { constant, pipe } from 'fp-ts/lib/function'
 import { getOrElse, Option } from 'fp-ts/lib/Option'
 import { ReactElement } from 'react'
-import toTimeFormat from './functions/toTimeFormat'
+import * as TIME from '../../modules/time'
 import { Time } from './types/Schedule.types'
 
 interface TimeSummaryDetailProps {
@@ -15,7 +15,7 @@ const TimeSummaryDetail = ({ label, children }: TimeSummaryDetailProps) =>
     <Typography>
       {label}:{' '}
       {pipe(
-        toTimeFormat(children) as Option<ReactElement>,
+        TIME.format(children) as Option<ReactElement>,
         getOrElse(
           constant(
             <Typography component='span' color='error'>
