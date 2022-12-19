@@ -6,21 +6,14 @@ import ViewListIcon from '@mui/icons-material/ViewList'
 import { SpeedDial, SpeedDialAction } from '@mui/material'
 import SpeedDialIcon from '@mui/material/SpeedDialIcon'
 import { flow } from 'fp-ts/lib/function'
-import {
-  cond,
-  either,
-  equals,
-  lensProp,
-  map,
-  path,
-  prop,
-  set,
-  when,
-} from 'ramda'
+import { cond, either, equals, map, path } from 'ramda'
 import { Dispatch, SetStateAction } from 'react'
 import { useBoolean } from 'usehooks-ts'
 import { Schedule } from '../Schedule/types/Schedule.types'
+import addSchedule from './functions/addSchedule'
 import isUnsavedSchedule from './functions/isUnsavedSchedule'
+import removeSchedule from './functions/removeSchedule'
+import saveSchedule from './functions/saveSchedule'
 import SaveDialog from './SaveDialog'
 import SavesDrawer from './SavesDrawer'
 import { SaveSchedule } from './types/ScheduleActions.types'
@@ -48,22 +41,27 @@ const ScheduleActions = ({
     setTrue: openSaveDialog,
   } = useBoolean()
 
-  // const handleDownloadIconClick = () => console.log('Download clicked')
-  // const handlePrintIconClick = () => console.log('Print clicked')
-
   const handleSpeedDialActionClick = flow(
     path(['currentTarget', 'ariaLabel']) as () => string,
     cond([
-      // [equals('Download'), handleDownloadIconClick],
-      // [equals('Print'), handlePrintIconClick],
       [either(equals('Save'), equals('Rename')), openSaveDialog],
       [equals('Schedules'), openDrawer],
     ])
   )
 
   const handleSave = ({ name }: SaveSchedule) => {
-    setSchedules(map(when(prop('selected'), set(lensProp('name'), name))))
+    setSchedules(saveSchedule(name))
     closeSaveDialog()
+  }
+
+  const handleCreate = () => {
+    setSchedules(addSchedule)
+    closeDrawer()
+  }
+
+  const handleDelete = (name: string) => {
+    setSchedules(removeSchedule(name))
+    closeDrawer()
   }
 
   return (
@@ -96,7 +94,10 @@ const ScheduleActions = ({
       <SavesDrawer
         open={isDrawerOpen}
         onClose={closeDrawer}
+        schedule={schedule}
         schedules={schedules}
+        onCreate={handleCreate}
+        onDelete={handleDelete}
       />
       <SaveDialog
         open={isSaveDialogOpen}
