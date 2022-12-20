@@ -3,9 +3,9 @@ import { Dispatch, SetStateAction } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 import Navbar from '../../components/layout/Navbar/Navbar'
 import Schedule from '../../components/Schedule/Schedule'
-import { Row } from '../../components/Schedule/types/Schedule.types'
 import ScheduleActions from '../../components/ScheduleActions/ScheduleActions'
 import * as SCHEDULE from '../../modules/schedule'
+import { Row } from '../../types/row'
 
 const Dashboard = () => {
   const [schedules, setSchedules] = useLocalStorage(

@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction } from 'react'
 import DayCell from '../DayCell'
 import NotificationCell from '../../layout/NotificationIcon/NotificationCell'
 import TimeCell from '../TimeCell'
-import { Row } from '../types/Schedule.types'
+import { Row } from '../../../types/row'
 
 const createColumns = (
   rows: Row[],

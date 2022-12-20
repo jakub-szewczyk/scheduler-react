@@ -4,7 +4,7 @@ import { IconButton, Stack, Typography } from '@mui/material'
 import { GridRenderCellParams } from '@mui/x-data-grid'
 import { Dispatch, SetStateAction } from 'react'
 import * as ROW from '../../modules/row'
-import { Row } from './types/Schedule.types'
+import { Row } from '../../types/row'
 
 interface DayCellProps extends GridRenderCellParams {
   rows: Row[]

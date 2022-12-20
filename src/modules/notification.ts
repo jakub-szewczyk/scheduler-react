@@ -1,6 +1,6 @@
 import { Task } from 'fp-ts/lib/Task'
 import { equals, isNil } from 'ramda'
-import { NotificationConfiguration } from '../components/Schedule/types/Schedule.types'
+import { NotificationConfiguration } from '../types/notification'
 import * as TIME from './time'
 
 const isPermissionGranted = equals('granted')

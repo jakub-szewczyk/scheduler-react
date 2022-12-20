@@ -8,12 +8,10 @@ import { useBoolean, useInterval } from 'usehooks-ts'
 import * as NOTIFICATION from '../../../modules/notification'
 import * as ROW from '../../../modules/row'
 import * as TIME from '../../../modules/time'
+import { NotificationConfiguration } from '../../../types/notification'
+import { Row } from '../../../types/row'
 import NotificationDialog from '../../Schedule/NotificationDialog'
 import NotificationIcon from '../../Schedule/NotificationIcon'
-import {
-  NotificationConfiguration,
-  Row,
-} from '../../Schedule/types/Schedule.types'
 
 interface NotificationCellProps extends GridRenderCellParams<any, Row> {
   rows: Row[]

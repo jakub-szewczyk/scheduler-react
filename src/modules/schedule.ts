@@ -16,7 +16,7 @@ import {
   when,
   __,
 } from 'ramda'
-import { Schedule } from '../components/Schedule/types/Schedule.types'
+import { Schedule } from '../types/schedule'
 
 type SchedulesEndomorphism = (schedules: Schedule[]) => Schedule[]
 

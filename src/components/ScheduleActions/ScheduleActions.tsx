@@ -9,11 +9,10 @@ import { flow } from 'fp-ts/lib/function'
 import { cond, either, equals, map, path } from 'ramda'
 import { Dispatch, SetStateAction } from 'react'
 import { useBoolean } from 'usehooks-ts'
-import { Schedule } from '../Schedule/types/Schedule.types'
 import * as SCHEDULE from '../../modules/schedule'
+import { Schedule } from '../../types/schedule'
 import SaveDialog from './SaveDialog'
 import SavesDrawer from './SavesDrawer'
-import { SaveSchedule } from './types/ScheduleActions.types'
 
 interface ScheduleActionsProps {
   schedule: Schedule
@@ -46,7 +45,7 @@ const ScheduleActions = ({
     ])
   )
 
-  const handleSave = ({ name }: SaveSchedule) => {
+  const handleSave = ({ name }: { name: string }) => {
     setSchedules(SCHEDULE.save(name))
     closeSaveDialog()
   }

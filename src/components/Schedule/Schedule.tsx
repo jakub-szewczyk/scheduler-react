@@ -2,9 +2,9 @@ import { DataGrid } from '@mui/x-data-grid'
 import { Dispatch, SetStateAction } from 'react'
 import * as ROW from '../../modules/row'
 import * as TABLE from '../../modules/table'
+import { Row } from '../../types/row'
 import createColumns from './helpers/createColumns'
 import DataGridWrapper from './styles/DataGridWrapper.styled'
-import { Row } from './types/Schedule.types'
 
 interface ScheduleProps {
   rows: Row[]

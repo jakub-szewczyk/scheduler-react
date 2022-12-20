@@ -19,8 +19,8 @@ import ListItemText from '@mui/material/ListItemText'
 import { formatDistanceToNow } from 'date-fns'
 import { any, map } from 'ramda'
 import { MouseEventHandler } from 'react'
-import { Schedule } from '../Schedule/types/Schedule.types'
 import * as SCHEDULE from '../../modules/schedule'
+import { Schedule } from '../../types/schedule'
 
 interface SavesDrawerProps extends DrawerProps {
   schedule: Schedule

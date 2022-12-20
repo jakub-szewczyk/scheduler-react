@@ -15,7 +15,8 @@ import {
   remove as _remove,
   update as _update,
 } from 'ramda'
-import { Day, Row } from '../components/Schedule/types/Schedule.types'
+import { Row } from '../types/row'
+import { Day } from '../types/time'
 
 type T = (x: Row[]) => (string | readonly string[])[]
 

@@ -3,7 +3,7 @@ import { constant, pipe } from 'fp-ts/lib/function'
 import { getOrElse, Option } from 'fp-ts/lib/Option'
 import { ReactElement } from 'react'
 import * as TIME from '../../modules/time'
-import { Time } from './types/Schedule.types'
+import { Time } from '../../types/time'
 
 interface TimeSummaryDetailProps {
   label: string

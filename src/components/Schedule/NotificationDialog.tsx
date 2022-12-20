@@ -22,7 +22,8 @@ import DraggableDialog, {
 import validationSchema from './validation/validationSchema'
 import TextSummaryDetail from './TextSummaryDetail'
 import TimeSummaryDetail from './TimeSummaryDetail'
-import { NotificationConfiguration, Row } from './types/Schedule.types'
+import { Row } from '../../types/row'
+import { NotificationConfiguration } from '../../types/notification'
 
 interface NotificationDialogProps extends DraggableDialogProps {
   row: Row & { starts: string }

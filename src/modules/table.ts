@@ -1,7 +1,7 @@
 import { GridColDef } from '@mui/x-data-grid'
 import { pipe } from 'fp-ts/lib/function'
 import { add, map, prop, reduce, Reduced } from 'ramda'
-import { Row } from '../components/Schedule/types/Schedule.types'
+import { Row } from '../types/row'
 
 type T = (a: number, b: unknown) => number | Reduced<number>
 

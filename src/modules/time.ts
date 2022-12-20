@@ -2,7 +2,7 @@ import { format as fnsFormat, isValid, subMinutes } from 'date-fns'
 import { constant, pipe } from 'fp-ts/lib/function'
 import { ap, getOrElse, none, of, some } from 'fp-ts/lib/Option'
 import { equals } from 'ramda'
-import { Time } from '../components/Schedule/types/Schedule.types'
+import { Time } from '../types/time'
 
 const TIME_FORMAT = 'hh:mm aaa'
 

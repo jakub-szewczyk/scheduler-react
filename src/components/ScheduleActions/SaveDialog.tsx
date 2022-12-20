@@ -5,16 +5,15 @@ import { MouseEventHandler } from 'react'
 import DraggableDialog, {
   DraggableDialogProps,
 } from '../layout/DraggableDialog/DraggableDialog'
-import { Schedule } from '../Schedule/types/Schedule.types'
 import validationSchema from './validation/validationSchema'
-import { SaveSchedule } from './types/ScheduleActions.types'
 import * as SCHEDULE from '../../modules/schedule'
+import { Schedule } from '../../types/schedule'
 
 interface SaveDialogProps extends DraggableDialogProps {
   schedule: Schedule
   onSave: (
-    values: SaveSchedule,
-    formikHelpers: FormikHelpers<SaveSchedule>
+    values: { name: string },
+    formikHelpers: FormikHelpers<{ name: string }>
   ) => void
   onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
