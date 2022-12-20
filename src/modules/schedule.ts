@@ -1,3 +1,4 @@
+import { prop } from 'fp-ts-ramda'
 import { flow, pipe } from 'fp-ts/lib/function'
 import {
   any,
@@ -9,7 +10,6 @@ import {
   last,
   lensProp,
   map,
-  prop,
   set,
   slice,
   unless,
@@ -55,6 +55,14 @@ const remove = (name: string): SchedulesEndomorphism =>
 const save = (name: string): SchedulesEndomorphism =>
   map(when(prop('selected'), set(lensProp('name'), name)))
 
+const select = (name: string): SchedulesEndomorphism =>
+  map(
+    flow(
+      set(lensProp('selected'), false),
+      when(flow(prop('name'), equals(name)), set(lensProp('selected'), true))
+    )
+  )
+
 const isUnsaved: (schedule: Schedule) => boolean = flow(
   prop('name'),
   equals('unsaved')
@@ -69,6 +77,7 @@ export {
   add,
   remove,
   save,
+  select,
   isUnsaved,
   asteriskSuffix,
   findSelected,

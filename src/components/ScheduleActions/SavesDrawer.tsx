@@ -27,6 +27,7 @@ interface SavesDrawerProps extends DrawerProps {
   schedules: Schedule[]
   onCreate: MouseEventHandler<HTMLButtonElement> | undefined
   onDelete: (name: string) => void
+  onSaveLoad: (name: string) => void
 }
 
 const SavesDrawer = ({
@@ -34,6 +35,7 @@ const SavesDrawer = ({
   schedules,
   onCreate,
   onDelete,
+  onSaveLoad,
   ...props
 }: SavesDrawerProps) => (
   <Drawer
@@ -43,13 +45,14 @@ const SavesDrawer = ({
       sx: { width: 320 },
     }}
   >
-    <Stack padding={2} justifyContent='space-between' height='100%'>
-      <Stack spacing={2}>
+    <Stack padding={2} justifyContent='space-between' height='100%' rowGap={2}>
+      <Stack spacing={2} overflow='auto'>
         <Typography variant='h6' align='center'>
           Create or load schedules
         </Typography>
         <List
           sx={{
+            overflow: 'auto',
             bgcolor: 'rgba(255, 255, 255, 0.05)',
             borderRadius: 1,
           }}
@@ -57,7 +60,7 @@ const SavesDrawer = ({
           {map(
             (schedule) => (
               <Stack key={schedule.name} direction='row' alignItems='start'>
-                <ListItemButton>
+                <ListItemButton onClick={() => onSaveLoad(schedule.name)}>
                   <ListItemAvatar>
                     <Avatar>
                       <ViewListIcon />
@@ -71,6 +74,13 @@ const SavesDrawer = ({
                         addSuffix: true,
                       }
                     )}
+                    sx={{
+                      '.MuiTypography-root': {
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap',
+                        textOverflow: 'ellipsis', // TODO: Test app-wide against long strings
+                      },
+                    }}
                   />
                 </ListItemButton>
                 <Tooltip

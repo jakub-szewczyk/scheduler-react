@@ -11,6 +11,7 @@ import { Schedule } from '../../types/schedule'
 
 interface SaveDialogProps extends DraggableDialogProps {
   schedule: Schedule
+  schedules: Schedule[]
   onSave: (
     values: { name: string },
     formikHelpers: FormikHelpers<{ name: string }>
@@ -20,6 +21,7 @@ interface SaveDialogProps extends DraggableDialogProps {
 
 const SaveDialog = ({
   schedule,
+  schedules,
   onSave,
   onClose,
   onCancel = onClose as MouseEventHandler<HTMLButtonElement> | undefined,
@@ -38,7 +40,7 @@ const SaveDialog = ({
           initialValues={{
             name: SCHEDULE.isUnsaved(schedule) ? '' : schedule.name,
           }}
-          validationSchema={validationSchema}
+          validationSchema={validationSchema(schedules)}
           onSubmit={onSave}
         >
           {() => (
@@ -49,9 +51,7 @@ const SaveDialog = ({
                 size='small'
                 label='Name'
                 helperText='Set schedule name'
-                InputProps={{
-                  sx: { width: 400 },
-                }}
+                sx={{ width: 400 }}
               />
             </Form>
           )}

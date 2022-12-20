@@ -5,8 +5,8 @@ import SaveIcon from '@mui/icons-material/Save'
 import ViewListIcon from '@mui/icons-material/ViewList'
 import { SpeedDial, SpeedDialAction } from '@mui/material'
 import SpeedDialIcon from '@mui/material/SpeedDialIcon'
-import { flow } from 'fp-ts/lib/function'
-import { cond, either, equals, map, path } from 'ramda'
+import { flow, pipe } from 'fp-ts/lib/function'
+import { cond, either, equals, map, path, trim } from 'ramda'
 import { Dispatch, SetStateAction } from 'react'
 import { useBoolean } from 'usehooks-ts'
 import * as SCHEDULE from '../../modules/schedule'
@@ -46,7 +46,7 @@ const ScheduleActions = ({
   )
 
   const handleSave = ({ name }: { name: string }) => {
-    setSchedules(SCHEDULE.save(name))
+    setSchedules(pipe(name, trim, SCHEDULE.save))
     closeSaveDialog()
   }
 
@@ -57,6 +57,12 @@ const ScheduleActions = ({
 
   const handleDelete = (name: string) => {
     setSchedules(SCHEDULE.remove(name))
+    closeDrawer()
+  }
+
+  // TODO: General rename
+  const handleSaveLoad = (name: string) => {
+    setSchedules(SCHEDULE.select(name))
     closeDrawer()
   }
 
@@ -94,11 +100,13 @@ const ScheduleActions = ({
         schedules={schedules}
         onCreate={handleCreate}
         onDelete={handleDelete}
+        onSaveLoad={handleSaveLoad}
       />
       <SaveDialog
         open={isSaveDialogOpen}
         onClose={closeSaveDialog}
         schedule={schedule}
+        schedules={schedules}
         onSave={handleSave}
       />
     </>
