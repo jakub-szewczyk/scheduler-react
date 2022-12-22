@@ -1,8 +1,13 @@
 import PendingActionsIcon from '@mui/icons-material/PendingActions'
 import ViewListIcon from '@mui/icons-material/ViewList'
 import { AppBar, Box, Stack, Toolbar, Typography } from '@mui/material'
+import * as SCHEDULE from '../../../modules/schedule'
 
-const Navbar = () => (
+interface NavbarProps {
+  scheduleName: string
+}
+
+const Navbar = ({ scheduleName }: NavbarProps) => (
   <Box sx={{ flexGrow: 1 }}>
     <AppBar position='static' color='transparent' elevation={0}>
       <Toolbar>
@@ -19,7 +24,15 @@ const Navbar = () => (
           sx={{ mx: 'auto' }}
         >
           <ViewListIcon />
-          <Typography fontStyle='italic'>Tough Mondays</Typography>
+          <Typography
+            maxWidth={400}
+            fontStyle='italic'
+            overflow='hidden'
+            whiteSpace='nowrap'
+            textOverflow='ellipsis'
+          >
+            {SCHEDULE.asteriskSuffix(scheduleName)}
+          </Typography>
         </Stack>
       </Toolbar>
     </AppBar>

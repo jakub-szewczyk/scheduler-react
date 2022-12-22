@@ -1,17 +1,17 @@
 import { Box, IconButton, Stack, Tooltip } from '@mui/material'
 import { GridRenderCellParams } from '@mui/x-data-grid'
+import { pipe } from 'fp-ts/lib/function'
 import { none } from 'fp-ts/lib/Option'
 import { once, trim } from 'ramda'
 import { Dispatch, MouseEventHandler, SetStateAction, useCallback } from 'react'
 import { useBoolean, useInterval } from 'usehooks-ts'
-import calculateNotificationTime from '../../Table/functions/calculateNotificationTime'
-import matchesTime from '../../Table/functions/matchesTime'
-import notify from '../../Table/functions/notify'
-import updateRowField from '../../Table/functions/updateRowField'
-import NotificationDialog from '../../Table/NotificationDialog'
-import NotificationIcon from '../../Table/NotificationIcon'
-import { NotificationConfiguration, Row } from '../../Table/types/Table.types'
-import { pipe } from 'fp-ts/lib/function'
+import * as NOTIFICATION from '../../../modules/notification'
+import * as ROW from '../../../modules/row'
+import * as TIME from '../../../modules/time'
+import { NotificationConfiguration } from '../../../types/notification'
+import { Row } from '../../../types/row'
+import NotificationDialog from '../../Schedule/NotificationDialog'
+import NotificationIcon from '../../Schedule/NotificationIcon'
 
 interface NotificationCellProps extends GridRenderCellParams<any, Row> {
   rows: Row[]
@@ -31,14 +31,15 @@ const NotificationCell = ({
     setTrue: openNotificationDialog,
   } = useBoolean(false)
 
-  const notifyOnce = useCallback(pipe(row.notification?.title!, notify, once), [
-    row.notification?.time,
-  ])
+  const notifyOnce = useCallback(
+    pipe(row.notification?.title || 'Notification', NOTIFICATION.notify, once),
+    [row.notification?.time]
+  )
 
   useInterval(
     () =>
       row.notification?.active &&
-      matchesTime(row.notification?.time, Date.now())
+      TIME.matches(row.notification?.time, Date.now())
         ? notifyOnce()
         : none,
     1000
@@ -48,7 +49,7 @@ const NotificationCell = ({
     | MouseEventHandler<HTMLButtonElement>
     | undefined = () =>
     setRows(
-      updateRowField(
+      ROW.update(
         field,
         {
           time: row.notification?.time || row.starts,
@@ -70,12 +71,12 @@ const NotificationCell = ({
     values: NotificationConfiguration
   ) => {
     setRows(
-      updateRowField(
+      ROW.update(
         'notification',
         {
           active: !!row.notification?.active,
-          time: calculateNotificationTime(row.starts!, values),
-          title: trim(values.title) || 'Notification',
+          time: NOTIFICATION.calculateTime(row.starts!, values),
+          title: trim(values.title),
         },
         id,
         rows
