@@ -6,6 +6,8 @@ import { Time } from '../types/time'
 
 const TIME_FORMAT = 'hh:mm aaa'
 
+const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+
 const format = (time: Time) =>
   time && isValid(new Date(time))
     ? some(fnsFormat(new Date(time), TIME_FORMAT))
@@ -17,4 +19,4 @@ const matches = (t0: Time, t1: Time) =>
 const subtractMinutes = (time: string, minutes: number) =>
   subMinutes(new Date(time), minutes).toISOString()
 
-export { format, matches, subtractMinutes }
+export { DAYS, format, matches, subtractMinutes }

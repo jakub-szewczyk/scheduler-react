@@ -10,6 +10,7 @@ import { cond, either, equals, map, path, trim } from 'ramda'
 import { Dispatch, SetStateAction } from 'react'
 import { useBoolean } from 'usehooks-ts'
 import * as SCHEDULE from '../../modules/schedule'
+import { exportScheduleToXLSX } from '../../modules/xlsx'
 import { Schedule } from '../../types/schedule'
 import SaveScheduleDialog from './SaveScheduleDialog'
 import SchedulesDrawer from './SchedulesDrawer'
@@ -40,6 +41,8 @@ const ScheduleActions = ({
   const handleSpeedDialActionClick = flow(
     path(['currentTarget', 'ariaLabel']) as () => string,
     cond([
+      [equals('Download'), exportScheduleToXLSX(schedule)],
+      [equals('Print'), window.print],
       [either(equals('Save'), equals('Rename')), openSaveScheduleDialog],
       [equals('Schedules'), openSchedulesDrawer],
     ])
