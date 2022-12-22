@@ -18,7 +18,7 @@ const validationSchema = object({
         'Invalid date format',
         flow(TIME.format, isSome)
       ),
-    otherwise: string().notRequired(),
+    otherwise: string().nullable().notRequired(),
   }),
 })
 

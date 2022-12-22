@@ -32,7 +32,7 @@ const NotificationCell = ({
   } = useBoolean(false)
 
   const notifyOnce = useCallback(
-    pipe(row.notification?.title!, NOTIFICATION.notify, once),
+    pipe(row.notification?.title || 'Notification', NOTIFICATION.notify, once),
     [row.notification?.time]
   )
 
@@ -76,7 +76,7 @@ const NotificationCell = ({
         {
           active: !!row.notification?.active,
           time: NOTIFICATION.calculateTime(row.starts!, values),
-          title: trim(values.title) || 'Notification',
+          title: trim(values.title),
         },
         id,
         rows
