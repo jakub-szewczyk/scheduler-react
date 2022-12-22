@@ -24,7 +24,13 @@ const Navbar = ({ scheduleName }: NavbarProps) => (
           sx={{ mx: 'auto' }}
         >
           <ViewListIcon />
-          <Typography fontStyle='italic'>
+          <Typography
+            maxWidth={400}
+            fontStyle='italic'
+            overflow='hidden'
+            whiteSpace='nowrap'
+            textOverflow='ellipsis'
+          >
             {SCHEDULE.asteriskSuffix(scheduleName)}
           </Typography>
         </Stack>

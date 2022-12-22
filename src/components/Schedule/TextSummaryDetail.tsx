@@ -7,7 +7,7 @@ interface TextSummaryDetailProps {
 
 const TextSummaryDetail = ({ label, children }: TextSummaryDetailProps) =>
   children ? (
-    <Typography>
+    <Typography overflow='hidden' whiteSpace='nowrap' textOverflow='ellipsis'>
       {label}: {children}
     </Typography>
   ) : null

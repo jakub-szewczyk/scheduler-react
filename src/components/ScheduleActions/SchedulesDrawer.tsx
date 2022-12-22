@@ -78,7 +78,7 @@ const SchedulesDrawer = ({
                       '.MuiTypography-root': {
                         overflow: 'hidden',
                         whiteSpace: 'nowrap',
-                        textOverflow: 'ellipsis', // TODO: Test app-wide against long strings
+                        textOverflow: 'ellipsis',
                       },
                     }}
                   />
