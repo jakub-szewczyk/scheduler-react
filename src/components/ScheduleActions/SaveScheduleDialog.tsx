@@ -9,7 +9,7 @@ import validationSchema from './validation/validationSchema'
 import * as SCHEDULE from '../../modules/schedule'
 import { Schedule } from '../../types/schedule'
 
-interface SaveDialogProps extends DraggableDialogProps {
+interface SaveScheduleDialogProps extends DraggableDialogProps {
   schedule: Schedule
   schedules: Schedule[]
   onSave: (
@@ -19,14 +19,14 @@ interface SaveDialogProps extends DraggableDialogProps {
   onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
 
-const SaveDialog = ({
+const SaveScheduleDialog = ({
   schedule,
   schedules,
   onSave,
   onClose,
   onCancel = onClose as MouseEventHandler<HTMLButtonElement> | undefined,
   ...props
-}: SaveDialogProps) => (
+}: SaveScheduleDialogProps) => (
   <DraggableDialog
     {...props}
     onClose={onClose}
@@ -71,4 +71,4 @@ const SaveDialog = ({
   />
 )
 
-export default SaveDialog
+export default SaveScheduleDialog

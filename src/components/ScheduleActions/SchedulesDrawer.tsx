@@ -22,22 +22,22 @@ import { MouseEventHandler } from 'react'
 import * as SCHEDULE from '../../modules/schedule'
 import { Schedule } from '../../types/schedule'
 
-interface SavesDrawerProps extends DrawerProps {
+interface SchedulesDrawerProps extends Omit<DrawerProps, 'onSelect'> {
   schedule: Schedule
   schedules: Schedule[]
   onCreate: MouseEventHandler<HTMLButtonElement> | undefined
   onDelete: (name: string) => void
-  onSaveLoad: (name: string) => void
+  onSelect: (name: string) => void
 }
 
-const SavesDrawer = ({
+const SchedulesDrawer = ({
   schedule,
   schedules,
   onCreate,
   onDelete,
-  onSaveLoad,
+  onSelect,
   ...props
-}: SavesDrawerProps) => (
+}: SchedulesDrawerProps) => (
   <Drawer
     {...props}
     anchor='right'
@@ -60,7 +60,7 @@ const SavesDrawer = ({
           {map(
             (schedule) => (
               <Stack key={schedule.name} direction='row' alignItems='start'>
-                <ListItemButton onClick={() => onSaveLoad(schedule.name)}>
+                <ListItemButton onClick={() => onSelect(schedule.name)}>
                   <ListItemAvatar>
                     <Avatar>
                       <ViewListIcon />
@@ -128,4 +128,4 @@ const SavesDrawer = ({
   </Drawer>
 )
 
-export default SavesDrawer
+export default SchedulesDrawer

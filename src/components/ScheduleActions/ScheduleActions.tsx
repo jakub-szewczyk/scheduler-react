@@ -11,8 +11,8 @@ import { Dispatch, SetStateAction } from 'react'
 import { useBoolean } from 'usehooks-ts'
 import * as SCHEDULE from '../../modules/schedule'
 import { Schedule } from '../../types/schedule'
-import SaveDialog from './SaveDialog'
-import SavesDrawer from './SavesDrawer'
+import SaveScheduleDialog from './SaveScheduleDialog'
+import SchedulesDrawer from './SchedulesDrawer'
 
 interface ScheduleActionsProps {
   schedule: Schedule
@@ -26,44 +26,43 @@ const ScheduleActions = ({
   setSchedules,
 }: ScheduleActionsProps) => {
   const {
-    value: isDrawerOpen,
-    setFalse: closeDrawer,
-    setTrue: openDrawer,
+    value: isSchedulesDrawerOpen,
+    setFalse: closeSchedulesDrawer,
+    setTrue: openSchedulesDrawer,
   } = useBoolean()
 
   const {
-    value: isSaveDialogOpen,
-    setFalse: closeSaveDialog,
-    setTrue: openSaveDialog,
+    value: isSaveScheduleDialogOpen,
+    setFalse: closeSaveScheduleDialog,
+    setTrue: openSaveScheduleDialog,
   } = useBoolean()
 
   const handleSpeedDialActionClick = flow(
     path(['currentTarget', 'ariaLabel']) as () => string,
     cond([
-      [either(equals('Save'), equals('Rename')), openSaveDialog],
-      [equals('Schedules'), openDrawer],
+      [either(equals('Save'), equals('Rename')), openSaveScheduleDialog],
+      [equals('Schedules'), openSchedulesDrawer],
     ])
   )
 
-  const handleSave = ({ name }: { name: string }) => {
+  const handleScheduleSave = ({ name }: { name: string }) => {
     setSchedules(pipe(name, trim, SCHEDULE.save))
-    closeSaveDialog()
+    closeSaveScheduleDialog()
   }
 
-  const handleCreate = () => {
+  const handleScheduleCreate = () => {
     setSchedules(SCHEDULE.add)
-    closeDrawer()
+    closeSchedulesDrawer()
   }
 
-  const handleDelete = (name: string) => {
+  const handleScheduleDelete = (name: string) => {
     setSchedules(SCHEDULE.remove(name))
-    closeDrawer()
+    closeSchedulesDrawer()
   }
 
-  // TODO: General rename
-  const handleSaveLoad = (name: string) => {
+  const handleScheduleSelect = (name: string) => {
     setSchedules(SCHEDULE.select(name))
-    closeDrawer()
+    closeSchedulesDrawer()
   }
 
   return (
@@ -93,21 +92,21 @@ const ScheduleActions = ({
           ]
         )}
       </SpeedDial>
-      <SavesDrawer
-        open={isDrawerOpen}
-        onClose={closeDrawer}
+      <SchedulesDrawer
+        open={isSchedulesDrawerOpen}
+        onClose={closeSchedulesDrawer}
         schedule={schedule}
         schedules={schedules}
-        onCreate={handleCreate}
-        onDelete={handleDelete}
-        onSaveLoad={handleSaveLoad}
+        onCreate={handleScheduleCreate}
+        onDelete={handleScheduleDelete}
+        onSelect={handleScheduleSelect}
       />
-      <SaveDialog
-        open={isSaveDialogOpen}
-        onClose={closeSaveDialog}
+      <SaveScheduleDialog
+        open={isSaveScheduleDialogOpen}
+        onClose={closeSaveScheduleDialog}
         schedule={schedule}
         schedules={schedules}
-        onSave={handleSave}
+        onSave={handleScheduleSave}
       />
     </>
   )
