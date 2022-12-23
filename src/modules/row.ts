@@ -1,6 +1,7 @@
 import { GridRowId } from '@mui/x-data-grid'
 import { prop } from 'fp-ts-ramda'
-import { flow, pipe } from 'fp-ts/lib/function'
+import { constant, flow, pipe } from 'fp-ts/lib/function'
+import * as Option from 'fp-ts/Option'
 import { nanoid } from 'nanoid'
 import {
   add as _add,
@@ -17,6 +18,7 @@ import {
 } from 'ramda'
 import { Row } from '../types/row'
 import { Day } from '../types/time'
+import * as TIME from './time'
 
 type T = (x: Row[]) => (string | readonly string[])[]
 
@@ -46,6 +48,14 @@ const update = <T>(field: string, value: T, id: GridRowId, rows: Row[]) => {
   return _update(index, { ...rows[index], [field]: value }, rows)
 }
 
+const toXLSX = ({ day, starts, ends, room, subject }: Row) => ({
+  Day: day,
+  Starts: pipe(TIME.format(starts), Option.getOrElse(constant(''))),
+  Ends: pipe(TIME.format(ends), Option.getOrElse(constant(''))),
+  Room: room,
+  Subject: subject,
+})
+
 export {
   equalsId,
   findById,
@@ -55,4 +65,5 @@ export {
   add,
   remove,
   update,
+  toXLSX,
 }

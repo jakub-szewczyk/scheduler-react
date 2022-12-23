@@ -16,6 +16,8 @@ import {
   when,
   __,
 } from 'ramda'
+import { utils, writeFileXLSX } from 'xlsx'
+import * as ROW from '../modules/row'
 import { Schedule } from '../types/schedule'
 
 type SchedulesEndomorphism = (schedules: Schedule[]) => Schedule[]
@@ -72,6 +74,13 @@ const asteriskSuffix = when(equals('unsaved'), concat(__, '*'))
 
 const findSelected = find<Schedule>(prop('selected'))
 
+const exportToXLSX = (schedule: Schedule) => () => {
+  const ws = utils.json_to_sheet(pipe(schedule.rows, map(ROW.toXLSX)))
+  const wb = utils.book_new()
+  utils.book_append_sheet(wb, ws, 'Data')
+  writeFileXLSX(wb, `${schedule.name}.xlsx`)
+}
+
 export {
   INITIAL_VALUES,
   add,
@@ -81,4 +90,5 @@ export {
   isUnsaved,
   asteriskSuffix,
   findSelected,
+  exportToXLSX,
 }
