@@ -20,6 +20,7 @@ const Schedule = ({ rows, setRows }: ScheduleProps) => {
       maxWidth={TABLE.calculateMaxWidth(columns)}
     >
       <DataGrid
+        disableVirtualization
         headerHeight={TABLE.HEADER_HEIGHT}
         rowHeight={TABLE.ROW_HEIGHT}
         columns={columns}
