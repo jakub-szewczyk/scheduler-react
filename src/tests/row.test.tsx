@@ -1,27 +1,14 @@
-import { render, screen, within } from '@testing-library/react'
+import { render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from '../App'
-
-const getMondayRow = () =>
-  screen.getByRole('row', {
-    name: /monday/i,
-  })
-
-const getMondayStartsCell = () =>
-  within(getMondayRow()).getAllByRole('textbox')[0]!
-
-const getMondayEndsCell = () =>
-  within(getMondayRow()).getAllByRole('textbox')[1]!
-
-const getMondayRoomCell = () => within(getMondayRow()).getAllByRole('cell')[3]
-
-const getMondayRoomCellInput = () => getMondayRoomCell().querySelector('input')!
-
-const getMondaySubjectCell = () =>
-  within(getMondayRow()).getAllByRole('cell')[4]
-
-const getMondaySubjectCellInput = () =>
-  getMondaySubjectCell().querySelector('input')!
+import {
+  getMondayEndsCell,
+  getMondayRoomCell,
+  getMondayRoomCellInput,
+  getMondayStartsCell,
+  getMondaySubjectCell,
+  getMondaySubjectCellInput,
+} from './queries'
 
 describe('Monday', () => {
   it('sets starts to 08:00 am', async () => {
