@@ -43,7 +43,7 @@ describe('Notification', () => {
     expect(
       await findMondayNotificationCellIconButtonEnabledTooltip()
     ).toBeVisible()
-  }, 15000)
+  }, 30000)
 
   it('saves settings via configuration dialog', async () => {
     render(<App />)
