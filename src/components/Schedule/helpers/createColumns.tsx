@@ -22,7 +22,7 @@ const createColumns = (
     field: 'starts',
     headerName: 'Starts',
     sortable: false,
-    width: 155,
+    width: 165,
     renderCell: (params) => (
       <TimeCell {...params} rows={rows} setRows={setRows} />
     ),
@@ -31,7 +31,7 @@ const createColumns = (
     field: 'ends',
     headerName: 'Ends',
     sortable: false,
-    width: 155,
+    width: 165,
     renderCell: (params) => (
       <TimeCell {...params} rows={rows} setRows={setRows} />
     ),
@@ -41,7 +41,7 @@ const createColumns = (
     headerName: 'Room',
     sortable: false,
     editable: true,
-    width: 155,
+    width: 165,
   },
   {
     field: 'subject',
@@ -55,7 +55,7 @@ const createColumns = (
     headerName: 'Notification',
     sortable: false,
     editable: false,
-    width: 100,
+    width: 118,
     renderCell: (params) => <NotificationCell {...params} setRows={setRows} />,
   },
 ]

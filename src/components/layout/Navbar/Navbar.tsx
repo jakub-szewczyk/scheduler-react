@@ -9,7 +9,7 @@ interface NavbarProps {
 
 const Navbar = ({ scheduleName }: NavbarProps) => (
   <Box sx={{ flexGrow: 1 }}>
-    <AppBar position='static' color='transparent' elevation={0}>
+    <AppBar position='static' elevation={0}>
       <Toolbar>
         <Stack direction='row' alignItems='center' columnGap={1.5}>
           <PendingActionsIcon />

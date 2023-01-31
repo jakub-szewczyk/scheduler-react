@@ -12,10 +12,20 @@ const useSchedules = () => {
 
   const schedule = SCHEDULE.findSelected(schedules)!
 
-  const setRows = ((rows: Row[]) =>
+  const setRows: Dispatch<SetStateAction<Row[]>> = (
+    rows: Row[] | ((rows: Row[]) => Row[])
+  ) =>
     setSchedules(
-      map(when(prop('selected'), set(lensProp('rows'), rows)))
-    )) as Dispatch<SetStateAction<Row[]>>
+      map(
+        when(
+          prop('selected'),
+          set(
+            lensProp('rows'),
+            typeof rows === 'function' ? rows(schedule.rows) : rows
+          )
+        )
+      )
+    )
 
   return { schedule, schedules, setSchedules, setRows }
 }
