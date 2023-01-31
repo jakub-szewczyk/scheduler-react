@@ -43,10 +43,12 @@ const add = (id: GridRowId, rows: Row[]) =>
 const remove = (id: GridRowId, rows: Row[]) =>
   _remove(findIndexById(id, rows), 1, rows)
 
-const update = <T>(field: string, value: T, id: GridRowId, rows: Row[]) => {
-  const index = findIndexById(id, rows)
-  return _update(index, { ...rows[index], [field]: value }, rows)
-}
+const update = curry(
+  <T>(field: string, value: T, id: GridRowId, rows: Row[]) => {
+    const index = findIndexById(id, rows)
+    return _update(index, { ...rows[index], [field]: value }, rows)
+  }
+)
 
 const toXLSX = ({ day, starts, ends, room, subject }: Row) => ({
   Day: day,

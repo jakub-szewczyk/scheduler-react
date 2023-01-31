@@ -5,16 +5,15 @@ import { none } from 'fp-ts/lib/Option'
 import { once, trim } from 'ramda'
 import { Dispatch, MouseEventHandler, SetStateAction, useCallback } from 'react'
 import { useBoolean, useInterval } from 'usehooks-ts'
-import * as NOTIFICATION from '../../../modules/notification'
-import * as ROW from '../../../modules/row'
-import * as TIME from '../../../modules/time'
-import { NotificationConfiguration } from '../../../types/notification'
-import { Row } from '../../../types/row'
-import NotificationDialog from '../../Schedule/NotificationDialog'
-import NotificationIcon from '../../Schedule/NotificationIcon'
+import * as NOTIFICATION from '../../modules/notification'
+import * as ROW from '../../modules/row'
+import * as TIME from '../../modules/time'
+import { NotificationConfiguration } from '../../types/notification'
+import { Row } from '../../types/row'
+import NotificationDialog from './NotificationDialog'
+import NotificationIcon from '../layout/NotificationIcon/NotificationIcon'
 
 interface NotificationCellProps extends GridRenderCellParams<any, Row> {
-  rows: Row[]
   setRows: Dispatch<SetStateAction<Row[]>>
 }
 
@@ -22,7 +21,6 @@ const NotificationCell = ({
   id,
   field,
   row,
-  rows,
   setRows,
 }: NotificationCellProps) => {
   const {
@@ -31,6 +29,7 @@ const NotificationCell = ({
     setTrue: openNotificationDialog,
   } = useBoolean(false)
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const notifyOnce = useCallback(
     pipe(row.notification?.title || 'Notification', NOTIFICATION.notify, once),
     [row.notification?.time]
@@ -55,8 +54,7 @@ const NotificationCell = ({
           time: row.notification?.time || row.starts,
           active: !row.notification?.active,
         },
-        id,
-        rows
+        id
       )
     )
 
@@ -78,8 +76,7 @@ const NotificationCell = ({
           time: NOTIFICATION.calculateTime(row.starts!, values),
           title: trim(values.title),
         },
-        id,
-        rows
+        id
       )
     )
     closeNotificationDialog()
