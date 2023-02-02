@@ -1,13 +1,18 @@
 import { CssBaseline, ThemeProvider } from '@mui/material'
 import { RouterProvider } from 'react-router-dom'
-import router from './router'
+import useSchedules from './hooks/useSchedules'
+import createRouter from './router'
 import theme from './theme'
 
-const App = () => (
-  <ThemeProvider theme={theme}>
-    <CssBaseline />
-    <RouterProvider router={router} />
-  </ThemeProvider>
-)
+const App = () => {
+  const { schedule } = useSchedules()
+
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <RouterProvider router={createRouter(schedule)} />
+    </ThemeProvider>
+  )
+}
 
 export default App
