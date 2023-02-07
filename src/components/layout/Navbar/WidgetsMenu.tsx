@@ -13,6 +13,10 @@ import {
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
+/**
+ * TODO:
+ * Rename to `WidgetMenu`
+ */
 const WidgetsMenu = () => {
   const [menu, setMenu] = useState<HTMLElement | null>(null)
 

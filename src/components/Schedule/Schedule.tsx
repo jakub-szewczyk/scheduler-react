@@ -1,3 +1,4 @@
+import { useTheme } from '@mui/material'
 import { Dispatch, SetStateAction } from 'react'
 import * as ROW from '../../modules/row'
 import * as TABLE from '../../modules/table'
@@ -11,6 +12,8 @@ interface ScheduleProps {
 }
 
 const Schedule = ({ rows, setRows }: ScheduleProps) => {
+  const theme = useTheme()
+
   const columns = createColumns(rows, setRows)
 
   return (
@@ -18,7 +21,10 @@ const Schedule = ({ rows, setRows }: ScheduleProps) => {
       elevation={0}
       height={TABLE.calculateHeight(rows)}
       sx={{
-        maxWidth: TABLE.calculateMaxWidth(columns),
+        maxWidth: Math.min(
+          theme.breakpoints.values.lg,
+          TABLE.calculateMaxWidth(columns)
+        ),
       }}
     >
       <DataGrid

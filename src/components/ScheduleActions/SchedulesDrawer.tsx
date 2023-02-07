@@ -22,6 +22,10 @@ import { MouseEventHandler } from 'react'
 import * as SCHEDULE from '../../modules/schedule'
 import { Schedule } from '../../types/schedule'
 
+/**
+ * TODO:
+ * Rename to `ScheduleDrawer`
+ */
 interface SchedulesDrawerProps extends Omit<DrawerProps, 'onSelect'> {
   schedule: Schedule
   schedules: Schedule[]
