@@ -13,8 +13,13 @@ const reducer: ImmerReducer<Status[], Action> = (
   { type, payload: { source, destination } }
 ) => {
   switch (type) {
-    case 'issue/drag':
-      if (source.droppableId === destination.droppableId) {
+    case 'board/drag':
+      if (
+        source.droppableId === 'board' &&
+        destination.droppableId === 'board'
+      ) {
+        return move(source.index, destination.index, statuses)
+      } else if (source.droppableId === destination.droppableId) {
         const status = statuses.find(matchByDraggableLocation(source))!
         status.issues = move(source.index, destination.index, status.issues)
       } else {

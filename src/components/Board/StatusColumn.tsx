@@ -1,28 +1,36 @@
 import { Paper, Stack, Typography } from '@mui/material'
+import { Draggable } from 'react-beautiful-dnd'
 import { Status } from '../../types/board'
 import StrictModeDroppable from '../layout/StrictModeDroppable/StrictModeDroppable'
 import IssueItem from './IssueItem'
 
-const StatusColumn = ({ title, issues }: Status) => (
-  <StrictModeDroppable droppableId={title}>
-    {({ droppableProps, innerRef, placeholder }) => (
+interface StatusColumnProps extends Status {
+  index: number
+}
+
+const StatusColumn = ({ index, title, issues }: StatusColumnProps) => (
+  <Draggable draggableId={title} index={index}>
+    {({ draggableProps, dragHandleProps, innerRef }) => (
       <Paper
-        {...droppableProps}
+        {...draggableProps}
         ref={innerRef}
         elevation={0}
         sx={{
           flexShrink: 0,
           width: 280,
           p: 0.75,
+          mx: 1,
         }}
       >
         <Typography
+          {...dragHandleProps}
           component={Paper}
           elevation={0}
           padding={1}
           textAlign='center'
           textTransform='uppercase'
           sx={{
+            cursor: 'grab',
             color: (theme) => theme.palette.common.black,
             bgcolor: (theme) => theme.palette.primary.main,
             '&:hover': {
@@ -32,15 +40,24 @@ const StatusColumn = ({ title, issues }: Status) => (
         >
           {title}
         </Typography>
-        <Stack spacing={0.75}>
-          {issues.map((issue, index) => (
-            <IssueItem key={issue.title} {...issue} index={index} />
-          ))}
-          {placeholder}
-        </Stack>
+        <StrictModeDroppable type='status' droppableId={title}>
+          {({ droppableProps, innerRef, placeholder }) => (
+            <Stack
+              {...droppableProps}
+              ref={innerRef}
+              spacing={0.75}
+              height='calc(100% - 40px)'
+            >
+              {issues.map((issue, index) => (
+                <IssueItem {...issue} key={issue.title} index={index} />
+              ))}
+              {placeholder}
+            </Stack>
+          )}
+        </StrictModeDroppable>
       </Paper>
     )}
-  </StrictModeDroppable>
+  </Draggable>
 )
 
 export default StatusColumn
