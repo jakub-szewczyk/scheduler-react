@@ -15,16 +15,11 @@ type Payload = {
   destination: DraggableLocation
 }
 
-interface IssueReorderAction {
-  type: 'issue/reorder'
+interface IssueDragAction {
+  type: 'issue/drag'
   payload: Payload
 }
 
-interface IssueMoveAction {
-  type: 'issue/move'
-  payload: Payload
-}
-
-type Action = IssueReorderAction | IssueMoveAction
+type Action = IssueDragAction
 
 export type { Status, Issue, Action }
