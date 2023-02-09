@@ -1,4 +1,5 @@
-import { Paper, Stack, Typography } from '@mui/material'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
+import { IconButton, Paper, Stack, Typography } from '@mui/material'
 import { Draggable } from 'react-beautiful-dnd'
 import { Status } from '../../types/board'
 import StrictModeDroppable from '../layout/StrictModeDroppable/StrictModeDroppable'
@@ -22,14 +23,12 @@ const StatusColumn = ({ index, title, issues }: StatusColumnProps) => (
           mx: 1,
         }}
       >
-        <Typography
+        <Paper
           {...dragHandleProps}
-          component={Paper}
           elevation={0}
-          padding={1}
-          textAlign='center'
-          textTransform='uppercase'
           sx={{
+            position: 'relative',
+            p: 1,
             cursor: 'grab',
             color: (theme) => theme.palette.common.black,
             bgcolor: (theme) => theme.palette.primary.main,
@@ -38,8 +37,27 @@ const StatusColumn = ({ index, title, issues }: StatusColumnProps) => (
             },
           }}
         >
-          {title}
-        </Typography>
+          <Typography
+            noWrap
+            textAlign='center'
+            textTransform='uppercase'
+            marginX={3.75}
+          >
+            {title}
+          </Typography>
+          <IconButton
+            size='small'
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              right: 8,
+              translate: '0 -50%',
+              color: 'inherit',
+            }}
+          >
+            <MoreVertIcon fontSize='small' />
+          </IconButton>
+        </Paper>
         <StrictModeDroppable type='status' droppableId={title}>
           {({ droppableProps, innerRef, placeholder }) => (
             <Stack
