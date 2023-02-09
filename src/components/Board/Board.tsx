@@ -1,17 +1,13 @@
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
-import { useImmerReducer } from 'use-immer'
+import { useLocalStorage } from 'usehooks-ts'
 import { STATUSES } from '../../mocks/board'
-import { reducer } from '../../modules/board'
-import { Action, Status } from '../../types/board'
+import { calculateDragState } from '../../modules/board'
 import StrictModeDroppable from '../layout/StrictModeDroppable/StrictModeDroppable'
 import StatusColumn from './StatusColumn'
 import { BoardContainer } from './styles/Board.styled'
 
 const Board = () => {
-  const [statuses, dispatch] = useImmerReducer<Status[], Action>(
-    reducer,
-    STATUSES
-  )
+  const [statuses, setStatuses] = useLocalStorage('statuses', STATUSES)
 
   const handleDragEnd = ({ source, destination }: DropResult) => {
     if (
@@ -21,13 +17,7 @@ const Board = () => {
     )
       return
 
-    dispatch({
-      type: 'board/drag',
-      payload: {
-        source,
-        destination,
-      },
-    })
+    setStatuses(calculateDragState({ source, destination }))
   }
 
   return (

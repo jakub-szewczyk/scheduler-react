@@ -10,16 +10,9 @@ interface Issue {
   content: string
 }
 
-type Payload = {
+type DropResultLocation = {
   source: DraggableLocation
   destination: DraggableLocation
 }
 
-interface BoardDragAction {
-  type: 'board/drag'
-  payload: Payload
-}
-
-type Action = BoardDragAction
-
-export type { Status, Issue, Action }
+export type { Status, Issue, DropResultLocation }
