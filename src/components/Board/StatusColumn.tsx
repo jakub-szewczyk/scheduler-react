@@ -1,9 +1,9 @@
-import MoreVertIcon from '@mui/icons-material/MoreVert'
-import { IconButton, Paper, Stack, Typography } from '@mui/material'
+import { Paper, Stack, Typography } from '@mui/material'
 import { Draggable } from 'react-beautiful-dnd'
 import { Status } from '../../types/board'
 import StrictModeDroppable from '../layout/StrictModeDroppable/StrictModeDroppable'
 import IssueItem from './IssueItem'
+import StatusActionsMenu from './StatusActionsMenu'
 
 interface StatusColumnProps extends Status {
   index: number
@@ -45,18 +45,7 @@ const StatusColumn = ({ index, title, issues }: StatusColumnProps) => (
           >
             {title}
           </Typography>
-          <IconButton
-            size='small'
-            sx={{
-              position: 'absolute',
-              top: '50%',
-              right: 8,
-              translate: '0 -50%',
-              color: 'inherit',
-            }}
-          >
-            <MoreVertIcon fontSize='small' />
-          </IconButton>
+          <StatusActionsMenu />
         </Paper>
         <StrictModeDroppable type='status' droppableId={title}>
           {({ droppableProps, innerRef, placeholder }) => (

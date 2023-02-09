@@ -8,7 +8,6 @@ import {
   ListItemText,
   Menu,
   MenuItem,
-  MenuList,
 } from '@mui/material'
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -40,35 +39,33 @@ const WidgetsMenu = () => {
         <WidgetsIcon />
       </IconButton>
       <Menu open={!!menu} anchorEl={menu} onClose={() => setMenu(null)}>
-        <MenuList>
-          <MenuItem
-            selected={pathname === '/notes'}
-            onClick={handleNotesMenuItemClick}
-          >
-            <ListItemIcon>
-              <StickyNote2Icon fontSize='small' />
-            </ListItemIcon>
-            <ListItemText>Notes</ListItemText>
-          </MenuItem>
-          <MenuItem
-            selected={pathname === '/kanban'}
-            onClick={handleKanbanMenuItemClick}
-          >
-            <ListItemIcon>
-              <ViewKanbanIcon fontSize='small' />
-            </ListItemIcon>
-            <ListItemText>Kanban</ListItemText>
-          </MenuItem>
-          <MenuItem
-            selected={pathname === '/'}
-            onClick={handleSchedulesMenuItemClick}
-          >
-            <ListItemIcon>
-              <ViewListIcon fontSize='small' />
-            </ListItemIcon>
-            <ListItemText>Schedules</ListItemText>
-          </MenuItem>
-        </MenuList>
+        <MenuItem
+          selected={pathname === '/notes'}
+          onClick={handleNotesMenuItemClick}
+        >
+          <ListItemIcon>
+            <StickyNote2Icon fontSize='small' />
+          </ListItemIcon>
+          <ListItemText>Notes</ListItemText>
+        </MenuItem>
+        <MenuItem
+          selected={pathname === '/kanban'}
+          onClick={handleKanbanMenuItemClick}
+        >
+          <ListItemIcon>
+            <ViewKanbanIcon fontSize='small' />
+          </ListItemIcon>
+          <ListItemText>Kanban</ListItemText>
+        </MenuItem>
+        <MenuItem
+          selected={pathname === '/'}
+          onClick={handleSchedulesMenuItemClick}
+        >
+          <ListItemIcon>
+            <ViewListIcon fontSize='small' />
+          </ListItemIcon>
+          <ListItemText>Schedules</ListItemText>
+        </MenuItem>
       </Menu>
     </>
   )
