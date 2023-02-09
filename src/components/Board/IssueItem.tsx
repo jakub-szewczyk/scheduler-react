@@ -1,13 +1,7 @@
-import MoreVertIcon from '@mui/icons-material/MoreVert'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  IconButton,
-  Typography,
-} from '@mui/material'
+import { Card, CardContent, CardHeader, Typography } from '@mui/material'
 import { Draggable } from 'react-beautiful-dnd'
 import { Issue } from '../../types/board'
+import IssueActionsMenu from './IssueActionsMenu'
 
 interface IssueItemProps extends Issue {
   index: number
@@ -29,11 +23,7 @@ const IssueItem = ({ index, title, content }: IssueItemProps) => (
       >
         <CardHeader
           title={title}
-          action={
-            <IconButton size='small'>
-              <MoreVertIcon fontSize='small' />
-            </IconButton>
-          }
+          action={<IssueActionsMenu />}
           titleTypographyProps={{
             variant: 'body1',
             noWrap: true,
