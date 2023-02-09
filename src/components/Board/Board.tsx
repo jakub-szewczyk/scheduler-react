@@ -1,13 +1,15 @@
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { useLocalStorage } from 'usehooks-ts'
-import { STATUSES } from '../../mocks/board'
-import { calculateDragState } from '../../modules/board'
+import * as BOARD from '../../modules/board'
 import StrictModeDroppable from '../layout/StrictModeDroppable/StrictModeDroppable'
 import StatusColumn from './StatusColumn'
 import { BoardContainer } from './styles/Board.styled'
 
 const Board = () => {
-  const [statuses, setStatuses] = useLocalStorage('statuses', STATUSES)
+  const [statuses, setStatuses] = useLocalStorage(
+    'statuses',
+    BOARD.INITIAL_VALUES
+  )
 
   const handleDragEnd = ({ source, destination }: DropResult) => {
     if (
@@ -17,7 +19,7 @@ const Board = () => {
     )
       return
 
-    setStatuses(calculateDragState({ source, destination }))
+    setStatuses(BOARD.calculateDragState({ source, destination }))
   }
 
   return (

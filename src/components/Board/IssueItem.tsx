@@ -1,4 +1,11 @@
-import { Card, CardContent, CardHeader, Typography } from '@mui/material'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  IconButton,
+  Typography,
+} from '@mui/material'
 import { Draggable } from 'react-beautiful-dnd'
 import { Issue } from '../../types/board'
 
@@ -22,10 +29,23 @@ const IssueItem = ({ index, title, content }: IssueItemProps) => (
       >
         <CardHeader
           title={title}
-          titleTypographyProps={{ variant: 'body1' }}
-          sx={{ pb: 0 }}
+          action={
+            <IconButton size='small'>
+              <MoreVertIcon fontSize='small' />
+            </IconButton>
+          }
+          titleTypographyProps={{
+            variant: 'body1',
+            noWrap: true,
+          }}
+          sx={{
+            pb: 0,
+            '.MuiCardHeader-content': {
+              width: 'calc(100% - 60px)',
+            },
+          }}
         />
-        <CardContent>
+        <CardContent sx={{ pb: '1rem !important' }}>
           <Typography
             sx={{
               overflow: 'hidden',
