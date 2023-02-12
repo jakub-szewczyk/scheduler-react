@@ -1,5 +1,5 @@
-const Kanban = () => {
-  return <div>Kanban</div>
-}
+import Board from '../../components/Board/Board'
+
+const Kanban = () => <Board />
 
 export default Kanban

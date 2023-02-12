@@ -2,55 +2,52 @@ import { Button, Stack, Typography } from '@mui/material'
 import { Field, Form, Formik, FormikHelpers } from 'formik'
 import { TextField } from 'formik-mui'
 import { MouseEventHandler } from 'react'
+import { Status } from '../../types/board'
 import DraggableDialog, {
   DraggableDialogProps,
 } from '../layout/DraggableDialog/DraggableDialog'
-import validationSchema from './validation/validationSchema'
-import * as SCHEDULE from '../../modules/schedule'
-import { Schedule } from '../../types/schedule'
+import { editStatusValidationSchema } from './validation/validationSchema'
 
-interface SaveScheduleDialogProps extends DraggableDialogProps {
-  schedule: Schedule
-  schedules: Schedule[]
+interface EditStatusDialogProps extends DraggableDialogProps {
+  status: Status
+  statuses: Status[]
   onSave: (
-    values: { name: string },
-    formikHelpers: FormikHelpers<{ name: string }>
+    values: { title: string },
+    formikHelpers: FormikHelpers<{ title: string }>
   ) => void
   onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
 
-const SaveScheduleDialog = ({
-  schedule,
-  schedules,
+const EditStatusDialog = ({
+  status,
+  statuses,
   onSave,
   onClose,
   onCancel = onClose as MouseEventHandler<HTMLButtonElement> | undefined,
   ...props
-}: SaveScheduleDialogProps) => (
+}: EditStatusDialogProps) => (
   <DraggableDialog
     {...props}
     onClose={onClose}
-    dialogTitle={
-      SCHEDULE.isUnsaved(schedule) ? 'Save schedule' : 'Rename schedule'
-    }
+    dialogTitle='Rename status'
     dialogContent={
       <Stack spacing={3}>
-        <Typography>Choose a name for your schedule</Typography>
+        <Typography>Choose a title for your status</Typography>
         <Formik
           initialValues={{
-            name: SCHEDULE.isUnsaved(schedule) ? '' : schedule.name,
+            title: status.title,
           }}
-          validationSchema={validationSchema(schedules)}
+          validationSchema={editStatusValidationSchema(statuses)}
           onSubmit={onSave}
         >
           {() => (
-            <Form id='schedule'>
+            <Form id='status'>
               <Field
                 component={TextField}
-                name='name'
+                name='title'
                 size='small'
-                label='Name'
-                helperText='Set schedule name'
+                label='Title'
+                helperText='Set status title'
                 sx={{ width: 400 }}
               />
             </Form>
@@ -63,7 +60,7 @@ const SaveScheduleDialog = ({
         <Button variant='outlined' onClick={onCancel}>
           Cancel
         </Button>
-        <Button type='submit' form='schedule' variant='outlined'>
+        <Button type='submit' form='status' variant='outlined'>
           Save
         </Button>
       </>
@@ -71,4 +68,4 @@ const SaveScheduleDialog = ({
   />
 )
 
-export default SaveScheduleDialog
+export default EditStatusDialog
