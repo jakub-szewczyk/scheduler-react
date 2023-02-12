@@ -1,16 +1,25 @@
 import { Paper, Stack, Typography } from '@mui/material'
+import { Dispatch, SetStateAction } from 'react'
 import { Draggable } from 'react-beautiful-dnd'
 import { Status } from '../../types/board'
 import StrictModeDroppable from '../layout/StrictModeDroppable/StrictModeDroppable'
 import IssueItem from './IssueItem'
 import StatusActionsMenu from './StatusActionsMenu'
 
-interface StatusColumnProps extends Status {
+interface StatusColumnProps {
   index: number
+  status: Status
+  statuses: Status[]
+  setStatuses: Dispatch<SetStateAction<Status[]>>
 }
 
-const StatusColumn = ({ index, title, issues }: StatusColumnProps) => (
-  <Draggable draggableId={title} index={index}>
+const StatusColumn = ({
+  index,
+  status,
+  statuses,
+  setStatuses,
+}: StatusColumnProps) => (
+  <Draggable draggableId={status.title} index={index}>
     {({ draggableProps, dragHandleProps, innerRef }) => (
       <Paper
         {...draggableProps}
@@ -43,11 +52,15 @@ const StatusColumn = ({ index, title, issues }: StatusColumnProps) => (
             textTransform='uppercase'
             marginX={3.75}
           >
-            {title}
+            {status.title}
           </Typography>
-          <StatusActionsMenu />
+          <StatusActionsMenu
+            status={status}
+            statuses={statuses}
+            setStatuses={setStatuses}
+          />
         </Paper>
-        <StrictModeDroppable type='status' droppableId={title}>
+        <StrictModeDroppable type='status' droppableId={status.title}>
           {({ droppableProps, innerRef, placeholder }) => (
             <Stack
               {...droppableProps}
@@ -55,7 +68,7 @@ const StatusColumn = ({ index, title, issues }: StatusColumnProps) => (
               spacing={0.75}
               height='calc(100% - 40px)'
             >
-              {issues.map((issue, index) => (
+              {status.issues.map((issue, index) => (
                 <IssueItem {...issue} key={issue.title} index={index} />
               ))}
               {placeholder}

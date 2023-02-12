@@ -60,4 +60,10 @@ const calculateDragState = ({ source, destination }: DropResultLocation) =>
     }
   })
 
-export { INITIAL_VALUES, calculateDragState }
+const renameStatus = (previousTitle: string, currentTitle: string) =>
+  produce((statuses: Status[]) => {
+    const status = statuses.find((status) => status.title === previousTitle)!
+    status.title = currentTitle.trim().toLowerCase()
+  })
+
+export { INITIAL_VALUES, calculateDragState, renameStatus }

@@ -32,7 +32,13 @@ const Board = () => {
         {({ droppableProps, innerRef, placeholder }) => (
           <BoardContainer {...droppableProps} ref={innerRef}>
             {statuses.map((status, index) => (
-              <StatusColumn {...status} key={status.title} index={index} />
+              <StatusColumn
+                key={status.title}
+                index={index}
+                status={status}
+                statuses={statuses}
+                setStatuses={setStatuses}
+              />
             ))}
             {placeholder}
           </BoardContainer>

@@ -8,17 +8,42 @@ import {
   Menu,
   MenuItem,
 } from '@mui/material'
-import { useState } from 'react'
+import { Dispatch, SetStateAction, useState } from 'react'
+import { useBoolean } from 'usehooks-ts'
+import { Status } from '../../types/board'
+import EditStatusDialog from './EditStatusDialog'
+import * as BOARD from '../../modules/board'
 
-const StatusActionsMenu = () => {
+interface StatusActionsMenuProps {
+  status: Status
+  statuses: Status[]
+  setStatuses: Dispatch<SetStateAction<Status[]>>
+}
+
+const StatusActionsMenu = ({
+  status,
+  statuses,
+  setStatuses,
+}: StatusActionsMenuProps) => {
   const [menu, setMenu] = useState<HTMLElement | null>(null)
+  const {
+    value: isEditDialogOpen,
+    setFalse: closeEditDialog,
+    setTrue: openEditDialog,
+  } = useBoolean(false)
 
   const handleEditMenuItemClick = () => {
     setMenu(null)
+    openEditDialog()
   }
 
   const handleDeleteMenuItemClick = () => {
     setMenu(null)
+  }
+
+  const handleStatusEdit = ({ title }: { title: string }) => {
+    setStatuses(BOARD.renameStatus(status.title, title))
+    closeEditDialog()
   }
 
   return (
@@ -50,6 +75,13 @@ const StatusActionsMenu = () => {
           <ListItemText>Delete</ListItemText>
         </MenuItem>
       </Menu>
+      <EditStatusDialog
+        open={isEditDialogOpen}
+        onClose={closeEditDialog}
+        status={status}
+        statuses={statuses}
+        onSave={handleStatusEdit}
+      />
     </>
   )
 }
