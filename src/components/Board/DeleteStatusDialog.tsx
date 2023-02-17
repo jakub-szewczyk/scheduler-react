@@ -20,6 +20,7 @@ const DeleteStatusDialog = ({
 }: DeleteStatusDialogProps) => (
   <DraggableDialog
     {...props}
+    onClose={onClose}
     dialogTitle='Delete status'
     dialogContent={
       <Typography>
