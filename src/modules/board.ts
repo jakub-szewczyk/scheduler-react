@@ -1,7 +1,7 @@
 import produce from 'immer'
 import { curry, findIndex, move, remove } from 'ramda'
 import { DraggableLocation } from 'react-beautiful-dnd'
-import { DropResultLocation, Status } from '../types/board'
+import { DropResultLocation, Issue, Status } from '../types/board'
 
 const INITIAL_VALUES: Status[] = [
   {
@@ -60,7 +60,7 @@ const calculateDragState = ({ source, destination }: DropResultLocation) =>
     }
   })
 
-const renameStatus = (previousTitle: string, currentTitle: string) =>
+const editStatus = (previousTitle: string, currentTitle: string) =>
   produce((statuses: Status[]) => {
     const status = statuses.find((status) => status.title === previousTitle)!
     status.title = currentTitle.trim().toLowerCase()
@@ -74,4 +74,31 @@ const deleteStatus = curry((title: string, statuses: Status[]) =>
   )
 )
 
-export { INITIAL_VALUES, calculateDragState, renameStatus, deleteStatus }
+const editIssue = (title: string, values: Issue) =>
+  produce((statuses: Status[]) => {
+    const issue = statuses
+      .flatMap((status) => status.issues)
+      .find((issue) => issue.title === title)!
+    issue.title = values.title
+    issue.content = values.content
+  })
+
+const deleteIssue = (title: string) =>
+  produce((statuses: Status[]) => {
+    const status = statuses.find((status) =>
+      status.issues.some((issue) => issue.title === title)
+    )!
+    const statusIndex = status.issues.findIndex(
+      (issue) => issue.title === title
+    )
+    status.issues.splice(statusIndex, 1)
+  })
+
+export {
+  INITIAL_VALUES,
+  calculateDragState,
+  editStatus,
+  deleteStatus,
+  editIssue,
+  deleteIssue,
+}

@@ -1,14 +1,18 @@
 import { Card, CardContent, CardHeader, Typography } from '@mui/material'
+import { Dispatch, SetStateAction } from 'react'
 import { Draggable } from 'react-beautiful-dnd'
-import { Issue } from '../../types/board'
+import { Issue, Status } from '../../types/board'
 import IssueActionsMenu from './IssueActionsMenu'
 
-interface IssueItemProps extends Issue {
+interface IssueItemProps {
   index: number
+  issue: Issue
+  issues: Issue[]
+  setStatuses: Dispatch<SetStateAction<Status[]>>
 }
 
-const IssueItem = ({ index, title, content }: IssueItemProps) => (
-  <Draggable draggableId={title} index={index}>
+const IssueItem = ({ index, issue, issues, setStatuses }: IssueItemProps) => (
+  <Draggable draggableId={issue.title} index={index}>
     {({ draggableProps, dragHandleProps, innerRef }) => (
       <Card
         {...draggableProps}
@@ -22,8 +26,14 @@ const IssueItem = ({ index, title, content }: IssueItemProps) => (
         }}
       >
         <CardHeader
-          title={title}
-          action={<IssueActionsMenu />}
+          title={issue.title}
+          action={
+            <IssueActionsMenu
+              issue={issue}
+              issues={issues}
+              setStatuses={setStatuses}
+            />
+          }
           titleTypographyProps={{
             variant: 'body1',
             noWrap: true,
@@ -44,7 +54,7 @@ const IssueItem = ({ index, title, content }: IssueItemProps) => (
               WebkitBoxOrient: 'vertical',
             }}
           >
-            {content}
+            {issue.content}
           </Typography>
         </CardContent>
       </Card>

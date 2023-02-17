@@ -12,8 +12,8 @@ interface EditStatusDialogProps extends DraggableDialogProps {
   status: Status
   statuses: Status[]
   onSave: (
-    values: { title: string },
-    formikHelpers: FormikHelpers<{ title: string }>
+    values: Pick<Status, 'title'>,
+    formikHelpers: FormikHelpers<Pick<Status, 'title'>>
   ) => void
   onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
@@ -29,7 +29,7 @@ const EditStatusDialog = ({
   <DraggableDialog
     {...props}
     onClose={onClose}
-    dialogTitle='Rename status'
+    dialogTitle='Edit status'
     dialogContent={
       <Stack spacing={3}>
         <Typography>Choose a title for your status</Typography>

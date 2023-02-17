@@ -69,7 +69,13 @@ const StatusColumn = ({
               height='calc(100% - 40px)'
             >
               {status.issues.map((issue, index) => (
-                <IssueItem {...issue} key={issue.title} index={index} />
+                <IssueItem
+                  key={issue.title}
+                  index={index}
+                  issue={issue}
+                  issues={status.issues}
+                  setStatuses={setStatuses}
+                />
               ))}
               {placeholder}
             </Stack>

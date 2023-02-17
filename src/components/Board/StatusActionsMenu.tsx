@@ -48,12 +48,12 @@ const StatusActionsMenu = ({
     openDeleteDialog()
   }
 
-  const handleStatusEdit = ({ title }: { title: string }) => {
-    setStatuses(BOARD.renameStatus(status.title, title))
+  const handleStatusEdit = ({ title }: Pick<Status, 'title'>) => {
+    setStatuses(BOARD.editStatus(status.title, title))
     closeEditDialog()
   }
 
-  const handleStatusDelete = ({ title }: { title: string }) => {
+  const handleStatusDelete = ({ title }: Pick<Status, 'title'>) => {
     setStatuses(BOARD.deleteStatus(title))
     closeDeleteDialog()
   }
