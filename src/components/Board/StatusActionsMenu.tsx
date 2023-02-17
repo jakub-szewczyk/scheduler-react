@@ -10,9 +10,10 @@ import {
 } from '@mui/material'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useBoolean } from 'usehooks-ts'
-import { Status } from '../../types/board'
-import EditStatusDialog from './EditStatusDialog'
 import * as BOARD from '../../modules/board'
+import { Status } from '../../types/board'
+import DeleteStatusDialog from './DeleteStatusDialog'
+import EditStatusDialog from './EditStatusDialog'
 
 interface StatusActionsMenuProps {
   status: Status
@@ -31,6 +32,11 @@ const StatusActionsMenu = ({
     setFalse: closeEditDialog,
     setTrue: openEditDialog,
   } = useBoolean(false)
+  const {
+    value: isDeleteDialogOpen,
+    setFalse: closeDeleteDialog,
+    setTrue: openDeleteDialog,
+  } = useBoolean(false)
 
   const handleEditMenuItemClick = () => {
     setMenu(null)
@@ -39,11 +45,17 @@ const StatusActionsMenu = ({
 
   const handleDeleteMenuItemClick = () => {
     setMenu(null)
+    openDeleteDialog()
   }
 
   const handleStatusEdit = ({ title }: { title: string }) => {
     setStatuses(BOARD.renameStatus(status.title, title))
     closeEditDialog()
+  }
+
+  const handleStatusDelete = ({ title }: { title: string }) => {
+    setStatuses(BOARD.deleteStatus(title))
+    closeDeleteDialog()
   }
 
   return (
@@ -81,6 +93,12 @@ const StatusActionsMenu = ({
         status={status}
         statuses={statuses}
         onSave={handleStatusEdit}
+      />
+      <DeleteStatusDialog
+        open={isDeleteDialogOpen}
+        onClose={closeDeleteDialog}
+        status={status}
+        onDelete={handleStatusDelete}
       />
     </>
   )

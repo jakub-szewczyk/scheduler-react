@@ -8,7 +8,6 @@ const editStatusValidationSchema = (statuses: Status[]) =>
   object().shape({
     title: string()
       .required('Required')
-      .matches(/^\S*$/, 'No whitespace allowed')
       .test(
         'unique status names',
         'This title has already been used by one of your statuses',

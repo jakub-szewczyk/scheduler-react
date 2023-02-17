@@ -1,5 +1,5 @@
 import produce from 'immer'
-import { curry, move } from 'ramda'
+import { curry, findIndex, move, remove } from 'ramda'
 import { DraggableLocation } from 'react-beautiful-dnd'
 import { DropResultLocation, Status } from '../types/board'
 
@@ -66,4 +66,12 @@ const renameStatus = (previousTitle: string, currentTitle: string) =>
     status.title = currentTitle.trim().toLowerCase()
   })
 
-export { INITIAL_VALUES, calculateDragState, renameStatus }
+const deleteStatus = curry((title: string, statuses: Status[]) =>
+  remove(
+    findIndex((status) => status.title === title, statuses),
+    1,
+    statuses
+  )
+)
+
+export { INITIAL_VALUES, calculateDragState, renameStatus, deleteStatus }
