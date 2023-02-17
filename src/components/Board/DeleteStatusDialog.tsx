@@ -24,7 +24,7 @@ const DeleteStatusDialog = ({
     dialogTitle='Delete status'
     dialogContent={
       <Typography>
-        Are you sure you want to delete this status and all its related issues?
+        Are you sure you want to delete this status and all its issues?
       </Typography>
     }
     dialogActions={
