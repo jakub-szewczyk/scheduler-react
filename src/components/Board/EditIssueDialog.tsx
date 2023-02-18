@@ -35,7 +35,7 @@ const EditIssueDialog = ({
             title: issue.title,
             content: issue.content,
           }}
-          validationSchema={editIssueValidationSchema(issues)}
+          validationSchema={editIssueValidationSchema(issue, issues)}
           onSubmit={onSave}
         >
           {() => (

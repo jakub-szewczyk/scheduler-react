@@ -66,21 +66,20 @@ const editStatus = (previousTitle: string, currentTitle: string) =>
     status.title = currentTitle.trim().toLowerCase()
   })
 
-const deleteStatus = curry((title: string, statuses: Status[]) =>
+const deleteStatus = (title: string) => (statuses: Status[]) =>
   remove(
     findIndex((status) => status.title === title, statuses),
     1,
     statuses
   )
-)
 
 const editIssue = (title: string, values: Issue) =>
   produce((statuses: Status[]) => {
     const issue = statuses
       .flatMap((status) => status.issues)
       .find((issue) => issue.title === title)!
-    issue.title = values.title
-    issue.content = values.content
+    issue.title = values.title.trim()
+    issue.content = values.content.trim()
   })
 
 const deleteIssue = (title: string) =>

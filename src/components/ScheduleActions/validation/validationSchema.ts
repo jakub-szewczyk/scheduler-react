@@ -1,17 +1,25 @@
 import { prop } from 'fp-ts-ramda'
+import { filter, map } from 'fp-ts/lib/Array'
 import { pipe } from 'fp-ts/lib/function'
-import { includes, map, trim } from 'ramda'
+import { includes } from 'ramda'
 import { object, string } from 'yup'
 import { Schedule } from '../../../types/schedule'
 
-const validationSchema = (schedules: Schedule[]) =>
+const validationSchema = (schedule: Schedule, schedules: Schedule[]) =>
   object().shape({
     name: string()
+      .trim()
       .required('Required')
       .test(
         'unique schedule names',
         'This name has already been used by one of your schedules',
-        (name = '') => !pipe(schedules, map(prop('name')), includes(trim(name)))
+        (name = '') =>
+          !pipe(
+            schedules,
+            filter(({ name }) => name !== schedule.name),
+            map(prop('name')),
+            includes(name)
+          )
       ),
   })
 

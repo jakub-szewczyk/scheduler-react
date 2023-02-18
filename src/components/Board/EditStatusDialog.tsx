@@ -37,7 +37,7 @@ const EditStatusDialog = ({
           initialValues={{
             title: status.title,
           }}
-          validationSchema={editStatusValidationSchema(statuses)}
+          validationSchema={editStatusValidationSchema(status, statuses)}
           onSubmit={onSave}
         >
           {() => (

@@ -40,7 +40,7 @@ const SaveScheduleDialog = ({
           initialValues={{
             name: SCHEDULE.isUnsaved(schedule) ? '' : schedule.name,
           }}
-          validationSchema={validationSchema(schedules)}
+          validationSchema={validationSchema(schedule, schedules)}
           onSubmit={onSave}
         >
           {() => (
