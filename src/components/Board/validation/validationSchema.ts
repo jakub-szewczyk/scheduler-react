@@ -24,7 +24,7 @@ const editStatusValidationSchema = (status: Status, statuses: Status[]) =>
       ),
   })
 
-const editIssueValidationSchema = (issue: Issue, issues: Issue[]) =>
+const editIssueValidationSchema = (issue: Issue, statuses: Status[]) =>
   object().shape({
     title: string()
       .trim()
@@ -34,7 +34,7 @@ const editIssueValidationSchema = (issue: Issue, issues: Issue[]) =>
         'This title has already been used by one of your issues',
         (title = '') =>
           !pipe(
-            issues,
+            statuses.flatMap((status) => status.issues),
             filter(({ title }) => title !== issue.title),
             map(prop('title')),
             includes(title)

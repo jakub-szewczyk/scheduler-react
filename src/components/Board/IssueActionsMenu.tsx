@@ -18,12 +18,14 @@ import DeleteIssueDialog from './DeleteIssueDialog'
 interface IssueActionsMenuProps {
   issue: Issue
   issues: Issue[]
+  statuses: Status[]
   setStatuses: Dispatch<SetStateAction<Status[]>>
 }
 
 const IssueActionsMenu = ({
   issue,
   issues,
+  statuses,
   setStatuses,
 }: IssueActionsMenuProps) => {
   const [menu, setMenu] = useState<HTMLElement | null>(null)
@@ -85,6 +87,7 @@ const IssueActionsMenu = ({
         onClose={closeEditDialog}
         issue={issue}
         issues={issues}
+        statuses={statuses}
         onSave={handleIssueEdit}
       />
       <DeleteIssueDialog

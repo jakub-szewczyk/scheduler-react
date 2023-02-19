@@ -74,6 +74,7 @@ const StatusColumn = ({
                   index={index}
                   issue={issue}
                   issues={status.issues}
+                  statuses={statuses}
                   setStatuses={setStatuses}
                 />
               ))}

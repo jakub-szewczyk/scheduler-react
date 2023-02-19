@@ -2,7 +2,7 @@ import { Button, Stack, Typography } from '@mui/material'
 import { Field, Form, Formik, FormikHelpers } from 'formik'
 import { TextField } from 'formik-mui'
 import { MouseEventHandler } from 'react'
-import { Issue } from '../../types/board'
+import { Issue, Status } from '../../types/board'
 import DraggableDialog, {
   DraggableDialogProps,
 } from '../layout/DraggableDialog/DraggableDialog'
@@ -11,6 +11,7 @@ import { editIssueValidationSchema } from './validation/validationSchema'
 interface EditIssueDialogProps extends DraggableDialogProps {
   issue: Issue
   issues: Issue[]
+  statuses: Status[]
   onSave: (values: Issue, formikHelpers: FormikHelpers<Issue>) => void
   onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
@@ -18,6 +19,7 @@ interface EditIssueDialogProps extends DraggableDialogProps {
 const EditIssueDialog = ({
   issue,
   issues,
+  statuses,
   onSave,
   onClose,
   onCancel = onClose as MouseEventHandler<HTMLButtonElement> | undefined,
@@ -35,7 +37,7 @@ const EditIssueDialog = ({
             title: issue.title,
             content: issue.content,
           }}
-          validationSchema={editIssueValidationSchema(issue, issues)}
+          validationSchema={editIssueValidationSchema(issue, statuses)}
           onSubmit={onSave}
         >
           {() => (
