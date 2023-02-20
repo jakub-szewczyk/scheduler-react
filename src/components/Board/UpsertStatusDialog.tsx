@@ -55,7 +55,11 @@ const UpsertStatusDialog = ({
             initialValues={{
               title: mode === 'EDIT' ? status.title : '',
             }}
-            validationSchema={editStatusValidationSchema(status, statuses)}
+            validationSchema={editStatusValidationSchema(
+              mode,
+              status,
+              statuses
+            )}
             onSubmit={onSubmit(mode)}
           >
             {() => (
@@ -83,6 +87,9 @@ const UpsertStatusDialog = ({
           </Button>
         </>
       }
+      TransitionProps={{
+        exit: false,
+      }}
     />
   )
 }

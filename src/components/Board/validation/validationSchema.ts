@@ -1,12 +1,16 @@
 import { prop } from 'fp-ts-ramda'
 import { filter, map } from 'fp-ts/lib/Array'
-import { pipe } from 'fp-ts/lib/function'
+import { identity, pipe } from 'fp-ts/lib/function'
 import { includes, toLower } from 'ramda'
 import { object, string } from 'yup'
 import { deleteStatus } from '../../../modules/board'
-import { Issue, Status } from '../../../types/board'
+import { Issue, Status, UpsertStatusDialogMode } from '../../../types/board'
 
-const editStatusValidationSchema = (status: Status, statuses: Status[]) =>
+const editStatusValidationSchema = (
+  mode: UpsertStatusDialogMode,
+  status: Status,
+  statuses: Status[]
+) =>
   object().shape({
     title: string()
       .trim()
@@ -17,7 +21,7 @@ const editStatusValidationSchema = (status: Status, statuses: Status[]) =>
         (title = '') =>
           !pipe(
             statuses,
-            deleteStatus(status.title),
+            mode === 'EDIT' ? deleteStatus(status.title) : identity,
             map(prop('title')),
             includes(toLower(title))
           )

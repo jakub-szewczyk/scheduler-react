@@ -10,6 +10,10 @@ const validationSchema = (schedule: Schedule, schedules: Schedule[]) =>
     name: string()
       .trim()
       .required('Required')
+      .notOneOf(
+        ['unsaved', 'unsaved*'],
+        'This name has been set aside for exclusive purposes'
+      )
       .test(
         'unique schedule names',
         'This name has already been used by one of your schedules',
