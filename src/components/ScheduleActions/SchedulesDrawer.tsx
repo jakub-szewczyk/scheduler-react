@@ -108,7 +108,7 @@ const SchedulesDrawer = ({
       </Stack>
       <Tooltip
         title={
-          SCHEDULE.isUnsaved(schedule) &&
+          any(SCHEDULE.isUnsaved, schedules) &&
           'All schedules must be saved before creating a new one'
         }
       >

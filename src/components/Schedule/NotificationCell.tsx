@@ -53,6 +53,7 @@ const NotificationCell = ({
         {
           time: row.notification?.time || row.starts,
           active: !row.notification?.active,
+          title: row.notification?.title,
         },
         id
       )
