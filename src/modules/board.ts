@@ -2,6 +2,7 @@ import produce from 'immer'
 import { curry, findIndex, move, remove } from 'ramda'
 import { DraggableLocation } from 'react-beautiful-dnd'
 import { DropResultLocation, Issue, Status } from '../types/board'
+import { rectifier } from './math'
 
 const INITIAL_VALUES: Status[] = [
   {
@@ -73,6 +74,28 @@ const deleteStatus = (title: string) => (statuses: Status[]) =>
     statuses
   )
 
+const insertStatusBefore = (statusAfterTitle: string, title: string) =>
+  produce((statuses: Status[]) => {
+    const statusAfterIndex = statuses.findIndex(
+      (status) => status.title === statusAfterTitle
+    )!
+    statuses.splice(rectifier(statusAfterIndex), 0, {
+      title: title.trim().toLowerCase(),
+      issues: [],
+    })
+  })
+
+const insertStatusAfter = (statusAfterBefore: string, title: string) =>
+  produce((statuses: Status[]) => {
+    const statusBeforeIndex = statuses.findIndex(
+      (status) => status.title === statusAfterBefore
+    )!
+    statuses.splice(statusBeforeIndex + 1, 0, {
+      title: title.trim().toLowerCase(),
+      issues: [],
+    })
+  })
+
 const editIssue = (title: string, values: Issue) =>
   produce((statuses: Status[]) => {
     const issue = statuses
@@ -98,6 +121,8 @@ export {
   calculateDragState,
   editStatus,
   deleteStatus,
+  insertStatusBefore,
+  insertStatusAfter,
   editIssue,
   deleteIssue,
 }

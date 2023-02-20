@@ -1,3 +1,5 @@
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
@@ -11,9 +13,9 @@ import {
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useBoolean } from 'usehooks-ts'
 import * as BOARD from '../../modules/board'
-import { Status } from '../../types/board'
+import { Status, UpsertStatusDialogMode } from '../../types/board'
 import DeleteStatusDialog from './DeleteStatusDialog'
-import EditStatusDialog from './EditStatusDialog'
+import UpsertStatusDialog from './UpsertStatusDialog'
 
 interface StatusActionsMenuProps {
   status: Status
@@ -27,11 +29,7 @@ const StatusActionsMenu = ({
   setStatuses,
 }: StatusActionsMenuProps) => {
   const [menu, setMenu] = useState<HTMLElement | null>(null)
-  const {
-    value: isEditDialogOpen,
-    setFalse: closeEditDialog,
-    setTrue: openEditDialog,
-  } = useBoolean(false)
+  const [mode, setMode] = useState<UpsertStatusDialogMode>('IDLE')
   const {
     value: isDeleteDialogOpen,
     setFalse: closeDeleteDialog,
@@ -40,7 +38,7 @@ const StatusActionsMenu = ({
 
   const handleEditMenuItemClick = () => {
     setMenu(null)
-    openEditDialog()
+    setMode('EDIT')
   }
 
   const handleDeleteMenuItemClick = () => {
@@ -48,14 +46,34 @@ const StatusActionsMenu = ({
     openDeleteDialog()
   }
 
+  const handleInsertBeforeMenuItemClick = () => {
+    setMenu(null)
+    setMode('INSERT_BEFORE')
+  }
+
+  const handleInsertAfterMenuItemClick = () => {
+    setMenu(null)
+    setMode('INSERT_AFTER')
+  }
+
   const handleStatusEdit = ({ title }: Pick<Status, 'title'>) => {
     setStatuses(BOARD.editStatus(status.title, title))
-    closeEditDialog()
+    setMode('IDLE')
   }
 
   const handleStatusDelete = ({ title }: Pick<Status, 'title'>) => {
     setStatuses(BOARD.deleteStatus(title))
     closeDeleteDialog()
+  }
+
+  const handleStatusInsertBefore = ({ title }: Pick<Status, 'title'>) => {
+    setStatuses(BOARD.insertStatusBefore(status.title, title))
+    setMode('IDLE')
+  }
+
+  const handleStatusInsertAfter = ({ title }: Pick<Status, 'title'>) => {
+    setStatuses(BOARD.insertStatusAfter(status.title, title))
+    setMode('IDLE')
   }
 
   return (
@@ -86,13 +104,27 @@ const StatusActionsMenu = ({
           </ListItemIcon>
           <ListItemText>Delete</ListItemText>
         </MenuItem>
+        <MenuItem onClick={handleInsertBeforeMenuItemClick}>
+          <ListItemIcon>
+            <ArrowBackIcon fontSize='small' />
+          </ListItemIcon>
+          <ListItemText>Insert before</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={handleInsertAfterMenuItemClick}>
+          <ListItemIcon>
+            <ArrowForwardIcon fontSize='small' />
+          </ListItemIcon>
+          <ListItemText>Insert after</ListItemText>
+        </MenuItem>
       </Menu>
-      <EditStatusDialog
-        open={isEditDialogOpen}
-        onClose={closeEditDialog}
+      <UpsertStatusDialog
+        mode={mode}
+        onClose={() => setMode('IDLE')}
         status={status}
         statuses={statuses}
-        onSave={handleStatusEdit}
+        onEdit={handleStatusEdit}
+        onInsertBefore={handleStatusInsertBefore}
+        onInsertAfter={handleStatusInsertAfter}
       />
       <DeleteStatusDialog
         open={isDeleteDialogOpen}
