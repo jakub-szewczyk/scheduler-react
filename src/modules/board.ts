@@ -25,11 +25,11 @@ const INITIAL_VALUES: Status[] = [
     ],
   },
   {
-    title: 'inprogress',
+    title: 'on hold',
     issues: [],
   },
   {
-    title: 'review',
+    title: 'inprogress',
     issues: [],
   },
   {
