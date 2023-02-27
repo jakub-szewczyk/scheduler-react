@@ -17,4 +17,12 @@ type DropResultLocation = {
 
 type UpsertStatusDialogMode = 'EDIT' | 'INSERT_BEFORE' | 'INSERT_AFTER'
 
-export type { Status, Issue, DropResultLocation, UpsertStatusDialogMode }
+type UpsertIssueDialogMode = 'EDIT' | 'INSERT_ABOVE' | 'INSERT_BELOW'
+
+export type {
+  Status,
+  Issue,
+  DropResultLocation,
+  UpsertStatusDialogMode,
+  UpsertIssueDialogMode,
+}

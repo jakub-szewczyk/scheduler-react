@@ -1,3 +1,5 @@
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
@@ -10,10 +12,10 @@ import {
 } from '@mui/material'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useBoolean } from 'usehooks-ts'
-import { Issue, Status } from '../../types/board'
-import EditIssueDialog from './EditIssueDialog'
 import * as BOARD from '../../modules/board'
+import { Issue, Status, UpsertIssueDialogMode } from '../../types/board'
 import DeleteIssueDialog from './DeleteIssueDialog'
+import UpsertIssueDialog from './UpsertIssueDialog'
 
 interface IssueActionsMenuProps {
   issue: Issue
@@ -29,10 +31,11 @@ const IssueActionsMenu = ({
   setStatuses,
 }: IssueActionsMenuProps) => {
   const [menu, setMenu] = useState<HTMLElement | null>(null)
+  const [mode, setMode] = useState<UpsertIssueDialogMode>('EDIT')
   const {
-    value: isEditDialogOpen,
-    setFalse: closeEditDialog,
-    setTrue: openEditDialog,
+    value: isUpsertDialogOpen,
+    setFalse: closeUpsertDialog,
+    setTrue: openUpsertDialog,
   } = useBoolean(false)
   const {
     value: isDeleteDialogOpen,
@@ -42,7 +45,8 @@ const IssueActionsMenu = ({
 
   const handleEditMenuItemClick = () => {
     setMenu(null)
-    openEditDialog()
+    setMode('EDIT')
+    openUpsertDialog()
   }
 
   const handleDeleteMenuItemClick = () => {
@@ -50,14 +54,36 @@ const IssueActionsMenu = ({
     openDeleteDialog()
   }
 
+  const handleInsertAboveMenuItemClick = () => {
+    setMenu(null)
+    setMode('INSERT_ABOVE')
+    openUpsertDialog()
+  }
+
+  const handleInsertBelowMenuItemClick = () => {
+    setMenu(null)
+    setMode('INSERT_BELOW')
+    openUpsertDialog()
+  }
+
   const handleIssueEdit = (values: Issue) => {
     setStatuses(BOARD.editIssue(issue.title, values))
-    closeEditDialog()
+    closeUpsertDialog()
   }
 
   const handleIssueDelete = ({ title }: Issue) => {
     setStatuses(BOARD.deleteIssue(title))
     closeDeleteDialog()
+  }
+
+  const handleIssueInsertAbove = (values: Issue) => {
+    setStatuses(BOARD.insertIssueAbove(issue.title, values))
+    closeUpsertDialog()
+  }
+
+  const handleIssueInsertBelow = (values: Issue) => {
+    setStatuses(BOARD.insertIssueBelow(issue.title, values))
+    closeUpsertDialog()
   }
 
   return (
@@ -81,14 +107,29 @@ const IssueActionsMenu = ({
           </ListItemIcon>
           <ListItemText>Delete</ListItemText>
         </MenuItem>
+        <MenuItem onClick={handleInsertAboveMenuItemClick}>
+          <ListItemIcon>
+            <ArrowUpwardIcon fontSize='small' />
+          </ListItemIcon>
+          <ListItemText>Insert above</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={handleInsertBelowMenuItemClick}>
+          <ListItemIcon>
+            <ArrowDownwardIcon fontSize='small' />
+          </ListItemIcon>
+          <ListItemText>Insert below</ListItemText>
+        </MenuItem>
       </Menu>
-      <EditIssueDialog
-        open={isEditDialogOpen}
-        onClose={closeEditDialog}
+      <UpsertIssueDialog
+        open={isUpsertDialogOpen}
+        onClose={closeUpsertDialog}
+        mode={mode}
         issue={issue}
         issues={issues}
         statuses={statuses}
-        onSave={handleIssueEdit}
+        onEdit={handleIssueEdit}
+        onInsertAbove={handleIssueInsertAbove}
+        onInsertBelow={handleIssueInsertBelow}
       />
       <DeleteIssueDialog
         open={isDeleteDialogOpen}

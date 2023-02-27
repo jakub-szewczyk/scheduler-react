@@ -8,7 +8,7 @@ import { Status, UpsertStatusDialogMode } from '../../types/board'
 import DraggableDialog, {
   DraggableDialogProps,
 } from '../layout/DraggableDialog/DraggableDialog'
-import { editStatusValidationSchema } from './validation/validationSchema'
+import { upsertStatusValidationSchema } from './validation/validationSchema'
 
 type SubmitHandler = (
   values: Pick<Status, 'title'>,
@@ -54,7 +54,7 @@ const UpsertStatusDialog = ({
             initialValues={{
               title: mode === 'EDIT' ? status.title : '',
             }}
-            validationSchema={editStatusValidationSchema(
+            validationSchema={upsertStatusValidationSchema(
               mode,
               status,
               statuses

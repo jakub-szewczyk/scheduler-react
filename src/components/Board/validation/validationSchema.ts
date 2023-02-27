@@ -4,9 +4,14 @@ import { identity, pipe } from 'fp-ts/lib/function'
 import { includes, toLower } from 'ramda'
 import { object, string } from 'yup'
 import { deleteStatus } from '../../../modules/board'
-import { Issue, Status, UpsertStatusDialogMode } from '../../../types/board'
+import {
+  Issue,
+  Status,
+  UpsertIssueDialogMode,
+  UpsertStatusDialogMode,
+} from '../../../types/board'
 
-const editStatusValidationSchema = (
+const upsertStatusValidationSchema = (
   mode: UpsertStatusDialogMode,
   status: Status,
   statuses: Status[]
@@ -28,7 +33,11 @@ const editStatusValidationSchema = (
       ),
   })
 
-const editIssueValidationSchema = (issue: Issue, statuses: Status[]) =>
+const upsertIssueValidationSchema = (
+  mode: UpsertIssueDialogMode,
+  issue: Issue,
+  statuses: Status[]
+) =>
   object().shape({
     title: string()
       .trim()
@@ -39,7 +48,9 @@ const editIssueValidationSchema = (issue: Issue, statuses: Status[]) =>
         (title = '') =>
           !pipe(
             statuses.flatMap((status) => status.issues),
-            filter(({ title }) => title !== issue.title),
+            mode === 'EDIT'
+              ? filter(({ title }) => title !== issue.title)
+              : identity,
             map(prop('title')),
             includes(title)
           )
@@ -47,4 +58,4 @@ const editIssueValidationSchema = (issue: Issue, statuses: Status[]) =>
     content: string().trim().required('Required'),
   })
 
-export { editStatusValidationSchema, editIssueValidationSchema }
+export { upsertStatusValidationSchema, upsertIssueValidationSchema }

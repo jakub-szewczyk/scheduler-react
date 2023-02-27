@@ -2,7 +2,6 @@ import produce from 'immer'
 import { curry, findIndex, move, remove } from 'ramda'
 import { DraggableLocation } from 'react-beautiful-dnd'
 import { DropResultLocation, Issue, Status } from '../types/board'
-import { rectifier } from './math'
 
 const INITIAL_VALUES: Status[] = [
   {
@@ -79,7 +78,7 @@ const insertStatusBefore = (statusAfterTitle: string, title: string) =>
     const statusAfterIndex = statuses.findIndex(
       (status) => status.title === statusAfterTitle
     )!
-    statuses.splice(rectifier(statusAfterIndex), 0, {
+    statuses.splice(statusAfterIndex, 0, {
       title: title.trim().toLowerCase(),
       issues: [],
     })
@@ -110,10 +109,32 @@ const deleteIssue = (title: string) =>
     const status = statuses.find((status) =>
       status.issues.some((issue) => issue.title === title)
     )!
-    const statusIndex = status.issues.findIndex(
-      (issue) => issue.title === title
-    )
-    status.issues.splice(statusIndex, 1)
+    const issueIndex = status.issues.findIndex((issue) => issue.title === title)
+    status.issues.splice(issueIndex, 1)
+  })
+
+const insertIssueAbove = (title: string, values: Issue) =>
+  produce((statuses: Status[]) => {
+    const status = statuses.find((status) =>
+      status.issues.some((issue) => issue.title === title)
+    )!
+    const issueIndex = status.issues.findIndex((issue) => issue.title === title)
+    status.issues.splice(issueIndex, 0, {
+      title: values.title.trim(),
+      content: values.content.trim(),
+    })
+  })
+
+const insertIssueBelow = (title: string, values: Issue) =>
+  produce((statuses: Status[]) => {
+    const status = statuses.find((status) =>
+      status.issues.some((issue) => issue.title === title)
+    )!
+    const issueIndex = status.issues.findIndex((issue) => issue.title === title)
+    status.issues.splice(issueIndex + 1, 0, {
+      title: values.title.trim(),
+      content: values.content.trim(),
+    })
   })
 
 export {
@@ -125,4 +146,6 @@ export {
   insertStatusAfter,
   editIssue,
   deleteIssue,
+  insertIssueAbove,
+  insertIssueBelow,
 }
