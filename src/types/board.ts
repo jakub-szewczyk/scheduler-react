@@ -15,6 +15,6 @@ type DropResultLocation = {
   destination: DraggableLocation
 }
 
-type UpsertStatusDialogMode = 'IDLE' | 'EDIT' | 'INSERT_BEFORE' | 'INSERT_AFTER'
+type UpsertStatusDialogMode = 'EDIT' | 'INSERT_BEFORE' | 'INSERT_AFTER'
 
 export type { Status, Issue, DropResultLocation, UpsertStatusDialogMode }

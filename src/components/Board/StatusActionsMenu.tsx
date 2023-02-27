@@ -29,7 +29,12 @@ const StatusActionsMenu = ({
   setStatuses,
 }: StatusActionsMenuProps) => {
   const [menu, setMenu] = useState<HTMLElement | null>(null)
-  const [mode, setMode] = useState<UpsertStatusDialogMode>('IDLE')
+  const [mode, setMode] = useState<UpsertStatusDialogMode>('EDIT')
+  const {
+    value: isUpsertDialogOpen,
+    setFalse: closeUpsertDialog,
+    setTrue: openUpsertDialog,
+  } = useBoolean(false)
   const {
     value: isDeleteDialogOpen,
     setFalse: closeDeleteDialog,
@@ -39,6 +44,7 @@ const StatusActionsMenu = ({
   const handleEditMenuItemClick = () => {
     setMenu(null)
     setMode('EDIT')
+    openUpsertDialog()
   }
 
   const handleDeleteMenuItemClick = () => {
@@ -49,16 +55,18 @@ const StatusActionsMenu = ({
   const handleInsertBeforeMenuItemClick = () => {
     setMenu(null)
     setMode('INSERT_BEFORE')
+    openUpsertDialog()
   }
 
   const handleInsertAfterMenuItemClick = () => {
     setMenu(null)
     setMode('INSERT_AFTER')
+    openUpsertDialog()
   }
 
   const handleStatusEdit = ({ title }: Pick<Status, 'title'>) => {
     setStatuses(BOARD.editStatus(status.title, title))
-    setMode('IDLE')
+    closeUpsertDialog()
   }
 
   const handleStatusDelete = ({ title }: Pick<Status, 'title'>) => {
@@ -68,12 +76,12 @@ const StatusActionsMenu = ({
 
   const handleStatusInsertBefore = ({ title }: Pick<Status, 'title'>) => {
     setStatuses(BOARD.insertStatusBefore(status.title, title))
-    setMode('IDLE')
+    closeUpsertDialog()
   }
 
   const handleStatusInsertAfter = ({ title }: Pick<Status, 'title'>) => {
     setStatuses(BOARD.insertStatusAfter(status.title, title))
-    setMode('IDLE')
+    closeUpsertDialog()
   }
 
   return (
@@ -118,8 +126,9 @@ const StatusActionsMenu = ({
         </MenuItem>
       </Menu>
       <UpsertStatusDialog
+        open={isUpsertDialogOpen}
+        onClose={closeUpsertDialog}
         mode={mode}
-        onClose={() => setMode('IDLE')}
         status={status}
         statuses={statuses}
         onEdit={handleStatusEdit}

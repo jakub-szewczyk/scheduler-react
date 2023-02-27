@@ -15,7 +15,7 @@ type SubmitHandler = (
   formikHelpers: FormikHelpers<Pick<Status, 'title'>>
 ) => void
 
-interface UpsertStatusDialogProps extends Omit<DraggableDialogProps, 'open'> {
+interface UpsertStatusDialogProps extends DraggableDialogProps {
   mode: UpsertStatusDialogMode
   status: Status
   statuses: Status[]
@@ -45,7 +45,6 @@ const UpsertStatusDialog = ({
   return (
     <DraggableDialog
       {...props}
-      open={mode !== 'IDLE'}
       onClose={onClose}
       dialogTitle={mode === 'EDIT' ? 'Edit status' : 'Create status'}
       dialogContent={
@@ -87,9 +86,6 @@ const UpsertStatusDialog = ({
           </Button>
         </>
       }
-      TransitionProps={{
-        exit: false,
-      }}
     />
   )
 }
