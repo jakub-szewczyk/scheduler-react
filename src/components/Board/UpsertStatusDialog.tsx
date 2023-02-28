@@ -4,7 +4,7 @@ import { TextField } from 'formik-mui'
 import { constant } from 'fp-ts/lib/function'
 import { cond, equals } from 'ramda'
 import { MouseEventHandler } from 'react'
-import { Status, UpsertStatusDialogMode } from '../../types/board'
+import { Status } from '../../types/board'
 import DraggableDialog, {
   DraggableDialogProps,
 } from '../layout/DraggableDialog/DraggableDialog'
@@ -15,20 +15,52 @@ type SubmitHandler = (
   formikHelpers: FormikHelpers<Pick<Status, 'title'>>
 ) => void
 
-interface UpsertStatusDialogProps extends DraggableDialogProps {
-  mode: UpsertStatusDialogMode
+interface StatusDialogProps extends DraggableDialogProps {
+  status?: Status
+  statuses?: Status[]
+  onCreate?: SubmitHandler
+  onEdit?: SubmitHandler
+  onInsertBefore?: SubmitHandler
+  onInsertAfter?: SubmitHandler
+  onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
+}
+
+interface CreateStatusDialogProps extends StatusDialogProps {
+  mode: 'CREATE'
+  statuses: Status[]
+  onCreate: SubmitHandler
+}
+
+interface EditStatusDialogProps extends StatusDialogProps {
+  mode: 'EDIT'
   status: Status
   statuses: Status[]
   onEdit: SubmitHandler
-  onInsertBefore: SubmitHandler
-  onInsertAfter: SubmitHandler
-  onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
+
+interface InsertBeforeStatusDialogProps extends StatusDialogProps {
+  mode: 'INSERT_BEFORE'
+  statuses: Status[]
+  onInsertBefore: SubmitHandler
+}
+
+interface InsertAfterStatusDialogProps extends StatusDialogProps {
+  mode: 'INSERT_AFTER'
+  statuses: Status[]
+  onInsertAfter: SubmitHandler
+}
+
+type UpsertStatusDialogProps =
+  | CreateStatusDialogProps
+  | EditStatusDialogProps
+  | InsertBeforeStatusDialogProps
+  | InsertAfterStatusDialogProps
 
 const UpsertStatusDialog = ({
   mode,
   status,
   statuses,
+  onCreate,
   onEdit,
   onInsertBefore,
   onInsertAfter,
@@ -37,9 +69,10 @@ const UpsertStatusDialog = ({
   ...props
 }: UpsertStatusDialogProps) => {
   const onSubmit = cond([
-    [equals('EDIT'), constant(onEdit)],
-    [equals('INSERT_BEFORE'), constant(onInsertBefore)],
-    [equals('INSERT_AFTER'), constant(onInsertAfter)],
+    [equals('CREATE'), constant(onCreate!)],
+    [equals('EDIT'), constant(onEdit!)],
+    [equals('INSERT_BEFORE'), constant(onInsertBefore!)],
+    [equals('INSERT_AFTER'), constant(onInsertAfter!)],
   ])
 
   return (

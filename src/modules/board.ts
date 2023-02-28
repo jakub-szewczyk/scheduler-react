@@ -60,6 +60,15 @@ const calculateDragState = ({ source, destination }: DropResultLocation) =>
     }
   })
 
+const createStatus = (title: string) =>
+  produce(
+    (statuses: Status[]) =>
+      void statuses.unshift({
+        title: title.trim().toLowerCase(),
+        issues: [],
+      })
+  )
+
 const editStatus = (previousTitle: string, currentTitle: string) =>
   produce((statuses: Status[]) => {
     const status = statuses.find((status) => status.title === previousTitle)!
@@ -94,6 +103,15 @@ const insertStatusAfter = (statusAfterBefore: string, title: string) =>
       issues: [],
     })
   })
+
+const createIssue = (values: Issue) =>
+  produce(
+    (statuses: Status[]) =>
+      void statuses[0].issues.unshift({
+        title: values.title.trim(),
+        content: values.content.trim(),
+      })
+  )
 
 const editIssue = (title: string, values: Issue) =>
   produce((statuses: Status[]) => {
@@ -140,10 +158,12 @@ const insertIssueBelow = (title: string, values: Issue) =>
 export {
   INITIAL_VALUES,
   calculateDragState,
+  createStatus,
   editStatus,
   deleteStatus,
   insertStatusBefore,
   insertStatusAfter,
+  createIssue,
   editIssue,
   deleteIssue,
   insertIssueAbove,

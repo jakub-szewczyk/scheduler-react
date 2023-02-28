@@ -1,16 +1,17 @@
+import { Dispatch, SetStateAction } from 'react'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
-import { useLocalStorage } from 'usehooks-ts'
 import * as BOARD from '../../modules/board'
+import { Status } from '../../types/board'
 import StrictModeDroppable from '../layout/StrictModeDroppable/StrictModeDroppable'
 import StatusColumn from './StatusColumn'
 import { BoardContainer } from './styles/Board.styled'
 
-const Board = () => {
-  const [statuses, setStatuses] = useLocalStorage(
-    'statuses',
-    BOARD.INITIAL_VALUES
-  )
+interface BoardProps {
+  statuses: Status[]
+  setStatuses: Dispatch<SetStateAction<Status[]>>
+}
 
+const Board = ({ statuses, setStatuses }: BoardProps) => {
   const handleDragEnd = ({ source, destination }: DropResult) => {
     if (
       !destination ||

@@ -4,7 +4,7 @@ import { TextField } from 'formik-mui'
 import { constant } from 'fp-ts/lib/function'
 import { cond, equals } from 'ramda'
 import { MouseEventHandler } from 'react'
-import { Issue, Status, UpsertIssueDialogMode } from '../../types/board'
+import { Issue, Status } from '../../types/board'
 import DraggableDialog, {
   DraggableDialogProps,
 } from '../layout/DraggableDialog/DraggableDialog'
@@ -15,33 +15,67 @@ type SubmitHandler = (
   formikHelpers: FormikHelpers<Issue>
 ) => void
 
-interface EditIssueDialogProps extends DraggableDialogProps {
-  mode: UpsertIssueDialogMode
+interface IssueDialogProps extends DraggableDialogProps {
+  issue?: Issue
+  issues?: Issue[]
+  statuses?: Status[]
+  onCreate?: SubmitHandler
+  onEdit?: SubmitHandler
+  onInsertAbove?: SubmitHandler
+  onInsertBelow?: SubmitHandler
+  onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
+}
+
+interface CreateIssueDialogProps extends IssueDialogProps {
+  mode: 'CREATE'
+  statuses: Status[]
+  onCreate: SubmitHandler
+}
+
+interface EditIssueDialogProps extends IssueDialogProps {
+  mode: 'EDIT'
   issue: Issue
   issues: Issue[]
   statuses: Status[]
   onEdit: SubmitHandler
-  onInsertAbove: SubmitHandler
-  onInsertBelow: SubmitHandler
-  onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
+
+interface InsertAboveIssueDialogProps extends IssueDialogProps {
+  mode: 'INSERT_ABOVE'
+  statuses: Status[]
+  onInsertAbove: SubmitHandler
+}
+
+interface InsertBelowIssueDialogProps extends IssueDialogProps {
+  mode: 'INSERT_BELOW'
+  statuses: Status[]
+  onInsertBelow: SubmitHandler
+}
+
+type UpsertIssueDialogProps =
+  | CreateIssueDialogProps
+  | EditIssueDialogProps
+  | InsertAboveIssueDialogProps
+  | InsertBelowIssueDialogProps
 
 const UpsertIssueDialog = ({
   mode,
   issue,
   issues,
   statuses,
+  onCreate,
   onEdit,
   onInsertAbove,
   onInsertBelow,
   onClose,
   onCancel = onClose as MouseEventHandler<HTMLButtonElement> | undefined,
   ...props
-}: EditIssueDialogProps) => {
+}: UpsertIssueDialogProps) => {
   const onSubmit = cond([
-    [equals('EDIT'), constant(onEdit)],
-    [equals('INSERT_ABOVE'), constant(onInsertAbove)],
-    [equals('INSERT_BELOW'), constant(onInsertBelow)],
+    [equals('CREATE'), constant(onCreate!)],
+    [equals('EDIT'), constant(onEdit!)],
+    [equals('INSERT_ABOVE'), constant(onInsertAbove!)],
+    [equals('INSERT_BELOW'), constant(onInsertBelow!)],
   ])
 
   return (

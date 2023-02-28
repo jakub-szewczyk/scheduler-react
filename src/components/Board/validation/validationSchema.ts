@@ -13,7 +13,7 @@ import {
 
 const upsertStatusValidationSchema = (
   mode: UpsertStatusDialogMode,
-  status: Status,
+  status: Status | undefined,
   statuses: Status[]
 ) =>
   object().shape({
@@ -26,7 +26,7 @@ const upsertStatusValidationSchema = (
         (title = '') =>
           !pipe(
             statuses,
-            mode === 'EDIT' ? deleteStatus(status.title) : identity,
+            mode === 'EDIT' && status ? deleteStatus(status.title) : identity,
             map(prop('title')),
             includes(toLower(title))
           )
@@ -35,7 +35,7 @@ const upsertStatusValidationSchema = (
 
 const upsertIssueValidationSchema = (
   mode: UpsertIssueDialogMode,
-  issue: Issue,
+  issue: Issue | undefined,
   statuses: Status[]
 ) =>
   object().shape({
@@ -48,7 +48,7 @@ const upsertIssueValidationSchema = (
         (title = '') =>
           !pipe(
             statuses.flatMap((status) => status.issues),
-            mode === 'EDIT'
+            mode === 'EDIT' && issue
               ? filter(({ title }) => title !== issue.title)
               : identity,
             map(prop('title')),

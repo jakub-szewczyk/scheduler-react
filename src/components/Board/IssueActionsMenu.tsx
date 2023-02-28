@@ -31,7 +31,8 @@ const IssueActionsMenu = ({
   setStatuses,
 }: IssueActionsMenuProps) => {
   const [menu, setMenu] = useState<HTMLElement | null>(null)
-  const [mode, setMode] = useState<UpsertIssueDialogMode>('EDIT')
+  const [mode, setMode] =
+    useState<Exclude<UpsertIssueDialogMode, 'CREATE'>>('EDIT')
   const {
     value: isUpsertDialogOpen,
     setFalse: closeUpsertDialog,
