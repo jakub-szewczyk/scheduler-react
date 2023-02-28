@@ -5,8 +5,8 @@ import SaveIcon from '@mui/icons-material/Save'
 import ViewListIcon from '@mui/icons-material/ViewList'
 import { SpeedDial, SpeedDialAction } from '@mui/material'
 import SpeedDialIcon from '@mui/material/SpeedDialIcon'
-import { flow, pipe } from 'fp-ts/lib/function'
-import { cond, either, equals, map, path, trim } from 'ramda'
+import { pipe } from 'fp-ts/lib/function'
+import { trim } from 'ramda'
 import { Dispatch, SetStateAction } from 'react'
 import { useBoolean } from 'usehooks-ts'
 import * as SCHEDULE from '../../modules/schedule'
@@ -37,16 +37,6 @@ const ScheduleActions = ({
     setTrue: openSaveScheduleDialog,
   } = useBoolean()
 
-  const handleSpeedDialActionClick = flow(
-    path(['currentTarget', 'ariaLabel']) as () => string,
-    cond([
-      [equals('Download'), SCHEDULE.exportToXLSX(schedule)],
-      [equals('Print'), window.print],
-      [either(equals('Save'), equals('Rename')), openSaveScheduleDialog],
-      [equals('Schedules'), openSchedulesDrawer],
-    ])
-  )
-
   const handleScheduleSave = ({ name }: { name: string }) => {
     setSchedules(pipe(name, trim, SCHEDULE.save))
     closeSaveScheduleDialog()
@@ -74,25 +64,26 @@ const ScheduleActions = ({
         icon={<SpeedDialIcon />}
         sx={{ position: 'fixed', bottom: 24, right: 24 }}
       >
-        {map(
-          ({ name, icon }) => (
-            <SpeedDialAction
-              key={name}
-              icon={icon}
-              tooltipTitle={name}
-              onClick={handleSpeedDialActionClick}
-            />
-          ),
-          [
-            { name: 'Download', icon: <DownloadIcon /> },
-            { name: 'Print', icon: <PrintIcon /> },
-            {
-              name: SCHEDULE.isUnsaved(schedule) ? 'Save' : 'Rename',
-              icon: SCHEDULE.isUnsaved(schedule) ? <SaveIcon /> : <EditIcon />,
-            },
-            { name: 'Schedules', icon: <ViewListIcon /> },
-          ]
-        )}
+        <SpeedDialAction
+          tooltipTitle='Download'
+          icon={<DownloadIcon />}
+          onClick={SCHEDULE.exportToXLSX(schedule)}
+        />
+        <SpeedDialAction
+          tooltipTitle='Print'
+          icon={<PrintIcon />}
+          onClick={window.print}
+        />
+        <SpeedDialAction
+          tooltipTitle={SCHEDULE.isUnsaved(schedule) ? 'Save' : 'Rename'}
+          icon={SCHEDULE.isUnsaved(schedule) ? <SaveIcon /> : <EditIcon />}
+          onClick={openSaveScheduleDialog}
+        />
+        <SpeedDialAction
+          tooltipTitle='Schedules'
+          icon={<ViewListIcon />}
+          onClick={openSchedulesDrawer}
+        />
       </SpeedDial>
       <SchedulesDrawer
         open={isSchedulesDrawerOpen}
