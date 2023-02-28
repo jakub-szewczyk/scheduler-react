@@ -4,10 +4,10 @@ import { SpeedDial, SpeedDialAction } from '@mui/material'
 import SpeedDialIcon from '@mui/material/SpeedDialIcon'
 import { Dispatch, SetStateAction } from 'react'
 import { useBoolean } from 'usehooks-ts'
-import { createIssue, createStatus } from '../../../modules/board'
-import { Issue, Status } from '../../../types/board'
-import UpsertIssueDialog from '../UpsertIssueDialog'
-import UpsertStatusDialog from '../UpsertStatusDialog'
+import { createIssue, createStatus } from '../../modules/board'
+import { Issue, Status } from '../../types/board'
+import UpsertIssueDialog from '../Board/UpsertIssueDialog'
+import UpsertStatusDialog from '../Board/UpsertStatusDialog'
 
 interface BoardActionsProps {
   statuses: Status[]

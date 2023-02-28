@@ -1,6 +1,6 @@
 import { useLocalStorage } from 'usehooks-ts'
 import Board from '../../components/Board/Board'
-import BoardActions from '../../components/Board/BoardActions/BoardActions'
+import BoardActions from '../../components/BoardActions/BoardActions'
 import * as BOARD from '../../modules/board'
 
 const Kanban = () => {
