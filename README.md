@@ -4,7 +4,9 @@
 
 1. Delete schedule confirmation dialog.
 
-2. Notes module.
+2. Consider resizing schedule table and kanban board to fit it more nicely on mobile screens.
+
+3. Notes module.
 
 ## Bugs
 
