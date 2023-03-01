@@ -17,7 +17,7 @@ const DataGrid = styled(MuiDataGrid)(({ theme }) => ({
   '.MuiDataGrid-virtualScroller': {
     overflowY: 'hidden',
     '::-webkit-scrollbar': {
-      height: 8,
+      height: 4,
     },
     '::-webkit-scrollbar-track': {
       background: theme.palette.secondary.light,
@@ -28,6 +28,11 @@ const DataGrid = styled(MuiDataGrid)(({ theme }) => ({
       borderRadius: theme.shape.borderRadius,
       '&:hover': {
         background: theme.palette.primary.dark,
+      },
+    },
+    [theme.breakpoints.up('sm')]: {
+      '::-webkit-scrollbar': {
+        height: 8,
       },
     },
   },

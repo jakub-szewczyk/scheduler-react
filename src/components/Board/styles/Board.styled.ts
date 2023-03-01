@@ -7,12 +7,8 @@ const BoardContainer = styled(Box)(({ theme }) => ({
   margin: '3.5rem auto 0 auto',
   overflowX: 'auto',
   overflowY: 'hidden',
-  [theme.breakpoints.up('sm')]: {
-    width: 'calc(100% - 48px)',
-    marginTop: '4rem',
-  },
   '::-webkit-scrollbar': {
-    height: 8,
+    height: 4,
   },
   '::-webkit-scrollbar-track': {
     background: theme.palette.secondary.light,
@@ -23,6 +19,13 @@ const BoardContainer = styled(Box)(({ theme }) => ({
     borderRadius: theme.shape.borderRadius,
     '&:hover': {
       background: theme.palette.primary.dark,
+    },
+  },
+  [theme.breakpoints.up('sm')]: {
+    width: 'calc(100% - 48px)',
+    marginTop: '4rem',
+    '::-webkit-scrollbar': {
+      height: 8,
     },
   },
 }))

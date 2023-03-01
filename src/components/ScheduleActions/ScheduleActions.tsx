@@ -91,6 +91,7 @@ const ScheduleActions = ({
       </SpeedDial>
       <SchedulesDrawer
         open={isSchedulesDrawerOpen}
+        onOpen={openSchedulesDrawer}
         onClose={closeSchedulesDrawer}
         schedule={schedule}
         schedules={schedules}
