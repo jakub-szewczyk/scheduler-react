@@ -20,9 +20,11 @@ const DraggableDialog = ({
   ...props
 }: DraggableDialogProps) => (
   <Dialog
-    {...props}
+    fullWidth
+    maxWidth='xs'
     aria-labelledby='draggable-dialog-title'
     PaperComponent={PaperComponent}
+    {...props}
   >
     <DialogTitle id='draggable-dialog-title' sx={{ cursor: 'move' }}>
       {dialogTitle}

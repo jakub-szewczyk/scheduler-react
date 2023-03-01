@@ -2,12 +2,16 @@ import { Box, styled } from '@mui/material'
 
 const BoardContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
-  width: '100%',
+  width: 'calc(100% - 32px)',
   maxWidth: theme.breakpoints.values.lg,
-  margin: '5rem auto 0 auto',
+  margin: '3.5rem auto 0 auto',
   overflowX: 'auto',
   overflowY: 'hidden',
-  '&::-webkit-scrollbar': {
+  [theme.breakpoints.up('sm')]: {
+    width: 'calc(100% - 48px)',
+    marginTop: '4rem',
+  },
+  '::-webkit-scrollbar': {
     height: 8,
   },
   '::-webkit-scrollbar-track': {

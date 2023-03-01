@@ -51,7 +51,7 @@ const SaveScheduleDialog = ({
                 size='small'
                 label='Name'
                 helperText='Set schedule name'
-                sx={{ width: 400 }}
+                fullWidth
               />
             </Form>
           )}

@@ -102,7 +102,7 @@ const UpsertStatusDialog = ({
                   size='small'
                   label='Title'
                   helperText='Set status title'
-                  sx={{ width: 400 }}
+                  fullWidth
                 />
               </Form>
             )}

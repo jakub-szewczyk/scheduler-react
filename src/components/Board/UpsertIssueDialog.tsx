@@ -107,7 +107,7 @@ const UpsertIssueDialog = ({
                     size='small'
                     label='Title'
                     helperText='Set issue title'
-                    sx={{ width: 400 }}
+                    fullWidth
                   />
                   <Field
                     component={TextField}
@@ -118,7 +118,7 @@ const UpsertIssueDialog = ({
                     minRows={4}
                     maxRows={4}
                     multiline
-                    sx={{ width: 400 }}
+                    fullWidth
                   />
                 </Stack>
               </Form>
