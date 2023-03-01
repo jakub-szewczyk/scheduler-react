@@ -4,11 +4,11 @@ import ViewListIcon from '@mui/icons-material/ViewList'
 import {
   Box,
   Button,
-  Drawer,
-  DrawerProps,
   IconButton,
   ListItemButton,
   Stack,
+  SwipeableDrawer,
+  SwipeableDrawerProps,
   Tooltip,
   Typography,
 } from '@mui/material'
@@ -22,7 +22,7 @@ import { MouseEventHandler } from 'react'
 import * as SCHEDULE from '../../modules/schedule'
 import { Schedule } from '../../types/schedule'
 
-interface SchedulesDrawerProps extends Omit<DrawerProps, 'onSelect'> {
+interface SchedulesDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
   schedule: Schedule
   schedules: Schedule[]
   onCreate: MouseEventHandler<HTMLButtonElement> | undefined
@@ -38,7 +38,7 @@ const SchedulesDrawer = ({
   onSelect,
   ...props
 }: SchedulesDrawerProps) => (
-  <Drawer
+  <SwipeableDrawer
     {...props}
     anchor='right'
     PaperProps={{
@@ -125,7 +125,7 @@ const SchedulesDrawer = ({
         </Box>
       </Tooltip>
     </Stack>
-  </Drawer>
+  </SwipeableDrawer>
 )
 
 export default SchedulesDrawer
