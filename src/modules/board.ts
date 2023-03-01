@@ -1,5 +1,15 @@
+import { pipe } from 'fp-ts/lib/function'
 import produce from 'immer'
-import { curry, findIndex, move, remove } from 'ramda'
+import {
+  curry,
+  equals,
+  findIndex,
+  join,
+  move,
+  remove,
+  split,
+  tail,
+} from 'ramda'
 import { DraggableLocation } from 'react-beautiful-dnd'
 import { DropResultLocation, Issue, Status } from '../types/board'
 
@@ -40,25 +50,37 @@ const INITIAL_VALUES: Status[] = [
 
 const matchByDraggableLocation = curry(
   ({ droppableId }: DraggableLocation, { title }: Status) =>
-    title === droppableId
+    pipe(droppableId, split('-'), tail, join('-'), equals(title))
 )
 
-const calculateDragState = ({ source, destination }: DropResultLocation) =>
+const dragStatus = ({ source, destination }: DropResultLocation) =>
+  move(source.index, destination.index)
+
+const dragIssueWithinStatus = ({ source, destination }: DropResultLocation) =>
   produce((statuses: Status[]) => {
-    if (source.droppableId === 'board' && destination.droppableId === 'board') {
-      return move(source.index, destination.index, statuses)
-    } else if (source.droppableId === destination.droppableId) {
-      const status = statuses.find(matchByDraggableLocation(source))!
-      status.issues = move(source.index, destination.index, status.issues)
-    } else {
-      const sourceStatus = statuses.find(matchByDraggableLocation(source))!
-      const destinationStatus = statuses.find(
-        matchByDraggableLocation(destination)
-      )!
-      const [sourceIssue] = sourceStatus.issues.splice(source.index, 1)
-      destinationStatus.issues.splice(destination.index, 0, sourceIssue)
-    }
+    const status = statuses.find(matchByDraggableLocation(source))!
+    status.issues = move(source.index, destination.index, status.issues)
   })
+
+const dragIssueBetweenStatuses = ({
+  source,
+  destination,
+}: DropResultLocation) =>
+  produce((statuses: Status[]) => {
+    const sourceStatus = statuses.find(matchByDraggableLocation(source))!
+    const destinationStatus = statuses.find(
+      matchByDraggableLocation(destination)
+    )!
+    const [sourceIssue] = sourceStatus.issues.splice(source.index, 1)
+    destinationStatus.issues.splice(destination.index, 0, sourceIssue)
+  })
+
+const drag = ({ source, destination }: DropResultLocation) =>
+  source.droppableId === 'board' && destination.droppableId === 'board'
+    ? dragStatus({ source, destination })
+    : source.droppableId === destination.droppableId
+    ? dragIssueWithinStatus({ source, destination })
+    : dragIssueBetweenStatuses({ source, destination })
 
 const createStatus = (title: string) =>
   produce(
@@ -157,7 +179,7 @@ const insertIssueBelow = (title: string, values: Issue) =>
 
 export {
   INITIAL_VALUES,
-  calculateDragState,
+  drag,
   createStatus,
   editStatus,
   deleteStatus,

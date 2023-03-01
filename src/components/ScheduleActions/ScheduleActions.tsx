@@ -62,7 +62,11 @@ const ScheduleActions = ({
       <SpeedDial
         ariaLabel='speed-dial'
         icon={<SpeedDialIcon />}
-        sx={{ position: 'fixed', bottom: 24, right: 24 }}
+        sx={{
+          position: 'fixed',
+          bottom: { xs: 16, sm: 24 },
+          right: { xs: 16, sm: 24 },
+        }}
       >
         <SpeedDialAction
           tooltipTitle='Download'

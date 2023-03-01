@@ -19,7 +19,7 @@ const IssueItem = ({
   statuses,
   setStatuses,
 }: IssueItemProps) => (
-  <Draggable draggableId={issue.title} index={index}>
+  <Draggable draggableId={`issue-${issue.title}`} index={index}>
     {({ draggableProps, dragHandleProps, innerRef }) => (
       <Card
         {...draggableProps}

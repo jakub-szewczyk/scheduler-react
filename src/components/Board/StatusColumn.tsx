@@ -19,7 +19,7 @@ const StatusColumn = ({
   statuses,
   setStatuses,
 }: StatusColumnProps) => (
-  <Draggable draggableId={status.title} index={index}>
+  <Draggable draggableId={`status-${status.title}`} index={index}>
     {({ draggableProps, dragHandleProps, innerRef }) => (
       <Paper
         {...draggableProps}
@@ -60,7 +60,10 @@ const StatusColumn = ({
             setStatuses={setStatuses}
           />
         </Paper>
-        <StrictModeDroppable type='status' droppableId={status.title}>
+        <StrictModeDroppable
+          type='status'
+          droppableId={`status-${status.title}`}
+        >
           {({ droppableProps, innerRef, placeholder }) => (
             <Stack
               {...droppableProps}

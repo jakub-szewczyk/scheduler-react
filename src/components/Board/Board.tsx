@@ -20,7 +20,7 @@ const Board = ({ statuses, setStatuses }: BoardProps) => {
     )
       return
 
-    setStatuses(BOARD.calculateDragState({ source, destination }))
+    setStatuses(BOARD.drag({ source, destination }))
   }
 
   return (
