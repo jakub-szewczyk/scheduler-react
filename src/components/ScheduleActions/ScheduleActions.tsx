@@ -7,24 +7,15 @@ import { SpeedDial, SpeedDialAction } from '@mui/material'
 import SpeedDialIcon from '@mui/material/SpeedDialIcon'
 import { pipe } from 'fp-ts/lib/function'
 import { trim } from 'ramda'
-import { Dispatch, SetStateAction } from 'react'
 import { useBoolean } from 'usehooks-ts'
+import useSchedules from '../../hooks/useSchedules'
 import * as SCHEDULE from '../../modules/schedule'
-import { Schedule } from '../../types/schedule'
 import SaveScheduleDialog from './SaveScheduleDialog'
 import SchedulesDrawer from './SchedulesDrawer'
 
-interface ScheduleActionsProps {
-  schedule: Schedule
-  schedules: Schedule[]
-  setSchedules: Dispatch<SetStateAction<Schedule[]>>
-}
+const ScheduleActions = () => {
+  const { schedule, schedules, setSchedules } = useSchedules()
 
-const ScheduleActions = ({
-  schedule,
-  schedules,
-  setSchedules,
-}: ScheduleActionsProps) => {
   const {
     value: isSchedulesDrawerOpen,
     setFalse: closeSchedulesDrawer,

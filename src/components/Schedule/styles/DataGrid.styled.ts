@@ -15,8 +15,8 @@ const DataGrid = styled(MuiDataGrid)(({ theme }) => ({
     borderTop: 0,
   },
   '.MuiDataGrid-virtualScroller': {
-    overflowY: 'hidden',
     '::-webkit-scrollbar': {
+      width: 4,
       height: 4,
     },
     '::-webkit-scrollbar-track': {
@@ -30,8 +30,12 @@ const DataGrid = styled(MuiDataGrid)(({ theme }) => ({
         background: theme.palette.primary.dark,
       },
     },
+    '::-webkit-scrollbar-corner': {
+      display: 'none',
+    },
     [theme.breakpoints.up('sm')]: {
       '::-webkit-scrollbar': {
+        width: 8,
         height: 8,
       },
     },
@@ -50,11 +54,13 @@ const DataGridContainer = styled(Paper)<{ height: number }>(
   ({ theme, height }) => ({
     width: 'calc(100% - 32px)',
     height,
-    margin: '3.5rem auto 0 auto',
+    maxHeight: 'calc(100vh - 160px)',
+    margin: '1rem auto 0 auto',
     overflow: 'hidden',
     [theme.breakpoints.up('sm')]: {
       width: 'calc(100% - 48px)',
-      marginTop: '4rem',
+      maxHeight: 'calc(100vh - 192px)',
+      marginTop: '1.5rem',
     },
     '.MuiDataGrid-footerContainer': {
       height: TABLE.FOOTER_HEIGHT,

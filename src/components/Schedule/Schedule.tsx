@@ -1,20 +1,20 @@
 import { useTheme } from '@mui/material'
-import { Dispatch, SetStateAction } from 'react'
+import useSchedules from '../../hooks/useSchedules'
 import * as ROW from '../../modules/row'
 import * as TABLE from '../../modules/table'
-import { Row } from '../../types/row'
+import DataGridFooter from './DataGridFooter'
 import createColumns from './helpers/createColumns'
 import { DataGrid, DataGridContainer } from './styles/DataGrid.styled'
 
-interface ScheduleProps {
-  rows: Row[]
-  setRows: Dispatch<SetStateAction<Row[]>>
-}
-
-const Schedule = ({ rows, setRows }: ScheduleProps) => {
-  const theme = useTheme()
+const Schedule = () => {
+  const {
+    schedule: { rows },
+    setRows,
+  } = useSchedules()
 
   const columns = createColumns(rows, setRows)
+
+  const theme = useTheme()
 
   return (
     <DataGridContainer
@@ -38,6 +38,9 @@ const Schedule = ({ rows, setRows }: ScheduleProps) => {
         onCellEditCommit={({ field, value, id }) =>
           setRows(ROW.update(field, value, id, rows))
         }
+        components={{
+          Footer: DataGridFooter,
+        }}
       />
     </DataGridContainer>
   )
