@@ -1,26 +1,19 @@
 import AddIcon from '@mui/icons-material/Add'
-import CloseIcon from '@mui/icons-material/Close'
-import ViewListIcon from '@mui/icons-material/ViewList'
 import {
   Box,
   Button,
-  IconButton,
-  ListItemButton,
   Stack,
   SwipeableDrawer,
   SwipeableDrawerProps,
   Tooltip,
   Typography,
 } from '@mui/material'
-import Avatar from '@mui/material/Avatar'
 import List from '@mui/material/List'
-import ListItemAvatar from '@mui/material/ListItemAvatar'
-import ListItemText from '@mui/material/ListItemText'
-import { formatDistanceToNow } from 'date-fns'
-import { any, map } from 'ramda'
+import { any } from 'ramda'
 import { MouseEventHandler } from 'react'
 import * as SCHEDULE from '../../modules/schedule'
 import { Schedule } from '../../types/schedule'
+import SchedulesDrawerItem from './SchedulesDrawerItem'
 
 interface SchedulesDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
   schedule: Schedule
@@ -57,53 +50,15 @@ const SchedulesDrawer = ({
             borderRadius: 1,
           }}
         >
-          {map(
-            (schedule) => (
-              <Stack key={schedule.name} direction='row' alignItems='start'>
-                <ListItemButton onClick={() => onSelect(schedule.name)}>
-                  <ListItemAvatar>
-                    <Avatar>
-                      <ViewListIcon />
-                    </Avatar>
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={SCHEDULE.asteriskSuffix(schedule.name)}
-                    secondary={formatDistanceToNow(
-                      new Date(schedule.createdAt),
-                      {
-                        addSuffix: true,
-                      }
-                    )}
-                    sx={{
-                      '.MuiTypography-root': {
-                        overflow: 'hidden',
-                        whiteSpace: 'nowrap',
-                        textOverflow: 'ellipsis',
-                      },
-                    }}
-                  />
-                </ListItemButton>
-                <Tooltip
-                  placement='left'
-                  title={
-                    schedules.length === 1 &&
-                    'At least one schedule is required'
-                  }
-                >
-                  <Box>
-                    <IconButton
-                      size='small'
-                      disabled={schedules.length === 1}
-                      onClick={() => onDelete(schedule.name)}
-                    >
-                      <CloseIcon fontSize='small' />
-                    </IconButton>
-                  </Box>
-                </Tooltip>
-              </Stack>
-            ),
-            schedules
-          )}
+          {schedules.map((schedule) => (
+            <SchedulesDrawerItem
+              key={schedule.name}
+              schedule={schedule}
+              schedules={schedules}
+              onSelect={onSelect}
+              onDelete={onDelete}
+            />
+          ))}
         </List>
       </Stack>
       <Tooltip

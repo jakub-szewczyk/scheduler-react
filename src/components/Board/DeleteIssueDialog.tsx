@@ -30,12 +30,7 @@ const DeleteIssueDialog = ({
         <Button variant='outlined' onClick={onCancel}>
           Cancel
         </Button>
-        <Button
-          type='submit'
-          form='status'
-          variant='outlined'
-          onClick={() => onDelete(issue)}
-        >
+        <Button variant='outlined' onClick={() => onDelete(issue)}>
           Delete
         </Button>
       </>

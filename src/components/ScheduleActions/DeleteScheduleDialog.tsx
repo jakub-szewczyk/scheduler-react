@@ -1,38 +1,36 @@
 import { Button, Typography } from '@mui/material'
 import { MouseEventHandler } from 'react'
-import { Status } from '../../types/board'
+import { Schedule } from '../../types/schedule'
 import DraggableDialog, {
   DraggableDialogProps,
 } from '../layout/DraggableDialog/DraggableDialog'
 
-interface DeleteStatusDialogProps extends DraggableDialogProps {
-  status: Status
-  onDelete: (status: Status) => void
+interface DeleteScheduleDialogProps extends DraggableDialogProps {
+  schedule: Schedule
+  onDelete: (name: string) => void
   onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
 
-const DeleteStatusDialog = ({
-  status,
+const DeleteScheduleDialog = ({
+  schedule,
   onDelete,
   onClose,
   onCancel = onClose as MouseEventHandler<HTMLButtonElement> | undefined,
   ...props
-}: DeleteStatusDialogProps) => (
+}: DeleteScheduleDialogProps) => (
   <DraggableDialog
     {...props}
     onClose={onClose}
-    dialogTitle='Delete status'
+    dialogTitle='Delete schedule'
     dialogContent={
-      <Typography>
-        Are you sure you want to delete this status and all its issues?
-      </Typography>
+      <Typography>Are you sure you want to delete this schedule?</Typography>
     }
     dialogActions={
       <>
         <Button variant='outlined' onClick={onCancel}>
           Cancel
         </Button>
-        <Button variant='outlined' onClick={() => onDelete(status)}>
+        <Button variant='outlined' onClick={() => onDelete(schedule.name)}>
           Delete
         </Button>
       </>
@@ -40,4 +38,4 @@ const DeleteStatusDialog = ({
   />
 )
 
-export default DeleteStatusDialog
+export default DeleteScheduleDialog
