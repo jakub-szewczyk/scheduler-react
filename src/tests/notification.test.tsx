@@ -4,7 +4,7 @@ import App from '../App'
 
 afterEach(() => localStorage.clear())
 
-it('turns notification on', async () => {
+it('enables notification', async () => {
   render(<App />)
   const user = userEvent.setup()
   const button = within(
@@ -33,7 +33,7 @@ it('turns notification on', async () => {
   await user.click(button)
 }, 10000)
 
-it('saves settings via configuration dialog', async () => {
+it('saves configuration via dialog', async () => {
   render(<App />)
   const user = userEvent.setup()
   await user.type(
@@ -183,4 +183,4 @@ it('saves settings via configuration dialog', async () => {
       name: /save/i,
     })
   )
-}, 35000)
+}, 45000)

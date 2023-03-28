@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from '../App'
 
-it('sets starts to 08:00 am', async () => {
+it('sets start to 08:00 am', async () => {
   render(<App />)
   const user = userEvent.setup()
   const textbox = within(
@@ -14,7 +14,7 @@ it('sets starts to 08:00 am', async () => {
   expect(textbox).toHaveDisplayValue('08:00 am')
 })
 
-it('sets ends to 09:30 am', async () => {
+it('sets end to 09:30 am', async () => {
   render(<App />)
   const user = userEvent.setup()
   const textbox = within(
@@ -52,4 +52,19 @@ it('sets subject to mathematics', async () => {
   const input = cell.querySelector('input')!
   await user.type(input, 'mathematics')
   expect(input).toHaveDisplayValue('mathematics')
+})
+
+it('inserts and removes sub-day row', async () => {
+  render(<App />)
+  const user = userEvent.setup()
+  await user.click(
+    within(
+      screen.getByRole('cell', {
+        name: /monday/i,
+      })
+    ).getByRole('button')
+  )
+  expect(screen.getByTestId('RemoveIcon')).toBeInTheDocument()
+  await user.click(screen.getByTestId('RemoveIcon'))
+  expect(screen.queryByTestId('RemoveIcon')).not.toBeInTheDocument()
 })
