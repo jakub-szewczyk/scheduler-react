@@ -6,11 +6,9 @@
 
 2. Consider resizing schedule table and kanban board to fit it more nicely on mobile screens.
 
-3. Hide tooltip on notification icon mouse down.
+3. Split board module into status and issue modules.
 
-4. Split board module into status and issue modules.
-
-5. Notes module.
+4. Notes module.
 
 ## Bugs
 

@@ -98,6 +98,7 @@ const NotificationCell = ({
               : 'Set start time to enable notification'
           }
           placement='left'
+          disableTouchListener
         >
           <Box>
             <IconButton
