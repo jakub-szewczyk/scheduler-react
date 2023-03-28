@@ -1,43 +1,55 @@
-import { render } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from '../App'
-import {
-  getMondayEndsCell,
-  getMondayRoomCell,
-  getMondayRoomCellInput,
-  getMondayStartsCell,
-  getMondaySubjectCell,
-  getMondaySubjectCellInput,
-} from './queries'
 
-describe('Monday', () => {
-  it('sets starts to 08:00 am', async () => {
-    render(<App />)
-    const user = userEvent.setup()
-    await user.type(getMondayStartsCell(), '0800a')
-    expect(getMondayStartsCell()).toHaveDisplayValue('08:00 am')
-  })
+it('sets starts to 08:00 am', async () => {
+  render(<App />)
+  const user = userEvent.setup()
+  const textbox = within(
+    screen.getByRole('row', {
+      name: /monday/i,
+    })
+  ).getAllByRole('textbox')[0]!
+  await user.type(textbox, '0800a')
+  expect(textbox).toHaveDisplayValue('08:00 am')
+})
 
-  it('sets ends to 09:30 am', async () => {
-    render(<App />)
-    const user = userEvent.setup()
-    await user.type(getMondayEndsCell(), '0930a')
-    expect(getMondayEndsCell()).toHaveDisplayValue('09:30 am')
-  })
+it('sets ends to 09:30 am', async () => {
+  render(<App />)
+  const user = userEvent.setup()
+  const textbox = within(
+    screen.getByRole('row', {
+      name: /monday/i,
+    })
+  ).getAllByRole('textbox')[1]!
+  await user.type(textbox, '0930a')
+  expect(textbox).toHaveDisplayValue('09:30 am')
+})
 
-  it('sets room to 110', async () => {
-    render(<App />)
-    const user = userEvent.setup()
-    await user.dblClick(getMondayRoomCell())
-    await user.type(getMondayRoomCellInput(), '110')
-    expect(getMondayRoomCellInput()).toHaveDisplayValue('110')
-  })
+it('sets room to 110', async () => {
+  render(<App />)
+  const user = userEvent.setup()
+  const cell = within(
+    screen.getByRole('row', {
+      name: /monday/i,
+    })
+  ).getAllByRole('cell')[3]
+  await user.dblClick(cell)
+  const input = cell.querySelector('input')!
+  await user.type(input, '110')
+  expect(input).toHaveDisplayValue('110')
+})
 
-  it('sets subject to mathematics', async () => {
-    render(<App />)
-    const user = userEvent.setup()
-    await user.dblClick(getMondaySubjectCell())
-    await user.type(getMondaySubjectCellInput(), 'mathematics')
-    expect(getMondaySubjectCellInput()).toHaveDisplayValue('mathematics')
-  })
+it('sets subject to mathematics', async () => {
+  render(<App />)
+  const user = userEvent.setup()
+  const cell = within(
+    screen.getByRole('row', {
+      name: /monday/i,
+    })
+  ).getAllByRole('cell')[4]
+  await user.dblClick(cell)
+  const input = cell.querySelector('input')!
+  await user.type(input, 'mathematics')
+  expect(input).toHaveDisplayValue('mathematics')
 })
