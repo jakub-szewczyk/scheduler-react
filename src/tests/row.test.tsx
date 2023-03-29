@@ -2,6 +2,8 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from '../App'
 
+beforeEach(() => localStorage.clear())
+
 it('sets start to 08:00 am', async () => {
   render(<App />)
   const user = userEvent.setup()
@@ -54,7 +56,7 @@ it('sets subject to mathematics', async () => {
   expect(input).toHaveDisplayValue('mathematics')
 })
 
-it('inserts and removes sub-day row', async () => {
+it('inserts and removes', async () => {
   render(<App />)
   const user = userEvent.setup()
   await user.click(

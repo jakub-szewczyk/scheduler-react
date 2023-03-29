@@ -2,9 +2,9 @@ import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from '../App'
 
-afterEach(() => localStorage.clear())
+beforeEach(() => localStorage.clear())
 
-it('enables notification', async () => {
+it('turns on', async () => {
   render(<App />)
   const user = userEvent.setup()
   const button = within(

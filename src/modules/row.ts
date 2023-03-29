@@ -8,7 +8,6 @@ import {
   count,
   curry,
   equals,
-  find,
   findIndex,
   includes,
   insert,
@@ -23,9 +22,6 @@ import * as TIME from './time'
 type T = (x: Row[]) => (string | readonly string[])[]
 
 const equalsId = (id: GridRowId) => flow(prop('id'), equals(id))
-
-const findById = (id: GridRowId, rows: Row[]): Row | undefined =>
-  pipe(rows, find(equalsId(id)))
 
 const findIndexById = curry((id: GridRowId, rows: Row[]) =>
   pipe(rows, findIndex(equalsId(id)))
@@ -60,7 +56,6 @@ const toXLSX = ({ day, starts, ends, room, subject }: Row) => ({
 
 export {
   equalsId,
-  findById,
   findIndexById,
   countPerDays,
   calculateNewIndex,
