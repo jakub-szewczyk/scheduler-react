@@ -289,13 +289,11 @@ it('triggers at current time', async () => {
     screen.getByRole('textbox', {
       name: /time/i,
     }),
-    '{Backspace}{Backspace}{Backspace}{Backspace}{Backspace}{Delete}'
-  )
-  await user.type(
-    screen.getByRole('textbox', {
-      name: /time/i,
-    }),
-    '0740am'
+    '0740a',
+    {
+      initialSelectionStart: 0,
+      initialSelectionEnd: 0,
+    }
   )
   await user.click(
     screen.getByRole('button', {

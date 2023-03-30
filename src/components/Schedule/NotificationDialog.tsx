@@ -58,6 +58,7 @@ const NotificationDialog = ({
           )}
           validationSchema={validationSchema}
           onSubmit={onSave}
+          enableReinitialize
         >
           {({ values, touched, errors }) => (
             <Form id='notification'>
