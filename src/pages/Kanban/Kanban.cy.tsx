@@ -284,25 +284,266 @@ describe('<Kanban />', () => {
     })
   })
 
-  // TODO: Test issue drag and drop
   // issue
   describe('issue', () => {
+    // mouse events
     describe('using mouse events', () => {
-      // top to bottom mouse events
-      it('drags issue to the top', () => {})
-      // bottom to top mouse events
-      it('drags issue to the bottom', () => {})
-      // over statuses
-      it('drags issue over statuses', () => {})
+      it('drags issue to the top', () => {
+        cy.mount(<Kanban />)
+        cy.get('[data-rbd-draggable-id="issue-Adjust column titles"]')
+          .as('top-issue')
+          .invoke('index')
+          .should('equal', 0)
+        cy.get('[data-rbd-draggable-id="issue-Create your own issues"]')
+          .as('middle-issue')
+          .invoke('index')
+          .should('equal', 1)
+        cy.get(
+          '[data-rbd-draggable-id="issue-Get familiar with the kanban board"]'
+        )
+          .as('bottom-issue')
+          .invoke('index')
+          .should('equal', 2)
+        cy.drag(
+          '[data-rbd-draggable-id="issue-Get familiar with the kanban board"]',
+          '[data-rbd-draggable-id="issue-Create your own issues"]'
+        )
+        cy.get('@top-issue').invoke('index').should('equal', 0)
+        cy.get('@middle-issue').invoke('index').should('equal', 2)
+        cy.get('@bottom-issue').invoke('index').should('equal', 1)
+        cy.drag(
+          '[data-rbd-draggable-id="issue-Get familiar with the kanban board"]',
+          '[data-rbd-draggable-id="issue-Adjust column titles"]'
+        )
+        cy.get('@top-issue').invoke('index').should('equal', 1)
+        cy.get('@middle-issue').invoke('index').should('equal', 2)
+        cy.get('@bottom-issue').invoke('index').should('equal', 0)
+      })
+
+      it('drags issue to the bottom', () => {
+        cy.mount(<Kanban />)
+        cy.get('[data-rbd-draggable-id="issue-Adjust column titles"]')
+          .as('top-issue')
+          .invoke('index')
+          .should('equal', 0)
+        cy.get('[data-rbd-draggable-id="issue-Create your own issues"]')
+          .as('middle-issue')
+          .invoke('index')
+          .should('equal', 1)
+        cy.get(
+          '[data-rbd-draggable-id="issue-Get familiar with the kanban board"]'
+        )
+          .as('bottom-issue')
+          .invoke('index')
+          .should('equal', 2)
+        cy.drag(
+          '[data-rbd-draggable-id="issue-Adjust column titles"]',
+          '[data-rbd-draggable-id="issue-Create your own issues"]'
+        )
+        cy.get('@top-issue').invoke('index').should('equal', 1)
+        cy.get('@middle-issue').invoke('index').should('equal', 0)
+        cy.get('@bottom-issue').invoke('index').should('equal', 2)
+        cy.drag(
+          '[data-rbd-draggable-id="issue-Adjust column titles"]',
+          '[data-rbd-draggable-id="issue-Get familiar with the kanban board"]'
+        )
+        cy.get('@top-issue').invoke('index').should('equal', 2)
+        cy.get('@middle-issue').invoke('index').should('equal', 0)
+        cy.get('@bottom-issue').invoke('index').should('equal', 1)
+      })
+
+      it('drags issue over statuses', () => {
+        cy.mount(<Kanban />)
+        cy.get('[data-rbd-draggable-id="issue-Adjust column titles"]')
+          .as('top-issue')
+          .invoke('index')
+          .should('equal', 0)
+        cy.get('[data-rbd-draggable-id="issue-Create your own issues"]')
+          .as('middle-issue')
+          .invoke('index')
+          .should('equal', 1)
+        cy.get(
+          '[data-rbd-draggable-id="issue-Get familiar with the kanban board"]'
+        )
+          .as('bottom-issue')
+          .invoke('index')
+          .should('equal', 2)
+        cy.get('[data-rbd-draggable-id="status-todo"]')
+          .children()
+          .last()
+          .as('todo-issues')
+          .children()
+          .should('have.length', 3)
+        cy.get('[data-rbd-draggable-id="status-on hold"]')
+          .children()
+          .last()
+          .as('on-hold-issues')
+          .children()
+          .should('have.length', 0)
+        cy.get('[data-rbd-draggable-id="status-inprogress"]')
+          .children()
+          .last()
+          .as('inprogress-issues')
+          .children()
+          .should('have.length', 0)
+        cy.get('[data-rbd-draggable-id="status-done"]')
+          .children()
+          .last()
+          .as('done-issues')
+          .children()
+          .should('have.length', 0)
+        cy.drag(
+          '[data-rbd-draggable-id="issue-Adjust column titles"]',
+          '[data-rbd-draggable-id="status-on hold"] > .MuiPaper-root'
+        )
+        cy.get('@todo-issues').children().should('have.length', 2)
+        cy.get('@on-hold-issues').children().should('have.length', 1)
+        cy.get('@inprogress-issues').children().should('have.length', 0)
+        cy.get('@done-issues').children().should('have.length', 0)
+        cy.drag(
+          '[data-rbd-draggable-id="issue-Create your own issues"]',
+          '[data-rbd-draggable-id="status-inprogress"] > .MuiPaper-root'
+        )
+        cy.get('@todo-issues').children().should('have.length', 1)
+        cy.get('@on-hold-issues').children().should('have.length', 1)
+        cy.get('@inprogress-issues').children().should('have.length', 1)
+        cy.get('@done-issues').children().should('have.length', 0)
+        cy.drag(
+          '[data-rbd-draggable-id="issue-Get familiar with the kanban board"]',
+          '[data-rbd-draggable-id="status-done"] > .MuiPaper-root'
+        )
+        cy.get('@todo-issues').children().should('have.length', 0)
+        cy.get('@on-hold-issues').children().should('have.length', 1)
+        cy.get('@inprogress-issues').children().should('have.length', 1)
+        cy.get('@done-issues').children().should('have.length', 1)
+        cy.drag(
+          '[data-rbd-draggable-id="issue-Adjust column titles"]',
+          '[data-rbd-draggable-id="status-todo"] > .MuiPaper-root'
+        )
+        cy.get('@todo-issues').children().should('have.length', 1)
+        cy.get('@on-hold-issues').children().should('have.length', 0)
+        cy.get('@inprogress-issues').children().should('have.length', 1)
+        cy.get('@done-issues').children().should('have.length', 1)
+      })
     })
 
+    // keyboard events
     describe('using keyboard events', () => {
-      // top to bottom keyboard events
-      it('drags issue to the top', () => {})
-      // bottom to top keyboard events
-      it('drags issue to the bottom', () => {})
-      // over statuses
-      it('drags issue over statuses', () => {})
+      it('drags issue to the top', () => {
+        cy.mount(<Kanban />)
+        cy.get('[data-rbd-draggable-id="issue-Adjust column titles"]')
+          .as('top-issue')
+          .invoke('index')
+          .should('equal', 0)
+        cy.get('[data-rbd-draggable-id="issue-Create your own issues"]')
+          .as('middle-issue')
+          .invoke('index')
+          .should('equal', 1)
+        cy.get(
+          '[data-rbd-draggable-id="issue-Get familiar with the kanban board"]'
+        )
+          .as('bottom-issue')
+          .invoke('index')
+          .should('equal', 2)
+        cy.get('@bottom-issue').focus().type(' {upArrow} ')
+        cy.get('@top-issue').invoke('index').should('equal', 0)
+        cy.get('@middle-issue').invoke('index').should('equal', 2)
+        cy.get('@bottom-issue').invoke('index').should('equal', 1)
+        cy.get('@bottom-issue').focus().type(' {upArrow}{upArrow} ')
+        cy.get('@top-issue').invoke('index').should('equal', 1)
+        cy.get('@middle-issue').invoke('index').should('equal', 2)
+        cy.get('@bottom-issue').invoke('index').should('equal', 0)
+      })
+
+      it('drags issue to the bottom', () => {
+        cy.mount(<Kanban />)
+        cy.get('[data-rbd-draggable-id="issue-Adjust column titles"]')
+          .as('top-issue')
+          .invoke('index')
+          .should('equal', 0)
+        cy.get('[data-rbd-draggable-id="issue-Create your own issues"]')
+          .as('middle-issue')
+          .invoke('index')
+          .should('equal', 1)
+        cy.get(
+          '[data-rbd-draggable-id="issue-Get familiar with the kanban board"]'
+        )
+          .as('bottom-issue')
+          .invoke('index')
+          .should('equal', 2)
+        cy.get('@top-issue').focus().type(' {downArrow} ')
+        cy.get('@top-issue').invoke('index').should('equal', 1)
+        cy.get('@middle-issue').invoke('index').should('equal', 0)
+        cy.get('@bottom-issue').invoke('index').should('equal', 2)
+        cy.get('@top-issue').focus().type(' {downArrow}{downArrow} ')
+        cy.get('@top-issue').invoke('index').should('equal', 2)
+        cy.get('@middle-issue').invoke('index').should('equal', 0)
+        cy.get('@bottom-issue').invoke('index').should('equal', 1)
+      })
+
+      it('drags issue over statuses', () => {
+        cy.mount(<Kanban />)
+        cy.get('[data-rbd-draggable-id="issue-Adjust column titles"]')
+          .as('top-issue')
+          .invoke('index')
+          .should('equal', 0)
+        cy.get('[data-rbd-draggable-id="issue-Create your own issues"]')
+          .as('middle-issue')
+          .invoke('index')
+          .should('equal', 1)
+        cy.get(
+          '[data-rbd-draggable-id="issue-Get familiar with the kanban board"]'
+        )
+          .as('bottom-issue')
+          .invoke('index')
+          .should('equal', 2)
+        cy.get('[data-rbd-draggable-id="status-todo"]')
+          .children()
+          .last()
+          .as('todo-issues')
+          .children()
+          .should('have.length', 3)
+        cy.get('[data-rbd-draggable-id="status-on hold"]')
+          .children()
+          .last()
+          .as('on-hold-issues')
+          .children()
+          .should('have.length', 0)
+        cy.get('[data-rbd-draggable-id="status-inprogress"]')
+          .children()
+          .last()
+          .as('inprogress-issues')
+          .children()
+          .should('have.length', 0)
+        cy.get('[data-rbd-draggable-id="status-done"]')
+          .children()
+          .last()
+          .as('done-issues')
+          .children()
+          .should('have.length', 0)
+        cy.get('@top-issue').focus().type(' {rightArrow} ')
+        cy.get('@todo-issues').children().should('have.length', 2)
+        cy.get('@on-hold-issues').children().should('have.length', 1)
+        cy.get('@inprogress-issues').children().should('have.length', 0)
+        cy.get('@done-issues').children().should('have.length', 0)
+        cy.get('@middle-issue').focus().type(' {rightArrow}{rightArrow} ')
+        cy.get('@todo-issues').children().should('have.length', 1)
+        cy.get('@on-hold-issues').children().should('have.length', 1)
+        cy.get('@inprogress-issues').children().should('have.length', 1)
+        cy.get('@done-issues').children().should('have.length', 0)
+        cy.get('@bottom-issue')
+          .focus()
+          .type(' {rightArrow}{rightArrow}{rightArrow} ')
+        cy.get('@todo-issues').children().should('have.length', 0)
+        cy.get('@on-hold-issues').children().should('have.length', 1)
+        cy.get('@inprogress-issues').children().should('have.length', 1)
+        cy.get('@done-issues').children().should('have.length', 1)
+        cy.get('@top-issue').focus().type(' {leftArrow} ')
+        cy.get('@todo-issues').children().should('have.length', 1)
+        cy.get('@on-hold-issues').children().should('have.length', 0)
+        cy.get('@inprogress-issues').children().should('have.length', 1)
+        cy.get('@done-issues').children().should('have.length', 1)
+      })
     })
   })
 })
