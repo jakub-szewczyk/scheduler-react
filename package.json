@@ -48,6 +48,7 @@
     "@vitejs/plugin-react": "^2.1.0",
     "@vitest/coverage-c8": "^0.26.2",
     "@vitest/ui": "^0.26.2",
+    "cypress": "^12.9.0",
     "eslint": "^8.28.0",
     "eslint-config-react-app": "^7.0.1",
     "jsdom": "^20.0.3",
