@@ -6,7 +6,7 @@ import { isUnsaved } from '../../modules/common'
 import { Schedule } from '../../types/schedule'
 import DraggableDialog, {
   DraggableDialogProps,
-} from '../layout/DraggableDialog/DraggableDialog'
+} from '../../layout/DraggableDialog/DraggableDialog'
 import validationSchema from './validation/validationSchema'
 
 interface SaveScheduleDialogProps extends DraggableDialogProps {

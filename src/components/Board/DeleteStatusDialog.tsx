@@ -3,7 +3,7 @@ import { MouseEventHandler } from 'react'
 import { Status } from '../../types/board'
 import DraggableDialog, {
   DraggableDialogProps,
-} from '../layout/DraggableDialog/DraggableDialog'
+} from '../../layout/DraggableDialog/DraggableDialog'
 
 interface DeleteStatusDialogProps extends DraggableDialogProps {
   status: Status

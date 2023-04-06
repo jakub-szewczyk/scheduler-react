@@ -6,7 +6,7 @@ import { isUnsaved } from '../../modules/common'
 import { Board } from '../../types/board'
 import DraggableDialog, {
   DraggableDialogProps,
-} from '../layout/DraggableDialog/DraggableDialog'
+} from '../../layout/DraggableDialog/DraggableDialog'
 import validationSchema from './validation/validationSchema'
 
 interface SaveBoardDialogProps extends DraggableDialogProps {

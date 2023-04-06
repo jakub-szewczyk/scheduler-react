@@ -1,3 +1,5 @@
+import { Board, DropResultLocation, Status } from '@/types/board'
+import { Issue } from '@/types/issue'
 import { prop } from 'fp-ts-ramda'
 import { flow, pipe } from 'fp-ts/lib/function'
 import produce from 'immer'
@@ -25,7 +27,6 @@ import {
   find,
 } from 'ramda'
 import { DraggableLocation } from 'react-beautiful-dnd'
-import { Board, DropResultLocation, Issue, Status } from '../types/board'
 
 type BoardsEndomorphism = (boards: Board[]) => Board[]
 

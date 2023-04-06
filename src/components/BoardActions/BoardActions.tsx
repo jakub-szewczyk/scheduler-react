@@ -12,11 +12,11 @@ import useBoards from '../../hooks/useBoards'
 import * as BOARD from '../../modules/board'
 import { createIssue, createStatus } from '../../modules/board'
 import { isUnsaved } from '../../modules/common'
-import { Issue, Status } from '../../types/board'
 import UpsertIssueDialog from '../Board/UpsertIssueDialog'
 import UpsertStatusDialog from '../Board/UpsertStatusDialog'
 import BoardsDrawer from './BoardsDrawer'
 import SaveBoardDialog from './SaveBoardDialog'
+import { Issue, Status } from '@/types/status'
 
 const BoardActions = () => {
   const { board, boards, setBoards, setStatuses } = useBoards()

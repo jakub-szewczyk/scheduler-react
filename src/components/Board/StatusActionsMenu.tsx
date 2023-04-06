@@ -13,9 +13,9 @@ import {
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useBoolean } from 'usehooks-ts'
 import * as BOARD from '../../modules/board'
-import { Status, UpsertStatusDialogMode } from '../../types/board'
 import DeleteStatusDialog from './DeleteStatusDialog'
 import UpsertStatusDialog from './UpsertStatusDialog'
+import { Status, UpsertStatusDialogMode } from '@/types/status'
 
 interface StatusActionsMenuProps {
   status: Status

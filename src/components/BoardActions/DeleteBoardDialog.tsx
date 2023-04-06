@@ -2,7 +2,7 @@ import { Button, Typography } from '@mui/material'
 import { MouseEventHandler } from 'react'
 import DraggableDialog, {
   DraggableDialogProps,
-} from '../layout/DraggableDialog/DraggableDialog'
+} from '../../layout/DraggableDialog/DraggableDialog'
 import { Board } from '../../types/board'
 
 interface DeleteBoardDialogProps extends DraggableDialogProps {

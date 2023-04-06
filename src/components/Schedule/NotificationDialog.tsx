@@ -18,7 +18,7 @@ import { MouseEventHandler } from 'react'
 import * as NOTIFICATION from '../../modules/notification'
 import DraggableDialog, {
   DraggableDialogProps,
-} from '../layout/DraggableDialog/DraggableDialog'
+} from '../../layout/DraggableDialog/DraggableDialog'
 import validationSchema from './validation/validationSchema'
 import TextSummaryDetail from './TextSummaryDetail'
 import TimeSummaryDetail from './TimeSummaryDetail'

@@ -1,5 +1,5 @@
 import { createBrowserRouter, Outlet } from 'react-router-dom'
-import Navbar from './components/layout/Navbar/Navbar'
+import Navbar from './layout/Navbar/Navbar'
 import Dashboard from './pages/Dashboard/Dashboard'
 import Kanban from './pages/Kanban/Kanban'
 import Notes from './pages/Notes/Notes'

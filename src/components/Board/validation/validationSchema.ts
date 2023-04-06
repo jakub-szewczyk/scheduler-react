@@ -4,12 +4,8 @@ import { identity, pipe } from 'fp-ts/lib/function'
 import { includes, toLower } from 'ramda'
 import { object, string } from 'yup'
 import { deleteStatus } from '../../../modules/board'
-import {
-  Issue,
-  Status,
-  UpsertIssueDialogMode,
-  UpsertStatusDialogMode,
-} from '../../../types/board'
+import { Status, UpsertStatusDialogMode } from '@/types/status'
+import { Issue, UpsertIssueDialogMode } from '@/types/issue'
 
 const upsertStatusValidationSchema = (
   mode: UpsertStatusDialogMode,

@@ -3,7 +3,7 @@ import { MouseEventHandler } from 'react'
 import { Schedule } from '../../types/schedule'
 import DraggableDialog, {
   DraggableDialogProps,
-} from '../layout/DraggableDialog/DraggableDialog'
+} from '../../layout/DraggableDialog/DraggableDialog'
 
 interface DeleteScheduleDialogProps extends DraggableDialogProps {
   schedule: Schedule

@@ -1,8 +1,9 @@
 import { Card, CardContent, CardHeader, Typography } from '@mui/material'
 import { Dispatch, SetStateAction } from 'react'
 import { Draggable } from 'react-beautiful-dnd'
-import { Issue, Status } from '../../types/board'
 import IssueActionsMenu from './IssueActionsMenu'
+import { Issue } from '@/types/issue'
+import { Status } from '@/types/status'
 
 interface IssueItemProps {
   index: number

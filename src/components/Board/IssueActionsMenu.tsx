@@ -13,9 +13,10 @@ import {
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useBoolean } from 'usehooks-ts'
 import * as BOARD from '../../modules/board'
-import { Issue, Status, UpsertIssueDialogMode } from '../../types/board'
 import DeleteIssueDialog from './DeleteIssueDialog'
 import UpsertIssueDialog from './UpsertIssueDialog'
+import { Issue, UpsertIssueDialogMode } from '@/types/issue'
+import { Status } from '@/types/status'
 
 interface IssueActionsMenuProps {
   issue: Issue
