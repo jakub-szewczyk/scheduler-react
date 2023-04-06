@@ -4,11 +4,12 @@ import { TextField } from 'formik-mui'
 import { constant } from 'fp-ts/lib/function'
 import { cond, equals } from 'ramda'
 import { MouseEventHandler } from 'react'
-import { Issue, Status } from '../../types/board'
 import DraggableDialog, {
   DraggableDialogProps,
-} from '../layout/DraggableDialog/DraggableDialog'
+} from '../../layout/DraggableDialog/DraggableDialog'
 import { upsertIssueValidationSchema } from './validation/validationSchema'
+import { Issue } from '@/types/issue'
+import { Status } from '@/types/status'
 
 type SubmitHandler = (
   values: Issue,

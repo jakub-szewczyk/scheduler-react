@@ -1,36 +1,36 @@
 import { Button, Typography } from '@mui/material'
 import { MouseEventHandler } from 'react'
-import { Schedule } from '../../types/schedule'
 import DraggableDialog, {
   DraggableDialogProps,
 } from '../../layout/DraggableDialog/DraggableDialog'
+import { Board } from '../../types/board'
 
-interface DeleteScheduleDialogProps extends DraggableDialogProps {
-  schedule: Schedule
+interface DeleteBoardDialogProps extends DraggableDialogProps {
+  board: Board
   onDelete: (name: string) => void
   onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
 
-const DeleteScheduleDialog = ({
-  schedule,
+const DeleteBoardDialog = ({
+  board,
   onDelete,
   onClose,
   onCancel = onClose as MouseEventHandler<HTMLButtonElement> | undefined,
   ...props
-}: DeleteScheduleDialogProps) => (
+}: DeleteBoardDialogProps) => (
   <DraggableDialog
     {...props}
     onClose={onClose}
-    dialogTitle='Delete schedule'
+    dialogTitle='Delete board'
     dialogContent={
-      <Typography>Are you sure you want to delete this schedule?</Typography>
+      <Typography>Are you sure you want to delete this board?</Typography>
     }
     dialogActions={
       <>
         <Button variant='outlined' onClick={onCancel}>
           Cancel
         </Button>
-        <Button variant='outlined' onClick={() => onDelete(schedule.name)}>
+        <Button variant='outlined' onClick={() => onDelete(board.name)}>
           Delete
         </Button>
       </>
@@ -38,4 +38,4 @@ const DeleteScheduleDialog = ({
   />
 )
 
-export default DeleteScheduleDialog
+export default DeleteBoardDialog

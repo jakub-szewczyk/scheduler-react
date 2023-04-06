@@ -1,13 +1,11 @@
 import { DraggableLocation } from 'react-beautiful-dnd'
+import { Status } from './status'
 
-interface Status {
-  title: string
-  issues: Issue[]
-}
-
-interface Issue {
-  title: string
-  content: string
+interface Board {
+  name: string
+  selected: boolean
+  createdAt: string
+  statuses: Status[]
 }
 
 type DropResultLocation = {
@@ -15,18 +13,4 @@ type DropResultLocation = {
   destination: DraggableLocation
 }
 
-type UpsertStatusDialogMode =
-  | 'CREATE'
-  | 'EDIT'
-  | 'INSERT_BEFORE'
-  | 'INSERT_AFTER'
-
-type UpsertIssueDialogMode = 'CREATE' | 'EDIT' | 'INSERT_ABOVE' | 'INSERT_BELOW'
-
-export type {
-  Status,
-  Issue,
-  DropResultLocation,
-  UpsertStatusDialogMode,
-  UpsertIssueDialogMode,
-}
+export type { Board, Status, DropResultLocation }

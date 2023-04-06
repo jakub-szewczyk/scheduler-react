@@ -11,7 +11,7 @@ import * as TIME from '../../modules/time'
 import { NotificationConfiguration } from '../../types/notification'
 import { Row } from '../../types/row'
 import NotificationDialog from './NotificationDialog'
-import NotificationIcon from '../layout/NotificationIcon/NotificationIcon'
+import NotificationIcon from '../../layout/NotificationIcon/NotificationIcon'
 
 interface NotificationCellProps extends GridRenderCellParams<any, Row> {
   setRows: Dispatch<SetStateAction<Row[]>>

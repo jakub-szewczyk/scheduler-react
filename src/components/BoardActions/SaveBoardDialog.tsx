@@ -3,15 +3,15 @@ import { Field, Form, Formik, FormikHelpers } from 'formik'
 import { TextField } from 'formik-mui'
 import { MouseEventHandler } from 'react'
 import { isUnsaved } from '../../modules/common'
-import { Schedule } from '../../types/schedule'
+import { Board } from '../../types/board'
 import DraggableDialog, {
   DraggableDialogProps,
 } from '../../layout/DraggableDialog/DraggableDialog'
 import validationSchema from './validation/validationSchema'
 
-interface SaveScheduleDialogProps extends DraggableDialogProps {
-  schedule: Schedule
-  schedules: Schedule[]
+interface SaveBoardDialogProps extends DraggableDialogProps {
+  board: Board
+  boards: Board[]
   onSave: (
     values: { name: string },
     formikHelpers: FormikHelpers<{ name: string }>
@@ -19,36 +19,36 @@ interface SaveScheduleDialogProps extends DraggableDialogProps {
   onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
 
-const SaveScheduleDialog = ({
-  schedule,
-  schedules,
+const SaveBoardDialog = ({
+  board,
+  boards,
   onSave,
   onClose,
   onCancel = onClose as MouseEventHandler<HTMLButtonElement> | undefined,
   ...props
-}: SaveScheduleDialogProps) => (
+}: SaveBoardDialogProps) => (
   <DraggableDialog
     {...props}
     onClose={onClose}
-    dialogTitle={isUnsaved(schedule) ? 'Save schedule' : 'Rename schedule'}
+    dialogTitle={isUnsaved(board) ? 'Save board' : 'Rename board'}
     dialogContent={
       <Stack spacing={3}>
-        <Typography>Choose a name for your schedule</Typography>
+        <Typography>Choose a name for your board</Typography>
         <Formik
           initialValues={{
-            name: isUnsaved(schedule) ? '' : schedule.name,
+            name: isUnsaved(board) ? '' : board.name,
           }}
-          validationSchema={validationSchema(schedule, schedules)}
+          validationSchema={validationSchema(board, boards)}
           onSubmit={onSave}
         >
           {() => (
-            <Form id='schedule'>
+            <Form id='board'>
               <Field
                 component={TextField}
                 name='name'
                 size='small'
                 label='Name'
-                helperText='Set schedule name'
+                helperText='Set board name'
                 fullWidth
               />
             </Form>
@@ -61,7 +61,7 @@ const SaveScheduleDialog = ({
         <Button variant='outlined' onClick={onCancel}>
           Cancel
         </Button>
-        <Button type='submit' form='schedule' variant='outlined'>
+        <Button type='submit' form='board' variant='outlined'>
           Save
         </Button>
       </>
@@ -69,4 +69,4 @@ const SaveScheduleDialog = ({
   />
 )
 
-export default SaveScheduleDialog
+export default SaveBoardDialog

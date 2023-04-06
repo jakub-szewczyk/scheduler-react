@@ -1,19 +1,33 @@
-import { pipe } from 'fp-ts/lib/function'
+import { Board, DropResultLocation, Status } from '@/types/board'
+import { prop } from 'fp-ts-ramda'
+import { flow, pipe } from 'fp-ts/lib/function'
 import produce from 'immer'
 import {
+  __,
+  any,
+  complement,
+  concat,
   curry,
   equals,
-  findIndex,
+  filter,
+  find,
   join,
+  last,
+  lensProp,
+  map,
   move,
-  remove,
+  set,
+  slice,
   split,
   tail,
+  unless,
+  when,
 } from 'ramda'
 import { DraggableLocation } from 'react-beautiful-dnd'
-import { DropResultLocation, Issue, Status } from '../types/board'
 
-const INITIAL_VALUES: Status[] = [
+type BoardsEndomorphism = (boards: Board[]) => Board[]
+
+const INITIAL_STATUSES: Status[] = [
   {
     title: 'todo',
     issues: [
@@ -45,6 +59,15 @@ const INITIAL_VALUES: Status[] = [
   {
     title: 'done',
     issues: [],
+  },
+]
+
+const INITIAL_BOARDS: Board[] = [
+  {
+    name: 'unsaved',
+    selected: true,
+    createdAt: new Date().toISOString(),
+    statuses: INITIAL_STATUSES,
   },
 ]
 
@@ -82,112 +105,43 @@ const drag = ({ source, destination }: DropResultLocation) =>
     ? dragIssueWithinStatus({ source, destination })
     : dragIssueBetweenStatuses({ source, destination })
 
-const createStatus = (title: string) =>
-  produce(
-    (statuses: Status[]) =>
-      void statuses.unshift({
-        title: title.trim().toLowerCase(),
-        issues: [],
-      })
+const add: BoardsEndomorphism = flow(
+  map(set(lensProp('selected'), false)),
+  concat(__, INITIAL_BOARDS)
+)
+
+const remove = (name: string): BoardsEndomorphism =>
+  flow(
+    filter(flow(prop('name'), complement(equals(name)))),
+    unless(any(prop('selected')), (boards: any[]) =>
+      pipe(
+        boards,
+        slice(0, -1) as (x: any[]) => any[],
+        concat(__, [set(lensProp('selected'), true, last(boards))])
+      )
+    )
   )
 
-const editStatus = (previousTitle: string, currentTitle: string) =>
-  produce((statuses: Status[]) => {
-    const status = statuses.find((status) => status.title === previousTitle)!
-    status.title = currentTitle.trim().toLowerCase()
-  })
+const save = (name: string): BoardsEndomorphism =>
+  map(when(prop('selected'), set(lensProp('name'), name)))
 
-const deleteStatus = (title: string) => (statuses: Status[]) =>
-  remove(
-    findIndex((status) => status.title === title, statuses),
-    1,
-    statuses
+const select = (name: string): BoardsEndomorphism =>
+  map(
+    flow(
+      set(lensProp('selected'), false),
+      when(flow(prop('name'), equals(name)), set(lensProp('selected'), true))
+    )
   )
 
-const insertStatusBefore = (statusAfterTitle: string, title: string) =>
-  produce((statuses: Status[]) => {
-    const statusAfterIndex = statuses.findIndex(
-      (status) => status.title === statusAfterTitle
-    )!
-    statuses.splice(statusAfterIndex, 0, {
-      title: title.trim().toLowerCase(),
-      issues: [],
-    })
-  })
-
-const insertStatusAfter = (statusAfterBefore: string, title: string) =>
-  produce((statuses: Status[]) => {
-    const statusBeforeIndex = statuses.findIndex(
-      (status) => status.title === statusAfterBefore
-    )!
-    statuses.splice(statusBeforeIndex + 1, 0, {
-      title: title.trim().toLowerCase(),
-      issues: [],
-    })
-  })
-
-const createIssue = (values: Issue) =>
-  produce(
-    (statuses: Status[]) =>
-      void statuses[0].issues.unshift({
-        title: values.title.trim(),
-        content: values.content.trim(),
-      })
-  )
-
-const editIssue = (title: string, values: Issue) =>
-  produce((statuses: Status[]) => {
-    const issue = statuses
-      .flatMap((status) => status.issues)
-      .find((issue) => issue.title === title)!
-    issue.title = values.title.trim()
-    issue.content = values.content.trim()
-  })
-
-const deleteIssue = (title: string) =>
-  produce((statuses: Status[]) => {
-    const status = statuses.find((status) =>
-      status.issues.some((issue) => issue.title === title)
-    )!
-    const issueIndex = status.issues.findIndex((issue) => issue.title === title)
-    status.issues.splice(issueIndex, 1)
-  })
-
-const insertIssueAbove = (title: string, values: Issue) =>
-  produce((statuses: Status[]) => {
-    const status = statuses.find((status) =>
-      status.issues.some((issue) => issue.title === title)
-    )!
-    const issueIndex = status.issues.findIndex((issue) => issue.title === title)
-    status.issues.splice(issueIndex, 0, {
-      title: values.title.trim(),
-      content: values.content.trim(),
-    })
-  })
-
-const insertIssueBelow = (title: string, values: Issue) =>
-  produce((statuses: Status[]) => {
-    const status = statuses.find((status) =>
-      status.issues.some((issue) => issue.title === title)
-    )!
-    const issueIndex = status.issues.findIndex((issue) => issue.title === title)
-    status.issues.splice(issueIndex + 1, 0, {
-      title: values.title.trim(),
-      content: values.content.trim(),
-    })
-  })
+const findSelected = find<Board>(prop('selected'))
 
 export {
-  INITIAL_VALUES,
+  INITIAL_BOARDS,
+  INITIAL_STATUSES,
   drag,
-  createStatus,
-  editStatus,
-  deleteStatus,
-  insertStatusBefore,
-  insertStatusAfter,
-  createIssue,
-  editIssue,
-  deleteIssue,
-  insertIssueAbove,
-  insertIssueBelow,
+  add,
+  remove,
+  save,
+  select,
+  findSelected,
 }

@@ -12,25 +12,25 @@ import List from '@mui/material/List'
 import { any } from 'ramda'
 import { MouseEventHandler } from 'react'
 import { isUnsaved } from '../../modules/common'
-import { Schedule } from '../../types/schedule'
-import SchedulesDrawerItem from './SchedulesDrawerItem'
+import { Board } from '../../types/board'
+import BoardsDrawerItem from './BoardsDrawerItem'
 
-interface SchedulesDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
-  schedule: Schedule
-  schedules: Schedule[]
+interface BoardsDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
+  board: Board
+  boards: Board[]
   onCreate: MouseEventHandler<HTMLButtonElement> | undefined
   onDelete: (name: string) => void
   onSelect: (name: string) => void
 }
 
-const SchedulesDrawer = ({
-  schedule,
-  schedules,
+const BoardsDrawer = ({
+  board,
+  boards,
   onCreate,
   onDelete,
   onSelect,
   ...props
-}: SchedulesDrawerProps) => (
+}: BoardsDrawerProps) => (
   <SwipeableDrawer
     {...props}
     anchor='right'
@@ -41,7 +41,7 @@ const SchedulesDrawer = ({
     <Stack padding={2} justifyContent='space-between' height='100%' rowGap={2}>
       <Stack spacing={2} overflow='auto'>
         <Typography variant='h6' align='center'>
-          Create or load schedules
+          Create or load boards
         </Typography>
         <List
           sx={{
@@ -50,11 +50,11 @@ const SchedulesDrawer = ({
             borderRadius: 1,
           }}
         >
-          {schedules.map((schedule) => (
-            <SchedulesDrawerItem
-              key={schedule.name}
-              schedule={schedule}
-              schedules={schedules}
+          {boards.map((board) => (
+            <BoardsDrawerItem
+              key={board.name}
+              board={board}
+              boards={boards}
               onSelect={onSelect}
               onDelete={onDelete}
             />
@@ -63,19 +63,19 @@ const SchedulesDrawer = ({
       </Stack>
       <Tooltip
         title={
-          any(isUnsaved, schedules) &&
-          'All schedules must be saved before creating a new one'
+          any(isUnsaved, boards) &&
+          'All boards must be saved before creating a new one'
         }
       >
         <Box>
           <Button
             variant='outlined'
             endIcon={<AddIcon />}
-            disabled={any(isUnsaved, schedules)}
+            disabled={any(isUnsaved, boards)}
             onClick={onCreate}
             fullWidth
           >
-            New schedule
+            New board
           </Button>
         </Box>
       </Tooltip>
@@ -83,4 +83,4 @@ const SchedulesDrawer = ({
   </SwipeableDrawer>
 )
 
-export default SchedulesDrawer
+export default BoardsDrawer

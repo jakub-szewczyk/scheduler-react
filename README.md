@@ -2,11 +2,11 @@
 
 ## Todo
 
-1. Tests.
+1. Increase test coverage to gain high confidence (component, e2e).
 
-2. Split board module into status and issue modules.
+1. Add new documents module (notes in widget's menu).
 
-3. Notes module.
+1. Custom textarea scrollbar.
 
 ## Bugs
 

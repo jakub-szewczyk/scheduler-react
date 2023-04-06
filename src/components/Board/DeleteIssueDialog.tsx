@@ -1,9 +1,9 @@
-import { Button, Typography } from '@mui/material'
-import { MouseEventHandler } from 'react'
-import { Issue } from '../../types/board'
 import DraggableDialog, {
   DraggableDialogProps,
-} from '../layout/DraggableDialog/DraggableDialog'
+} from '@/layout/DraggableDialog/DraggableDialog'
+import { Issue } from '@/types/issue'
+import { Button, Typography } from '@mui/material'
+import { MouseEventHandler } from 'react'
 
 interface DeleteIssueDialogProps extends DraggableDialogProps {
   issue: Issue

@@ -12,6 +12,7 @@ import useSchedules from '../../hooks/useSchedules'
 import * as SCHEDULE from '../../modules/schedule'
 import SaveScheduleDialog from './SaveScheduleDialog'
 import SchedulesDrawer from './SchedulesDrawer'
+import { isUnsaved } from '../../modules/common'
 
 const ScheduleActions = () => {
   const { schedule, schedules, setSchedules } = useSchedules()
@@ -70,8 +71,8 @@ const ScheduleActions = () => {
           onClick={window.print}
         />
         <SpeedDialAction
-          tooltipTitle={SCHEDULE.isUnsaved(schedule) ? 'Save' : 'Rename'}
-          icon={SCHEDULE.isUnsaved(schedule) ? <SaveIcon /> : <EditIcon />}
+          tooltipTitle={isUnsaved(schedule) ? 'Save' : 'Rename'}
+          icon={isUnsaved(schedule) ? <SaveIcon /> : <EditIcon />}
           onClick={openSaveScheduleDialog}
         />
         <SpeedDialAction
