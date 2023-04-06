@@ -1,3 +1,5 @@
+import * as STATUS from '@/modules/status'
+import { Status, UpsertStatusDialogMode } from '@/types/status'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -12,10 +14,8 @@ import {
 } from '@mui/material'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useBoolean } from 'usehooks-ts'
-import * as BOARD from '../../modules/board'
 import DeleteStatusDialog from './DeleteStatusDialog'
 import UpsertStatusDialog from './UpsertStatusDialog'
-import { Status, UpsertStatusDialogMode } from '@/types/status'
 
 interface StatusActionsMenuProps {
   status: Status
@@ -66,22 +66,22 @@ const StatusActionsMenu = ({
   }
 
   const handleStatusEdit = ({ title }: Pick<Status, 'title'>) => {
-    setStatuses(BOARD.editStatus(status.title, title))
+    setStatuses(STATUS.edit(status.title, title))
     closeUpsertDialog()
   }
 
   const handleStatusDelete = ({ title }: Pick<Status, 'title'>) => {
-    setStatuses(BOARD.deleteStatus(title))
+    setStatuses(STATUS.remove(title))
     closeDeleteDialog()
   }
 
   const handleStatusInsertBefore = ({ title }: Pick<Status, 'title'>) => {
-    setStatuses(BOARD.insertStatusBefore(status.title, title))
+    setStatuses(STATUS.insertBefore(status.title, title))
     closeUpsertDialog()
   }
 
   const handleStatusInsertAfter = ({ title }: Pick<Status, 'title'>) => {
-    setStatuses(BOARD.insertStatusAfter(status.title, title))
+    setStatuses(STATUS.insertAfter(status.title, title))
     closeUpsertDialog()
   }
 

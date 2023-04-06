@@ -1,3 +1,5 @@
+import { Issue, UpsertIssueDialogMode } from '@/types/issue'
+import { Status } from '@/types/status'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -12,11 +14,9 @@ import {
 } from '@mui/material'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useBoolean } from 'usehooks-ts'
-import * as BOARD from '../../modules/board'
+import * as ISSUE from '../../modules/issue'
 import DeleteIssueDialog from './DeleteIssueDialog'
 import UpsertIssueDialog from './UpsertIssueDialog'
-import { Issue, UpsertIssueDialogMode } from '@/types/issue'
-import { Status } from '@/types/status'
 
 interface IssueActionsMenuProps {
   issue: Issue
@@ -69,22 +69,22 @@ const IssueActionsMenu = ({
   }
 
   const handleIssueEdit = (values: Issue) => {
-    setStatuses(BOARD.editIssue(issue.title, values))
+    setStatuses(ISSUE.edit(issue.title, values))
     closeUpsertDialog()
   }
 
   const handleIssueDelete = ({ title }: Issue) => {
-    setStatuses(BOARD.deleteIssue(title))
+    setStatuses(ISSUE.remove(title))
     closeDeleteDialog()
   }
 
   const handleIssueInsertAbove = (values: Issue) => {
-    setStatuses(BOARD.insertIssueAbove(issue.title, values))
+    setStatuses(ISSUE.insertAbove(issue.title, values))
     closeUpsertDialog()
   }
 
   const handleIssueInsertBelow = (values: Issue) => {
-    setStatuses(BOARD.insertIssueBelow(issue.title, values))
+    setStatuses(ISSUE.insertBelow(issue.title, values))
     closeUpsertDialog()
   }
 

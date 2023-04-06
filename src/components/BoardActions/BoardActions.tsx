@@ -10,7 +10,8 @@ import { trim } from 'ramda'
 import { useBoolean } from 'usehooks-ts'
 import useBoards from '../../hooks/useBoards'
 import * as BOARD from '../../modules/board'
-import { createIssue, createStatus } from '../../modules/board'
+import * as ISSUE from '@/modules/issue'
+import * as STATUS from '@/modules/status'
 import { isUnsaved } from '../../modules/common'
 import UpsertIssueDialog from '../Board/UpsertIssueDialog'
 import UpsertStatusDialog from '../Board/UpsertStatusDialog'
@@ -46,12 +47,12 @@ const BoardActions = () => {
   } = useBoolean(false)
 
   const handleStatusCreate = ({ title }: Pick<Status, 'title'>) => {
-    setStatuses(createStatus(title))
+    setStatuses(STATUS.create(title))
     closeUpsertStatusDialog()
   }
 
   const handleIssueCreate = (issue: Issue) => {
-    setStatuses(createIssue(issue))
+    setStatuses(ISSUE.create(issue))
     closeUpsertIssueDialog()
   }
 
