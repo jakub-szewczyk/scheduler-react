@@ -2,11 +2,11 @@
 
 ## Todo
 
-1. Documents module.
+1. Increase test coverage to gain high confidence (component, e2e).
 
-2. Multiple boards management (just like schedules).
+1. Add new documents module (notes in widget's menu).
 
-3. Split board module into status and issue modules.
+1. Custom textarea scrollbar.
 
 ## Bugs
 
