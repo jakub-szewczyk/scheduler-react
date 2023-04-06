@@ -27,7 +27,7 @@ import { DraggableLocation } from 'react-beautiful-dnd'
 
 type BoardsEndomorphism = (boards: Board[]) => Board[]
 
-const INITIAL_VALUES: Status[] = [
+const INITIAL_STATUSES: Status[] = [
   {
     title: 'todo',
     issues: [
@@ -67,7 +67,7 @@ const INITIAL_BOARDS: Board[] = [
     name: 'unsaved',
     selected: true,
     createdAt: new Date().toISOString(),
-    statuses: INITIAL_VALUES,
+    statuses: INITIAL_STATUSES,
   },
 ]
 
@@ -105,8 +105,6 @@ const drag = ({ source, destination }: DropResultLocation) =>
     ? dragIssueWithinStatus({ source, destination })
     : dragIssueBetweenStatuses({ source, destination })
 
-const findSelected = find<Board>(prop('selected'))
-
 const add: BoardsEndomorphism = flow(
   map(set(lensProp('selected'), false)),
   concat(__, INITIAL_BOARDS)
@@ -135,13 +133,15 @@ const select = (name: string): BoardsEndomorphism =>
     )
   )
 
+const findSelected = find<Board>(prop('selected'))
+
 export {
   INITIAL_BOARDS,
-  INITIAL_VALUES,
+  INITIAL_STATUSES,
   drag,
-  findSelected,
   add,
   remove,
   save,
   select,
+  findSelected,
 }
