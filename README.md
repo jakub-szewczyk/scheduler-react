@@ -2,11 +2,11 @@
 
 ## Todo
 
-1. Tests.
+1. Documents module.
 
-2. Split board module into status and issue modules.
+2. Multiple boards management (just like schedules).
 
-3. Notes module.
+3. Split board module into status and issue modules.
 
 ## Bugs
 

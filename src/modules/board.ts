@@ -1,17 +1,33 @@
-import { pipe } from 'fp-ts/lib/function'
+import { prop } from 'fp-ts-ramda'
+import { flow, pipe } from 'fp-ts/lib/function'
 import produce from 'immer'
 import {
+  __,
+  any,
+  complement,
+  concat,
   curry,
   equals,
+  filter,
   findIndex,
   join,
+  last,
+  lensProp,
+  map,
   move,
-  remove,
+  set,
+  remove as _remove,
+  slice,
   split,
   tail,
+  unless,
+  when,
+  find,
 } from 'ramda'
 import { DraggableLocation } from 'react-beautiful-dnd'
-import { DropResultLocation, Issue, Status } from '../types/board'
+import { Board, DropResultLocation, Issue, Status } from '../types/board'
+
+type BoardsEndomorphism = (boards: Board[]) => Board[]
 
 const INITIAL_VALUES: Status[] = [
   {
@@ -45,6 +61,15 @@ const INITIAL_VALUES: Status[] = [
   {
     title: 'done',
     issues: [],
+  },
+]
+
+const INITIAL_BOARDS: Board[] = [
+  {
+    name: 'unsaved',
+    selected: true,
+    createdAt: new Date().toISOString(),
+    statuses: INITIAL_VALUES,
   },
 ]
 
@@ -82,6 +107,36 @@ const drag = ({ source, destination }: DropResultLocation) =>
     ? dragIssueWithinStatus({ source, destination })
     : dragIssueBetweenStatuses({ source, destination })
 
+const findSelected = find<Board>(prop('selected'))
+
+const add: BoardsEndomorphism = flow(
+  map(set(lensProp('selected'), false)),
+  concat(__, INITIAL_BOARDS)
+)
+
+const remove = (name: string): BoardsEndomorphism =>
+  flow(
+    filter(flow(prop('name'), complement(equals(name)))),
+    unless(any(prop('selected')), (boards: any[]) =>
+      pipe(
+        boards,
+        slice(0, -1) as (x: any[]) => any[],
+        concat(__, [set(lensProp('selected'), true, last(boards))])
+      )
+    )
+  )
+
+const save = (name: string): BoardsEndomorphism =>
+  map(when(prop('selected'), set(lensProp('name'), name)))
+
+const select = (name: string): BoardsEndomorphism =>
+  map(
+    flow(
+      set(lensProp('selected'), false),
+      when(flow(prop('name'), equals(name)), set(lensProp('selected'), true))
+    )
+  )
+
 const createStatus = (title: string) =>
   produce(
     (statuses: Status[]) =>
@@ -98,7 +153,7 @@ const editStatus = (previousTitle: string, currentTitle: string) =>
   })
 
 const deleteStatus = (title: string) => (statuses: Status[]) =>
-  remove(
+  _remove(
     findIndex((status) => status.title === title, statuses),
     1,
     statuses
@@ -178,8 +233,14 @@ const insertIssueBelow = (title: string, values: Issue) =>
   })
 
 export {
+  INITIAL_BOARDS,
   INITIAL_VALUES,
   drag,
+  findSelected,
+  add,
+  remove,
+  save,
+  select,
   createStatus,
   editStatus,
   deleteStatus,

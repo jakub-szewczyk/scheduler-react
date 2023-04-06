@@ -6,6 +6,7 @@ import { useBoolean } from 'usehooks-ts'
 import useSchedules from '../../hooks/useSchedules'
 import * as SCHEDULE from '../../modules/schedule'
 import SaveScheduleDialog from '../ScheduleActions/SaveScheduleDialog'
+import { asteriskSuffix } from '../../modules/common'
 
 const DataGridFooter = () => {
   const { schedule, schedules, setSchedules } = useSchedules()
@@ -35,7 +36,7 @@ const DataGridFooter = () => {
             <EditIcon fontSize='small' />
           </IconButton>
           <Typography maxWidth='calc(100% - 42px)' noWrap>
-            {SCHEDULE.asteriskSuffix(schedule.name)}
+            {asteriskSuffix(schedule.name)}
           </Typography>
         </Stack>
       </Stack>

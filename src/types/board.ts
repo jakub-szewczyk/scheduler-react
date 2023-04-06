@@ -1,5 +1,12 @@
 import { DraggableLocation } from 'react-beautiful-dnd'
 
+interface Board {
+  name: string
+  selected: boolean
+  createdAt: string
+  statuses: Status[]
+}
+
 interface Status {
   title: string
   issues: Issue[]
@@ -24,6 +31,7 @@ type UpsertStatusDialogMode =
 type UpsertIssueDialogMode = 'CREATE' | 'EDIT' | 'INSERT_ABOVE' | 'INSERT_BELOW'
 
 export type {
+  Board,
   Status,
   Issue,
   DropResultLocation,

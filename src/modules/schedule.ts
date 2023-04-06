@@ -65,13 +65,6 @@ const select = (name: string): SchedulesEndomorphism =>
     )
   )
 
-const isUnsaved: (schedule: Schedule) => boolean = flow(
-  prop('name'),
-  equals('unsaved')
-)
-
-const asteriskSuffix = when(equals('unsaved'), concat(__, '*'))
-
 const findSelected = find<Schedule>(prop('selected'))
 
 const exportToXLSX = (schedule: Schedule) => () => {
@@ -81,14 +74,4 @@ const exportToXLSX = (schedule: Schedule) => () => {
   writeFileXLSX(wb, `${schedule.name}.xlsx`)
 }
 
-export {
-  INITIAL_VALUES,
-  add,
-  remove,
-  save,
-  select,
-  isUnsaved,
-  asteriskSuffix,
-  findSelected,
-  exportToXLSX,
-}
+export { INITIAL_VALUES, add, remove, save, select, findSelected, exportToXLSX }

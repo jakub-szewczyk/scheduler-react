@@ -7,22 +7,22 @@ import ListItemText from '@mui/material/ListItemText'
 import { formatDistanceToNow } from 'date-fns'
 import { useBoolean } from 'usehooks-ts'
 import { asteriskSuffix } from '../../modules/common'
-import { Schedule } from '../../types/schedule'
-import DeleteScheduleDialog from './DeleteScheduleDialog'
+import { Board } from '../../types/board'
+import DeleteBoardDialog from './DeleteBoardDialog'
 
-interface SchedulesDrawerItemProps {
-  schedule: Schedule
-  schedules: Schedule[]
+interface BoardsDrawerItemProps {
+  board: Board
+  boards: Board[]
   onDelete: (name: string) => void
   onSelect: (name: string) => void
 }
 
-const SchedulesDrawerItem = ({
-  schedule,
-  schedules,
+const BoardsDrawerItem = ({
+  board,
+  boards,
   onDelete,
   onSelect,
-}: SchedulesDrawerItemProps) => {
+}: BoardsDrawerItemProps) => {
   const {
     value: isDeleteDialogOpen,
     setFalse: closeDeleteDialog,
@@ -32,15 +32,15 @@ const SchedulesDrawerItem = ({
   return (
     <>
       <Stack direction='row' alignItems='start'>
-        <ListItemButton onClick={() => onSelect(schedule.name)}>
+        <ListItemButton onClick={() => onSelect(board.name)}>
           <ListItemAvatar>
             <Avatar>
               <ViewListIcon />
             </Avatar>
           </ListItemAvatar>
           <ListItemText
-            primary={asteriskSuffix(schedule.name)}
-            secondary={formatDistanceToNow(new Date(schedule.createdAt), {
+            primary={asteriskSuffix(board.name)}
+            secondary={formatDistanceToNow(new Date(board.createdAt), {
               addSuffix: true,
             })}
             sx={{
@@ -54,12 +54,12 @@ const SchedulesDrawerItem = ({
         </ListItemButton>
         <Tooltip
           placement='left'
-          title={schedules.length === 1 && 'At least one schedule is required'}
+          title={boards.length === 1 && 'At least one board is required'}
         >
           <Box>
             <IconButton
               size='small'
-              disabled={schedules.length === 1}
+              disabled={boards.length === 1}
               onClick={openDeleteDialog}
             >
               <CloseIcon fontSize='small' />
@@ -67,14 +67,14 @@ const SchedulesDrawerItem = ({
           </Box>
         </Tooltip>
       </Stack>
-      <DeleteScheduleDialog
+      <DeleteBoardDialog
         open={isDeleteDialogOpen}
         onClose={closeDeleteDialog}
-        schedule={schedule}
+        board={board}
         onDelete={onDelete}
       />
     </>
   )
 }
 
-export default SchedulesDrawerItem
+export default BoardsDrawerItem
