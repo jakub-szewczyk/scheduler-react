@@ -1,14 +1,14 @@
-import Kanban from './Kanban'
+import Board from './Board'
 
 beforeEach(() => cy.viewport(1360, 560))
 
-describe('<Kanban />', () => {
+describe('<Board />', () => {
   // status
   describe('status', () => {
     describe('using mouse events', () => {
       // left to right mouse events
       it('drags "todo" one column to the right', () => {
-        cy.mount(<Kanban />)
+        cy.mount(<Board />)
         cy.get('[data-rbd-draggable-id="status-todo"]')
           .as('todo')
           .invoke('index')
@@ -26,7 +26,7 @@ describe('<Kanban />', () => {
       })
 
       it('drags "todo" two columns to the right', () => {
-        cy.mount(<Kanban />)
+        cy.mount(<Board />)
         cy.get('[data-rbd-draggable-id="status-todo"]')
           .as('todo')
           .invoke('index')
@@ -49,7 +49,7 @@ describe('<Kanban />', () => {
       })
 
       it('drags "todo" all the way to the right', () => {
-        cy.mount(<Kanban />)
+        cy.mount(<Board />)
         cy.get('[data-rbd-draggable-id="status-todo"]')
           .as('todo')
           .invoke('index')
@@ -78,7 +78,7 @@ describe('<Kanban />', () => {
 
       // right to left mouse events
       it('drags "done" one column to the left', () => {
-        cy.mount(<Kanban />)
+        cy.mount(<Board />)
         cy.get('[data-rbd-draggable-id="status-done"]')
           .as('done')
           .invoke('index')
@@ -96,7 +96,7 @@ describe('<Kanban />', () => {
       })
 
       it('drags "done" two columns to the left', () => {
-        cy.mount(<Kanban />)
+        cy.mount(<Board />)
         cy.get('[data-rbd-draggable-id="status-done"]')
           .as('done')
           .invoke('index')
@@ -119,7 +119,7 @@ describe('<Kanban />', () => {
       })
 
       it('drags "done" all the way to the left', () => {
-        cy.mount(<Kanban />)
+        cy.mount(<Board />)
         cy.get('[data-rbd-draggable-id="status-done"]')
           .as('done')
           .invoke('index')
@@ -150,7 +150,7 @@ describe('<Kanban />', () => {
     describe('using keyboard events', () => {
       // left to right keyboard events
       it('drags "todo" one column to the right', () => {
-        cy.mount(<Kanban />)
+        cy.mount(<Board />)
         cy.get('[data-rbd-draggable-id="status-todo"]')
           .as('todo')
           .invoke('index')
@@ -167,7 +167,7 @@ describe('<Kanban />', () => {
       })
 
       it('drags "todo" two columns to the right', () => {
-        cy.mount(<Kanban />)
+        cy.mount(<Board />)
         cy.get('[data-rbd-draggable-id="status-todo"]')
           .as('todo')
           .invoke('index')
@@ -189,7 +189,7 @@ describe('<Kanban />', () => {
       })
 
       it('drags "todo" all the way to the right', () => {
-        cy.mount(<Kanban />)
+        cy.mount(<Board />)
         cy.get('[data-rbd-draggable-id="status-todo"]')
           .as('todo')
           .invoke('index')
@@ -217,7 +217,7 @@ describe('<Kanban />', () => {
 
       // right to left keyboard events
       it('drags "done" one column to the left', () => {
-        cy.mount(<Kanban />)
+        cy.mount(<Board />)
         cy.get('[data-rbd-draggable-id="status-done"]')
           .as('done')
           .invoke('index')
@@ -234,7 +234,7 @@ describe('<Kanban />', () => {
       })
 
       it('drags "done" two columns to the left', () => {
-        cy.mount(<Kanban />)
+        cy.mount(<Board />)
         cy.get('[data-rbd-draggable-id="status-done"]')
           .as('done')
           .invoke('index')
@@ -256,7 +256,7 @@ describe('<Kanban />', () => {
       })
 
       it('drags "done" all the way to the left', () => {
-        cy.mount(<Kanban />)
+        cy.mount(<Board />)
         cy.get('[data-rbd-draggable-id="status-done"]')
           .as('done')
           .invoke('index')
@@ -289,7 +289,7 @@ describe('<Kanban />', () => {
     // mouse events
     describe('using mouse events', () => {
       it('drags issue to the top', () => {
-        cy.mount(<Kanban />)
+        cy.mount(<Board />)
         cy.get('[data-rbd-draggable-id="issue-Adjust column titles"]')
           .as('top-issue')
           .invoke('index')
@@ -321,7 +321,7 @@ describe('<Kanban />', () => {
       })
 
       it('drags issue to the bottom', () => {
-        cy.mount(<Kanban />)
+        cy.mount(<Board />)
         cy.get('[data-rbd-draggable-id="issue-Adjust column titles"]')
           .as('top-issue')
           .invoke('index')
@@ -353,7 +353,7 @@ describe('<Kanban />', () => {
       })
 
       it('drags issue over statuses', () => {
-        cy.mount(<Kanban />)
+        cy.mount(<Board />)
         cy.get('[data-rbd-draggable-id="issue-Adjust column titles"]')
           .as('top-issue')
           .invoke('index')
@@ -430,7 +430,7 @@ describe('<Kanban />', () => {
     // keyboard events
     describe('using keyboard events', () => {
       it('drags issue to the top', () => {
-        cy.mount(<Kanban />)
+        cy.mount(<Board />)
         cy.get('[data-rbd-draggable-id="issue-Adjust column titles"]')
           .as('top-issue')
           .invoke('index')
@@ -456,7 +456,7 @@ describe('<Kanban />', () => {
       })
 
       it('drags issue to the bottom', () => {
-        cy.mount(<Kanban />)
+        cy.mount(<Board />)
         cy.get('[data-rbd-draggable-id="issue-Adjust column titles"]')
           .as('top-issue')
           .invoke('index')
@@ -482,7 +482,7 @@ describe('<Kanban />', () => {
       })
 
       it('drags issue over statuses', () => {
-        cy.mount(<Kanban />)
+        cy.mount(<Board />)
         cy.get('[data-rbd-draggable-id="issue-Adjust column titles"]')
           .as('top-issue')
           .invoke('index')
