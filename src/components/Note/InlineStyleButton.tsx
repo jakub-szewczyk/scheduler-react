@@ -35,7 +35,7 @@ const InlineStyleButton = ({
       event.preventDefault()
       setEditorState(RichUtils.toggleInlineStyle(editorState, type))
     }}
-    sx={{ minWidth: 0 }}
+    sx={{ minWidth: 0, flexShrink: 0 }}
   >
     {toIcon[type]}
   </Button>
