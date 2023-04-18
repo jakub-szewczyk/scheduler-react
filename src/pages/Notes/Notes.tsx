@@ -1,5 +1,5 @@
-const Notes = () => {
-  return <div>Notes</div>
-}
+import Note from '@/components/Note/Note'
+
+const Notes = () => <Note />
 
 export default Notes
