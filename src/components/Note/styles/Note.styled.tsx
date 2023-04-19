@@ -75,6 +75,22 @@ const EditorContainer = styled(Paper)(({ theme }) => ({
       width: 8,
     },
   },
+  blockquote: {
+    padding: '0.5rem 1rem',
+    background: theme.palette.secondary.main,
+    borderLeft: `0.25rem solid ${theme.palette.primary.main}`,
+    borderRadius: 4,
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
+  },
+  '.public-DraftStyleDefault-pre': {
+    padding: '0.5rem 1rem',
+    background: theme.palette.secondary.main,
+    borderRadius: 4,
+    '& > pre': {
+      marginBlock: 0,
+    },
+  },
 }))
 
 export { NoteContainer, ToolbarContainer, EditorContainer }

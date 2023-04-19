@@ -14,10 +14,6 @@ const Note = () => {
 
   const editorRef = useRef<Editor>(null)
 
-  /**
-   * TODO:
-   * Find out if it's possible to somehow refactor this ugly imperative code.
-   */
   const handleKeyCommand = (
     command: string,
     editorState: EditorState,
