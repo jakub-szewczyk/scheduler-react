@@ -4,7 +4,7 @@ import WidgetsMenu from './WidgetsMenu'
 
 const Navbar = () => (
   <Box sx={{ flexGrow: 1 }}>
-    <AppBar position='static' elevation={0}>
+    <AppBar elevation={0}>
       <Toolbar sx={{ justifyContent: 'space-between' }}>
         <Stack direction='row' alignItems='center' columnGap={1.5}>
           <PendingActionsIcon />

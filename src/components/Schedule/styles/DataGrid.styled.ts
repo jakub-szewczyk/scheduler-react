@@ -15,6 +15,7 @@ const DataGrid = styled(MuiDataGrid)(({ theme }) => ({
     borderTop: 0,
   },
   '.MuiDataGrid-virtualScroller': {
+    overflowY: 'hidden',
     '::-webkit-scrollbar': {
       width: 4,
       height: 4,
@@ -54,13 +55,11 @@ const DataGridContainer = styled(Paper)<{ height: number }>(
   ({ theme, height }) => ({
     width: 'calc(100% - 32px)',
     height,
-    maxHeight: 'calc(100vh - 160px)',
-    margin: '1rem auto 0 auto',
+    margin: '1rem auto',
     overflow: 'hidden',
     [theme.breakpoints.up('sm')]: {
       width: 'calc(100% - 48px)',
-      maxHeight: 'calc(100vh - 192px)',
-      marginTop: '1.5rem',
+      marginBlock: '1.5rem',
     },
     '.MuiDataGrid-footerContainer': {
       height: TABLE.FOOTER_HEIGHT,

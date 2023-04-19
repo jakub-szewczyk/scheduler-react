@@ -11,9 +11,6 @@ const NoteContainer = styled(Box)(({ theme }) => ({
 }))
 
 const ToolbarContainer = styled(Paper)(({ theme }) => ({
-  position: 'sticky',
-  top: 0,
-  zIndex: 2,
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
@@ -24,6 +21,7 @@ const ToolbarContainer = styled(Paper)(({ theme }) => ({
   borderBottomLeftRadius: 0,
   borderBottomRightRadius: 0,
   overflowX: 'auto',
+  overflowY: 'hidden',
   '::-webkit-scrollbar': {
     width: 4,
     height: 4,
@@ -52,6 +50,7 @@ const ToolbarContainer = styled(Paper)(({ theme }) => ({
 
 const EditorContainer = styled(Paper)(({ theme }) => ({
   minHeight: 'calc(100vh - 165px)',
+  maxHeight: 'calc(100vh - 165px)',
   padding: 16,
   borderTopLeftRadius: 0,
   borderTopRightRadius: 0,
@@ -76,6 +75,7 @@ const EditorContainer = styled(Paper)(({ theme }) => ({
   },
   [theme.breakpoints.up('sm')]: {
     minHeight: 'calc(100vh - 189px)',
+    maxHeight: 'calc(100vh - 189px)',
     '::-webkit-scrollbar': {
       width: 8,
     },
