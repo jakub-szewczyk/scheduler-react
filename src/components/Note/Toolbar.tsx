@@ -25,6 +25,7 @@ const Toolbar = ({
       value='spellcheck'
       selected={spellCheck}
       onMouseDown={() => setSpellCheck((spellCheck) => !spellCheck)}
+      sx={{ height: 36 }}
     >
       <SpellcheckIcon fontSize='small' />
     </ToggleButton>

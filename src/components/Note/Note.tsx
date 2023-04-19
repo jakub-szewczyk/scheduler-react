@@ -1,10 +1,9 @@
-import { Divider } from '@mui/material'
+import { isPlaceholderVisible } from '@/modules/note'
 import { DraftHandleValue, Editor, EditorState, RichUtils } from 'draft-js'
 import 'draft-js/dist/Draft.css'
 import { useRef, useState } from 'react'
 import Toolbar from './Toolbar'
 import { EditorContainer, NoteContainer } from './styles/Note.styled'
-import { isPlaceholderVisible } from '@/modules/note'
 
 const Note = () => {
   const [editorState, setEditorState] = useState(() =>
@@ -35,7 +34,6 @@ const Note = () => {
         spellCheck={spellCheck}
         setSpellCheck={setSpellCheck}
       />
-      <Divider />
       <EditorContainer
         elevation={0}
         onClick={() => editorRef.current?.focus()}

@@ -1,4 +1,5 @@
 type DraftBlockStyleType =
+  | 'unstyled'
   | 'header-one'
   | 'header-two'
   | 'header-three'

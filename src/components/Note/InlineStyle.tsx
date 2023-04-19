@@ -24,6 +24,7 @@ const InlineStyle = ({
       event.preventDefault()
       setEditorState(RichUtils.toggleInlineStyle(editorState, type))
     }}
+    sx={{ height: 36 }}
   >
     {toInlineStyleIcon[type]}
   </ToggleButton>

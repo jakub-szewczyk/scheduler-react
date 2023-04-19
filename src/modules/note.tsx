@@ -8,6 +8,7 @@ import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered'
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote'
 import FormatUnderlinedIcon from '@mui/icons-material/FormatUnderlined'
 import StrikethroughSIcon from '@mui/icons-material/StrikethroughS'
+import { Typography } from '@mui/material'
 import { DraftInlineStyleType, EditorState } from 'draft-js'
 import { ReactNode } from 'react'
 
@@ -19,19 +20,14 @@ const toInlineStyleIcon: { [key in DraftInlineStyleType]: ReactNode } = {
   CODE: <CodeIcon fontSize='small' />,
 }
 
-/**
- * TODO:
- * 1. Find the best component for heading sizes.
- * 2. Style blockquote block.
- * 3. Style codeblock.
- */
 const toBlockStyleIcon: { [key in DraftBlockStyleType]: ReactNode } = {
-  'header-one': null,
-  'header-two': null,
-  'header-three': null,
-  'header-four': null,
-  'header-five': null,
-  'header-six': null,
+  unstyled: <Typography fontSize='small'>Paragraph</Typography>,
+  'header-one': <Typography fontSize='small'>Headline 1</Typography>,
+  'header-two': <Typography fontSize='small'>Headline 2</Typography>,
+  'header-three': <Typography fontSize='small'>Headline 3</Typography>,
+  'header-four': <Typography fontSize='small'>Headline 4</Typography>,
+  'header-five': <Typography fontSize='small'>Headline 5</Typography>,
+  'header-six': <Typography fontSize='small'>Headline 6</Typography>,
   'unordered-list-item': <FormatListBulletedIcon fontSize='small' />,
   'ordered-list-item': <FormatListNumberedIcon fontSize='small' />,
   blockquote: <FormatQuoteIcon fontSize='small' />,

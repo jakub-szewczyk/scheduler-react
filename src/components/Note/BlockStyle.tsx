@@ -25,6 +25,10 @@ const BlockStyle = ({
       event.preventDefault()
       setEditorState(RichUtils.toggleBlockType(editorState, type))
     }}
+    sx={{
+      height: 36,
+      whiteSpace: 'nowrap',
+    }}
   >
     {toBlockStyleIcon[type]}
   </ToggleButton>
