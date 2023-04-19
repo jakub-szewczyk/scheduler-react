@@ -1,7 +1,8 @@
 import SpellcheckIcon from '@mui/icons-material/Spellcheck'
-import { Button } from '@mui/material'
+import { ToggleButton } from '@mui/material'
 import { EditorState } from 'draft-js'
 import { Dispatch, SetStateAction } from 'react'
+import BlockStyles from './BlockStyles'
 import InlineStyles from './InlineStyles'
 import { ToolbarContainer } from './styles/Note.styled'
 
@@ -19,16 +20,16 @@ const Toolbar = ({
   setSpellCheck,
 }: ToolbarProps) => (
   <ToolbarContainer elevation={0}>
-    <Button
+    <ToggleButton
       size='small'
-      variant={spellCheck ? 'contained' : 'outlined'}
+      value='spellcheck'
+      selected={spellCheck}
       onMouseDown={() => setSpellCheck((spellCheck) => !spellCheck)}
-      sx={{ minWidth: 0, flexShrink: 0 }}
     >
       <SpellcheckIcon fontSize='small' />
-    </Button>
+    </ToggleButton>
     <InlineStyles editorState={editorState} setEditorState={setEditorState} />
-    {/* TODO: Add support for block styles */}
+    <BlockStyles editorState={editorState} setEditorState={setEditorState} />
   </ToolbarContainer>
 )
 

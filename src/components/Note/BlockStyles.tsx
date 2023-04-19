@@ -1,41 +1,37 @@
 import { EditorState } from 'draft-js'
 import { Dispatch, SetStateAction } from 'react'
-import InlineStyle from './InlineStyle'
+import BlockStyle from './BlockStyle'
 import { ToggleButtonGroup } from '@mui/material'
+import { blockStyle } from '@/modules/note'
 
-interface InlineStylesProps {
+interface BlockStylesProps {
   editorState: EditorState
   setEditorState: Dispatch<SetStateAction<EditorState>>
 }
 
-const InlineStyles = ({ editorState, setEditorState }: InlineStylesProps) => (
-  <ToggleButtonGroup value={editorState.getCurrentInlineStyle().toArray()}>
-    <InlineStyle
-      type='BOLD'
+const BlockStyles = ({ editorState, setEditorState }: BlockStylesProps) => (
+  <ToggleButtonGroup value={blockStyle(editorState)} exclusive>
+    <BlockStyle
+      type='ordered-list-item'
       editorState={editorState}
       setEditorState={setEditorState}
     />
-    <InlineStyle
-      type='ITALIC'
+    <BlockStyle
+      type='unordered-list-item'
       editorState={editorState}
       setEditorState={setEditorState}
     />
-    <InlineStyle
-      type='UNDERLINE'
+    <BlockStyle
+      type='blockquote'
       editorState={editorState}
       setEditorState={setEditorState}
     />
-    <InlineStyle
-      type='STRIKETHROUGH'
-      editorState={editorState}
-      setEditorState={setEditorState}
-    />
-    <InlineStyle
-      type='CODE'
+    <BlockStyle
+      type='code-block'
       editorState={editorState}
       setEditorState={setEditorState}
     />
   </ToggleButtonGroup>
 )
 
-export default InlineStyles
+export default BlockStyles

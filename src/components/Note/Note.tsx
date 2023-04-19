@@ -4,6 +4,7 @@ import 'draft-js/dist/Draft.css'
 import { useRef, useState } from 'react'
 import Toolbar from './Toolbar'
 import { EditorContainer, NoteContainer } from './styles/Note.styled'
+import { isPlaceholderVisible } from '@/modules/note'
 
 const Note = () => {
   const [editorState, setEditorState] = useState(() =>
@@ -13,6 +14,10 @@ const Note = () => {
 
   const editorRef = useRef<Editor>(null)
 
+  /**
+   * TODO:
+   * Find out if it's possible to somehow refactor this ugly imperative code.
+   */
   const handleKeyCommand = (
     command: string,
     editorState: EditorState,
@@ -35,7 +40,15 @@ const Note = () => {
         setSpellCheck={setSpellCheck}
       />
       <Divider />
-      <EditorContainer elevation={0} onClick={() => editorRef.current?.focus()}>
+      <EditorContainer
+        elevation={0}
+        onClick={() => editorRef.current?.focus()}
+        sx={{
+          '.public-DraftEditorPlaceholder-root': {
+            display: isPlaceholderVisible(editorState) ? 'block' : 'none',
+          },
+        }}
+      >
         <Editor
           ref={editorRef}
           editorState={editorState}

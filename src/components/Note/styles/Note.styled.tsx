@@ -12,7 +12,7 @@ const NoteContainer = styled(Box)(({ theme }) => ({
 
 const ToolbarContainer = styled(Paper)(({ theme }) => ({
   display: 'flex',
-  columnGap: 8,
+  columnGap: 16,
   padding: 16,
   borderBottomLeftRadius: 0,
   borderBottomRightRadius: 0,
@@ -44,8 +44,8 @@ const ToolbarContainer = styled(Paper)(({ theme }) => ({
 }))
 
 const EditorContainer = styled(Paper)(({ theme }) => ({
-  minHeight: 'calc(100vh - 149px)',
-  maxHeight: 'calc(100vh - 149px)',
+  minHeight: 'calc(100vh - 157px)',
+  maxHeight: 'calc(100vh - 157px)',
   padding: 16,
   borderTopLeftRadius: 0,
   borderTopRightRadius: 0,
@@ -69,8 +69,8 @@ const EditorContainer = styled(Paper)(({ theme }) => ({
     display: 'none',
   },
   [theme.breakpoints.up('sm')]: {
-    minHeight: 'calc(100vh - 173px)',
-    maxHeight: 'calc(100vh - 173px)',
+    minHeight: 'calc(100vh - 181px)',
+    maxHeight: 'calc(100vh - 181px)',
     '::-webkit-scrollbar': {
       width: 8,
     },
