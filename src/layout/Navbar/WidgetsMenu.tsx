@@ -23,13 +23,13 @@ const WidgetsMenu = () => {
     setMenu(null)
   }
 
-  const handleKanbanMenuItemClick = () => {
-    navigate('/kanban')
+  const handleBoardsMenuItemClick = () => {
+    navigate('/boards')
     setMenu(null)
   }
 
   const handleSchedulesMenuItemClick = () => {
-    navigate('/')
+    navigate('/schedules')
     setMenu(null)
   }
 
@@ -49,16 +49,16 @@ const WidgetsMenu = () => {
           <ListItemText>Notes</ListItemText>
         </MenuItem>
         <MenuItem
-          selected={pathname === '/kanban'}
-          onClick={handleKanbanMenuItemClick}
+          selected={pathname === '/boards'}
+          onClick={handleBoardsMenuItemClick}
         >
           <ListItemIcon>
             <ViewKanbanIcon fontSize='small' />
           </ListItemIcon>
-          <ListItemText>Kanban</ListItemText>
+          <ListItemText>Boards</ListItemText>
         </MenuItem>
         <MenuItem
-          selected={pathname === '/'}
+          selected={pathname === '/schedules'}
           onClick={handleSchedulesMenuItemClick}
         >
           <ListItemIcon>

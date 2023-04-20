@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom'
 import Navbar from './layout/Navbar/Navbar'
-import Dashboard from './pages/Dashboard/Dashboard'
-import Kanban from './pages/Kanban/Kanban'
+import Schedules from './pages/Schedules/Schedules'
+import Boards from './pages/Boards/Boards'
 import Notes from './pages/Notes/Notes'
 
 const router = createBrowserRouter([
@@ -22,12 +22,12 @@ const router = createBrowserRouter([
         element: <Notes />,
       },
       {
-        path: '/kanban',
-        element: <Kanban />,
+        path: '/boards',
+        element: <Boards />,
       },
       {
         path: '/schedules',
-        element: <Dashboard />,
+        element: <Schedules />,
       },
     ],
   },
