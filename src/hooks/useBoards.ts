@@ -9,9 +9,7 @@ const useBoards = () => {
 
   const board = BOARD.findSelected(boards)!
 
-  const setStatuses: Dispatch<SetStateAction<Status[]>> = (
-    statuses: Status[] | ((rows: Status[]) => Status[])
-  ) =>
+  const setStatuses: Dispatch<SetStateAction<Status[]>> = (statuses) =>
     setBoards(
       map(
         when(

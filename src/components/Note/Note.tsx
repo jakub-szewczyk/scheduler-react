@@ -4,11 +4,15 @@ import 'draft-js/dist/Draft.css'
 import { useRef, useState } from 'react'
 import Toolbar from './Toolbar'
 import { EditorContainer, NoteContainer } from './styles/Note.styled'
+import useNotes from '@/hooks/useNotes'
 
+/**
+ * TODO:
+ * 1. Refactor.
+ * 2. PDF or other document format export.
+ */
 const Note = () => {
-  const [editorState, setEditorState] = useState(() =>
-    EditorState.createEmpty()
-  )
+  const { note: editorState, setNote: setEditorState } = useNotes()
   const [spellCheck, setSpellCheck] = useState(true)
 
   const editorRef = useRef<Editor>(null)

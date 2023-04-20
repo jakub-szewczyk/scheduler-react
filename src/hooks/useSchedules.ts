@@ -12,9 +12,7 @@ const useSchedules = () => {
 
   const schedule = SCHEDULE.findSelected(schedules)!
 
-  const setRows: Dispatch<SetStateAction<Row[]>> = (
-    rows: Row[] | ((rows: Row[]) => Row[])
-  ) =>
+  const setRows: Dispatch<SetStateAction<Row[]>> = (rows) =>
     setSchedules(
       map(
         when(
