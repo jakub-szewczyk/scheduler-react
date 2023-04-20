@@ -34,7 +34,7 @@ const Toolbar = forwardRef<Editor, ToolbarProps>(
           pagebreak: { mode: ['avoid-all'] },
         })
         .from(html)
-        .save()
+        .save() // TODO: Set pdf filename to note's name
     }
 
     return (
