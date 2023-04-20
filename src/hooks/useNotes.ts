@@ -1,8 +1,8 @@
 import { EditorState, convertFromRaw, convertToRaw } from 'draft-js'
 import { Dispatch, SetStateAction, useState } from 'react'
 
-const useNotes = () => {
-  const [editorState, setEditorState] = useState(() =>
+const useEditorState = () => {
+  const [initialEditorState, setInitialEditorState] = useState(() =>
     localStorage.getItem('note')
       ? EditorState.createWithContent(
           convertFromRaw(JSON.parse(localStorage.getItem('note')!))
@@ -10,26 +10,26 @@ const useNotes = () => {
       : EditorState.createEmpty()
   )
 
-  const setNote: Dispatch<SetStateAction<EditorState>> = (value) => {
+  const setEditorState: Dispatch<SetStateAction<EditorState>> = (value) => {
     if (typeof value === 'function') {
-      const previousValue = value(editorState)
+      const previousValue = value(initialEditorState)
       localStorage.setItem(
         'note',
         JSON.stringify(convertToRaw(previousValue.getCurrentContent()))
       )
-      setEditorState(previousValue)
+      setInitialEditorState(previousValue)
     } else {
       localStorage.setItem(
         'note',
         JSON.stringify(convertToRaw(value.getCurrentContent()))
       )
-      setEditorState(value)
+      setInitialEditorState(value)
     }
   }
 
   return {
-    note: editorState,
-    setNote,
+    editorState: initialEditorState,
+    setEditorState,
   }
 }
-export default useNotes
+export default useEditorState

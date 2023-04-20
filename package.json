@@ -26,6 +26,7 @@
     "formik-mui-x-date-pickers": "^0.0.1",
     "fp-ts": "^2.13.1",
     "fp-ts-ramda": "^0.1.7",
+    "html2pdf.js": "^0.10.1",
     "immer": "^9.0.19",
     "nanoid": "^4.0.0",
     "ramda": "^0.28.0",

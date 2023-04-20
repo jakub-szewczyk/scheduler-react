@@ -1,18 +1,13 @@
+import useEditorState from '@/hooks/useNotes'
 import { isPlaceholderVisible } from '@/modules/note'
 import { DraftHandleValue, Editor, EditorState, RichUtils } from 'draft-js'
 import 'draft-js/dist/Draft.css'
 import { useRef, useState } from 'react'
 import Toolbar from './Toolbar'
 import { EditorContainer, NoteContainer } from './styles/Note.styled'
-import useNotes from '@/hooks/useNotes'
 
-/**
- * TODO:
- * 1. Refactor.
- * 2. PDF or other document format export.
- */
 const Note = () => {
-  const { note: editorState, setNote: setEditorState } = useNotes()
+  const { editorState, setEditorState } = useEditorState()
   const [spellCheck, setSpellCheck] = useState(true)
 
   const editorRef = useRef<Editor>(null)
@@ -33,6 +28,7 @@ const Note = () => {
   return (
     <NoteContainer>
       <Toolbar
+        ref={editorRef}
         editorState={editorState}
         setEditorState={setEditorState}
         spellCheck={spellCheck}
