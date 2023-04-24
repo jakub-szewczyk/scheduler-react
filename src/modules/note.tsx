@@ -1,4 +1,5 @@
-import { DraftBlockStyleType } from '@/types/note'
+import * as NOTE from '@/modules/note'
+import { DraftBlockStyleType, Note } from '@/types/note'
 import CodeIcon from '@mui/icons-material/Code'
 import DataObjectIcon from '@mui/icons-material/DataObject'
 import FormatBoldIcon from '@mui/icons-material/FormatBold'
@@ -9,8 +10,45 @@ import FormatQuoteIcon from '@mui/icons-material/FormatQuote'
 import FormatUnderlinedIcon from '@mui/icons-material/FormatUnderlined'
 import StrikethroughSIcon from '@mui/icons-material/StrikethroughS'
 import { Typography } from '@mui/material'
-import { DraftInlineStyleType, EditorState } from 'draft-js'
-import { ReactNode } from 'react'
+import {
+  DraftInlineStyleType,
+  Editor,
+  EditorState,
+  RawDraftContentState,
+  convertFromRaw,
+} from 'draft-js'
+import produce from 'immer'
+import { ReactNode, SetStateAction } from 'react'
+// @ts-ignore
+import html2pdf from 'html2pdf.js'
+
+const INITIAL_VALUES: Note[] = [
+  {
+    name: 'unsaved',
+    selected: true,
+    createdAt: new Date().toISOString(),
+    editorState: EditorState.createEmpty(),
+  },
+]
+
+const initialState = () =>
+  localStorage.getItem('notes')
+    ? JSON.parse(localStorage.getItem('notes')!).map((note: Note) => ({
+        ...note,
+        editorState: EditorState.createWithContent(
+          convertFromRaw(note.editorState as RawDraftContentState)
+        ),
+      }))
+    : NOTE.INITIAL_VALUES
+
+const updatedState = (value: SetStateAction<EditorState>) =>
+  produce((notes: Note[]) => {
+    const note = notes.find((note) => note.selected)!
+    note.editorState =
+      typeof value === 'function'
+        ? value(note.editorState as EditorState)
+        : value
+  })
 
 const toInlineStyleIcon: { [key in DraftInlineStyleType]: ReactNode } = {
   BOLD: <FormatBoldIcon fontSize='small' />,
@@ -44,4 +82,25 @@ const isPlaceholderVisible = (editorState: EditorState) =>
   editorState.getCurrentContent().hasText() ||
   editorState.getCurrentContent().getBlockMap().first().getType() === 'unstyled'
 
-export { toInlineStyleIcon, toBlockStyleIcon, blockStyle, isPlaceholderVisible }
+const exportToPDF = (editor: Editor, filename?: string) => {
+  const html = editor.editorContainer?.cloneNode(true) as HTMLElement
+  html.style.color = 'black'
+  html2pdf()
+    .set({
+      margin: 16,
+      pagebreak: { mode: ['avoid-all'] },
+    })
+    .from(html)
+    .save(filename)
+}
+
+export {
+  INITIAL_VALUES,
+  initialState,
+  updatedState,
+  toInlineStyleIcon,
+  toBlockStyleIcon,
+  blockStyle,
+  isPlaceholderVisible,
+  exportToPDF,
+}

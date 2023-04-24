@@ -1,3 +1,12 @@
+import { EditorState, RawDraftContentState } from 'draft-js'
+
+interface Note {
+  name: string
+  selected: boolean
+  createdAt: string
+  editorState: EditorState | RawDraftContentState
+}
+
 type DraftBlockStyleType =
   | 'unstyled'
   | 'header-one'
@@ -11,4 +20,4 @@ type DraftBlockStyleType =
   | 'blockquote'
   | 'code-block'
 
-export type { DraftBlockStyleType }
+export type { Note, DraftBlockStyleType }

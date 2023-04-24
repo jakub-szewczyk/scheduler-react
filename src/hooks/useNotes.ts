@@ -1,35 +1,35 @@
-import { EditorState, convertFromRaw, convertToRaw } from 'draft-js'
+import * as NOTE from '@/modules/note'
+import { Note } from '@/types/note'
+import { EditorState, convertToRaw } from 'draft-js'
 import { Dispatch, SetStateAction, useState } from 'react'
 
-const useEditorState = () => {
-  const [initialEditorState, setInitialEditorState] = useState(() =>
-    localStorage.getItem('note')
-      ? EditorState.createWithContent(
-          convertFromRaw(JSON.parse(localStorage.getItem('note')!))
-        )
-      : EditorState.createEmpty()
-  )
+const useNotes = () => {
+  const [notes, setNotes] = useState<Note[]>(NOTE.initialState)
 
   const setEditorState: Dispatch<SetStateAction<EditorState>> = (value) => {
-    if (typeof value === 'function') {
-      const previousValue = value(initialEditorState)
-      localStorage.setItem(
-        'note',
-        JSON.stringify(convertToRaw(previousValue.getCurrentContent()))
+    localStorage.setItem(
+      'notes',
+      JSON.stringify(
+        NOTE.updatedState(value)(notes).map((note) => ({
+          ...note,
+          editorState: convertToRaw(
+            (note.editorState as EditorState).getCurrentContent()
+          ),
+        }))
       )
-      setInitialEditorState(previousValue)
-    } else {
-      localStorage.setItem(
-        'note',
-        JSON.stringify(convertToRaw(value.getCurrentContent()))
-      )
-      setInitialEditorState(value)
-    }
+    )
+    setNotes(NOTE.updatedState(value))
   }
 
+  const note = notes.find((note) => note.selected)!
+
   return {
-    editorState: initialEditorState,
+    note,
+    notes,
+    setNotes,
+    editorState: note.editorState as EditorState,
     setEditorState,
   }
 }
-export default useEditorState
+
+export default useNotes

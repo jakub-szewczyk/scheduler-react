@@ -1,16 +1,17 @@
-import useEditorState from '@/hooks/useNotes'
+import useNotes from '@/hooks/useNotes'
 import { isPlaceholderVisible } from '@/modules/note'
 import { DraftHandleValue, Editor, EditorState, RichUtils } from 'draft-js'
 import 'draft-js/dist/Draft.css'
-import { useRef, useState } from 'react'
+import { RefObject, forwardRef, useState } from 'react'
 import Toolbar from './Toolbar'
 import { EditorContainer, NoteContainer } from './styles/Note.styled'
 
-const Note = () => {
-  const { editorState, setEditorState } = useEditorState()
+const Note = forwardRef<Editor>((_, ref) => {
+  const editorRef = ref as RefObject<Editor>
+
   const [spellCheck, setSpellCheck] = useState(true)
 
-  const editorRef = useRef<Editor>(null)
+  const { editorState, setEditorState } = useNotes()
 
   const handleKeyCommand = (
     command: string,
@@ -54,5 +55,6 @@ const Note = () => {
       </EditorContainer>
     </NoteContainer>
   )
-}
+})
+
 export default Note
