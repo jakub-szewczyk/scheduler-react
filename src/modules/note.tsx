@@ -17,10 +17,14 @@ import {
   RawDraftContentState,
   convertFromRaw,
 } from 'draft-js'
+import { prop } from 'fp-ts-ramda'
 import produce from 'immer'
 import { ReactNode, SetStateAction } from 'react'
 // @ts-ignore
 import html2pdf from 'html2pdf.js'
+import { lensProp, map, set, when } from 'ramda'
+
+type NotesEndomorphism = (notes: Note[]) => Note[]
 
 const INITIAL_VALUES: Note[] = [
   {
@@ -50,6 +54,10 @@ const updatedState = (value: SetStateAction<EditorState>) =>
         : value
   })
 
+// FIXME: This doesn't persist state due to `useNotes` implementation
+const save = (name: string): NotesEndomorphism =>
+  map(when(prop('selected'), set(lensProp('name'), name)))
+
 const toInlineStyleIcon: { [key in DraftInlineStyleType]: ReactNode } = {
   BOLD: <FormatBoldIcon fontSize='small' />,
   ITALIC: <FormatItalicIcon fontSize='small' />,
@@ -60,12 +68,12 @@ const toInlineStyleIcon: { [key in DraftInlineStyleType]: ReactNode } = {
 
 const toBlockStyleIcon: { [key in DraftBlockStyleType]: ReactNode } = {
   unstyled: <Typography fontSize='small'>Paragraph</Typography>,
-  'header-one': <Typography fontSize='small'>Headline 1</Typography>,
-  'header-two': <Typography fontSize='small'>Headline 2</Typography>,
-  'header-three': <Typography fontSize='small'>Headline 3</Typography>,
-  'header-four': <Typography fontSize='small'>Headline 4</Typography>,
-  'header-five': <Typography fontSize='small'>Headline 5</Typography>,
-  'header-six': <Typography fontSize='small'>Headline 6</Typography>,
+  'header-one': <Typography fontSize='small'>Heading 1</Typography>,
+  'header-two': <Typography fontSize='small'>Heading 2</Typography>,
+  'header-three': <Typography fontSize='small'>Heading 3</Typography>,
+  'header-four': <Typography fontSize='small'>Heading 4</Typography>,
+  'header-five': <Typography fontSize='small'>Heading 5</Typography>,
+  'header-six': <Typography fontSize='small'>Heading 6</Typography>,
   'unordered-list-item': <FormatListBulletedIcon fontSize='small' />,
   'ordered-list-item': <FormatListNumberedIcon fontSize='small' />,
   blockquote: <FormatQuoteIcon fontSize='small' />,
@@ -98,6 +106,7 @@ export {
   INITIAL_VALUES,
   initialState,
   updatedState,
+  save,
   toInlineStyleIcon,
   toBlockStyleIcon,
   blockStyle,

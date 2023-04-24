@@ -6,6 +6,12 @@ import { Dispatch, SetStateAction, useState } from 'react'
 const useNotes = () => {
   const [notes, setNotes] = useState<Note[]>(NOTE.initialState)
 
+  /**
+   * TODO:
+   * It seems that every new, calculated notes state
+   * has to be mapped in order to persist it in local storage.
+   * Try coming up with a reusable abstraction to handle such case.
+   */
   const setEditorState: Dispatch<SetStateAction<EditorState>> = (value) => {
     localStorage.setItem(
       'notes',
