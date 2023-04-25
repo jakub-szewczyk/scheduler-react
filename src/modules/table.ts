@@ -15,7 +15,7 @@ const calculateHeight = (rows: Row[]) =>
   HEADER_HEIGHT + ROW_HEIGHT * rows.length + FOOTER_HEIGHT + 2
 
 const calculateMaxWidth = (columns: GridColDef[]) =>
-  pipe(columns, map(prop('width')), reduce(add as T, 0), add(10))
+  pipe(columns, map(prop('width')), reduce(add as T, 0))
 
 export {
   HEADER_HEIGHT,

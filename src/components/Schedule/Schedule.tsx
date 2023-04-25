@@ -2,7 +2,7 @@ import { useTheme } from '@mui/material'
 import useSchedules from '../../hooks/useSchedules'
 import * as ROW from '../../modules/row'
 import * as TABLE from '../../modules/table'
-import DataGridFooter from './DataGridFooter'
+import DataGridHeader from './DataGridHeader'
 import createColumns from './helpers/createColumns'
 import { DataGrid, DataGridContainer } from './styles/DataGrid.styled'
 
@@ -29,8 +29,9 @@ const Schedule = () => {
     >
       <DataGrid
         disableColumnMenu
+        showCellRightBorder
+        showColumnRightBorder
         hideFooterPagination
-        disableVirtualization
         headerHeight={TABLE.HEADER_HEIGHT}
         rowHeight={TABLE.ROW_HEIGHT}
         columns={columns}
@@ -39,7 +40,7 @@ const Schedule = () => {
           setRows(ROW.update(field, value, id, rows))
         }
         components={{
-          Footer: DataGridFooter,
+          Header: DataGridHeader,
         }}
       />
     </DataGridContainer>

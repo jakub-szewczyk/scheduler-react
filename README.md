@@ -8,8 +8,6 @@ TODO: Description
 
 - Display selected kanban board name.
 
-- Consider moving schedule name to the top.
-
 - Customize textarea scrollbar.
 
 - Improve notification configuration dialog styles - prevent textfield helper text from wrapping.

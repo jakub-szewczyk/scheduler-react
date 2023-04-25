@@ -4,11 +4,11 @@ import { pipe } from 'fp-ts/lib/function'
 import { trim } from 'ramda'
 import { useBoolean } from 'usehooks-ts'
 import useSchedules from '../../hooks/useSchedules'
+import { asteriskSuffix } from '../../modules/common'
 import * as SCHEDULE from '../../modules/schedule'
 import SaveScheduleDialog from '../ScheduleActions/SaveScheduleDialog'
-import { asteriskSuffix } from '../../modules/common'
 
-const DataGridFooter = () => {
+const DataGridHeader = () => {
   const { schedule, schedules, setSchedules } = useSchedules()
 
   const {
@@ -24,7 +24,12 @@ const DataGridFooter = () => {
 
   return (
     <>
-      <Stack direction='row' height={60} paddingX={2}>
+      <Stack
+        direction='row'
+        height={60}
+        paddingX={2}
+        sx={{ borderBottom: 'thin solid #515151' }}
+      >
         <Stack
           direction='row'
           justifyContent='center'
@@ -51,4 +56,4 @@ const DataGridFooter = () => {
   )
 }
 
-export default DataGridFooter
+export default DataGridHeader
