@@ -72,7 +72,7 @@ const NoteActions = forwardRef<Editor, NoteActionsProps>(
           <SpeedDialAction
             tooltipTitle='Download'
             icon={<DownloadIcon />}
-            onClick={() => exportToPDF(editorRef.current!)}
+            onClick={() => exportToPDF(editorRef.current!, note.name)}
           />
           <SpeedDialAction
             tooltipTitle={isUnsaved(note) ? 'Save' : 'Rename'}

@@ -10,14 +10,16 @@ import {
 } from 'react'
 import Toolbar from './Toolbar'
 import { EditorContainer, NoteContainer } from './styles/Note.styled'
+import { Note as INote } from '@/types/note'
 
 interface NoteProps {
+  note: INote
   editorState: EditorState
   setEditorState: Dispatch<SetStateAction<EditorState>>
 }
 
 const Note = forwardRef<Editor, NoteProps>(
-  ({ editorState, setEditorState }, ref) => {
+  ({ note, editorState, setEditorState }, ref) => {
     const editorRef = ref as RefObject<Editor>
 
     const [spellCheck, setSpellCheck] = useState(true)
@@ -39,6 +41,7 @@ const Note = forwardRef<Editor, NoteProps>(
       <NoteContainer>
         <Toolbar
           ref={editorRef}
+          note={note}
           editorState={editorState}
           setEditorState={setEditorState}
           spellCheck={spellCheck}

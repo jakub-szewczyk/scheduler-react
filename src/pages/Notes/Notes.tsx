@@ -13,6 +13,7 @@ const Notes = () => {
     <>
       <Note
         ref={editorRef}
+        note={note}
         editorState={editorState}
         setEditorState={setEditorState}
       />
