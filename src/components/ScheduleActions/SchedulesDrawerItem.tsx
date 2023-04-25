@@ -34,7 +34,13 @@ const SchedulesDrawerItem = ({
       <Stack direction='row' alignItems='start'>
         <ListItemButton onClick={() => onSelect(schedule.name)}>
           <ListItemAvatar>
-            <Avatar>
+            <Avatar
+              sx={{
+                ...(schedule.selected && {
+                  bgcolor: (theme) => theme.palette.primary.main,
+                }),
+              }}
+            >
               <ViewListIcon />
             </Avatar>
           </ListItemAvatar>

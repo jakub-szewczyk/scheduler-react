@@ -7,22 +7,12 @@ import { useRef } from 'react'
 const Notes = () => {
   const editorRef = useRef<Editor>(null)
 
-  const { note, notes, setNotes, editorState, setEditorState } = useNotes()
+  const notes = useNotes()
 
   return (
     <>
-      <Note
-        ref={editorRef}
-        note={note}
-        editorState={editorState}
-        setEditorState={setEditorState}
-      />
-      <NoteActions
-        ref={editorRef}
-        note={note}
-        notes={notes}
-        setNotes={setNotes}
-      />
+      <Note ref={editorRef} {...notes} />
+      <NoteActions ref={editorRef} {...notes} />
     </>
   )
 }

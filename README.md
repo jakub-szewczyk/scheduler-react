@@ -4,10 +4,6 @@ TODO: Description
 
 ## TODO
 
-- Highlight currently working widget (schedule, board, note) in their respective selection drawers.
-
-- Display selected note name.
-
 - Customize textarea scrollbar.
 
 - Improve notification configuration dialog styles - prevent textfield helper text from wrapping.

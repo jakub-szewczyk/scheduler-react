@@ -49,8 +49,8 @@ const ToolbarContainer = styled(Paper)(({ theme }) => ({
 }))
 
 const EditorContainer = styled(Paper)(({ theme }) => ({
-  minHeight: 'calc(100vh - 165px)',
-  maxHeight: 'calc(100vh - 165px)',
+  minHeight: 'calc(100vh - 211px)',
+  maxHeight: 'calc(100vh - 211px)',
   padding: 16,
   borderTopLeftRadius: 0,
   borderTopRightRadius: 0,
@@ -74,8 +74,8 @@ const EditorContainer = styled(Paper)(({ theme }) => ({
     display: 'none',
   },
   [theme.breakpoints.up('sm')]: {
-    minHeight: 'calc(100vh - 189px)',
-    maxHeight: 'calc(100vh - 189px)',
+    minHeight: 'calc(100vh - 243px)',
+    maxHeight: 'calc(100vh - 243px)',
     '::-webkit-scrollbar': {
       width: 8,
     },

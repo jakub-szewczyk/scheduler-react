@@ -1,5 +1,5 @@
 import CloseIcon from '@mui/icons-material/Close'
-import ViewListIcon from '@mui/icons-material/ViewList'
+import ViewKanbanIcon from '@mui/icons-material/ViewKanban'
 import { Box, IconButton, ListItemButton, Stack, Tooltip } from '@mui/material'
 import Avatar from '@mui/material/Avatar'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
@@ -34,8 +34,14 @@ const BoardsDrawerItem = ({
       <Stack direction='row' alignItems='start'>
         <ListItemButton onClick={() => onSelect(board.name)}>
           <ListItemAvatar>
-            <Avatar>
-              <ViewListIcon />
+            <Avatar
+              sx={{
+                ...(board.selected && {
+                  bgcolor: (theme) => theme.palette.primary.main,
+                }),
+              }}
+            >
+              <ViewKanbanIcon />
             </Avatar>
           </ListItemAvatar>
           <ListItemText

@@ -1,6 +1,6 @@
 import { Note } from '@/types/note'
 import CloseIcon from '@mui/icons-material/Close'
-import ViewListIcon from '@mui/icons-material/ViewList'
+import StickyNote2Icon from '@mui/icons-material/StickyNote2'
 import { Box, IconButton, ListItemButton, Stack, Tooltip } from '@mui/material'
 import Avatar from '@mui/material/Avatar'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
@@ -34,8 +34,14 @@ const NotesDrawerItem = ({
       <Stack direction='row' alignItems='start'>
         <ListItemButton onClick={() => onSelect(note.name)}>
           <ListItemAvatar>
-            <Avatar>
-              <ViewListIcon />
+            <Avatar
+              sx={{
+                ...(note.selected && {
+                  bgcolor: (theme) => theme.palette.primary.main,
+                }),
+              }}
+            >
+              <StickyNote2Icon />
             </Avatar>
           </ListItemAvatar>
           <ListItemText
