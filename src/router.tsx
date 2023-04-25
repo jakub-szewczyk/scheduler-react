@@ -29,6 +29,10 @@ const router = createBrowserRouter([
         path: '/schedules',
         element: <Schedules />,
       },
+      {
+        path: '*',
+        element: <Navigate to='/schedules' replace />,
+      },
     ],
   },
 ])
