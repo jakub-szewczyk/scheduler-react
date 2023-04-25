@@ -8,7 +8,7 @@ import { asteriskSuffix } from '../../modules/common'
 import * as SCHEDULE from '../../modules/schedule'
 import SaveScheduleDialog from '../ScheduleActions/SaveScheduleDialog'
 
-const DataGridHeader = () => {
+const ScheduleHeader = () => {
   const { schedule, schedules, setSchedules } = useSchedules()
 
   const {
@@ -56,4 +56,4 @@ const DataGridHeader = () => {
   )
 }
 
-export default DataGridHeader
+export default ScheduleHeader

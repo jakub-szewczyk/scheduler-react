@@ -6,7 +6,7 @@ TODO: Description
 
 - Highlight currently working widget (schedule, board, note) in their respective selection drawers.
 
-- Display selected kanban board name.
+- Display selected note name.
 
 - Customize textarea scrollbar.
 

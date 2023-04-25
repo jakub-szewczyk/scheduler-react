@@ -2,7 +2,7 @@ import { useTheme } from '@mui/material'
 import useSchedules from '../../hooks/useSchedules'
 import * as ROW from '../../modules/row'
 import * as TABLE from '../../modules/table'
-import DataGridHeader from './DataGridHeader'
+import ScheduleHeader from './ScheduleHeader'
 import createColumns from './helpers/createColumns'
 import { DataGrid, DataGridContainer } from './styles/DataGrid.styled'
 
@@ -40,7 +40,7 @@ const Schedule = () => {
           setRows(ROW.update(field, value, id, rows))
         }
         components={{
-          Header: DataGridHeader,
+          Header: ScheduleHeader,
         }}
       />
     </DataGridContainer>
