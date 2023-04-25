@@ -4,8 +4,6 @@ TODO: Description
 
 ## TODO
 
-- Add a favicon.
-
 - Add 404 page.
 
 - Highlight currently working widget (schedule, board, note) in their respective selection drawers.
