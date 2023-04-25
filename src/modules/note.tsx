@@ -1,4 +1,3 @@
-import * as NOTE from '@/modules/note'
 import { DraftBlockStyleType, Note } from '@/types/note'
 import CodeIcon from '@mui/icons-material/Code'
 import DataObjectIcon from '@mui/icons-material/DataObject'
@@ -19,11 +18,26 @@ import {
   convertToRaw,
 } from 'draft-js'
 import { prop } from 'fp-ts-ramda'
+import { flow, pipe } from 'fp-ts/lib/function'
 import produce from 'immer'
 import { ReactNode } from 'react'
 // @ts-ignore
 import html2pdf from 'html2pdf.js'
-import { lensProp, map, set, when } from 'ramda'
+import {
+  __,
+  any,
+  complement,
+  concat,
+  equals,
+  filter,
+  last,
+  lensProp,
+  map,
+  set,
+  slice,
+  unless,
+  when,
+} from 'ramda'
 
 type NotesEndomorphism = (notes: Note[]) => Note[]
 
@@ -53,7 +67,7 @@ const deserialize = (note: Note) => ({
 const initialState = () =>
   localStorage.getItem('notes')
     ? JSON.parse(localStorage.getItem('notes')!).map(deserialize)
-    : NOTE.INITIAL_VALUES
+    : INITIAL_VALUES
 
 const updateEditorState = (editorState: EditorState) =>
   produce((notes: Note[]) => {
@@ -61,8 +75,33 @@ const updateEditorState = (editorState: EditorState) =>
     note.editorState = editorState
   })
 
+const add: NotesEndomorphism = flow(
+  map(set(lensProp('selected'), false)),
+  concat(__, INITIAL_VALUES)
+)
+
+const remove = (name: string): NotesEndomorphism =>
+  flow(
+    filter(flow(prop('name'), complement(equals(name)))),
+    unless(any(prop('selected')), (notes: any[]) =>
+      pipe(
+        notes,
+        slice(0, -1) as (x: any[]) => any[],
+        concat(__, [set(lensProp('selected'), true, last(notes))])
+      )
+    )
+  )
+
 const save = (name: string): NotesEndomorphism =>
   map(when(prop('selected'), set(lensProp('name'), name)))
+
+const select = (name: string): NotesEndomorphism =>
+  map(
+    flow(
+      set(lensProp('selected'), false),
+      when(flow(prop('name'), equals(name)), set(lensProp('selected'), true))
+    )
+  )
 
 const toInlineStyleIcon: { [key in DraftInlineStyleType]: ReactNode } = {
   BOLD: <FormatBoldIcon fontSize='small' />,
@@ -114,6 +153,9 @@ export {
   initialState,
   updateEditorState,
   save,
+  add,
+  remove,
+  select,
   toInlineStyleIcon,
   toBlockStyleIcon,
   blockStyle,
