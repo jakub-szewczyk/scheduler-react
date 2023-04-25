@@ -19,7 +19,7 @@ interface SaveNoteDialogProps extends DraggableDialogProps {
   onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
 
-const SaveNoteeDialog = ({
+const SaveNoteDialog = ({
   note,
   notes,
   onSave,
@@ -30,6 +30,7 @@ const SaveNoteeDialog = ({
   <DraggableDialog
     {...props}
     onClose={onClose}
+    // TODO: Flickering text. Same with different modules.
     dialogTitle={isUnsaved(note) ? 'Save note' : 'Rename note'}
     dialogContent={
       <Stack spacing={3}>
@@ -69,4 +70,4 @@ const SaveNoteeDialog = ({
   />
 )
 
-export default SaveNoteeDialog
+export default SaveNoteDialog

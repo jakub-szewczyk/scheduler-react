@@ -16,10 +16,11 @@ import {
   EditorState,
   RawDraftContentState,
   convertFromRaw,
+  convertToRaw,
 } from 'draft-js'
 import { prop } from 'fp-ts-ramda'
 import produce from 'immer'
-import { ReactNode, SetStateAction } from 'react'
+import { ReactNode } from 'react'
 // @ts-ignore
 import html2pdf from 'html2pdf.js'
 import { lensProp, map, set, when } from 'ramda'
@@ -35,26 +36,31 @@ const INITIAL_VALUES: Note[] = [
   },
 ]
 
+const serialize = (note: Note) => ({
+  ...note,
+  editorState: convertToRaw(
+    (note.editorState as EditorState).getCurrentContent()
+  ),
+})
+
+const deserialize = (note: Note) => ({
+  ...note,
+  editorState: EditorState.createWithContent(
+    convertFromRaw(note.editorState as RawDraftContentState)
+  ),
+})
+
 const initialState = () =>
   localStorage.getItem('notes')
-    ? JSON.parse(localStorage.getItem('notes')!).map((note: Note) => ({
-        ...note,
-        editorState: EditorState.createWithContent(
-          convertFromRaw(note.editorState as RawDraftContentState)
-        ),
-      }))
+    ? JSON.parse(localStorage.getItem('notes')!).map(deserialize)
     : NOTE.INITIAL_VALUES
 
-const updatedState = (value: SetStateAction<EditorState>) =>
+const updateEditorState = (editorState: EditorState) =>
   produce((notes: Note[]) => {
     const note = notes.find((note) => note.selected)!
-    note.editorState =
-      typeof value === 'function'
-        ? value(note.editorState as EditorState)
-        : value
+    note.editorState = editorState
   })
 
-// FIXME: This doesn't persist state due to `useNotes` implementation
 const save = (name: string): NotesEndomorphism =>
   map(when(prop('selected'), set(lensProp('name'), name)))
 
@@ -104,8 +110,9 @@ const exportToPDF = (editor: Editor, filename?: string) => {
 
 export {
   INITIAL_VALUES,
+  serialize,
   initialState,
-  updatedState,
+  updateEditorState,
   save,
   toInlineStyleIcon,
   toBlockStyleIcon,

@@ -1,40 +1,39 @@
 import * as NOTE from '@/modules/note'
 import { Note } from '@/types/note'
-import { EditorState, convertToRaw } from 'draft-js'
+import { EditorState } from 'draft-js'
+import { map } from 'ramda'
 import { Dispatch, SetStateAction, useState } from 'react'
 
 const useNotes = () => {
   const [notes, setNotes] = useState<Note[]>(NOTE.initialState)
 
-  /**
-   * TODO:
-   * It seems that every new, calculated notes state
-   * has to be mapped in order to persist it in local storage.
-   * Try coming up with a reusable abstraction to handle such case.
-   */
-  const setEditorState: Dispatch<SetStateAction<EditorState>> = (value) => {
+  const note = notes.find((note) => note.selected)!
+
+  const storeNotes: Dispatch<SetStateAction<Note[]>> = (value) => {
     localStorage.setItem(
       'notes',
       JSON.stringify(
-        NOTE.updatedState(value)(notes).map((note) => ({
-          ...note,
-          editorState: convertToRaw(
-            (note.editorState as EditorState).getCurrentContent()
-          ),
-        }))
+        map(NOTE.serialize, typeof value === 'function' ? value(notes) : value)
       )
     )
-    setNotes(NOTE.updatedState(value))
+    setNotes(typeof value === 'function' ? value(notes) : value)
   }
 
-  const note = notes.find((note) => note.selected)!
+  const storeEditorState: Dispatch<SetStateAction<EditorState>> = (value) =>
+    storeNotes(
+      NOTE.updateEditorState(
+        typeof value === 'function'
+          ? value(note.editorState as EditorState)
+          : value
+      )
+    )
 
   return {
     note,
     notes,
-    setNotes,
+    setNotes: storeNotes,
     editorState: note.editorState as EditorState,
-    setEditorState,
+    setEditorState: storeEditorState,
   }
 }
 
