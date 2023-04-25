@@ -1,35 +1,48 @@
-import { EditorState, convertFromRaw, convertToRaw } from 'draft-js'
+import * as NOTE from '@/modules/note'
+import { Note } from '@/types/note'
+import { EditorState } from 'draft-js'
+import { map } from 'ramda'
 import { Dispatch, SetStateAction, useState } from 'react'
 
-const useEditorState = () => {
-  const [initialEditorState, setInitialEditorState] = useState(() =>
-    localStorage.getItem('note')
-      ? EditorState.createWithContent(
-          convertFromRaw(JSON.parse(localStorage.getItem('note')!))
-        )
-      : EditorState.createEmpty()
-  )
+/**
+ * NOTE:
+ * To avoid data synchronization errors when reusing this hook in different parts of your code,
+ * it's recommended to treat it as a singleton - use it only once and have one source of truth.
+ * If you need to reuse the hook, consider using the Event API,
+ * as demonstrated in the useLocalStorage hook from the usehooks-ts library (https://usehooks-ts.com/react-hook/use-local-storage).
+ * This approach dispatches a custom event across all instances of the hook, ensuring that the data remains synchronized.
+ */
+const useNotes = () => {
+  const [notes, setNotes] = useState<Note[]>(NOTE.initialState)
 
-  const setEditorState: Dispatch<SetStateAction<EditorState>> = (value) => {
-    if (typeof value === 'function') {
-      const previousValue = value(initialEditorState)
-      localStorage.setItem(
-        'note',
-        JSON.stringify(convertToRaw(previousValue.getCurrentContent()))
+  const note = notes.find((note) => note.selected)!
+
+  const storeNotes: Dispatch<SetStateAction<Note[]>> = (value) => {
+    localStorage.setItem(
+      'notes',
+      JSON.stringify(
+        map(NOTE.serialize, typeof value === 'function' ? value(notes) : value)
       )
-      setInitialEditorState(previousValue)
-    } else {
-      localStorage.setItem(
-        'note',
-        JSON.stringify(convertToRaw(value.getCurrentContent()))
-      )
-      setInitialEditorState(value)
-    }
+    )
+    setNotes(typeof value === 'function' ? value(notes) : value)
   }
+
+  const storeEditorState: Dispatch<SetStateAction<EditorState>> = (value) =>
+    storeNotes(
+      NOTE.updateEditorState(
+        typeof value === 'function'
+          ? value(note.editorState as EditorState)
+          : value
+      )
+    )
 
   return {
-    editorState: initialEditorState,
-    setEditorState,
+    note,
+    notes,
+    setNotes: storeNotes,
+    editorState: note.editorState as EditorState,
+    setEditorState: storeEditorState,
   }
 }
-export default useEditorState
+
+export default useNotes

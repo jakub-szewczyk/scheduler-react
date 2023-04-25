@@ -10,8 +10,6 @@ TODO: Description
 
 - Highlight currently working widget (schedule, board, note) in their respective selection drawers.
 
-- Improve notes module: add support for multiple notes management and general CRUD operations.
-
 - Display selected kanban board name.
 
 - Consider moving schedule name to the top.
