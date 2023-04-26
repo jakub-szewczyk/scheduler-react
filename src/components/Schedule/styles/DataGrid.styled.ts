@@ -5,6 +5,11 @@ import * as TABLE from '../../../modules/table'
 const DataGrid = styled(MuiDataGrid)(({ theme }) => ({
   border: 0,
   fontSize: 16,
+  '.MuiDataGrid-columnHeader:last-child': {
+    '.MuiDataGrid-columnSeparator--sideRight': {
+      visibility: 'hidden',
+    },
+  },
   '.MuiDataGrid-columnHeaderTitleContainer': {
     paddingInline: 8,
   },

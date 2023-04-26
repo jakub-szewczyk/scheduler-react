@@ -17,33 +17,31 @@ const Schedule = () => {
   const theme = useTheme()
 
   return (
-    <DataGridContainer
-      elevation={0}
-      height={TABLE.calculateHeight(rows)}
-      sx={{
-        maxWidth: Math.min(
-          theme.breakpoints.values.lg,
-          TABLE.calculateMaxWidth(columns)
-        ),
-      }}
-    >
-      <DataGrid
-        disableColumnMenu
-        showCellRightBorder
-        showColumnRightBorder
-        hideFooterPagination
-        headerHeight={TABLE.HEADER_HEIGHT}
-        rowHeight={TABLE.ROW_HEIGHT}
-        columns={columns}
-        rows={rows}
-        onCellEditCommit={({ field, value, id }) =>
-          setRows(ROW.update(field, value, id, rows))
-        }
-        components={{
-          Header: ScheduleHeader,
+    <>
+      <ScheduleHeader />
+      <DataGridContainer
+        elevation={0}
+        height={TABLE.calculateHeight(rows)}
+        sx={{
+          maxWidth: Math.min(
+            theme.breakpoints.values.lg,
+            TABLE.calculateMaxWidth(columns)
+          ),
         }}
-      />
-    </DataGridContainer>
+      >
+        <DataGrid
+          disableColumnMenu
+          hideFooterPagination
+          headerHeight={TABLE.HEADER_HEIGHT}
+          rowHeight={TABLE.ROW_HEIGHT}
+          columns={columns}
+          rows={rows}
+          onCellEditCommit={({ field, value, id }) =>
+            setRows(ROW.update(field, value, id, rows))
+          }
+        />
+      </DataGridContainer>
+    </>
   )
 }
 

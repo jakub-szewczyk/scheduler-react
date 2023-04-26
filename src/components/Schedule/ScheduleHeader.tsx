@@ -26,24 +26,22 @@ const ScheduleHeader = () => {
     <>
       <Stack
         direction='row'
-        height={60}
-        paddingX={2}
-        sx={{ borderBottom: 'thin solid #515151' }}
+        justifyContent='center'
+        alignItems='center'
+        columnGap={1.5}
+        width={{
+          xs: 'calc(100% - 32px)',
+          sm: 'calc(100% - 48px)',
+        }}
+        maxWidth={(theme) => theme.breakpoints.values.lg}
+        marginX='auto'
       >
-        <Stack
-          direction='row'
-          justifyContent='center'
-          alignItems='center'
-          columnGap={1.5}
-          width='100%'
-        >
-          <IconButton size='small' onClick={openSaveScheduleDialog}>
-            <EditIcon fontSize='small' />
-          </IconButton>
-          <Typography maxWidth='calc(100% - 42px)' noWrap>
-            {asteriskSuffix(schedule.name)}
-          </Typography>
-        </Stack>
+        <IconButton size='small' onClick={openSaveScheduleDialog}>
+          <EditIcon fontSize='small' />
+        </IconButton>
+        <Typography maxWidth={(theme) => theme.breakpoints.values.sm} noWrap>
+          {asteriskSuffix(schedule.name)}
+        </Typography>
       </Stack>
       <SaveScheduleDialog
         open={isSaveScheduleDialogOpen}
