@@ -3,15 +3,8 @@ import { Note } from '@/types/note'
 import { EditorState } from 'draft-js'
 import { map } from 'ramda'
 import { Dispatch, SetStateAction, useState } from 'react'
+import { useEventListener } from 'usehooks-ts'
 
-/**
- * NOTE:
- * To avoid data synchronization errors when reusing this hook in different parts of code,
- * it's recommended to treat it as a singleton, so that there's only one source of truth.
- * If there is a need to invoke this hook multiple times, consider using the Event API,
- * as demonstrated in the `useLocalStorage` hook from the usehooks-ts library (https://usehooks-ts.com/react-hook/use-local-storage).
- * This approach dispatches a custom event across all instances of the hook, ensuring that the data remains synchronized.
- */
 const useNotes = () => {
   const [notes, setNotes] = useState<Note[]>(NOTE.initialState)
 
@@ -24,6 +17,7 @@ const useNotes = () => {
         map(NOTE.serialize, typeof value === 'function' ? value(notes) : value)
       )
     )
+    dispatchEvent(new Event('local-storage'))
     setNotes(typeof value === 'function' ? value(notes) : value)
   }
 
@@ -35,6 +29,10 @@ const useNotes = () => {
           : value
       )
     )
+
+  useEventListener('storage', () => setNotes(NOTE.initialState))
+
+  useEventListener('local-storage', () => setNotes(NOTE.initialState))
 
   return {
     note,
