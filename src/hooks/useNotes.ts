@@ -31,6 +31,7 @@ const useNotes = () => {
     )
 
   useEventListener('storage', () => setNotes(NOTE.initialState))
+
   useEventListener('local-storage', () => setNotes(NOTE.initialState))
 
   return {
