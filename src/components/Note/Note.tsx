@@ -10,7 +10,7 @@ import { EditorContainer, NoteContainer } from './styles/Note.styled'
 const Note = forwardRef<Editor>((_, ref) => {
   const editorRef = ref as RefObject<Editor>
 
-  const { note, notes, setNotes, editorState, setEditorState } = useNotes()
+  const { note, editorState, setEditorState } = useNotes()
 
   const [spellCheck, setSpellCheck] = useState(true)
 
@@ -29,7 +29,7 @@ const Note = forwardRef<Editor>((_, ref) => {
 
   return (
     <>
-      <NoteHeader note={note} notes={notes} setNotes={setNotes} />
+      <NoteHeader />
       <NoteContainer>
         <Toolbar
           ref={editorRef}

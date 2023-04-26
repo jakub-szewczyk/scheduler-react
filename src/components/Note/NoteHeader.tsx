@@ -1,21 +1,16 @@
+import useNotes from '@/hooks/useNotes'
 import { asteriskSuffix } from '@/modules/common'
 import * as NOTE from '@/modules/note'
-import { Note } from '@/types/note'
 import EditIcon from '@mui/icons-material/Edit'
 import { IconButton, Stack, Typography } from '@mui/material'
 import { pipe } from 'fp-ts/lib/function'
 import { trim } from 'ramda'
-import { Dispatch, SetStateAction } from 'react'
 import { useBoolean } from 'usehooks-ts'
 import SaveNoteDialog from '../NoteActions/SaveNoteDialog'
 
-interface NoteHeaderProps {
-  note: Note
-  notes: Note[]
-  setNotes: Dispatch<SetStateAction<Note[]>>
-}
+const NoteHeader = () => {
+  const { note, notes, setNotes } = useNotes()
 
-const NoteHeader = ({ note, notes, setNotes }: NoteHeaderProps) => {
   const {
     value: isSaveNoteDialogOpen,
     setFalse: closeSaveNoteDialog,
