@@ -1,4 +1,6 @@
-import { Button, Stack, Typography } from '@mui/material'
+import { Issue } from '@/types/issue'
+import { Status } from '@/types/status'
+import { Button, Stack, Theme, Typography } from '@mui/material'
 import { Field, Form, Formik, FormikHelpers } from 'formik'
 import { TextField } from 'formik-mui'
 import { constant } from 'fp-ts/lib/function'
@@ -8,8 +10,6 @@ import DraggableDialog, {
   DraggableDialogProps,
 } from '../../layout/DraggableDialog/DraggableDialog'
 import { upsertIssueValidationSchema } from './validation/validationSchema'
-import { Issue } from '@/types/issue'
-import { Status } from '@/types/status'
 
 type SubmitHandler = (
   values: Issue,
@@ -120,6 +120,32 @@ const UpsertIssueDialog = ({
                     maxRows={4}
                     multiline
                     fullWidth
+                    inputProps={{
+                      sx: {
+                        cursor: 'auto',
+                        '::-webkit-scrollbar': {
+                          width: {
+                            xs: 4,
+                            sm: 8,
+                          },
+                        },
+                        '::-webkit-scrollbar-track': {
+                          bgcolor: (theme: Theme) =>
+                            theme.palette.secondary.light,
+                          borderRadius: (theme: Theme) =>
+                            theme.shape.borderRadius,
+                        },
+                        '::-webkit-scrollbar-thumb': {
+                          bgcolor: (theme: Theme) => theme.palette.primary.main,
+                          borderRadius: (theme: Theme) =>
+                            theme.shape.borderRadius,
+                          '&:hover': {
+                            bgcolor: (theme: Theme) =>
+                              theme.palette.primary.dark,
+                          },
+                        },
+                      },
+                    }}
                   />
                 </Stack>
               </Form>

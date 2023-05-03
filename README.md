@@ -4,13 +4,15 @@ TODO: Description
 
 ## TODO
 
-- Customize textarea scrollbar.
+- Increase test coverage to gain high confidence (component, e2e).
 
-- Improve notification configuration dialog styles - prevent textfield helper text from wrapping.
+- Multiple projects management.
+
+- Server side persistance layer (authentication, local-remote data synchronization).
 
 - Locate the notification listener at the app level, so that they can trigger when browsing on any screen.
 
-- Increase test coverage to gain high confidence (component, e2e).
+- (Optional) Notification configuration dialog - prevent textfield helper text from wrapping.
 
 ## Known issues
 
