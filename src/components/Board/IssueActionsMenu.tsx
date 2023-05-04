@@ -20,14 +20,12 @@ import UpsertIssueDialog from './UpsertIssueDialog'
 
 interface IssueActionsMenuProps {
   issue: Issue
-  issues: Issue[]
   statuses: Status[]
   setStatuses: Dispatch<SetStateAction<Status[]>>
 }
 
 const IssueActionsMenu = ({
   issue,
-  issues,
   statuses,
   setStatuses,
 }: IssueActionsMenuProps) => {
@@ -127,7 +125,6 @@ const IssueActionsMenu = ({
         onClose={closeUpsertDialog}
         mode={mode}
         issue={issue}
-        issues={issues}
         statuses={statuses}
         onEdit={handleIssueEdit}
         onInsertAbove={handleIssueInsertAbove}

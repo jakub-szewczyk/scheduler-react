@@ -18,7 +18,6 @@ type SubmitHandler = (
 
 interface IssueDialogProps extends DraggableDialogProps {
   issue?: Issue
-  issues?: Issue[]
   statuses?: Status[]
   onCreate?: SubmitHandler
   onEdit?: SubmitHandler
@@ -36,7 +35,6 @@ interface CreateIssueDialogProps extends IssueDialogProps {
 interface EditIssueDialogProps extends IssueDialogProps {
   mode: 'EDIT'
   issue: Issue
-  issues: Issue[]
   statuses: Status[]
   onEdit: SubmitHandler
 }
@@ -62,7 +60,6 @@ type UpsertIssueDialogProps =
 const UpsertIssueDialog = ({
   mode,
   issue,
-  issues,
   statuses,
   onCreate,
   onEdit,

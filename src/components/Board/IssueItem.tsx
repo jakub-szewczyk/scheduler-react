@@ -8,18 +8,11 @@ import { Status } from '@/types/status'
 interface IssueItemProps {
   index: number
   issue: Issue
-  issues: Issue[]
   statuses: Status[]
   setStatuses: Dispatch<SetStateAction<Status[]>>
 }
 
-const IssueItem = ({
-  index,
-  issue,
-  issues,
-  statuses,
-  setStatuses,
-}: IssueItemProps) => (
+const IssueItem = ({ index, issue, statuses, setStatuses }: IssueItemProps) => (
   <Draggable draggableId={`issue-${issue.title}`} index={index}>
     {({ draggableProps, dragHandleProps, innerRef }) => (
       <Card
@@ -38,7 +31,6 @@ const IssueItem = ({
           action={
             <IssueActionsMenu
               issue={issue}
-              issues={issues}
               statuses={statuses}
               setStatuses={setStatuses}
             />

@@ -76,7 +76,6 @@ const StatusColumn = ({
                   key={issue.title}
                   index={index}
                   issue={issue}
-                  issues={status.issues}
                   statuses={statuses}
                   setStatuses={setStatuses}
                 />

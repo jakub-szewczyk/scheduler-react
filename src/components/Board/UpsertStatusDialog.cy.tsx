@@ -180,7 +180,7 @@ describe('<UpsertStatusDialog />', () => {
       cy.get('@onCreate').should('be.calledOnce')
     })
 
-    it('creates new status despite initial validation fail', () => {
+    it('edits status despite initial validation fail', () => {
       cy.mount(
         <UpsertStatusDialog
           mode='EDIT'
