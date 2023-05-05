@@ -7,8 +7,11 @@ import useSchedules from '../../hooks/useSchedules'
 import { asteriskSuffix } from '../../modules/common'
 import * as SCHEDULE from '../../modules/schedule'
 import SaveScheduleDialog from '../ScheduleActions/SaveScheduleDialog'
+import useProjects from '@/hooks/useProjects'
 
 const ScheduleHeader = () => {
+  const { project } = useProjects()
+
   const { schedule, schedules, setSchedules } = useSchedules()
 
   const {
@@ -18,7 +21,7 @@ const ScheduleHeader = () => {
   } = useBoolean()
 
   const handleScheduleSave = ({ name }: { name: string }) => {
-    setSchedules(pipe(name, trim, SCHEDULE.save))
+    setSchedules(pipe(name, trim, SCHEDULE.save(project)))
     closeSaveScheduleDialog()
   }
 

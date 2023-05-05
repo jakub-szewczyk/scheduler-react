@@ -1,30 +1,16 @@
+import { Project } from '@/types/project'
 import { prop } from 'fp-ts-ramda'
-import { flow, pipe } from 'fp-ts/lib/function'
-import {
-  any,
-  complement,
-  concat,
-  equals,
-  filter,
-  find,
-  last,
-  lensProp,
-  map,
-  set,
-  slice,
-  unless,
-  when,
-  __,
-} from 'ramda'
+import { pipe } from 'fp-ts/lib/function'
+import produce from 'immer'
+import { find, map } from 'ramda'
 import { utils, writeFileXLSX } from 'xlsx'
 import * as ROW from '../modules/row'
 import { Schedule } from '../types/schedule'
 
-type SchedulesEndomorphism = (schedules: Schedule[]) => Schedule[]
-
 const INITIAL_VALUES: Schedule[] = [
   {
     name: 'unsaved',
+    project: 'unsaved',
     selected: true,
     createdAt: new Date().toISOString(),
     rows: [
@@ -37,35 +23,69 @@ const INITIAL_VALUES: Schedule[] = [
   },
 ]
 
-const add: SchedulesEndomorphism = flow(
-  map(set(lensProp('selected'), false)),
-  concat(__, INITIAL_VALUES)
-)
-
-const remove = (name: string): SchedulesEndomorphism =>
-  flow(
-    filter(flow(prop('name'), complement(equals(name)))),
-    unless(any(prop('selected')), (schedules: any[]) =>
-      pipe(
-        schedules,
-        slice(0, -1) as (x: any[]) => any[],
-        concat(__, [set(lensProp('selected'), true, last(schedules))])
-      )
-    )
-  )
-
-const save = (name: string): SchedulesEndomorphism =>
-  map(when(prop('selected'), set(lensProp('name'), name)))
-
-const select = (name: string): SchedulesEndomorphism =>
-  map(
-    flow(
-      set(lensProp('selected'), false),
-      when(flow(prop('name'), equals(name)), set(lensProp('selected'), true))
-    )
-  )
-
 const findSelected = find<Schedule>(prop('selected'))
+
+const add = (project: Project) =>
+  produce((schedules: Schedule[]) => {
+    // NOTE: This works although I don't know why
+    // const projectSchedules = schedules.filter(
+    //   (schedule) => schedule.project === project.name
+    // )
+    // projectSchedules.forEach(
+    //   (projectSchedule) => (projectSchedule.selected = false)
+    // )
+    // schedules.push({ ...INITIAL_VALUES[0], project: project.name })
+    schedules.forEach((schedule) => {
+      if (schedule.project === project.name) {
+        schedule.selected = false
+      }
+    })
+    schedules.push({ ...INITIAL_VALUES[0], project: project.name })
+  })
+
+const remove = (project: Project, name: string) =>
+  produce((schedules: Schedule[]) => {
+    const scheduleIndex = schedules.findIndex(
+      (schedule) => schedule.project === project.name && schedule.name === name
+    )
+    const [removedSchedule] = schedules.splice(scheduleIndex, 1)
+    if (removedSchedule.selected)
+      schedules[schedules.length - 1].selected = true
+  })
+
+const save = (project: Project) => (name: string) =>
+  produce((schedules: Schedule[]) => {
+    // NOTE: This works although I don't know why
+    // const projectSchedules = schedules.filter(
+    //   (schedule) => schedule.project === project.name
+    // )
+    // const selectedProjectSchedule = projectSchedules.find(
+    //   (projectSchedule) => projectSchedule.selected
+    // )!
+    // selectedProjectSchedule.name = name
+    schedules.forEach((schedule) => {
+      if (schedule.project === project.name && schedule.selected) {
+        schedule.name = name
+      }
+    })
+  })
+
+const select = (project: Project, name: string) =>
+  produce((schedules: Schedule[]) => {
+    // NOTE: This works although I don't know why
+    // const projectSchedules = schedules.filter(
+    //   (schedule) => schedule.project === project.name
+    // )
+    // projectSchedules.forEach(
+    //   (projectSchedule) =>
+    //     (projectSchedule.selected = projectSchedule.name === name)
+    // )
+    schedules.forEach((schedule) => {
+      if (schedule.project === project.name) {
+        schedule.selected = schedule.name === name
+      }
+    })
+  })
 
 const exportToXLSX = (schedule: Schedule) => () => {
   const ws = utils.json_to_sheet(pipe(schedule.rows, map(ROW.toXLSX)))
@@ -74,4 +94,4 @@ const exportToXLSX = (schedule: Schedule) => () => {
   writeFileXLSX(wb, `${schedule.name}.xlsx`)
 }
 
-export { INITIAL_VALUES, add, remove, save, select, findSelected, exportToXLSX }
+export { INITIAL_VALUES, findSelected, add, remove, save, select, exportToXLSX }

@@ -148,7 +148,6 @@ const exportToPDF = (editor: Editor, filename?: string) => {
 }
 
 export {
-  INITIAL_VALUES,
   serialize,
   initialState,
   updateEditorState,

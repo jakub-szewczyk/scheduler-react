@@ -13,8 +13,11 @@ import * as SCHEDULE from '../../modules/schedule'
 import SaveScheduleDialog from './SaveScheduleDialog'
 import SchedulesDrawer from './SchedulesDrawer'
 import { isUnsaved } from '../../modules/common'
+import useProjects from '@/hooks/useProjects'
 
 const ScheduleActions = () => {
+  const { project } = useProjects()
+
   const { schedule, schedules, setSchedules } = useSchedules()
 
   const {
@@ -30,22 +33,22 @@ const ScheduleActions = () => {
   } = useBoolean()
 
   const handleScheduleSave = ({ name }: { name: string }) => {
-    setSchedules(pipe(name, trim, SCHEDULE.save))
+    setSchedules(pipe(name, trim, SCHEDULE.save(project)))
     closeSaveScheduleDialog()
   }
 
   const handleScheduleCreate = () => {
-    setSchedules(SCHEDULE.add)
+    setSchedules(SCHEDULE.add(project))
     closeSchedulesDrawer()
   }
 
   const handleScheduleDelete = (name: string) => {
-    setSchedules(SCHEDULE.remove(name))
+    setSchedules(SCHEDULE.remove(project, name))
     closeSchedulesDrawer()
   }
 
   const handleScheduleSelect = (name: string) => {
-    setSchedules(SCHEDULE.select(name))
+    setSchedules(SCHEDULE.select(project, name))
     closeSchedulesDrawer()
   }
 

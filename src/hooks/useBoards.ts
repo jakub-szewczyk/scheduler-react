@@ -5,7 +5,7 @@ import * as BOARD from '../modules/board'
 import { Status } from '../types/board'
 
 const useBoards = () => {
-  const [boards, setBoards] = useLocalStorage('boards', BOARD.INITIAL_BOARDS)
+  const [boards, setBoards] = useLocalStorage('boards', BOARD.INITIAL_VALUES)
 
   const board = BOARD.findSelected(boards)!
 

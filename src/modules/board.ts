@@ -62,7 +62,7 @@ const INITIAL_STATUSES: Status[] = [
   },
 ]
 
-const INITIAL_BOARDS: Board[] = [
+const INITIAL_VALUES: Board[] = [
   {
     name: 'unsaved',
     selected: true,
@@ -107,7 +107,7 @@ const drag = ({ source, destination }: DropResultLocation) =>
 
 const add: BoardsEndomorphism = flow(
   map(set(lensProp('selected'), false)),
-  concat(__, INITIAL_BOARDS)
+  concat(__, INITIAL_VALUES)
 )
 
 const remove = (name: string): BoardsEndomorphism =>
@@ -135,13 +135,4 @@ const select = (name: string): BoardsEndomorphism =>
 
 const findSelected = find<Board>(prop('selected'))
 
-export {
-  INITIAL_BOARDS,
-  INITIAL_STATUSES,
-  drag,
-  add,
-  remove,
-  save,
-  select,
-  findSelected,
-}
+export { INITIAL_VALUES, drag, add, remove, save, select, findSelected }
