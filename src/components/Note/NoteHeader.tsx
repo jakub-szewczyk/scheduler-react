@@ -7,8 +7,11 @@ import { pipe } from 'fp-ts/lib/function'
 import { trim } from 'ramda'
 import { useBoolean } from 'usehooks-ts'
 import SaveNoteDialog from '../NoteActions/SaveNoteDialog'
+import useProjects from '@/hooks/useProjects'
 
 const NoteHeader = () => {
+  const { project } = useProjects()
+
   const { note, notes, setNotes } = useNotes()
 
   const {
@@ -18,7 +21,7 @@ const NoteHeader = () => {
   } = useBoolean()
 
   const handleNoteSave = ({ name }: { name: string }) => {
-    setNotes(pipe(name, trim, NOTE.save))
+    setNotes(pipe(name, trim, NOTE.save(project)))
     closeSaveNoteDialog()
   }
 

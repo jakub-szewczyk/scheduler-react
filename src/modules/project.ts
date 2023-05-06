@@ -1,4 +1,5 @@
 import { Board } from '@/types/board'
+import { Note } from '@/types/note'
 import { Project } from '@/types/project'
 import { Schedule } from '@/types/schedule'
 import { flow } from 'fp-ts/lib/function'
@@ -38,6 +39,15 @@ const select = (name: string): ProjectsEndomorphism =>
     )
   )
 
+// NOTE: Extract to one polymorphic function.
+// TODO: Move to corresponding modules, in this case to a schedule module.
+const updateNoteForeignKey =
+  (project: Project) => (name: string) => (notes: Note[]) =>
+    notes.map((note) => ({
+      ...note,
+      project: note.project === project.name ? name : note.project,
+    }))
+
 // TODO: Move to corresponding modules, in this case to a schedule module.
 const updateBoardForeignKey =
   (project: Project) => (name: string) => (boards: Board[]) =>
@@ -59,6 +69,7 @@ export {
   add,
   save,
   select,
+  updateNoteForeignKey,
   updateBoardForeignKey,
   updateScheduleForeignKey,
 }

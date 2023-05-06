@@ -2,6 +2,7 @@ import { EditorState, RawDraftContentState } from 'draft-js'
 
 interface Note {
   name: string
+  project: string
   selected: boolean
   createdAt: string
   editorState: EditorState | RawDraftContentState

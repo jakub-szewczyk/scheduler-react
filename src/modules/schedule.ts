@@ -27,6 +27,7 @@ export const INITIAL_VALUES: Schedule[] = [
 // TODO:
 // Rename and consider moving it to the row module,
 // although it is actually used within the state update function corresponding to this module.
+// NOTE: Use `find` instead of `forEach`.
 export const rowsSetter = (rows: Row[], project: Project) =>
   produce((schedules: Schedule[]) => {
     schedules.forEach((schedule) => {
