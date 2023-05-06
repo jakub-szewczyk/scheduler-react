@@ -33,34 +33,23 @@ const countPerDays = (day: Day, rows: Row[]) =>
 const calculateNewIndex = (id: GridRowId, rows: Row[]) =>
   pipe(rows, findIndexById(id), _add(countPerDays(id as Day, rows)))
 
-const add = (id: GridRowId, rows: Row[]) =>
+export const add = (id: GridRowId, rows: Row[]) =>
   insert(calculateNewIndex(id, rows), { id: `${id}${nanoid()}` }, rows)
 
-const remove = (id: GridRowId, rows: Row[]) =>
+export const remove = (id: GridRowId, rows: Row[]) =>
   _remove(findIndexById(id, rows), 1, rows)
 
-const update = curry(
+export const update = curry(
   <T>(field: string, value: T, id: GridRowId, rows: Row[]) => {
     const index = findIndexById(id, rows)
     return _update(index, { ...rows[index], [field]: value }, rows)
   }
 )
 
-const toXLSX = ({ day, starts, ends, room, subject }: Row) => ({
+export const toXLSX = ({ day, starts, ends, room, subject }: Row) => ({
   Day: day,
   Starts: pipe(TIME.format(starts), Option.getOrElse(constant(''))),
   Ends: pipe(TIME.format(ends), Option.getOrElse(constant(''))),
   Room: room,
   Subject: subject,
 })
-
-export {
-  equalsId,
-  findIndexById,
-  countPerDays,
-  calculateNewIndex,
-  add,
-  remove,
-  update,
-  toXLSX,
-}

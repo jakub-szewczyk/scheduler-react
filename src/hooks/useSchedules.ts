@@ -9,10 +9,7 @@ const useSchedules = () => {
 
   const [schedules, setSchedules] = useLocalStorage(
     'schedules',
-    SCHEDULE.INITIAL_VALUES.map((schedule) => ({
-      ...schedule,
-      project: project.name,
-    }))
+    SCHEDULE.INITIAL_VALUES
   )
 
   // TODO: Consider renaming globally

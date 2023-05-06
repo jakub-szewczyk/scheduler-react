@@ -7,6 +7,7 @@ import { utils, writeFileXLSX } from 'xlsx'
 import * as ROW from '../modules/row'
 import { Schedule } from '../types/schedule'
 
+// TODO: Make these as functions so that they show the correct date.
 export const INITIAL_VALUES: Schedule[] = [
   {
     name: 'unsaved',
@@ -23,7 +24,9 @@ export const INITIAL_VALUES: Schedule[] = [
   },
 ]
 
-// TODO: Rename
+// TODO:
+// Rename and consider moving it to the row module,
+// although it is actually used within the state update function corresponding to this module.
 export const rowsSetter = (rows: Row[], project: Project) =>
   produce((schedules: Schedule[]) => {
     schedules.forEach((schedule) => {

@@ -50,6 +50,15 @@ export const INITIAL_VALUES: Board[] = [
   },
 ]
 
+// TODO: Move to board module
+export const statusesSetter = (statuses: Status[], project: Project) =>
+  produce((boards: Board[]) => {
+    boards.forEach((board) => {
+      if (board.project === project.name && board.selected)
+        board.statuses = statuses
+    })
+  })
+
 const matchByDraggableLocation = curry(
   ({ droppableId }: DraggableLocation, { title }: Status) =>
     pipe(droppableId, split('-'), tail, join('-'), equals(title))
@@ -77,7 +86,11 @@ const dragIssueBetweenStatuses = ({
     destinationStatus.issues.splice(destination.index, 0, sourceIssue)
   })
 
-// NOTE: It's used with statuses, not boards
+/**
+ * TODO:
+ * Consider moving this function to the status module,
+ * as it is used only with the `setStatus` procedure.
+ */
 export const drag = ({ source, destination }: DropResultLocation) =>
   source.droppableId === 'board' && destination.droppableId === 'board'
     ? dragStatus({ source, destination })
@@ -85,10 +98,6 @@ export const drag = ({ source, destination }: DropResultLocation) =>
     ? dragIssueWithinStatus({ source, destination })
     : dragIssueBetweenStatuses({ source, destination })
 
-// export const add: BoardsEndomorphism = flow(
-//   map(set(lensProp('selected'), false)),
-//   concat(__, INITIAL_VALUES)
-// )
 export const add = (project: Project) =>
   produce((boards: Board[]) => {
     boards.forEach((board) => {
@@ -96,18 +105,6 @@ export const add = (project: Project) =>
     })
     boards.push({ ...INITIAL_VALUES[0], project: project.name })
   })
-
-// export const remove = (name: string): BoardsEndomorphism =>
-//   flow(
-//     filter(flow(prop('name'), complement(equals(name)))),
-//     unless(any(prop('selected')), (boards: any[]) =>
-//       pipe(
-//         boards,
-//         slice(0, -1) as (x: any[]) => any[],
-//         concat(__, [set(lensProp('selected'), true, last(boards))])
-//       )
-//     )
-//   )
 
 // TODO: Make such functions polymorphic across all modules
 export const remove = (project: Project, name: string) =>
@@ -124,8 +121,6 @@ export const remove = (project: Project, name: string) =>
     }
   })
 
-// export const save = (name: string): BoardsEndomorphism =>
-//   map(when(prop('selected'), set(lensProp('name'), name)))
 export const save = (project: Project) => (name: string) =>
   produce((boards: Board[]) => {
     boards.forEach((board) => {
@@ -133,13 +128,6 @@ export const save = (project: Project) => (name: string) =>
     })
   })
 
-// export const select = (name: string): BoardsEndomorphism =>
-//   map(
-//     flow(
-//       set(lensProp('selected'), false),
-//       when(flow(prop('name'), equals(name)), set(lensProp('selected'), true))
-//     )
-//   )
 export const select = (project: Project, name: string) =>
   produce((boards: Board[]) => {
     boards.forEach((board) => {
