@@ -2,6 +2,7 @@ import useSchedules from '@/hooks/useSchedules'
 import { isUnsaved } from '@/modules/common'
 import * as PROJECT from '@/modules/project'
 import * as SCHEDULE from '@/modules/schedule'
+import * as BOARD from '@/modules/board'
 import { Project } from '@/types/project'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -20,6 +21,7 @@ import { __, concat, trim } from 'ramda'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useBoolean } from 'usehooks-ts'
 import SaveProjectDialog from './SaveProjectDialog'
+import useBoards from '@/hooks/useBoards'
 
 interface ProjectActionsMenuProps {
   project: Project
@@ -32,6 +34,8 @@ const ProjectActionsMenu = ({
   projects,
   setProjects,
 }: ProjectActionsMenuProps) => {
+  const { setBoards } = useBoards()
+
   const { setSchedules } = useSchedules()
 
   const [menu, setMenu] = useState<HTMLElement | null>(null)
@@ -45,9 +49,20 @@ const ProjectActionsMenu = ({
   const handleCreateMenuItemClick = () => {
     setMenu(null)
     setProjects(PROJECT.add)
+    setBoards(
+      concat(
+        __,
+        // TODO: Is map even necessary?
+        BOARD.INITIAL_VALUES.map((board) => ({
+          ...board,
+          project: 'unsaved',
+        }))
+      )
+    )
     setSchedules(
       concat(
         __,
+        // TODO: Is map even necessary?
         SCHEDULE.INITIAL_VALUES.map((schedule) => ({
           ...schedule,
           project: 'unsaved',
@@ -68,6 +83,7 @@ const ProjectActionsMenu = ({
 
   const handleProjectSave = ({ name }: { name: string }) => {
     setProjects(pipe(name, trim, PROJECT.save(project.name)))
+    setBoards(pipe(name, trim, PROJECT.updateBoardForeignKey(project)))
     setSchedules(pipe(name, trim, PROJECT.updateScheduleForeignKey(project)))
     // TODO: Go through all notes, boards and schedule and update their foreign key.
     closeSaveProjectDialog()

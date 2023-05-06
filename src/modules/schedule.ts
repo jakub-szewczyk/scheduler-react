@@ -1,13 +1,13 @@
 import { Project } from '@/types/project'
-import { prop } from 'fp-ts-ramda'
+import { Row } from '@/types/row'
 import { pipe } from 'fp-ts/lib/function'
 import produce from 'immer'
-import { find, map } from 'ramda'
+import { map } from 'ramda'
 import { utils, writeFileXLSX } from 'xlsx'
 import * as ROW from '../modules/row'
 import { Schedule } from '../types/schedule'
 
-const INITIAL_VALUES: Schedule[] = [
+export const INITIAL_VALUES: Schedule[] = [
   {
     name: 'unsaved',
     project: 'unsaved',
@@ -23,75 +23,56 @@ const INITIAL_VALUES: Schedule[] = [
   },
 ]
 
-const findSelected = find<Schedule>(prop('selected'))
-
-const add = (project: Project) =>
+// TODO: Rename
+export const rowsSetter = (rows: Row[], project: Project) =>
   produce((schedules: Schedule[]) => {
-    // NOTE: This works although I don't know why
-    // const projectSchedules = schedules.filter(
-    //   (schedule) => schedule.project === project.name
-    // )
-    // projectSchedules.forEach(
-    //   (projectSchedule) => (projectSchedule.selected = false)
-    // )
-    // schedules.push({ ...INITIAL_VALUES[0], project: project.name })
     schedules.forEach((schedule) => {
-      if (schedule.project === project.name) {
-        schedule.selected = false
-      }
+      if (schedule.project === project.name && schedule.selected)
+        schedule.rows = rows
+    })
+  })
+
+export const add = (project: Project) =>
+  produce((schedules: Schedule[]) => {
+    schedules.forEach((schedule) => {
+      if (schedule.project === project.name) schedule.selected = false
     })
     schedules.push({ ...INITIAL_VALUES[0], project: project.name })
   })
 
-const remove = (project: Project, name: string) =>
+export const remove = (project: Project, name: string) =>
   produce((schedules: Schedule[]) => {
     const scheduleIndex = schedules.findIndex(
       (schedule) => schedule.project === project.name && schedule.name === name
     )
     const [removedSchedule] = schedules.splice(scheduleIndex, 1)
-    if (removedSchedule.selected)
-      schedules[schedules.length - 1].selected = true
+    if (removedSchedule.selected) {
+      const projectSchedules = schedules.filter(
+        (schedule) => schedule.project === project.name
+      )
+      projectSchedules[projectSchedules.length - 1].selected = true
+    }
   })
 
-const save = (project: Project) => (name: string) =>
+export const save = (project: Project) => (name: string) =>
   produce((schedules: Schedule[]) => {
-    // NOTE: This works although I don't know why
-    // const projectSchedules = schedules.filter(
-    //   (schedule) => schedule.project === project.name
-    // )
-    // const selectedProjectSchedule = projectSchedules.find(
-    //   (projectSchedule) => projectSchedule.selected
-    // )!
-    // selectedProjectSchedule.name = name
     schedules.forEach((schedule) => {
-      if (schedule.project === project.name && schedule.selected) {
+      if (schedule.project === project.name && schedule.selected)
         schedule.name = name
-      }
     })
   })
 
-const select = (project: Project, name: string) =>
+export const select = (project: Project, name: string) =>
   produce((schedules: Schedule[]) => {
-    // NOTE: This works although I don't know why
-    // const projectSchedules = schedules.filter(
-    //   (schedule) => schedule.project === project.name
-    // )
-    // projectSchedules.forEach(
-    //   (projectSchedule) =>
-    //     (projectSchedule.selected = projectSchedule.name === name)
-    // )
     schedules.forEach((schedule) => {
-      if (schedule.project === project.name) {
+      if (schedule.project === project.name)
         schedule.selected = schedule.name === name
-      }
     })
   })
 
-const exportToXLSX = (schedule: Schedule) => () => {
+export const exportToXLSX = (schedule: Schedule) => () => {
   const ws = utils.json_to_sheet(pipe(schedule.rows, map(ROW.toXLSX)))
   const wb = utils.book_new()
   utils.book_append_sheet(wb, ws, 'Data')
   writeFileXLSX(wb, `${schedule.name}.xlsx`)
 }
-
-export { INITIAL_VALUES, findSelected, add, remove, save, select, exportToXLSX }

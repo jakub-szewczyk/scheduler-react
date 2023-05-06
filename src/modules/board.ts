@@ -1,31 +1,9 @@
 import { Board, DropResultLocation, Status } from '@/types/board'
-import { prop } from 'fp-ts-ramda'
-import { flow, pipe } from 'fp-ts/lib/function'
+import { Project } from '@/types/project'
+import { pipe } from 'fp-ts/lib/function'
 import produce from 'immer'
-import {
-  __,
-  any,
-  complement,
-  concat,
-  curry,
-  equals,
-  filter,
-  find,
-  join,
-  last,
-  lensProp,
-  map,
-  move,
-  set,
-  slice,
-  split,
-  tail,
-  unless,
-  when,
-} from 'ramda'
+import { curry, equals, join, move, split, tail } from 'ramda'
 import { DraggableLocation } from 'react-beautiful-dnd'
-
-type BoardsEndomorphism = (boards: Board[]) => Board[]
 
 const INITIAL_STATUSES: Status[] = [
   {
@@ -62,9 +40,10 @@ const INITIAL_STATUSES: Status[] = [
   },
 ]
 
-const INITIAL_VALUES: Board[] = [
+export const INITIAL_VALUES: Board[] = [
   {
     name: 'unsaved',
+    project: 'unsaved',
     selected: true,
     createdAt: new Date().toISOString(),
     statuses: INITIAL_STATUSES,
@@ -98,41 +77,72 @@ const dragIssueBetweenStatuses = ({
     destinationStatus.issues.splice(destination.index, 0, sourceIssue)
   })
 
-const drag = ({ source, destination }: DropResultLocation) =>
+// NOTE: It's used with statuses, not boards
+export const drag = ({ source, destination }: DropResultLocation) =>
   source.droppableId === 'board' && destination.droppableId === 'board'
     ? dragStatus({ source, destination })
     : source.droppableId === destination.droppableId
     ? dragIssueWithinStatus({ source, destination })
     : dragIssueBetweenStatuses({ source, destination })
 
-const add: BoardsEndomorphism = flow(
-  map(set(lensProp('selected'), false)),
-  concat(__, INITIAL_VALUES)
-)
+// export const add: BoardsEndomorphism = flow(
+//   map(set(lensProp('selected'), false)),
+//   concat(__, INITIAL_VALUES)
+// )
+export const add = (project: Project) =>
+  produce((boards: Board[]) => {
+    boards.forEach((board) => {
+      if (board.project === project.name) board.selected = false
+    })
+    boards.push({ ...INITIAL_VALUES[0], project: project.name })
+  })
 
-const remove = (name: string): BoardsEndomorphism =>
-  flow(
-    filter(flow(prop('name'), complement(equals(name)))),
-    unless(any(prop('selected')), (boards: any[]) =>
-      pipe(
-        boards,
-        slice(0, -1) as (x: any[]) => any[],
-        concat(__, [set(lensProp('selected'), true, last(boards))])
+// export const remove = (name: string): BoardsEndomorphism =>
+//   flow(
+//     filter(flow(prop('name'), complement(equals(name)))),
+//     unless(any(prop('selected')), (boards: any[]) =>
+//       pipe(
+//         boards,
+//         slice(0, -1) as (x: any[]) => any[],
+//         concat(__, [set(lensProp('selected'), true, last(boards))])
+//       )
+//     )
+//   )
+
+// TODO: Make such functions polymorphic across all modules
+export const remove = (project: Project, name: string) =>
+  produce((boards: Board[]) => {
+    const boardIndex = boards.findIndex(
+      (board) => board.project === project.name && board.name === name
+    )
+    const [removedBoard] = boards.splice(boardIndex, 1)
+    if (removedBoard.selected) {
+      const projectBoards = boards.filter(
+        (board) => board.project === project.name
       )
-    )
-  )
+      projectBoards[projectBoards.length - 1].selected = true
+    }
+  })
 
-const save = (name: string): BoardsEndomorphism =>
-  map(when(prop('selected'), set(lensProp('name'), name)))
+// export const save = (name: string): BoardsEndomorphism =>
+//   map(when(prop('selected'), set(lensProp('name'), name)))
+export const save = (project: Project) => (name: string) =>
+  produce((boards: Board[]) => {
+    boards.forEach((board) => {
+      if (board.project === project.name && board.selected) board.name = name
+    })
+  })
 
-const select = (name: string): BoardsEndomorphism =>
-  map(
-    flow(
-      set(lensProp('selected'), false),
-      when(flow(prop('name'), equals(name)), set(lensProp('selected'), true))
-    )
-  )
-
-const findSelected = find<Board>(prop('selected'))
-
-export { INITIAL_VALUES, drag, add, remove, save, select, findSelected }
+// export const select = (name: string): BoardsEndomorphism =>
+//   map(
+//     flow(
+//       set(lensProp('selected'), false),
+//       when(flow(prop('name'), equals(name)), set(lensProp('selected'), true))
+//     )
+//   )
+export const select = (project: Project, name: string) =>
+  produce((boards: Board[]) => {
+    boards.forEach((board) => {
+      if (board.project === project.name) board.selected = board.name === name
+    })
+  })

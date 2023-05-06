@@ -3,6 +3,7 @@ import { Status } from './status'
 
 interface Board {
   name: string
+  project: string
   selected: boolean
   createdAt: string
   statuses: Status[]

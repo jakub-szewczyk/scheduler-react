@@ -18,8 +18,11 @@ import UpsertStatusDialog from '../Board/UpsertStatusDialog'
 import BoardsDrawer from './BoardsDrawer'
 import SaveBoardDialog from './SaveBoardDialog'
 import { Issue, Status } from '@/types/status'
+import useProjects from '@/hooks/useProjects'
 
 const BoardActions = () => {
+  const { project } = useProjects()
+
   const { board, boards, setBoards, setStatuses } = useBoards()
 
   const {
@@ -57,22 +60,22 @@ const BoardActions = () => {
   }
 
   const handleBoardSave = ({ name }: { name: string }) => {
-    setBoards(pipe(name, trim, BOARD.save))
+    setBoards(pipe(name, trim, BOARD.save(project)))
     closeSaveBoardDialog()
   }
 
   const handleBoardCreate = () => {
-    setBoards(BOARD.add)
+    setBoards(BOARD.add(project))
     closeBoardsDrawer()
   }
 
   const handleBoardDelete = (name: string) => {
-    setBoards(BOARD.remove(name))
+    setBoards(BOARD.remove(project, name))
     closeBoardsDrawer()
   }
 
   const handleBoardSelect = (name: string) => {
-    setBoards(BOARD.select(name))
+    setBoards(BOARD.select(project, name))
     closeBoardsDrawer()
   }
 

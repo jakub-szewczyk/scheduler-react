@@ -1,3 +1,4 @@
+import { Board } from '@/types/board'
 import { Project } from '@/types/project'
 import { Schedule } from '@/types/schedule'
 import { flow } from 'fp-ts/lib/function'
@@ -38,6 +39,14 @@ const select = (name: string): ProjectsEndomorphism =>
   )
 
 // TODO: Move to corresponding modules, in this case to a schedule module.
+const updateBoardForeignKey =
+  (project: Project) => (name: string) => (boards: Board[]) =>
+    boards.map((board) => ({
+      ...board,
+      project: board.project === project.name ? name : board.project,
+    }))
+
+// TODO: Move to corresponding modules, in this case to a schedule module.
 const updateScheduleForeignKey =
   (project: Project) => (name: string) => (schedules: Schedule[]) =>
     schedules.map((schedule) => ({
@@ -45,4 +54,11 @@ const updateScheduleForeignKey =
       project: schedule.project === project.name ? name : schedule.project,
     }))
 
-export { INITIAL_VALUES, add, save, select, updateScheduleForeignKey }
+export {
+  INITIAL_VALUES,
+  add,
+  save,
+  select,
+  updateBoardForeignKey,
+  updateScheduleForeignKey,
+}
