@@ -1,7 +1,7 @@
 import { GridRowId } from '@mui/x-data-grid'
 import { Day } from './time'
 
-interface Row {
+export interface Row {
   id: GridRowId
   day?: Day
   starts?: string | null
@@ -14,5 +14,3 @@ interface Row {
     title: string
   }
 }
-
-export type { Row }

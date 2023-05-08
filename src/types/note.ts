@@ -1,7 +1,5 @@
 import { EditorState, RawDraftContentState } from 'draft-js'
 
-export type NotesEndomorphism = (notes: Note[]) => Note[]
-
 export interface Note {
   name: string
   project: string
@@ -9,6 +7,8 @@ export interface Note {
   createdAt: string
   editorState: EditorState | RawDraftContentState
 }
+
+export type NotesEndomorphism = (notes: Note[]) => Note[]
 
 export type DraftBlockStyleType =
   | 'unstyled'

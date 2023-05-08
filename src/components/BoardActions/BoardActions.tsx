@@ -17,8 +17,9 @@ import UpsertIssueDialog from '../Board/UpsertIssueDialog'
 import UpsertStatusDialog from '../Board/UpsertStatusDialog'
 import BoardsDrawer from './BoardsDrawer'
 import SaveBoardDialog from './SaveBoardDialog'
-import { Issue, Status } from '@/types/status'
+import { Status } from '@/types/status'
 import useProjects from '@/hooks/useProjects'
+import { Issue } from '@/types/issue'
 
 const BoardActions = () => {
   const { project } = useProjects()
