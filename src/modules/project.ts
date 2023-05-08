@@ -14,19 +14,18 @@ export const initialValues = (): Project[] => [
   },
 ]
 
-export const updateForeignKey =
-  (project: Project) =>
-  (name: string) =>
-  (widgets: Note[] | Board[] | Schedule[]) =>
-    widgets.map((widget) => ({
-      ...widget,
-      project: widget.project === project.name ? name : widget.project,
-    }))
-
 export const create: ProjectsEndomorphism = concat(
   __,
   initialValues().map((project) => ({ ...project, selected: false }))
 )
+
+export const select = (name: string): ProjectsEndomorphism =>
+  map(
+    flow(
+      set(lensProp('selected'), false),
+      when(flow(prop('name'), equals(name)), set(lensProp('selected'), true))
+    )
+  )
 
 export const save =
   (previousName: string) =>
@@ -38,10 +37,11 @@ export const save =
       )
     )
 
-export const select = (name: string): ProjectsEndomorphism =>
-  map(
-    flow(
-      set(lensProp('selected'), false),
-      when(flow(prop('name'), equals(name)), set(lensProp('selected'), true))
-    )
-  )
+export const updateForeignKey =
+  (project: Project) =>
+  (name: string) =>
+  (widgets: Note[] | Board[] | Schedule[]) =>
+    widgets.map((widget) => ({
+      ...widget,
+      project: widget.project === project.name ? name : widget.project,
+    }))
