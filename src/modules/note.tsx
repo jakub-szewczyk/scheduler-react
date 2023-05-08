@@ -52,14 +52,6 @@ export const initialState = (): Note[] =>
     ? JSON.parse(localStorage.getItem('notes')!).map(deserialize)
     : initialValues()
 
-export const calculateSubState = (editorState: EditorState, project: Project) =>
-  produce((notes: Note[]) => {
-    const note = notes.find(
-      (note) => note.project === project.name && note.selected
-    )!
-    note.editorState = editorState
-  })
-
 export const create = (project: Project) =>
   produce((notes: Note[]) => {
     notes.forEach(
@@ -80,6 +72,14 @@ export const remove = (project: Project, name: string) =>
     }
   })
 
+export const select = (project: Project, name: string) =>
+  produce((notes: Note[]) =>
+    notes.forEach(
+      (note) =>
+        note.project === project.name && (note.selected = note.name === name)
+    )
+  )
+
 export const save = (project: Project) => (name: string) =>
   produce((notes: Note[]) =>
     notes.forEach(
@@ -88,13 +88,35 @@ export const save = (project: Project) => (name: string) =>
     )
   )
 
-export const select = (project: Project, name: string) =>
-  produce((notes: Note[]) =>
-    notes.forEach(
-      (note) =>
-        note.project === project.name && (note.selected = note.name === name)
-    )
-  )
+export const calculateSubState = (editorState: EditorState, project: Project) =>
+  produce((notes: Note[]) => {
+    const note = notes.find(
+      (note) => note.project === project.name && note.selected
+    )!
+    note.editorState = editorState
+  })
+
+export const exportToPDF = (editor: Editor, filename?: string) => {
+  const html = editor.editorContainer?.cloneNode(true) as HTMLElement
+  html.style.color = 'black'
+  html2pdf()
+    .set({
+      margin: 16,
+      pagebreak: { mode: ['avoid-all'] },
+    })
+    .from(html)
+    .save(filename)
+}
+
+export const isPlaceholderVisible = (editorState: EditorState) =>
+  editorState.getCurrentContent().hasText() ||
+  editorState.getCurrentContent().getBlockMap().first().getType() === 'unstyled'
+
+export const blockStyle = (editorState: EditorState) =>
+  editorState
+    .getCurrentContent()
+    .getBlockForKey(editorState.getSelection().getStartKey())
+    .getType() as DraftBlockStyleType
 
 export const toInlineStyleIcon: { [key in DraftInlineStyleType]: ReactNode } = {
   BOLD: <FormatBoldIcon fontSize='small' />,
@@ -116,26 +138,4 @@ export const toBlockStyleIcon: { [key in DraftBlockStyleType]: ReactNode } = {
   'ordered-list-item': <FormatListNumberedIcon fontSize='small' />,
   blockquote: <FormatQuoteIcon fontSize='small' />,
   'code-block': <DataObjectIcon fontSize='small' />,
-}
-
-export const blockStyle = (editorState: EditorState) =>
-  editorState
-    .getCurrentContent()
-    .getBlockForKey(editorState.getSelection().getStartKey())
-    .getType() as DraftBlockStyleType
-
-export const isPlaceholderVisible = (editorState: EditorState) =>
-  editorState.getCurrentContent().hasText() ||
-  editorState.getCurrentContent().getBlockMap().first().getType() === 'unstyled'
-
-export const exportToPDF = (editor: Editor, filename?: string) => {
-  const html = editor.editorContainer?.cloneNode(true) as HTMLElement
-  html.style.color = 'black'
-  html2pdf()
-    .set({
-      margin: 16,
-      pagebreak: { mode: ['avoid-all'] },
-    })
-    .from(html)
-    .save(filename)
 }

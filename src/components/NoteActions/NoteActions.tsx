@@ -36,11 +36,6 @@ const NoteActions = forwardRef<Editor>((_, ref) => {
     setTrue: openSaveNoteDialog,
   } = useBoolean()
 
-  const handleNoteSave = ({ name }: { name: string }) => {
-    setNotes(pipe(name, trim, NOTE.save(project)))
-    closeSaveNoteDialog()
-  }
-
   const handleNoteCreate = () => {
     setNotes(NOTE.create(project))
     closeNotesDrawer()
@@ -54,6 +49,11 @@ const NoteActions = forwardRef<Editor>((_, ref) => {
   const handleNoteSelect = (name: string) => {
     setNotes(NOTE.select(project, name))
     closeNotesDrawer()
+  }
+
+  const handleNoteSave = ({ name }: { name: string }) => {
+    setNotes(pipe(name, trim, NOTE.save(project)))
+    closeSaveNoteDialog()
   }
 
   return (

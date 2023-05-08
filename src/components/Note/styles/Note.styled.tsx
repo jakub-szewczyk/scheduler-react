@@ -1,6 +1,6 @@
 import { Box, Paper, styled } from '@mui/material'
 
-const NoteContainer = styled(Box)(({ theme }) => ({
+export const NoteContainer = styled(Box)(({ theme }) => ({
   width: 'calc(100% - 32px)',
   maxWidth: theme.breakpoints.values.lg,
   margin: '1rem auto',
@@ -10,7 +10,7 @@ const NoteContainer = styled(Box)(({ theme }) => ({
   },
 }))
 
-const ToolbarContainer = styled(Paper)(({ theme }) => ({
+export const ToolbarContainer = styled(Paper)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
@@ -48,7 +48,7 @@ const ToolbarContainer = styled(Paper)(({ theme }) => ({
   },
 }))
 
-const EditorContainer = styled(Paper)(({ theme }) => ({
+export const EditorContainer = styled(Paper)(({ theme }) => ({
   minHeight: 'calc(100vh - 211px)',
   maxHeight: 'calc(100vh - 211px)',
   padding: 16,
@@ -97,5 +97,3 @@ const EditorContainer = styled(Paper)(({ theme }) => ({
     },
   },
 }))
-
-export { NoteContainer, ToolbarContainer, EditorContainer }
