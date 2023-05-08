@@ -11,7 +11,7 @@ export const create = (values: Issue) =>
       })
   )
 
-export const edit = (title: string, values: Issue) =>
+export const update = (title: string, values: Issue) =>
   produce((statuses: Status[]) => {
     const issue = statuses
       .flatMap((status) => status.issues)

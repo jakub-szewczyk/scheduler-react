@@ -70,7 +70,7 @@ const IssueActionsMenu = ({
   }
 
   const handleIssueEdit = (values: Issue) => {
-    setStatuses(ISSUE.edit(issue.title, values))
+    setStatuses(ISSUE.update(issue.title, values))
     closeUpsertDialog()
   }
 

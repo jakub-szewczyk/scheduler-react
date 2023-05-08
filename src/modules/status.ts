@@ -57,7 +57,7 @@ export const create = (title: string) =>
       })
   )
 
-export const edit = (previousTitle: string, currentTitle: string) =>
+export const update = (previousTitle: string, currentTitle: string) =>
   produce((statuses: Status[]) => {
     const status = statuses.find((status) => status.title === previousTitle)!
     status.title = currentTitle.trim().toLowerCase()

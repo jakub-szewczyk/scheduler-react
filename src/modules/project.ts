@@ -5,8 +5,7 @@ import { Schedule } from '@/types/schedule'
 import { flow } from 'fp-ts/lib/function'
 import { __, concat, equals, lensProp, map, prop, set, when } from 'ramda'
 
-// TODO: `createdAt` shows stale date as it's a constant not a function.
-export const INITIAL_VALUES: Project[] = [
+export const initialValues = (): Project[] => [
   {
     name: 'unsaved',
     description: '',
@@ -24,9 +23,9 @@ export const updateForeignKey =
       project: widget.project === project.name ? name : widget.project,
     }))
 
-export const add: ProjectsEndomorphism = concat(
+export const create: ProjectsEndomorphism = concat(
   __,
-  INITIAL_VALUES.map((project) => ({ ...project, selected: false }))
+  initialValues().map((project) => ({ ...project, selected: false }))
 )
 
 export const save =
@@ -34,7 +33,7 @@ export const save =
   (currentName: string): ProjectsEndomorphism =>
     map(
       when(
-        (project) => project.name === previousName,
+        flow(prop('name'), equals(previousName)),
         set(lensProp('name'), currentName)
       )
     )

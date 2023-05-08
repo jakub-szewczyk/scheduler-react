@@ -53,7 +53,7 @@ const ProjectItem = ({ project, projects, setProjects }: ProjectItemProps) => {
     | MouseEventHandler<HTMLButtonElement>
     | undefined = (event) => {
     event.stopPropagation()
-    setProjects(PROJECT.add)
+    setProjects(PROJECT.create)
     setNotes(concat(__, NOTE.initialValues()))
     setBoards(concat(__, BOARD.initialValues()))
     setSchedules(concat(__, SCHEDULE.initialValues()))

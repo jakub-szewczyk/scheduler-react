@@ -66,7 +66,7 @@ const BoardActions = () => {
   }
 
   const handleBoardCreate = () => {
-    setBoards(BOARD.add(project))
+    setBoards(BOARD.create(project))
     closeBoardsDrawer()
   }
 

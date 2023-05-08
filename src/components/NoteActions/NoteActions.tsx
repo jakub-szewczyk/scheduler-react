@@ -42,7 +42,7 @@ const NoteActions = forwardRef<Editor>((_, ref) => {
   }
 
   const handleNoteCreate = () => {
-    setNotes(NOTE.add(project))
+    setNotes(NOTE.create(project))
     closeNotesDrawer()
   }
 

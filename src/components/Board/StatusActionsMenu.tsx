@@ -66,7 +66,7 @@ const StatusActionsMenu = ({
   }
 
   const handleStatusEdit = ({ title }: Pick<Status, 'title'>) => {
-    setStatuses(STATUS.edit(status.title, title))
+    setStatuses(STATUS.update(status.title, title))
     closeUpsertDialog()
   }
 

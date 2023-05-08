@@ -60,11 +60,11 @@ export const calculateSubState = (editorState: EditorState, project: Project) =>
     note.editorState = editorState
   })
 
-export const add = (project: Project) =>
+export const create = (project: Project) =>
   produce((notes: Note[]) => {
-    notes.forEach((notes) => {
-      if (notes.project === project.name) notes.selected = false
-    })
+    notes.forEach(
+      (notes) => notes.project === project.name && (notes.selected = false)
+    )
     notes.push({ ...initialValues()[0], project: project.name })
   })
 
@@ -81,18 +81,20 @@ export const remove = (project: Project, name: string) =>
   })
 
 export const save = (project: Project) => (name: string) =>
-  produce((notes: Note[]) => {
-    notes.forEach((note) => {
-      if (note.project === project.name && note.selected) note.name = name
-    })
-  })
+  produce((notes: Note[]) =>
+    notes.forEach(
+      (note) =>
+        note.project === project.name && note.selected && (note.name = name)
+    )
+  )
 
 export const select = (project: Project, name: string) =>
-  produce((notes: Note[]) => {
-    notes.forEach((note) => {
-      if (note.project === project.name) note.selected = note.name === name
-    })
-  })
+  produce((notes: Note[]) =>
+    notes.forEach(
+      (note) =>
+        note.project === project.name && (note.selected = note.name === name)
+    )
+  )
 
 export const toInlineStyleIcon: { [key in DraftInlineStyleType]: ReactNode } = {
   BOLD: <FormatBoldIcon fontSize='small' />,

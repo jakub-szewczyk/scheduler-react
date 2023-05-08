@@ -31,11 +31,12 @@ export const calculateSubState = (rows: Row[], project: Project) =>
     schedule.rows = rows
   })
 
-export const add = (project: Project) =>
+export const create = (project: Project) =>
   produce((schedules: Schedule[]) => {
-    schedules.forEach((schedule) => {
-      if (schedule.project === project.name) schedule.selected = false
-    })
+    schedules.forEach(
+      (schedule) =>
+        schedule.project === project.name && (schedule.selected = false)
+    )
     schedules.push({ ...initialValues()[0], project: project.name })
   })
 
@@ -54,20 +55,23 @@ export const remove = (project: Project, name: string) =>
   })
 
 export const save = (project: Project) => (name: string) =>
-  produce((schedules: Schedule[]) => {
-    schedules.forEach((schedule) => {
-      if (schedule.project === project.name && schedule.selected)
-        schedule.name = name
-    })
-  })
+  produce((schedules: Schedule[]) =>
+    schedules.forEach(
+      (schedule) =>
+        schedule.project === project.name &&
+        schedule.selected &&
+        (schedule.name = name)
+    )
+  )
 
 export const select = (project: Project, name: string) =>
-  produce((schedules: Schedule[]) => {
-    schedules.forEach((schedule) => {
-      if (schedule.project === project.name)
-        schedule.selected = schedule.name === name
-    })
-  })
+  produce((schedules: Schedule[]) =>
+    schedules.forEach(
+      (schedule) =>
+        schedule.project === project.name &&
+        (schedule.selected = schedule.name === name)
+    )
+  )
 
 export const exportToXLSX = (schedule: Schedule) => () => {
   const ws = utils.json_to_sheet(pipe(schedule.rows, map(ROW.toXLSX)))

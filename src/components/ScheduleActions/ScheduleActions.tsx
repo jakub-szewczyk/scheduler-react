@@ -38,7 +38,7 @@ const ScheduleActions = () => {
   }
 
   const handleScheduleCreate = () => {
-    setSchedules(SCHEDULE.add(project))
+    setSchedules(SCHEDULE.create(project))
     closeSchedulesDrawer()
   }
 
