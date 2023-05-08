@@ -60,10 +60,6 @@ export const editorStateSetter = (editorState: EditorState, project: Project) =>
     note.editorState = editorState
   })
 
-// export const add: NotesEndomorphism = flow(
-//   map(set(lensProp('selected'), false)),
-//   concat(__, INITIAL_VALUES)
-// )
 export const add = (project: Project) =>
   produce((notes: Note[]) => {
     notes.forEach((notes) => {
@@ -72,17 +68,6 @@ export const add = (project: Project) =>
     notes.push({ ...INITIAL_VALUES[0], project: project.name })
   })
 
-// export const remove = (name: string): NotesEndomorphism =>
-//   flow(
-//     filter(flow(prop('name'), complement(equals(name)))),
-//     unless(any(prop('selected')), (notes: any[]) =>
-//       pipe(
-//         notes,
-//         slice(0, -1) as (x: any[]) => any[],
-//         concat(__, [set(lensProp('selected'), true, last(notes))])
-//       )
-//     )
-//   )
 export const remove = (project: Project, name: string) =>
   produce((notes: Note[]) => {
     const noteIndex = notes.findIndex(
@@ -95,8 +80,6 @@ export const remove = (project: Project, name: string) =>
     }
   })
 
-// export const save = (name: string): NotesEndomorphism =>
-//   map(when(prop('selected'), set(lensProp('name'), name)))
 export const save = (project: Project) => (name: string) =>
   produce((notes: Note[]) => {
     notes.forEach((note) => {
@@ -104,13 +87,6 @@ export const save = (project: Project) => (name: string) =>
     })
   })
 
-// export const select = (name: string): NotesEndomorphism =>
-//   map(
-//     flow(
-//       set(lensProp('selected'), false),
-//       when(flow(prop('name'), equals(name)), set(lensProp('selected'), true))
-//     )
-//   )
 export const select = (project: Project, name: string) =>
   produce((notes: Note[]) => {
     notes.forEach((note) => {
