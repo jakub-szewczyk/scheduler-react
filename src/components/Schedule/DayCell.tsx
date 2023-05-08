@@ -20,7 +20,7 @@ const DayCell = ({ id, value, rows, setRows }: DayCellProps) => (
   >
     <Typography>{value}</Typography>
     {id === value ? (
-      <IconButton size='small' onClick={() => setRows(ROW.add(id, rows))}>
+      <IconButton size='small' onClick={() => setRows(ROW.create(id, rows))}>
         <AddIcon fontSize='small' />
       </IconButton>
     ) : (

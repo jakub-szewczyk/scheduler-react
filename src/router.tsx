@@ -1,8 +1,9 @@
 import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom'
 import Navbar from './layout/Navbar/Navbar'
-import Schedules from './pages/Schedules/Schedules'
 import Boards from './pages/Boards/Boards'
 import Notes from './pages/Notes/Notes'
+import Projects from './pages/Projects/Projects'
+import Schedules from './pages/Schedules/Schedules'
 
 const router = createBrowserRouter([
   {
@@ -15,7 +16,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/',
-        element: <Navigate to='/schedules' replace />,
+        element: <Projects />,
       },
       {
         path: '/notes',

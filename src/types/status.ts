@@ -1,14 +1,12 @@
 import { Issue } from './issue'
 
-interface Status {
+export interface Status {
   title: string
   issues: Issue[]
 }
 
-type UpsertStatusDialogMode =
+export type UpsertStatusDialogMode =
   | 'CREATE'
   | 'EDIT'
   | 'INSERT_BEFORE'
   | 'INSERT_AFTER'
-
-export type { Status, Issue, UpsertStatusDialogMode }

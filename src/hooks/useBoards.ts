@@ -1,28 +1,31 @@
-import { lensProp, map, prop, set, when } from 'ramda'
 import { Dispatch, SetStateAction } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 import * as BOARD from '../modules/board'
-import { Status } from '../types/board'
+import useProjects from './useProjects'
+import { Status } from '@/types/status'
 
 const useBoards = () => {
-  const [boards, setBoards] = useLocalStorage('boards', BOARD.INITIAL_BOARDS)
+  const { project } = useProjects()
 
-  const board = BOARD.findSelected(boards)!
+  const [boards, setBoards] = useLocalStorage('boards', BOARD.initialValues())
+
+  const workingBoard = boards.find(
+    (board) => board.project === project.name && board.selected
+  )!
+
+  const workingBoards = boards.filter((board) => board.project === project.name)
 
   const setStatuses: Dispatch<SetStateAction<Status[]>> = (statuses) =>
     setBoards(
-      map(
-        when(
-          prop('selected'),
-          set(
-            lensProp('statuses'),
-            typeof statuses === 'function' ? statuses(board.statuses) : statuses
-          )
-        )
+      BOARD.calculateSubState(
+        typeof statuses === 'function'
+          ? statuses(workingBoard.statuses)
+          : statuses,
+        project
       )
     )
 
-  return { board, boards, setBoards, setStatuses }
+  return { board: workingBoard, boards: workingBoards, setBoards, setStatuses }
 }
 
 export default useBoards

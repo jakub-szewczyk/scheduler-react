@@ -1,8 +1,8 @@
-import { Status } from '@/types/board'
 import { Issue } from '@/types/issue'
+import { Status } from '@/types/status'
 import produce from 'immer'
 
-const create = (values: Issue) =>
+export const create = (values: Issue) =>
   produce(
     (statuses: Status[]) =>
       void statuses[0].issues.unshift({
@@ -11,7 +11,7 @@ const create = (values: Issue) =>
       })
   )
 
-const edit = (title: string, values: Issue) =>
+export const update = (title: string, values: Issue) =>
   produce((statuses: Status[]) => {
     const issue = statuses
       .flatMap((status) => status.issues)
@@ -20,7 +20,7 @@ const edit = (title: string, values: Issue) =>
     issue.content = values.content.trim()
   })
 
-const remove = (title: string) =>
+export const remove = (title: string) =>
   produce((statuses: Status[]) => {
     const status = statuses.find((status) =>
       status.issues.some((issue) => issue.title === title)
@@ -29,7 +29,7 @@ const remove = (title: string) =>
     status.issues.splice(issueIndex, 1)
   })
 
-const insertAbove = (title: string, values: Issue) =>
+export const insertAbove = (title: string, values: Issue) =>
   produce((statuses: Status[]) => {
     const status = statuses.find((status) =>
       status.issues.some((issue) => issue.title === title)
@@ -41,7 +41,7 @@ const insertAbove = (title: string, values: Issue) =>
     })
   })
 
-const insertBelow = (title: string, values: Issue) =>
+export const insertBelow = (title: string, values: Issue) =>
   produce((statuses: Status[]) => {
     const status = statuses.find((status) =>
       status.issues.some((issue) => issue.title === title)
@@ -52,5 +52,3 @@ const insertBelow = (title: string, values: Issue) =>
       content: values.content.trim(),
     })
   })
-
-export { create, edit, remove, insertAbove, insertBelow }

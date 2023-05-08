@@ -15,9 +15,12 @@ import { RefObject, forwardRef } from 'react'
 import { useBoolean } from 'usehooks-ts'
 import NotesDrawer from './NotesDrawer'
 import SaveNoteDialog from './SaveNoteDialog'
+import useProjects from '@/hooks/useProjects'
 
 const NoteActions = forwardRef<Editor>((_, ref) => {
   const editorRef = ref as RefObject<Editor>
+
+  const { project } = useProjects()
 
   const { note, notes, setNotes } = useNotes()
 
@@ -33,24 +36,24 @@ const NoteActions = forwardRef<Editor>((_, ref) => {
     setTrue: openSaveNoteDialog,
   } = useBoolean()
 
-  const handleNoteSave = ({ name }: { name: string }) => {
-    setNotes(pipe(name, trim, NOTE.save))
-    closeSaveNoteDialog()
-  }
-
   const handleNoteCreate = () => {
-    setNotes(NOTE.add)
+    setNotes(NOTE.create(project))
     closeNotesDrawer()
   }
 
   const handleNoteDelete = (name: string) => {
-    setNotes(NOTE.remove(name))
+    setNotes(NOTE.remove(project, name))
     closeNotesDrawer()
   }
 
   const handleNoteSelect = (name: string) => {
-    setNotes(NOTE.select(name))
+    setNotes(NOTE.select(project, name))
     closeNotesDrawer()
+  }
+
+  const handleNoteSave = ({ name }: { name: string }) => {
+    setNotes(pipe(name, trim, NOTE.save(project)))
+    closeSaveNoteDialog()
   }
 
   return (

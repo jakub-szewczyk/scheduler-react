@@ -1,6 +1,6 @@
 import { Box, styled } from '@mui/material'
 
-const BoardContainer = styled(Box)(({ theme }) => ({
+export const BoardContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   width: 'calc(100% - 32px)',
   maxWidth: theme.breakpoints.values.lg,
@@ -29,5 +29,3 @@ const BoardContainer = styled(Box)(({ theme }) => ({
     },
   },
 }))
-
-export { BoardContainer }

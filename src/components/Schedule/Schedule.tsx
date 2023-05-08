@@ -1,4 +1,3 @@
-import { useTheme } from '@mui/material'
 import useSchedules from '../../hooks/useSchedules'
 import * as ROW from '../../modules/row'
 import * as TABLE from '../../modules/table'
@@ -14,8 +13,6 @@ const Schedule = () => {
 
   const columns = createColumns(rows, setRows)
 
-  const theme = useTheme()
-
   return (
     <>
       <ScheduleHeader />
@@ -23,10 +20,11 @@ const Schedule = () => {
         elevation={0}
         height={TABLE.calculateHeight(rows)}
         sx={{
-          maxWidth: Math.min(
-            theme.breakpoints.values.lg,
-            TABLE.calculateMaxWidth(columns)
-          ),
+          maxWidth: (theme) =>
+            Math.min(
+              theme.breakpoints.values.lg,
+              TABLE.calculateMaxWidth(columns)
+            ),
         }}
       >
         <DataGrid

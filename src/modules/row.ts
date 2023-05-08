@@ -1,10 +1,12 @@
 import { GridRowId } from '@mui/x-data-grid'
 import { prop } from 'fp-ts-ramda'
-import { constant, flow, pipe } from 'fp-ts/lib/function'
 import * as Option from 'fp-ts/Option'
+import { constant, flow, pipe } from 'fp-ts/lib/function'
 import { nanoid } from 'nanoid'
 import {
-  add as _add,
+  remove as _remove,
+  update as _update,
+  add,
   count,
   curry,
   equals,
@@ -12,8 +14,6 @@ import {
   includes,
   insert,
   map,
-  remove as _remove,
-  update as _update,
 } from 'ramda'
 import { Row } from '../types/row'
 import { Day } from '../types/time'
@@ -31,36 +31,25 @@ const countPerDays = (day: Day, rows: Row[]) =>
   pipe(rows, map(prop('id')) as T, count(includes(day)))
 
 const calculateNewIndex = (id: GridRowId, rows: Row[]) =>
-  pipe(rows, findIndexById(id), _add(countPerDays(id as Day, rows)))
+  pipe(rows, findIndexById(id), add(countPerDays(id as Day, rows)))
 
-const add = (id: GridRowId, rows: Row[]) =>
+export const create = (id: GridRowId, rows: Row[]) =>
   insert(calculateNewIndex(id, rows), { id: `${id}${nanoid()}` }, rows)
 
-const remove = (id: GridRowId, rows: Row[]) =>
+export const remove = (id: GridRowId, rows: Row[]) =>
   _remove(findIndexById(id, rows), 1, rows)
 
-const update = curry(
+export const update = curry(
   <T>(field: string, value: T, id: GridRowId, rows: Row[]) => {
     const index = findIndexById(id, rows)
     return _update(index, { ...rows[index], [field]: value }, rows)
   }
 )
 
-const toXLSX = ({ day, starts, ends, room, subject }: Row) => ({
+export const toXLSX = ({ day, starts, ends, room, subject }: Row) => ({
   Day: day,
   Starts: pipe(TIME.format(starts), Option.getOrElse(constant(''))),
   Ends: pipe(TIME.format(ends), Option.getOrElse(constant(''))),
   Room: room,
   Subject: subject,
 })
-
-export {
-  equalsId,
-  findIndexById,
-  countPerDays,
-  calculateNewIndex,
-  add,
-  remove,
-  update,
-  toXLSX,
-}

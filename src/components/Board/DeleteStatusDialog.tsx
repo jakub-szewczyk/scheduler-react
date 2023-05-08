@@ -1,6 +1,6 @@
+import { Status } from '@/types/status'
 import { Button, Typography } from '@mui/material'
 import { MouseEventHandler } from 'react'
-import { Status } from '../../types/board'
 import DraggableDialog, {
   DraggableDialogProps,
 } from '../../layout/DraggableDialog/DraggableDialog'

@@ -1,31 +1,39 @@
-import { lensProp, map, prop, set, when } from 'ramda'
 import { Dispatch, SetStateAction } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 import * as SCHEDULE from '../modules/schedule'
 import { Row } from '../types/row'
+import useProjects from './useProjects'
 
 const useSchedules = () => {
+  const { project } = useProjects()
+
   const [schedules, setSchedules] = useLocalStorage(
     'schedules',
-    SCHEDULE.INITIAL_VALUES
+    SCHEDULE.initialValues()
   )
 
-  const schedule = SCHEDULE.findSelected(schedules)!
+  const workingSchedule = schedules.find(
+    (schedule) => schedule.project === project.name && schedule.selected
+  )!
+
+  const workingSchedules = schedules.filter(
+    (schedule) => schedule.project === project.name
+  )
 
   const setRows: Dispatch<SetStateAction<Row[]>> = (rows) =>
     setSchedules(
-      map(
-        when(
-          prop('selected'),
-          set(
-            lensProp('rows'),
-            typeof rows === 'function' ? rows(schedule.rows) : rows
-          )
-        )
+      SCHEDULE.calculateSubState(
+        typeof rows === 'function' ? rows(workingSchedule.rows) : rows,
+        project
       )
     )
 
-  return { schedule, schedules, setSchedules, setRows }
+  return {
+    schedule: workingSchedule,
+    schedules: workingSchedules,
+    setSchedules,
+    setRows,
+  }
 }
 
 export default useSchedules

@@ -1,4 +1,4 @@
-import { Note } from '@/types/note'
+import { Project } from '@/types/project'
 import { Button, Stack, Typography } from '@mui/material'
 import { Field, Form, Formik, FormikHelpers } from 'formik'
 import { TextField } from 'formik-mui'
@@ -9,9 +9,9 @@ import DraggableDialog, {
 import { isUnsaved } from '../../modules/common'
 import validationSchema from './validation/validationSchema'
 
-interface SaveNoteDialogProps extends DraggableDialogProps {
-  note: Note
-  notes: Note[]
+interface SaveProjectDialogProps extends DraggableDialogProps {
+  project: Project
+  projects: Project[]
   onSave: (
     values: { name: string },
     formikHelpers: FormikHelpers<{ name: string }>
@@ -19,36 +19,36 @@ interface SaveNoteDialogProps extends DraggableDialogProps {
   onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
 
-const SaveNoteDialog = ({
-  note,
-  notes,
+const SaveProjectDialog = ({
+  project,
+  projects,
   onSave,
   onClose,
   onCancel = onClose as MouseEventHandler<HTMLButtonElement> | undefined,
   ...props
-}: SaveNoteDialogProps) => (
+}: SaveProjectDialogProps) => (
   <DraggableDialog
     {...props}
     onClose={onClose}
-    dialogTitle={isUnsaved(note) ? 'Save note' : 'Rename note'}
+    dialogTitle={isUnsaved(project) ? 'Save project' : 'Rename project'}
     dialogContent={
       <Stack spacing={3}>
-        <Typography>Choose a name for your note</Typography>
+        <Typography>Choose a name for your project</Typography>
         <Formik
           initialValues={{
-            name: isUnsaved(note) ? '' : note.name,
+            name: isUnsaved(project) ? '' : project.name,
           }}
-          validationSchema={validationSchema(note, notes)}
+          validationSchema={validationSchema(project, projects)}
           onSubmit={onSave}
         >
           {() => (
-            <Form id='note'>
+            <Form id='project'>
               <Field
                 component={TextField}
                 name='name'
                 size='small'
                 label='Name'
-                helperText='Set note name'
+                helperText='Set project name'
                 fullWidth
               />
             </Form>
@@ -61,7 +61,7 @@ const SaveNoteDialog = ({
         <Button variant='outlined' onClick={onCancel}>
           Cancel
         </Button>
-        <Button type='submit' form='note' variant='outlined'>
+        <Button type='submit' form='project' variant='outlined'>
           Save
         </Button>
       </>
@@ -69,4 +69,4 @@ const SaveNoteDialog = ({
   />
 )
 
-export default SaveNoteDialog
+export default SaveProjectDialog

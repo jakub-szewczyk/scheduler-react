@@ -7,7 +7,7 @@ import * as STATUS from '../../../modules/status'
 import { Status, UpsertStatusDialogMode } from '@/types/status'
 import { Issue, UpsertIssueDialogMode } from '@/types/issue'
 
-const upsertStatusValidationSchema = (
+export const upsertStatusValidationSchema = (
   mode: UpsertStatusDialogMode,
   status: Status | undefined,
   statuses: Status[]
@@ -29,7 +29,7 @@ const upsertStatusValidationSchema = (
       ),
   })
 
-const upsertIssueValidationSchema = (
+export const upsertIssueValidationSchema = (
   mode: UpsertIssueDialogMode,
   issue: Issue | undefined,
   statuses: Status[]
@@ -53,5 +53,3 @@ const upsertIssueValidationSchema = (
       ),
     content: string().trim().required('Required'),
   })
-
-export { upsertStatusValidationSchema, upsertIssueValidationSchema }

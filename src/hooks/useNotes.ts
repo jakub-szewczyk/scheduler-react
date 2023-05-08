@@ -4,11 +4,22 @@ import { EditorState } from 'draft-js'
 import { map } from 'ramda'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useEventListener } from 'usehooks-ts'
+import useProjects from './useProjects'
 
 const useNotes = () => {
+  const { project } = useProjects()
+
   const [notes, setNotes] = useState<Note[]>(NOTE.initialState)
 
-  const note = notes.find((note) => note.selected)!
+  useEventListener('storage', () => setNotes(NOTE.initialState))
+
+  useEventListener('local-storage', () => setNotes(NOTE.initialState))
+
+  const workingNote = notes.find(
+    (note) => note.project === project.name && note.selected
+  )!
+
+  const workingNotes = notes.filter((note) => note.project === project.name)
 
   const storeNotes: Dispatch<SetStateAction<Note[]>> = (value) => {
     localStorage.setItem(
@@ -23,22 +34,19 @@ const useNotes = () => {
 
   const storeEditorState: Dispatch<SetStateAction<EditorState>> = (value) =>
     storeNotes(
-      NOTE.updateEditorState(
+      NOTE.calculateSubState(
         typeof value === 'function'
-          ? value(note.editorState as EditorState)
-          : value
+          ? value(workingNote.editorState as EditorState)
+          : value,
+        project
       )
     )
 
-  useEventListener('storage', () => setNotes(NOTE.initialState))
-
-  useEventListener('local-storage', () => setNotes(NOTE.initialState))
-
   return {
-    note,
-    notes,
+    note: workingNote,
+    notes: workingNotes,
     setNotes: storeNotes,
-    editorState: note.editorState as EditorState,
+    editorState: workingNote.editorState as EditorState,
     setEditorState: storeEditorState,
   }
 }

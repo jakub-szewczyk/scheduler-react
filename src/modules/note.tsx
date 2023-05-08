@@ -17,40 +17,23 @@ import {
   convertFromRaw,
   convertToRaw,
 } from 'draft-js'
-import { prop } from 'fp-ts-ramda'
-import { flow, pipe } from 'fp-ts/lib/function'
 import produce from 'immer'
 import { ReactNode } from 'react'
+import { Project } from '@/types/project'
 // @ts-ignore
 import html2pdf from 'html2pdf.js'
-import {
-  __,
-  any,
-  complement,
-  concat,
-  equals,
-  filter,
-  last,
-  lensProp,
-  map,
-  set,
-  slice,
-  unless,
-  when,
-} from 'ramda'
 
-type NotesEndomorphism = (notes: Note[]) => Note[]
-
-const INITIAL_VALUES: Note[] = [
+export const initialValues = (): Note[] => [
   {
     name: 'unsaved',
+    project: 'unsaved',
     selected: true,
     createdAt: new Date().toISOString(),
     editorState: EditorState.createEmpty(),
   },
 ]
 
-const serialize = (note: Note) => ({
+export const serialize = (note: Note) => ({
   ...note,
   editorState: convertToRaw(
     (note.editorState as EditorState).getCurrentContent()
@@ -64,78 +47,56 @@ const deserialize = (note: Note) => ({
   ),
 })
 
-const initialState = () =>
+export const initialState = (): Note[] =>
   localStorage.getItem('notes')
     ? JSON.parse(localStorage.getItem('notes')!).map(deserialize)
-    : INITIAL_VALUES
+    : initialValues()
 
-const updateEditorState = (editorState: EditorState) =>
+export const create = (project: Project) =>
   produce((notes: Note[]) => {
-    const note = notes.find((note) => note.selected)!
+    notes.forEach(
+      (notes) => notes.project === project.name && (notes.selected = false)
+    )
+    notes.push({ ...initialValues()[0], project: project.name })
+  })
+
+export const remove = (project: Project, name: string) =>
+  produce((notes: Note[]) => {
+    const noteIndex = notes.findIndex(
+      (notes) => notes.project === project.name && notes.name === name
+    )
+    const [removedNote] = notes.splice(noteIndex, 1)
+    if (removedNote.selected) {
+      const projectNotes = notes.filter((note) => note.project === project.name)
+      projectNotes[projectNotes.length - 1].selected = true
+    }
+  })
+
+export const select = (project: Project, name: string) =>
+  produce((notes: Note[]) =>
+    notes.forEach(
+      (note) =>
+        note.project === project.name && (note.selected = note.name === name)
+    )
+  )
+
+export const save = (project: Project) => (name: string) =>
+  produce((notes: Note[]) =>
+    notes.forEach(
+      (note) =>
+        note.project === project.name && note.selected && (note.name = name)
+    )
+  )
+
+export const calculateSubState = (editorState: EditorState, project: Project) =>
+  produce((notes: Note[]) => {
+    const note = notes.find(
+      (note) => note.project === project.name && note.selected
+    )!
     note.editorState = editorState
   })
 
-const add: NotesEndomorphism = flow(
-  map(set(lensProp('selected'), false)),
-  concat(__, INITIAL_VALUES)
-)
-
-const remove = (name: string): NotesEndomorphism =>
-  flow(
-    filter(flow(prop('name'), complement(equals(name)))),
-    unless(any(prop('selected')), (notes: any[]) =>
-      pipe(
-        notes,
-        slice(0, -1) as (x: any[]) => any[],
-        concat(__, [set(lensProp('selected'), true, last(notes))])
-      )
-    )
-  )
-
-const save = (name: string): NotesEndomorphism =>
-  map(when(prop('selected'), set(lensProp('name'), name)))
-
-const select = (name: string): NotesEndomorphism =>
-  map(
-    flow(
-      set(lensProp('selected'), false),
-      when(flow(prop('name'), equals(name)), set(lensProp('selected'), true))
-    )
-  )
-
-const toInlineStyleIcon: { [key in DraftInlineStyleType]: ReactNode } = {
-  BOLD: <FormatBoldIcon fontSize='small' />,
-  ITALIC: <FormatItalicIcon fontSize='small' />,
-  UNDERLINE: <FormatUnderlinedIcon fontSize='small' />,
-  STRIKETHROUGH: <StrikethroughSIcon fontSize='small' />,
-  CODE: <CodeIcon fontSize='small' />,
-}
-
-const toBlockStyleIcon: { [key in DraftBlockStyleType]: ReactNode } = {
-  unstyled: <Typography fontSize='small'>Paragraph</Typography>,
-  'header-one': <Typography fontSize='small'>Heading 1</Typography>,
-  'header-two': <Typography fontSize='small'>Heading 2</Typography>,
-  'header-three': <Typography fontSize='small'>Heading 3</Typography>,
-  'header-four': <Typography fontSize='small'>Heading 4</Typography>,
-  'header-five': <Typography fontSize='small'>Heading 5</Typography>,
-  'header-six': <Typography fontSize='small'>Heading 6</Typography>,
-  'unordered-list-item': <FormatListBulletedIcon fontSize='small' />,
-  'ordered-list-item': <FormatListNumberedIcon fontSize='small' />,
-  blockquote: <FormatQuoteIcon fontSize='small' />,
-  'code-block': <DataObjectIcon fontSize='small' />,
-}
-
-const blockStyle = (editorState: EditorState) =>
-  editorState
-    .getCurrentContent()
-    .getBlockForKey(editorState.getSelection().getStartKey())
-    .getType() as DraftBlockStyleType
-
-const isPlaceholderVisible = (editorState: EditorState) =>
-  editorState.getCurrentContent().hasText() ||
-  editorState.getCurrentContent().getBlockMap().first().getType() === 'unstyled'
-
-const exportToPDF = (editor: Editor, filename?: string) => {
+export const exportToPDF = (editor: Editor, filename?: string) => {
   const html = editor.editorContainer?.cloneNode(true) as HTMLElement
   html.style.color = 'black'
   html2pdf()
@@ -147,18 +108,34 @@ const exportToPDF = (editor: Editor, filename?: string) => {
     .save(filename)
 }
 
-export {
-  INITIAL_VALUES,
-  serialize,
-  initialState,
-  updateEditorState,
-  save,
-  add,
-  remove,
-  select,
-  toInlineStyleIcon,
-  toBlockStyleIcon,
-  blockStyle,
-  isPlaceholderVisible,
-  exportToPDF,
+export const isPlaceholderVisible = (editorState: EditorState) =>
+  editorState.getCurrentContent().hasText() ||
+  editorState.getCurrentContent().getBlockMap().first().getType() === 'unstyled'
+
+export const blockStyle = (editorState: EditorState) =>
+  editorState
+    .getCurrentContent()
+    .getBlockForKey(editorState.getSelection().getStartKey())
+    .getType() as DraftBlockStyleType
+
+export const toInlineStyleIcon: { [key in DraftInlineStyleType]: ReactNode } = {
+  BOLD: <FormatBoldIcon fontSize='small' />,
+  ITALIC: <FormatItalicIcon fontSize='small' />,
+  UNDERLINE: <FormatUnderlinedIcon fontSize='small' />,
+  STRIKETHROUGH: <StrikethroughSIcon fontSize='small' />,
+  CODE: <CodeIcon fontSize='small' />,
+}
+
+export const toBlockStyleIcon: { [key in DraftBlockStyleType]: ReactNode } = {
+  unstyled: <Typography fontSize='small'>Paragraph</Typography>,
+  'header-one': <Typography fontSize='small'>Heading 1</Typography>,
+  'header-two': <Typography fontSize='small'>Heading 2</Typography>,
+  'header-three': <Typography fontSize='small'>Heading 3</Typography>,
+  'header-four': <Typography fontSize='small'>Heading 4</Typography>,
+  'header-five': <Typography fontSize='small'>Heading 5</Typography>,
+  'header-six': <Typography fontSize='small'>Heading 6</Typography>,
+  'unordered-list-item': <FormatListBulletedIcon fontSize='small' />,
+  'ordered-list-item': <FormatListNumberedIcon fontSize='small' />,
+  blockquote: <FormatQuoteIcon fontSize='small' />,
+  'code-block': <DataObjectIcon fontSize='small' />,
 }

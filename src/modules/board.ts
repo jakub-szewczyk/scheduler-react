@@ -1,31 +1,7 @@
-import { Board, DropResultLocation, Status } from '@/types/board'
-import { prop } from 'fp-ts-ramda'
-import { flow, pipe } from 'fp-ts/lib/function'
+import { Board } from '@/types/board'
+import { Project } from '@/types/project'
+import { Status } from '@/types/status'
 import produce from 'immer'
-import {
-  __,
-  any,
-  complement,
-  concat,
-  curry,
-  equals,
-  filter,
-  find,
-  join,
-  last,
-  lensProp,
-  map,
-  move,
-  set,
-  slice,
-  split,
-  tail,
-  unless,
-  when,
-} from 'ramda'
-import { DraggableLocation } from 'react-beautiful-dnd'
-
-type BoardsEndomorphism = (boards: Board[]) => Board[]
 
 const INITIAL_STATUSES: Status[] = [
   {
@@ -62,86 +38,58 @@ const INITIAL_STATUSES: Status[] = [
   },
 ]
 
-const INITIAL_BOARDS: Board[] = [
+export const initialValues = (): Board[] => [
   {
     name: 'unsaved',
+    project: 'unsaved',
     selected: true,
     createdAt: new Date().toISOString(),
     statuses: INITIAL_STATUSES,
   },
 ]
 
-const matchByDraggableLocation = curry(
-  ({ droppableId }: DraggableLocation, { title }: Status) =>
-    pipe(droppableId, split('-'), tail, join('-'), equals(title))
-)
-
-const dragStatus = ({ source, destination }: DropResultLocation) =>
-  move(source.index, destination.index)
-
-const dragIssueWithinStatus = ({ source, destination }: DropResultLocation) =>
-  produce((statuses: Status[]) => {
-    const status = statuses.find(matchByDraggableLocation(source))!
-    status.issues = move(source.index, destination.index, status.issues)
+export const create = (project: Project) =>
+  produce((boards: Board[]) => {
+    boards.forEach(
+      (board) => board.project === project.name && (board.selected = false)
+    )
+    boards.push({ ...initialValues()[0], project: project.name })
   })
 
-const dragIssueBetweenStatuses = ({
-  source,
-  destination,
-}: DropResultLocation) =>
-  produce((statuses: Status[]) => {
-    const sourceStatus = statuses.find(matchByDraggableLocation(source))!
-    const destinationStatus = statuses.find(
-      matchByDraggableLocation(destination)
-    )!
-    const [sourceIssue] = sourceStatus.issues.splice(source.index, 1)
-    destinationStatus.issues.splice(destination.index, 0, sourceIssue)
-  })
-
-const drag = ({ source, destination }: DropResultLocation) =>
-  source.droppableId === 'board' && destination.droppableId === 'board'
-    ? dragStatus({ source, destination })
-    : source.droppableId === destination.droppableId
-    ? dragIssueWithinStatus({ source, destination })
-    : dragIssueBetweenStatuses({ source, destination })
-
-const add: BoardsEndomorphism = flow(
-  map(set(lensProp('selected'), false)),
-  concat(__, INITIAL_BOARDS)
-)
-
-const remove = (name: string): BoardsEndomorphism =>
-  flow(
-    filter(flow(prop('name'), complement(equals(name)))),
-    unless(any(prop('selected')), (boards: any[]) =>
-      pipe(
-        boards,
-        slice(0, -1) as (x: any[]) => any[],
-        concat(__, [set(lensProp('selected'), true, last(boards))])
+export const remove = (project: Project, name: string) =>
+  produce((boards: Board[]) => {
+    const boardIndex = boards.findIndex(
+      (board) => board.project === project.name && board.name === name
+    )
+    const [removedBoard] = boards.splice(boardIndex, 1)
+    if (removedBoard.selected) {
+      const projectBoards = boards.filter(
+        (board) => board.project === project.name
       )
+      projectBoards[projectBoards.length - 1].selected = true
+    }
+  })
+
+export const select = (project: Project, name: string) =>
+  produce((boards: Board[]) => {
+    boards.forEach(
+      (board) =>
+        board.project === project.name && (board.selected = board.name === name)
+    )
+  })
+
+export const save = (project: Project) => (name: string) =>
+  produce((boards: Board[]) =>
+    boards.forEach(
+      (board) =>
+        board.project === project.name && board.selected && (board.name = name)
     )
   )
 
-const save = (name: string): BoardsEndomorphism =>
-  map(when(prop('selected'), set(lensProp('name'), name)))
-
-const select = (name: string): BoardsEndomorphism =>
-  map(
-    flow(
-      set(lensProp('selected'), false),
-      when(flow(prop('name'), equals(name)), set(lensProp('selected'), true))
-    )
-  )
-
-const findSelected = find<Board>(prop('selected'))
-
-export {
-  INITIAL_BOARDS,
-  INITIAL_STATUSES,
-  drag,
-  add,
-  remove,
-  save,
-  select,
-  findSelected,
-}
+export const calculateSubState = (statuses: Status[], project: Project) =>
+  produce((boards: Board[]) => {
+    const board = boards.find(
+      (board) => board.project === project.name && board.selected
+    )!
+    board.statuses = statuses
+  })

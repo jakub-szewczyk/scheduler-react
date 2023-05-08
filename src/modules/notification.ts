@@ -5,7 +5,7 @@ import * as TIME from './time'
 
 const isPermissionGranted = equals('granted')
 
-const notify =
+export const notify =
   (title: string, options?: NotificationOptions): Task<Notification> =>
   () =>
     isPermissionGranted(Notification.permission)
@@ -14,12 +14,15 @@ const notify =
           () => new Notification(title, options)
         )
 
-const calculateTime = (starts: string, values: NotificationConfiguration) =>
+export const calculateTime = (
+  starts: string,
+  values: NotificationConfiguration
+) =>
   isNaN(+values.notification)
     ? values.time
     : TIME.subtractMinutes(starts, +values.notification)
 
-const calculateConfiguration = (
+export const calculateConfiguration = (
   starts: string,
   time: string | null | undefined,
   title = ''
@@ -59,5 +62,3 @@ const calculateConfiguration = (
         time,
         title,
       }
-
-export { notify, calculateTime, calculateConfiguration }

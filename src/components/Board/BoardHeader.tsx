@@ -7,8 +7,11 @@ import { pipe } from 'fp-ts/lib/function'
 import { trim } from 'ramda'
 import { useBoolean } from 'usehooks-ts'
 import SaveBoardDialog from '../BoardActions/SaveBoardDialog'
+import useProjects from '@/hooks/useProjects'
 
 const BoardHeader = () => {
+  const { project } = useProjects()
+
   const { board, boards, setBoards } = useBoards()
 
   const {
@@ -18,7 +21,7 @@ const BoardHeader = () => {
   } = useBoolean()
 
   const handleBoardSave = ({ name }: { name: string }) => {
-    setBoards(pipe(name, trim, BOARD.save))
+    setBoards(pipe(name, trim, BOARD.save(project)))
     closeSaveBoardDialog()
   }
 
