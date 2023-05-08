@@ -30,7 +30,6 @@ const SaveNoteDialog = ({
   <DraggableDialog
     {...props}
     onClose={onClose}
-    // TODO: Flickering text. Same with different modules.
     dialogTitle={isUnsaved(note) ? 'Save note' : 'Rename note'}
     dialogContent={
       <Stack spacing={3}>

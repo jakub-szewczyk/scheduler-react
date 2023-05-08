@@ -4,13 +4,11 @@ TODO: Description
 
 ## TODO
 
+- Flickering save/rename text inside a dialog (every module).
+
 - Increase test coverage to gain high confidence (component, e2e).
 
-- Multiple projects management.
-
 - Server side persistance layer (authentication, local-remote data synchronization).
-
-- Locate the notification listener at the app level, so that they can trigger when browsing on any screen.
 
 - (Optional) Notification configuration dialog - prevent textfield helper text from wrapping.
 

@@ -187,7 +187,7 @@ const ProjectItem = ({ project, projects, setProjects }: ProjectItemProps) => {
         projects={projects}
         onSave={handleProjectSave}
       />
-      {/* TODO: Edit and delete confirmation dialogs */}
+      {/* TODO: Delete confirmation dialog */}
     </>
   )
 }
