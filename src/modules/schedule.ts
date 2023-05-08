@@ -54,6 +54,15 @@ export const remove = (project: Project, name: string) =>
     }
   })
 
+export const select = (project: Project, name: string) =>
+  produce((schedules: Schedule[]) =>
+    schedules.forEach(
+      (schedule) =>
+        schedule.project === project.name &&
+        (schedule.selected = schedule.name === name)
+    )
+  )
+
 export const save = (project: Project) => (name: string) =>
   produce((schedules: Schedule[]) =>
     schedules.forEach(
@@ -61,15 +70,6 @@ export const save = (project: Project) => (name: string) =>
         schedule.project === project.name &&
         schedule.selected &&
         (schedule.name = name)
-    )
-  )
-
-export const select = (project: Project, name: string) =>
-  produce((schedules: Schedule[]) =>
-    schedules.forEach(
-      (schedule) =>
-        schedule.project === project.name &&
-        (schedule.selected = schedule.name === name)
     )
   )
 

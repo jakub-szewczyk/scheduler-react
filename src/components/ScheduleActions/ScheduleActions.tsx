@@ -32,11 +32,6 @@ const ScheduleActions = () => {
     setTrue: openSaveScheduleDialog,
   } = useBoolean()
 
-  const handleScheduleSave = ({ name }: { name: string }) => {
-    setSchedules(pipe(name, trim, SCHEDULE.save(project)))
-    closeSaveScheduleDialog()
-  }
-
   const handleScheduleCreate = () => {
     setSchedules(SCHEDULE.create(project))
     closeSchedulesDrawer()
@@ -50,6 +45,11 @@ const ScheduleActions = () => {
   const handleScheduleSelect = (name: string) => {
     setSchedules(SCHEDULE.select(project, name))
     closeSchedulesDrawer()
+  }
+
+  const handleScheduleSave = ({ name }: { name: string }) => {
+    setSchedules(pipe(name, trim, SCHEDULE.save(project)))
+    closeSaveScheduleDialog()
   }
 
   return (

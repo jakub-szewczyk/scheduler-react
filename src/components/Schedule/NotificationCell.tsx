@@ -36,6 +36,12 @@ const NotificationCell = ({
     [row.notification?.time]
   )
 
+  /**
+   * TODO:
+   * Lift this hook up as it is only
+   * notifying when the component is rendered.
+   * Consider adding a service worker to further improve notifications behavior.
+   */
   useInterval(
     () =>
       row.notification?.active &&
