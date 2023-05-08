@@ -9,9 +9,8 @@ const Projects = () => {
   return (
     <ProjectContainer>
       {projects.map((project) => (
-        <Grid xs={12} sm={6} md={4} lg={3} xl={12 / 5}>
+        <Grid key={project.name} xs={12} sm={6} md={4} lg={3} xl={12 / 5}>
           <ProjectItem
-            key={project.name}
             project={project}
             projects={projects}
             setProjects={setProjects}

@@ -1,6 +1,8 @@
 import { EditorState, RawDraftContentState } from 'draft-js'
 
-interface Note {
+export type NotesEndomorphism = (notes: Note[]) => Note[]
+
+export interface Note {
   name: string
   project: string
   selected: boolean
@@ -8,7 +10,7 @@ interface Note {
   editorState: EditorState | RawDraftContentState
 }
 
-type DraftBlockStyleType =
+export type DraftBlockStyleType =
   | 'unstyled'
   | 'header-one'
   | 'header-two'
@@ -20,5 +22,3 @@ type DraftBlockStyleType =
   | 'ordered-list-item'
   | 'blockquote'
   | 'code-block'
-
-export type { Note, DraftBlockStyleType }

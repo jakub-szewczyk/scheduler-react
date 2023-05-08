@@ -7,7 +7,6 @@ const useProjects = () => {
     PROJECT.INITIAL_VALUES
   )
 
-  // TODO: Use polymorphic `findSelected` function.
   const project = projects.find((project) => project.selected)!
 
   return { project, projects, setProjects }

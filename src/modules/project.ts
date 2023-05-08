@@ -1,13 +1,12 @@
 import { Board } from '@/types/board'
 import { Note } from '@/types/note'
-import { Project } from '@/types/project'
+import { Project, ProjectsEndomorphism } from '@/types/project'
 import { Schedule } from '@/types/schedule'
 import { flow } from 'fp-ts/lib/function'
 import { __, concat, equals, lensProp, map, prop, set, when } from 'ramda'
 
-type ProjectsEndomorphism = (projects: Project[]) => Project[]
-
-const INITIAL_VALUES: Project[] = [
+// TODO: `createdAt` shows stale date as it's a constant not a function.
+export const INITIAL_VALUES: Project[] = [
   {
     name: 'unsaved',
     description: '',
@@ -16,12 +15,21 @@ const INITIAL_VALUES: Project[] = [
   },
 ]
 
-const add: ProjectsEndomorphism = concat(
+export const updateForeignKey =
+  (project: Project) =>
+  (name: string) =>
+  (widgets: Note[] | Board[] | Schedule[]) =>
+    widgets.map((widget) => ({
+      ...widget,
+      project: widget.project === project.name ? name : widget.project,
+    }))
+
+export const add: ProjectsEndomorphism = concat(
   __,
   INITIAL_VALUES.map((project) => ({ ...project, selected: false }))
 )
 
-const save =
+export const save =
   (previousName: string) =>
   (currentName: string): ProjectsEndomorphism =>
     map(
@@ -31,45 +39,10 @@ const save =
       )
     )
 
-const select = (name: string): ProjectsEndomorphism =>
+export const select = (name: string): ProjectsEndomorphism =>
   map(
     flow(
       set(lensProp('selected'), false),
       when(flow(prop('name'), equals(name)), set(lensProp('selected'), true))
     )
   )
-
-// NOTE: Extract to one polymorphic function.
-// TODO: Move to corresponding modules, in this case to a schedule module.
-const updateNoteForeignKey =
-  (project: Project) => (name: string) => (notes: Note[]) =>
-    notes.map((note) => ({
-      ...note,
-      project: note.project === project.name ? name : note.project,
-    }))
-
-// TODO: Move to corresponding modules, in this case to a schedule module.
-const updateBoardForeignKey =
-  (project: Project) => (name: string) => (boards: Board[]) =>
-    boards.map((board) => ({
-      ...board,
-      project: board.project === project.name ? name : board.project,
-    }))
-
-// TODO: Move to corresponding modules, in this case to a schedule module.
-const updateScheduleForeignKey =
-  (project: Project) => (name: string) => (schedules: Schedule[]) =>
-    schedules.map((schedule) => ({
-      ...schedule,
-      project: schedule.project === project.name ? name : schedule.project,
-    }))
-
-export {
-  INITIAL_VALUES,
-  add,
-  save,
-  select,
-  updateNoteForeignKey,
-  updateBoardForeignKey,
-  updateScheduleForeignKey,
-}

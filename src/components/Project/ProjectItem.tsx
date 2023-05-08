@@ -6,7 +6,10 @@ import { asteriskSuffix, isUnsaved } from '@/modules/common'
 import * as NOTE from '@/modules/note'
 import * as PROJECT from '@/modules/project'
 import * as SCHEDULE from '@/modules/schedule'
+import { BoardsEndomorphism } from '@/types/board'
+import { NotesEndomorphism } from '@/types/note'
 import { Project } from '@/types/project'
+import { SchedulesEndomorphism } from '@/types/schedule'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
@@ -20,12 +23,12 @@ import {
   Typography,
 } from '@mui/material'
 import { formatDistanceToNow } from 'date-fns'
+import { pipe } from 'fp-ts/lib/function'
 import { __, concat, trim } from 'ramda'
 import { Dispatch, MouseEventHandler, SetStateAction } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBoolean } from 'usehooks-ts'
 import SaveProjectDialog from './SaveProjectDialog'
-import { pipe } from 'fp-ts/lib/function'
 
 interface ProjectItemProps {
   project: Project
@@ -65,10 +68,19 @@ const ProjectItem = ({ project, projects, setProjects }: ProjectItemProps) => {
 
   const handleProjectSave = ({ name }: { name: string }) => {
     setProjects(pipe(name, trim, PROJECT.save(project.name)))
-    // TODO: Use one polymorphic function instead.
-    setNotes(pipe(name, trim, PROJECT.updateNoteForeignKey(project)))
-    setBoards(pipe(name, trim, PROJECT.updateBoardForeignKey(project)))
-    setSchedules(pipe(name, trim, PROJECT.updateScheduleForeignKey(project)))
+    setNotes(
+      pipe(name, trim, PROJECT.updateForeignKey(project)) as NotesEndomorphism
+    )
+    setBoards(
+      pipe(name, trim, PROJECT.updateForeignKey(project)) as BoardsEndomorphism
+    )
+    setSchedules(
+      pipe(
+        name,
+        trim,
+        PROJECT.updateForeignKey(project)
+      ) as SchedulesEndomorphism
+    )
     closeSaveProjectDialog()
   }
 
