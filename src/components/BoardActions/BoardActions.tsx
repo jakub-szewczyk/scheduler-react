@@ -60,11 +60,6 @@ const BoardActions = () => {
     closeUpsertIssueDialog()
   }
 
-  const handleBoardSave = ({ name }: { name: string }) => {
-    setBoards(pipe(name, trim, BOARD.save(project)))
-    closeSaveBoardDialog()
-  }
-
   const handleBoardCreate = () => {
     setBoards(BOARD.create(project))
     closeBoardsDrawer()
@@ -78,6 +73,11 @@ const BoardActions = () => {
   const handleBoardSelect = (name: string) => {
     setBoards(BOARD.select(project, name))
     closeBoardsDrawer()
+  }
+
+  const handleBoardSave = ({ name }: { name: string }) => {
+    setBoards(pipe(name, trim, BOARD.save(project)))
+    closeSaveBoardDialog()
   }
 
   return (

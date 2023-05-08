@@ -23,14 +23,6 @@ export const initialValues = (): Schedule[] => [
   },
 ]
 
-export const calculateSubState = (rows: Row[], project: Project) =>
-  produce((schedules: Schedule[]) => {
-    const schedule = schedules.find(
-      (schedule) => schedule.project === project.name && schedule.selected
-    )!
-    schedule.rows = rows
-  })
-
 export const create = (project: Project) =>
   produce((schedules: Schedule[]) => {
     schedules.forEach(
@@ -72,6 +64,14 @@ export const save = (project: Project) => (name: string) =>
         (schedule.name = name)
     )
   )
+
+export const calculateSubState = (rows: Row[], project: Project) =>
+  produce((schedules: Schedule[]) => {
+    const schedule = schedules.find(
+      (schedule) => schedule.project === project.name && schedule.selected
+    )!
+    schedule.rows = rows
+  })
 
 export const exportToXLSX = (schedule: Schedule) => () => {
   const ws = utils.json_to_sheet(pipe(schedule.rows, map(ROW.toXLSX)))

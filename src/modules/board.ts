@@ -48,14 +48,6 @@ export const initialValues = (): Board[] => [
   },
 ]
 
-export const calculateSubState = (statuses: Status[], project: Project) =>
-  produce((boards: Board[]) => {
-    const board = boards.find(
-      (board) => board.project === project.name && board.selected
-    )!
-    board.statuses = statuses
-  })
-
 export const create = (project: Project) =>
   produce((boards: Board[]) => {
     boards.forEach(
@@ -78,6 +70,14 @@ export const remove = (project: Project, name: string) =>
     }
   })
 
+export const select = (project: Project, name: string) =>
+  produce((boards: Board[]) => {
+    boards.forEach(
+      (board) =>
+        board.project === project.name && (board.selected = board.name === name)
+    )
+  })
+
 export const save = (project: Project) => (name: string) =>
   produce((boards: Board[]) =>
     boards.forEach(
@@ -86,10 +86,10 @@ export const save = (project: Project) => (name: string) =>
     )
   )
 
-export const select = (project: Project, name: string) =>
+export const calculateSubState = (statuses: Status[], project: Project) =>
   produce((boards: Board[]) => {
-    boards.forEach(
-      (board) =>
-        board.project === project.name && (board.selected = board.name === name)
-    )
+    const board = boards.find(
+      (board) => board.project === project.name && board.selected
+    )!
+    board.statuses = statuses
   })

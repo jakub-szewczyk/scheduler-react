@@ -19,7 +19,6 @@ const Board = () => {
         source.index === destination.index)
     )
       return
-
     setStatuses(STATUS.drag({ source, destination }))
   }
 

@@ -2,7 +2,7 @@ import { Paper, styled } from '@mui/material'
 import { DataGrid as MuiDataGrid } from '@mui/x-data-grid'
 import * as TABLE from '../../../modules/table'
 
-const DataGrid = styled(MuiDataGrid)(({ theme }) => ({
+export const DataGrid = styled(MuiDataGrid)(({ theme }) => ({
   border: 0,
   fontSize: 16,
   '.MuiDataGrid-columnHeader:last-child': {
@@ -56,7 +56,7 @@ const DataGrid = styled(MuiDataGrid)(({ theme }) => ({
     },
 }))
 
-const DataGridContainer = styled(Paper)<{ height: number }>(
+export const DataGridContainer = styled(Paper)<{ height: number }>(
   ({ theme, height }) => ({
     width: 'calc(100% - 32px)',
     height,
@@ -71,5 +71,3 @@ const DataGridContainer = styled(Paper)<{ height: number }>(
     },
   })
 )
-
-export { DataGrid, DataGridContainer }
