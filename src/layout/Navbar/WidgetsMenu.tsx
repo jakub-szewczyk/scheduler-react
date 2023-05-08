@@ -16,6 +16,7 @@ const WidgetsMenu = () => {
   const [menu, setMenu] = useState<HTMLElement | null>(null)
 
   const navigate = useNavigate()
+
   const { pathname } = useLocation()
 
   const handleNotesMenuItemClick = () => {

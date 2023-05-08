@@ -1,7 +1,9 @@
+import NotificationsIcon from '@mui/icons-material/Notifications'
+import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone'
 import { Box, IconButton, Stack, Tooltip } from '@mui/material'
 import { GridRenderCellParams } from '@mui/x-data-grid'
-import { pipe } from 'fp-ts/lib/function'
 import { none } from 'fp-ts/lib/Option'
+import { pipe } from 'fp-ts/lib/function'
 import { once, trim } from 'ramda'
 import { Dispatch, MouseEventHandler, SetStateAction, useCallback } from 'react'
 import { useBoolean, useInterval } from 'usehooks-ts'
@@ -11,7 +13,6 @@ import * as TIME from '../../modules/time'
 import { NotificationConfiguration } from '../../types/notification'
 import { Row } from '../../types/row'
 import NotificationDialog from './NotificationDialog'
-import NotificationIcon from '../../layout/NotificationIcon/NotificationIcon'
 
 interface NotificationCellProps extends GridRenderCellParams<any, Row> {
   setRows: Dispatch<SetStateAction<Row[]>>
@@ -107,7 +108,11 @@ const NotificationCell = ({
               onClick={handleNotificationIconButtonClick}
               onContextMenu={handleNotificationIconButtonContextMenu}
             >
-              <NotificationIcon active={row.notification?.active} />
+              {row.notification?.active ? (
+                <NotificationsIcon fontSize='small' />
+              ) : (
+                <NotificationsNoneIcon fontSize='small' />
+              )}
             </IconButton>
           </Box>
         </Tooltip>
