@@ -12,7 +12,6 @@ const useSchedules = () => {
     SCHEDULE.initialValues()
   )
 
-  // TODO: Consider renaming globally
   const workingSchedule = schedules.find(
     (schedule) => schedule.project === project.name && schedule.selected
   )!

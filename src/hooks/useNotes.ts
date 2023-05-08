@@ -15,7 +15,6 @@ const useNotes = () => {
 
   useEventListener('local-storage', () => setNotes(NOTE.initialState))
 
-  // TODO: Consider renaming globally
   const workingNote = notes.find(
     (note) => note.project === project.name && note.selected
   )!
