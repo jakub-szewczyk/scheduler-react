@@ -1,10 +1,10 @@
 import { Paper, Stack, Typography } from '@mui/material'
 import { Dispatch, SetStateAction } from 'react'
 import { Draggable } from 'react-beautiful-dnd'
-import { Status } from '../../types/board'
 import StrictModeDroppable from '../../layout/StrictModeDroppable/StrictModeDroppable'
 import IssueItem from './IssueItem'
 import StatusActionsMenu from './StatusActionsMenu'
+import { Status } from '@/types/status'
 
 interface StatusColumnProps {
   index: number

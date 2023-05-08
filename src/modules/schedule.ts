@@ -7,8 +7,7 @@ import { utils, writeFileXLSX } from 'xlsx'
 import * as ROW from '../modules/row'
 import { Schedule } from '../types/schedule'
 
-// TODO: Make these as functions so that they show the correct date.
-export const INITIAL_VALUES: Schedule[] = [
+export const initialValues = (): Schedule[] => [
   {
     name: 'unsaved',
     project: 'unsaved',
@@ -24,16 +23,12 @@ export const INITIAL_VALUES: Schedule[] = [
   },
 ]
 
-// TODO:
-// Rename and consider moving it to the row module,
-// although it is actually used within the state update function corresponding to this module.
-// NOTE: Use `find` instead of `forEach`.
-export const rowsSetter = (rows: Row[], project: Project) =>
+export const calculateSubState = (rows: Row[], project: Project) =>
   produce((schedules: Schedule[]) => {
-    schedules.forEach((schedule) => {
-      if (schedule.project === project.name && schedule.selected)
-        schedule.rows = rows
-    })
+    const schedule = schedules.find(
+      (schedule) => schedule.project === project.name && schedule.selected
+    )!
+    schedule.rows = rows
   })
 
 export const add = (project: Project) =>
@@ -41,7 +36,7 @@ export const add = (project: Project) =>
     schedules.forEach((schedule) => {
       if (schedule.project === project.name) schedule.selected = false
     })
-    schedules.push({ ...INITIAL_VALUES[0], project: project.name })
+    schedules.push({ ...initialValues()[0], project: project.name })
   })
 
 export const remove = (project: Project, name: string) =>

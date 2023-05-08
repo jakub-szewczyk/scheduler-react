@@ -54,9 +54,9 @@ const ProjectItem = ({ project, projects, setProjects }: ProjectItemProps) => {
     | undefined = (event) => {
     event.stopPropagation()
     setProjects(PROJECT.add)
-    setNotes(concat(__, NOTE.INITIAL_VALUES))
-    setBoards(concat(__, BOARD.INITIAL_VALUES))
-    setSchedules(concat(__, SCHEDULE.INITIAL_VALUES))
+    setNotes(concat(__, NOTE.initialValues()))
+    setBoards(concat(__, BOARD.initialValues()))
+    setSchedules(concat(__, SCHEDULE.initialValues()))
   }
 
   const handleSaveIconButtonClick:

@@ -35,7 +35,7 @@ const useNotes = () => {
 
   const storeEditorState: Dispatch<SetStateAction<EditorState>> = (value) =>
     storeNotes(
-      NOTE.editorStateSetter(
+      NOTE.calculateSubState(
         typeof value === 'function'
           ? value(workingNote.editorState as EditorState)
           : value,

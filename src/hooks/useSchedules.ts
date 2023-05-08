@@ -9,7 +9,7 @@ const useSchedules = () => {
 
   const [schedules, setSchedules] = useLocalStorage(
     'schedules',
-    SCHEDULE.INITIAL_VALUES
+    SCHEDULE.initialValues()
   )
 
   // TODO: Consider renaming globally
@@ -23,7 +23,7 @@ const useSchedules = () => {
 
   const setRows: Dispatch<SetStateAction<Row[]>> = (rows) =>
     setSchedules(
-      SCHEDULE.rowsSetter(
+      SCHEDULE.calculateSubState(
         typeof rows === 'function' ? rows(workingSchedule.rows) : rows,
         project
       )

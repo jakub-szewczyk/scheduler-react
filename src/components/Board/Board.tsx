@@ -1,7 +1,7 @@
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import useBoards from '../../hooks/useBoards'
 import StrictModeDroppable from '../../layout/StrictModeDroppable/StrictModeDroppable'
-import * as BOARD from '../../modules/board'
+import * as STATUS from '../../modules/status'
 import BoardHeader from './BoardHeader'
 import StatusColumn from './StatusColumn'
 import { BoardContainer } from './styles/Board.styled'
@@ -20,7 +20,7 @@ const Board = () => {
     )
       return
 
-    setStatuses(BOARD.drag({ source, destination }))
+    setStatuses(STATUS.drag({ source, destination }))
   }
 
   return (

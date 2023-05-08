@@ -23,7 +23,7 @@ import { Project } from '@/types/project'
 // @ts-ignore
 import html2pdf from 'html2pdf.js'
 
-export const INITIAL_VALUES: Note[] = [
+export const initialValues = (): Note[] => [
   {
     name: 'unsaved',
     project: 'unsaved',
@@ -50,9 +50,9 @@ const deserialize = (note: Note) => ({
 export const initialState = (): Note[] =>
   localStorage.getItem('notes')
     ? JSON.parse(localStorage.getItem('notes')!).map(deserialize)
-    : INITIAL_VALUES
+    : initialValues()
 
-export const editorStateSetter = (editorState: EditorState, project: Project) =>
+export const calculateSubState = (editorState: EditorState, project: Project) =>
   produce((notes: Note[]) => {
     const note = notes.find(
       (note) => note.project === project.name && note.selected
@@ -65,7 +65,7 @@ export const add = (project: Project) =>
     notes.forEach((notes) => {
       if (notes.project === project.name) notes.selected = false
     })
-    notes.push({ ...INITIAL_VALUES[0], project: project.name })
+    notes.push({ ...initialValues()[0], project: project.name })
   })
 
 export const remove = (project: Project, name: string) =>
