@@ -40,8 +40,7 @@ export const save =
 export const updateForeignKey =
   (project: Project) =>
   (name: string) =>
-  (widgets: Note[] | Board[] | Schedule[]) =>
-    widgets.map((widget) => ({
-      ...widget,
-      project: widget.project === project.name ? name : widget.project,
-    }))
+  (widget: Note | Board | Schedule) => ({
+    ...widget,
+    project: widget.project === project.name ? name : widget.project,
+  })

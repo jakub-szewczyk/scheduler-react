@@ -24,7 +24,7 @@ import {
 } from '@mui/material'
 import { formatDistanceToNow } from 'date-fns'
 import { pipe } from 'fp-ts/lib/function'
-import { __, concat, trim } from 'ramda'
+import { __, concat, map, trim } from 'ramda'
 import { Dispatch, MouseEventHandler, SetStateAction } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBoolean } from 'usehooks-ts'
@@ -69,16 +69,18 @@ const ProjectItem = ({ project, projects, setProjects }: ProjectItemProps) => {
   const handleProjectSave = ({ name }: { name: string }) => {
     setProjects(pipe(name, trim, PROJECT.save(project.name)))
     setNotes(
-      pipe(name, trim, PROJECT.updateForeignKey(project)) as NotesEndomorphism
+      map(
+        pipe(name, trim, PROJECT.updateForeignKey(project))
+      ) as NotesEndomorphism
     )
     setBoards(
-      pipe(name, trim, PROJECT.updateForeignKey(project)) as BoardsEndomorphism
+      map(
+        pipe(name, trim, PROJECT.updateForeignKey(project))
+      ) as BoardsEndomorphism
     )
     setSchedules(
-      pipe(
-        name,
-        trim,
-        PROJECT.updateForeignKey(project)
+      map(
+        pipe(name, trim, PROJECT.updateForeignKey(project))
       ) as SchedulesEndomorphism
     )
     closeSaveProjectDialog()
