@@ -4,6 +4,10 @@ TODO: Description
 
 ## TODO
 
+- Working project indicator (show currently selected project, i.e. inside a navbar).
+
+- (Optional) Switch between projects with a dropdown.
+
 - Flickering save/rename text inside a dialog (every module).
 
 - Increase test coverage to gain high confidence (component, e2e).
