@@ -31,6 +31,7 @@ import { Dispatch, MouseEventHandler, SetStateAction } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBoolean } from 'usehooks-ts'
 import SaveProjectDialog from './SaveProjectDialog'
+import DeleteProjectDialog from './DeleteProjectDialog'
 
 interface ProjectItemProps {
   project: Project
@@ -51,6 +52,12 @@ const ProjectItem = ({ project, projects, setProjects }: ProjectItemProps) => {
     setTrue: openSaveProjectDialog,
   } = useBoolean()
 
+  const {
+    value: isDeleteProjectDialogOpen,
+    setFalse: closeDeleteProjectDialog,
+    setTrue: openDeleteProjectDialog,
+  } = useBoolean()
+
   const handleCreateIconButtonClick:
     | MouseEventHandler<HTMLButtonElement>
     | undefined = (event) => {
@@ -66,6 +73,13 @@ const ProjectItem = ({ project, projects, setProjects }: ProjectItemProps) => {
     | undefined = (event) => {
     event.stopPropagation()
     openSaveProjectDialog()
+  }
+
+  const handleDeleteIconButtonClick:
+    | MouseEventHandler<HTMLButtonElement>
+    | undefined = (event) => {
+    event.stopPropagation()
+    openDeleteProjectDialog()
   }
 
   const handleProjectSave = ({ name }: { name: string }) => {
@@ -86,6 +100,14 @@ const ProjectItem = ({ project, projects, setProjects }: ProjectItemProps) => {
       ) as SchedulesEndomorphism
     )
     closeSaveProjectDialog()
+  }
+
+  const handleProjectDelete = (name: string) => {
+    setProjects(PROJECT.remove(name))
+    setNotes(PROJECT.cascadeDelete(name) as NotesEndomorphism)
+    setBoards(PROJECT.cascadeDelete(name) as BoardsEndomorphism)
+    setSchedules(PROJECT.cascadeDelete(name) as SchedulesEndomorphism)
+    closeDeleteProjectDialog()
   }
 
   return (
@@ -160,6 +182,7 @@ const ProjectItem = ({ project, projects, setProjects }: ProjectItemProps) => {
           }}
         >
           <Tooltip
+            placement='left'
             title={
               any(isUnsaved, projects) &&
               'All projects must be saved before creating a new one'
@@ -193,9 +216,31 @@ const ProjectItem = ({ project, projects, setProjects }: ProjectItemProps) => {
               <EditIcon fontSize='small' />
             )}
           </IconButton>
-          <IconButton onClick={(event) => event.stopPropagation()}>
-            <DeleteIcon fontSize='small' />
-          </IconButton>
+          <Tooltip
+            placement='left'
+            title={projects.length === 1 && 'At least one project is required'}
+          >
+            <Box
+              onClick={(event) =>
+                projects.length === 1 && event.stopPropagation()
+              }
+            >
+              <IconButton
+                disabled={projects.length === 1}
+                onClick={handleDeleteIconButtonClick}
+                sx={{
+                  '.MuiSvgIcon-root': {
+                    ...(project.selected &&
+                      projects.length === 1 && {
+                        fill: 'rgba(0, 0, 0, 0.3)',
+                      }),
+                  },
+                }}
+              >
+                <DeleteIcon fontSize='small' />
+              </IconButton>
+            </Box>
+          </Tooltip>
         </CardActions>
       </Card>
       <SaveProjectDialog
@@ -205,7 +250,12 @@ const ProjectItem = ({ project, projects, setProjects }: ProjectItemProps) => {
         projects={projects}
         onSave={handleProjectSave}
       />
-      {/* TODO: Delete confirmation dialog */}
+      <DeleteProjectDialog
+        open={isDeleteProjectDialogOpen}
+        onClose={closeDeleteProjectDialog}
+        project={project}
+        onDelete={handleProjectDelete}
+      />
     </>
   )
 }

@@ -3,7 +3,18 @@ import { Note } from '@/types/note'
 import { Project, ProjectsEndomorphism } from '@/types/project'
 import { Schedule } from '@/types/schedule'
 import { flow } from 'fp-ts/lib/function'
-import { __, concat, equals, lensProp, map, prop, set, when } from 'ramda'
+import produce from 'immer'
+import {
+  __,
+  concat,
+  equals,
+  filter,
+  lensProp,
+  map,
+  prop,
+  set,
+  when,
+} from 'ramda'
 
 export const initialValues = (): Project[] => [
   {
@@ -18,6 +29,13 @@ export const create: ProjectsEndomorphism = concat(
   __,
   initialValues().map((project) => ({ ...project, selected: false }))
 )
+
+export const remove = (name: string) =>
+  produce((projects: Project[]) => {
+    const projectIndex = projects.findIndex((project) => project.name === name)
+    const [removedProject] = projects.splice(projectIndex, 1)
+    if (removedProject.selected) projects[projects.length - 1].selected = true
+  })
 
 export const select = (name: string): ProjectsEndomorphism =>
   map(
@@ -44,3 +62,10 @@ export const updateForeignKey =
     ...widget,
     project: widget.project === project.name ? name : widget.project,
   })
+
+export const cascadeDelete =
+  (name: string) => (widgets: Note[] | Board[] | Schedule[]) =>
+    filter(
+      (widget: Note | Board | Schedule) => widget.project !== name,
+      widgets
+    )
