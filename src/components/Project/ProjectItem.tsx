@@ -30,8 +30,8 @@ import { __, any, concat, map, trim } from 'ramda'
 import { Dispatch, MouseEventHandler, SetStateAction } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBoolean } from 'usehooks-ts'
-import SaveProjectDialog from './SaveProjectDialog'
 import DeleteProjectDialog from './DeleteProjectDialog'
+import SaveProjectDialog from './SaveProjectDialog'
 
 interface ProjectItemProps {
   project: Project
@@ -82,6 +82,11 @@ const ProjectItem = ({ project, projects, setProjects }: ProjectItemProps) => {
     openDeleteProjectDialog()
   }
 
+  const handleProjectSelect = () => {
+    setProjects(PROJECT.select(project.name))
+    navigate('/schedules')
+  }
+
   const handleProjectSave = ({ name }: { name: string }) => {
     setProjects(pipe(name, trim, PROJECT.save(project.name)))
     setNotes(
@@ -114,10 +119,7 @@ const ProjectItem = ({ project, projects, setProjects }: ProjectItemProps) => {
     <>
       <Card
         elevation={0}
-        onClick={() => {
-          setProjects(PROJECT.select(project.name))
-          navigate('/schedules')
-        }}
+        onClick={handleProjectSelect}
         sx={{
           cursor: 'pointer',
           ...(project.selected && {

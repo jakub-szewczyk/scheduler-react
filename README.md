@@ -4,7 +4,8 @@ TODO: Description
 
 ## TODO
 
-- Working project indicator (show currently selected project, i.e. inside a navbar).
+- Limit the heigh of the project dropdown (especially needed in case of many projects).
+  Also test the width in case of very long project names.
 
 - (Optional) Switch between projects with a dropdown.
 
