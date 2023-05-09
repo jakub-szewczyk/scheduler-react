@@ -15,16 +15,18 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import SaveIcon from '@mui/icons-material/Save'
 import {
+  Box,
   Card,
   CardActions,
   CardContent,
   CardHeader,
   IconButton,
+  Tooltip,
   Typography,
 } from '@mui/material'
 import { formatDistanceToNow } from 'date-fns'
 import { pipe } from 'fp-ts/lib/function'
-import { __, concat, map, trim } from 'ramda'
+import { __, any, concat, map, trim } from 'ramda'
 import { Dispatch, MouseEventHandler, SetStateAction } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBoolean } from 'usehooks-ts'
@@ -157,19 +159,33 @@ const ProjectItem = ({ project, projects, setProjects }: ProjectItemProps) => {
             },
           }}
         >
-          {/* TODO: Add a tooltip explaining why the button is disabled*/}
-          <IconButton
-            disabled={projects.some(isUnsaved)}
-            onClick={handleCreateIconButtonClick}
-            sx={{
-              '.MuiSvgIcon-root': {
-                ...(project.selected &&
-                  projects.some(isUnsaved) && { fill: 'rgba(0, 0, 0, 0.3)' }),
-              },
-            }}
+          <Tooltip
+            title={
+              any(isUnsaved, projects) &&
+              'All projects must be saved before creating a new one'
+            }
           >
-            <AddIcon fontSize='small' />
-          </IconButton>
+            <Box
+              onClick={(event) =>
+                any(isUnsaved, projects) && event.stopPropagation()
+              }
+            >
+              <IconButton
+                disabled={any(isUnsaved, projects)}
+                onClick={handleCreateIconButtonClick}
+                sx={{
+                  '.MuiSvgIcon-root': {
+                    ...(project.selected &&
+                      any(isUnsaved, projects) && {
+                        fill: 'rgba(0, 0, 0, 0.3)',
+                      }),
+                  },
+                }}
+              >
+                <AddIcon fontSize='small' />
+              </IconButton>
+            </Box>
+          </Tooltip>
           <IconButton onClick={handleSaveIconButtonClick}>
             {isUnsaved(project) ? (
               <SaveIcon fontSize='small' />
