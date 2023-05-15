@@ -39,7 +39,13 @@ const WidgetsMenu = () => {
       <IconButton onClick={(event) => setMenu(event.currentTarget)}>
         <WidgetsIcon />
       </IconButton>
-      <Menu open={!!menu} anchorEl={menu} onClose={() => setMenu(null)}>
+      <Menu
+        open={!!menu}
+        anchorEl={menu}
+        onClose={() => setMenu(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
         <MenuItem
           selected={pathname === '/notes'}
           onClick={handleNotesMenuItemClick}

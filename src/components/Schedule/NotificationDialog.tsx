@@ -67,8 +67,24 @@ const NotificationDialog = ({
                   component={Select}
                   name='notification'
                   label='Notification'
-                  formHelperText={{ children: 'Set notification time' }}
+                  formHelperText={{
+                    children: (
+                      <Typography variant='inherit' noWrap>
+                        Set notification time
+                      </Typography>
+                    ),
+                  }}
                   formControl={{ size: 'small', sx: { width: '50%' } }}
+                  MenuProps={{
+                    anchorOrigin: {
+                      vertical: 'bottom',
+                      horizontal: 'left',
+                    },
+                    transformOrigin: {
+                      vertical: 'top',
+                      horizontal: 'left',
+                    },
+                  }}
                 >
                   <MenuItem value={0}>Current time</MenuItem>
                   <MenuItem value={5}>5 minutes before</MenuItem>

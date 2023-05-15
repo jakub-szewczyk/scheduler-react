@@ -54,11 +54,54 @@ const Navbar = () => {
             onChange={(event) =>
               setProjects(PROJECT.select(event.target.value))
             }
-            sx={{ width: 120 }}
+            sx={{ minWidth: 80, width: 120, maxWidth: 120 }}
+            MenuProps={{
+              anchorOrigin: {
+                vertical: 'bottom',
+                horizontal: 'left',
+              },
+              transformOrigin: {
+                vertical: 'top',
+                horizontal: 'left',
+              },
+              sx: {
+                maxHeight: 320,
+                '.MuiPaper-root': {
+                  '::-webkit-scrollbar': {
+                    width: {
+                      xs: 4,
+                      sm: 8,
+                    },
+                  },
+                  '::-webkit-scrollbar-track': {
+                    bgcolor: (theme) => theme.palette.secondary.light,
+                    borderRadius: (theme) => theme.shape.borderRadius,
+                  },
+                  '::-webkit-scrollbar-thumb': {
+                    bgcolor: (theme) => theme.palette.primary.main,
+                    borderRadius: (theme) => theme.shape.borderRadius,
+                    '&:hover': {
+                      bgcolor: (theme) => theme.palette.primary.dark,
+                    },
+                  },
+                },
+              },
+            }}
           >
             {projects.map((project) => (
-              <MenuItem key={project.name} value={project.name}>
-                {asteriskSuffix(project.name)}
+              <MenuItem
+                key={project.name}
+                value={project.name}
+                sx={{
+                  maxWidth: 240,
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  textOverflow: 'clip',
+                }}
+              >
+                <Typography variant='inherit' noWrap>
+                  {asteriskSuffix(project.name)}
+                </Typography>
               </MenuItem>
             ))}
           </Select>

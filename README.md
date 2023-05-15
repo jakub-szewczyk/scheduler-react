@@ -4,18 +4,11 @@ TODO: Description
 
 ## TODO
 
-- Limit the heigh of the project dropdown (especially needed in case of many projects).
-  Also test the width in case of very long project names.
-
-- (Optional) Switch between projects with a dropdown.
-
-- Flickering save/rename text inside a dialog (every module).
-
 - Increase test coverage to gain high confidence (component, e2e).
 
-- Server side persistance layer (authentication, local-remote data synchronization).
+- Flickering save/rename text inside upsert dialogs (every module).
 
-- (Optional) Notification configuration dialog - prevent textfield helper text from wrapping.
+- Server side persistance layer (authentication, local-remote data synchronization).
 
 ## Known issues
 
