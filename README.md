@@ -1,14 +1,32 @@
 # Scheduler
 
-TODO: Description
+Schedule your tasks with ease!
 
-## TODO
+## Features
 
-- Increase test coverage to gain high confidence (component, e2e).
+### Multiple project management
 
-- Flickering save/rename text inside upsert dialogs (every module).
+![](/public/screenshots/1.png)
 
-- Server side persistance layer (authentication, local-remote data synchronization).
+### Take notes with the built in editor
+
+![](/public/screenshots/2.png)
+
+### Drag and drop your tasks on a kanban board
+
+![](/public/screenshots/3.png)
+
+### Schedule your tasks and meetings
+
+![](/public/screenshots/4.png)
+
+## Todo
+
+- Increase test coverage.
+
+- Server side persistance layer.
+
+- Flickering save/rename text inside upsert dialogs.
 
 ## Known issues
 
