@@ -8,7 +8,7 @@ Schedule your tasks with ease!
 
 ![](/public/screenshots/1.png)
 
-### Take notes with the built in editor
+### Take notes with the built-in editor
 
 ![](/public/screenshots/2.png)
 
