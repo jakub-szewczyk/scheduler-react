@@ -12,10 +12,14 @@ import {
   Typography,
 } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
+import ProfileMenu from './ProfileMenu'
 import WidgetsMenu from './WidgetsMenu'
+import { useUser } from '@clerk/clerk-react'
 
 const Navbar = () => {
   const navigate = useNavigate()
+
+  const { isSignedIn } = useUser()
 
   const { project, projects, setProjects } = useProjects()
 
@@ -47,67 +51,77 @@ const Navbar = () => {
               Scheduler
             </Typography>
           </Stack>
-          <Select
-            size='small'
-            variant='standard'
-            value={project.name}
-            onChange={(event) =>
-              setProjects(PROJECT.select(event.target.value))
-            }
-            sx={{ minWidth: 80, width: 120, maxWidth: 120 }}
-            MenuProps={{
-              anchorOrigin: {
-                vertical: 'bottom',
-                horizontal: 'left',
-              },
-              transformOrigin: {
-                vertical: 'top',
-                horizontal: 'left',
-              },
-              sx: {
-                maxHeight: 320,
-                '.MuiPaper-root': {
-                  '::-webkit-scrollbar': {
-                    width: {
-                      xs: 4,
-                      sm: 8,
-                    },
-                  },
-                  '::-webkit-scrollbar-track': {
-                    bgcolor: (theme) => theme.palette.secondary.light,
-                    borderRadius: (theme) => theme.shape.borderRadius,
-                  },
-                  '::-webkit-scrollbar-thumb': {
-                    bgcolor: (theme) => theme.palette.primary.main,
-                    borderRadius: (theme) => theme.shape.borderRadius,
-                    '&:hover': {
-                      bgcolor: (theme) => theme.palette.primary.dark,
-                    },
-                  },
-                },
-              },
-            }}
-          >
-            {projects.map((project) => (
-              <MenuItem
-                key={project.name}
+          {isSignedIn && (
+            <>
+              <Select
+                size='small'
+                variant='standard'
                 value={project.name}
-                sx={{
-                  maxWidth: 240,
-                  overflow: 'hidden',
-                  whiteSpace: 'nowrap',
-                  textOverflow: 'clip',
+                onChange={(event) =>
+                  setProjects(PROJECT.select(event.target.value))
+                }
+                sx={{ minWidth: 80, width: 120, maxWidth: 120 }}
+                MenuProps={{
+                  anchorOrigin: {
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                  },
+                  transformOrigin: {
+                    vertical: 'top',
+                    horizontal: 'left',
+                  },
+                  sx: {
+                    maxHeight: 320,
+                    '.MuiPaper-root': {
+                      '::-webkit-scrollbar': {
+                        width: {
+                          xs: 4,
+                          sm: 8,
+                        },
+                      },
+                      '::-webkit-scrollbar-track': {
+                        bgcolor: (theme) => theme.palette.secondary.light,
+                        borderRadius: (theme) => theme.shape.borderRadius,
+                      },
+                      '::-webkit-scrollbar-thumb': {
+                        bgcolor: (theme) => theme.palette.primary.main,
+                        borderRadius: (theme) => theme.shape.borderRadius,
+                        '&:hover': {
+                          bgcolor: (theme) => theme.palette.primary.dark,
+                        },
+                      },
+                    },
+                  },
                 }}
               >
-                <Typography variant='inherit' noWrap>
-                  {asteriskSuffix(project.name)}
-                </Typography>
-              </MenuItem>
-            ))}
-          </Select>
-          <Stack marginLeft='auto'>
-            <WidgetsMenu />
-          </Stack>
+                {projects.map((project) => (
+                  <MenuItem
+                    key={project.name}
+                    value={project.name}
+                    sx={{
+                      maxWidth: 240,
+                      overflow: 'hidden',
+                      whiteSpace: 'nowrap',
+                      textOverflow: 'clip',
+                    }}
+                  >
+                    <Typography variant='inherit' noWrap>
+                      {asteriskSuffix(project.name)}
+                    </Typography>
+                  </MenuItem>
+                ))}
+              </Select>
+              <Stack
+                direction='row'
+                alignItems='center'
+                columnGap={1}
+                marginLeft='auto'
+              >
+                <WidgetsMenu />
+                <ProfileMenu />
+              </Stack>
+            </>
+          )}
         </Toolbar>
       </AppBar>
     </Box>

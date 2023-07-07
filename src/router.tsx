@@ -1,9 +1,12 @@
+import { RedirectToSignIn, SignedIn, SignedOut } from '@clerk/clerk-react'
 import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom'
 import Navbar from './layout/Navbar/Navbar'
 import Boards from './pages/Boards/Boards'
 import Notes from './pages/Notes/Notes'
 import Projects from './pages/Projects/Projects'
 import Schedules from './pages/Schedules/Schedules'
+import SignIn from './pages/SignIn/SignIn'
+import SignUp from './pages/SignUp/SignUp'
 
 const router = createBrowserRouter([
   {
@@ -15,20 +18,64 @@ const router = createBrowserRouter([
     ),
     children: [
       {
+        path: '/sign-up',
+        element: <SignUp />,
+      },
+      {
+        path: '/sign-in',
+        element: <SignIn />,
+      },
+      {
         path: '/',
-        element: <Projects />,
+        element: (
+          <>
+            <SignedIn>
+              <Projects />
+            </SignedIn>
+            <SignedOut>
+              <RedirectToSignIn />
+            </SignedOut>
+          </>
+        ),
       },
       {
         path: '/notes',
-        element: <Notes />,
+        element: (
+          <>
+            <SignedIn>
+              <Notes />
+            </SignedIn>
+            <SignedOut>
+              <RedirectToSignIn />
+            </SignedOut>
+          </>
+        ),
       },
       {
         path: '/boards',
-        element: <Boards />,
+        element: (
+          <>
+            <SignedIn>
+              <Boards />
+            </SignedIn>
+            <SignedOut>
+              <RedirectToSignIn />
+            </SignedOut>
+          </>
+        ),
       },
       {
         path: '/schedules',
-        element: <Schedules />,
+        element: (
+          <>
+            <SignedIn>
+              <Schedules />
+            </SignedIn>
+            <SignedOut>
+              <RedirectToSignIn />
+            </SignedOut>
+          </>
+        ),
       },
       {
         path: '*',
