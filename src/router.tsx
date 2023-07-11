@@ -1,5 +1,5 @@
 import { RedirectToSignIn, SignedIn, SignedOut } from '@clerk/clerk-react'
-import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom'
+import { Navigate, Outlet, createBrowserRouter } from 'react-router-dom'
 import Navbar from './layout/Navbar/Navbar'
 import Boards from './pages/Boards/Boards'
 import Notes from './pages/Notes/Notes'

@@ -10,6 +10,10 @@ const ProfileMenu = () => {
 
   const { signOut } = useClerk()
 
+  /**
+   * TODO:
+   * Handle loading state.
+   */
   const handleSignOutMenuItemClick = async () => {
     await signOut()
     setMenu(null)

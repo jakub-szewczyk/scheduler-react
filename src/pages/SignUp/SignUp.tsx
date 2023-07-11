@@ -1,10 +1,15 @@
 import { SignUpContainer } from '@/components/SignUp/styles/SignUp.styled'
-import { SignUp as ClerkSignUp } from '@clerk/clerk-react'
+import { SignUp as ClerkSignUp, useClerk } from '@clerk/clerk-react'
+import { CircularProgress } from '@mui/material'
 
-const SignUp = () => (
-  <SignUpContainer>
-    <ClerkSignUp />
-  </SignUpContainer>
-)
+const SignUp = () => {
+  const { loaded } = useClerk()
+
+  return (
+    <SignUpContainer>
+      {loaded ? <ClerkSignUp /> : <CircularProgress />}
+    </SignUpContainer>
+  )
+}
 
 export default SignUp
