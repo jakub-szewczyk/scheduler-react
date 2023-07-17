@@ -1,7 +1,7 @@
 {
-  "name": "scheduler",
+  "name": "scheduler-client",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -20,6 +20,8 @@
     "@mui/material": "^5.10.11",
     "@mui/x-data-grid": "^5.17.8",
     "@mui/x-date-pickers": "^5.0.9",
+    "@tanstack/react-query": "^4.29.25",
+    "axios": "^1.4.0",
     "date-fns": "^2.29.3",
     "draft-js": "^0.11.7",
     "formik": "^2.2.9",
