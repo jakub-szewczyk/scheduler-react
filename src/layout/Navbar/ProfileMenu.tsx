@@ -1,21 +1,27 @@
 import { useClerk, useUser } from '@clerk/clerk-react'
 import LogoutIcon from '@mui/icons-material/Logout'
-import { Avatar, IconButton, ListItemIcon, Menu, MenuItem } from '@mui/material'
+import {
+  Avatar,
+  CircularProgress,
+  IconButton,
+  ListItemIcon,
+  Menu,
+  MenuItem,
+} from '@mui/material'
 import { useState } from 'react'
 
 const ProfileMenu = () => {
   const [menu, setMenu] = useState<HTMLElement | null>(null)
+  const [isSigningOut, setIsSigningOut] = useState(false)
 
   const { user } = useUser()
 
   const { signOut } = useClerk()
 
-  /**
-   * TODO:
-   * Handle loading state.
-   */
   const handleSignOutMenuItemClick = async () => {
+    setIsSigningOut(true)
     await signOut()
+    setIsSigningOut(false)
     setMenu(null)
   }
 
@@ -37,9 +43,13 @@ const ProfileMenu = () => {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <MenuItem onClick={handleSignOutMenuItemClick}>
+        <MenuItem onClick={handleSignOutMenuItemClick} disabled={isSigningOut}>
           <ListItemIcon>
-            <LogoutIcon fontSize='small' />
+            {isSigningOut ? (
+              <CircularProgress size={16} />
+            ) : (
+              <LogoutIcon fontSize='small' />
+            )}
           </ListItemIcon>
           Sign out
         </MenuItem>
