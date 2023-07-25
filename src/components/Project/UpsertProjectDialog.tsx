@@ -1,4 +1,4 @@
-import { Project } from '@/types/project'
+import { InitialValues, Project } from '@/types/project'
 import { Button, Stack, Theme, Typography } from '@mui/material'
 import { Field, Form, Formik, FormikHelpers } from 'formik'
 import { TextField } from 'formik-mui'
@@ -8,14 +8,7 @@ import DraggableDialog, {
 } from '../../layout/DraggableDialog/DraggableDialog'
 import validationSchema from './validation/validationSchema'
 import { LoadingButton } from '@mui/lab'
-
-// TODO: Move to a corresponding module file.
-const initialValues = (mode: 'CREATE' | 'EDIT', project: Project) => ({
-  name: mode === 'EDIT' ? project.name || '' : '',
-  description: mode === 'EDIT' ? project.description || '' : '',
-})
-
-export type InitialValues = ReturnType<typeof initialValues>
+import { initialValues } from '@/modules/project'
 
 interface ProjectDialogProps extends DraggableDialogProps {
   project: Project
@@ -25,7 +18,7 @@ interface ProjectDialogProps extends DraggableDialogProps {
 
 interface CreateProjectDialogProps {
   mode: 'CREATE'
-  onSave: (
+  onCreate: (
     values: InitialValues,
     formikHelpers: FormikHelpers<InitialValues>
   ) => void
@@ -52,7 +45,7 @@ const UpsertProjectDialog = ({
   <DraggableDialog
     {...props}
     onClose={onClose}
-    dialogTitle={props.mode === 'CREATE' ? 'Save project' : 'Edit project'}
+    dialogTitle={props.mode === 'CREATE' ? 'Create project' : 'Edit project'}
     dialogContent={
       <Stack spacing={3}>
         <Typography>
@@ -61,7 +54,7 @@ const UpsertProjectDialog = ({
         <Formik
           initialValues={initialValues(props.mode, project)}
           validationSchema={validationSchema}
-          onSubmit={props.mode === 'CREATE' ? props.onSave : props.onEdit}
+          onSubmit={props.mode === 'CREATE' ? props.onCreate : props.onEdit}
         >
           {() => (
             <Form id='project'>

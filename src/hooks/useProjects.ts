@@ -4,7 +4,7 @@ import * as PROJECT from '@/modules/project'
 const useProjects = () => {
   const [projects, setProjects] = useLocalStorage(
     'projects',
-    PROJECT.initialValues()
+    PROJECT.deprecatedInitialValues()
   )
 
   const project = projects.find((project) => project.selected)!

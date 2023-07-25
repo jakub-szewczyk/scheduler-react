@@ -1,5 +1,5 @@
 import { createProject, deleteProject, updateProject } from '@/services/project'
-import { Project } from '@/types/project'
+import { InitialValues, Project } from '@/types/project'
 import { useAuth } from '@clerk/clerk-react'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -11,17 +11,16 @@ import {
   CardContent,
   CardHeader,
   IconButton,
-  Tooltip,
   Typography,
 } from '@mui/material'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { formatDistanceToNow } from 'date-fns'
+import { FormikHelpers } from 'formik'
 import { MouseEventHandler } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBoolean } from 'usehooks-ts'
 import DeleteProjectDialog from './DeleteProjectDialog'
-import UpsertProjectDialog, { InitialValues } from './UpsertProjectDialog'
-import { FormikHelpers } from 'formik'
+import UpsertProjectDialog from './UpsertProjectDialog'
 
 interface ProjectItemProps {
   project: Project
@@ -29,9 +28,9 @@ interface ProjectItemProps {
 
 const ProjectItem = ({ project }: ProjectItemProps) => {
   const {
-    value: isSaveProjectDialogOpen,
-    setFalse: closeSaveProjectDialog,
-    setTrue: openSaveProjectDialog,
+    value: isCreateProjectDialogOpen,
+    setFalse: closeCreateProjectDialog,
+    setTrue: openCreateProjectDialog,
   } = useBoolean()
 
   const {
@@ -59,7 +58,7 @@ const ProjectItem = ({ project }: ProjectItemProps) => {
       {
         onSuccess: () => {
           queryClient.invalidateQueries(['projects'])
-          closeSaveProjectDialog()
+          closeCreateProjectDialog()
         },
       }
     )
@@ -88,11 +87,11 @@ const ProjectItem = ({ project }: ProjectItemProps) => {
       }
     )
 
-  const handleSaveIconButtonClick:
+  const handleCreateIconButtonClick:
     | MouseEventHandler<HTMLButtonElement>
     | undefined = (event) => {
     event.stopPropagation()
-    openSaveProjectDialog()
+    openCreateProjectDialog()
   }
 
   const handleEditIconButtonClick:
@@ -114,7 +113,7 @@ const ProjectItem = ({ project }: ProjectItemProps) => {
     navigate('/schedules')
   }
 
-  const handleProjectSave = (
+  const handleProjectCreate = (
     { name, description }: InitialValues,
     { setSubmitting }: FormikHelpers<InitialValues>
   ) =>
@@ -206,19 +205,11 @@ const ProjectItem = ({ project }: ProjectItemProps) => {
             },
           }}
         >
-          {/* <Tooltip
-            placement='left'
-            title={
-              any(isUnsaved, projects) &&
-              'All projects must be saved before creating a new one'
-            }
-          > */}
           <Box
             onClick={(event) => isCreatingProject && event.stopPropagation()}
           >
             <IconButton
-              // disabled={any(isUnsaved, projects)}
-              onClick={handleSaveIconButtonClick}
+              onClick={handleCreateIconButtonClick}
               // sx={{
               //   '.MuiSvgIcon-root': {
               //     ...(project.selected &&
@@ -231,7 +222,6 @@ const ProjectItem = ({ project }: ProjectItemProps) => {
               <AddIcon fontSize='small' />
             </IconButton>
           </Box>
-          {/* </Tooltip> */}
           <Box
             onClick={(event) => isCreatingProject && event.stopPropagation()}
           >
@@ -239,39 +229,38 @@ const ProjectItem = ({ project }: ProjectItemProps) => {
               <EditIcon fontSize='small' />
             </IconButton>
           </Box>
-          <Tooltip
+          {/* <Tooltip
             placement='left'
-            title='Required'
-            // title={projects.length === 1 && 'At least one project is required'}
+            title={projects.length === 1 && 'At least one project is required'}
+          > */}
+          <Box
+            onClick={(event) => isCreatingProject && event.stopPropagation()}
           >
-            <Box
-              onClick={(event) => isCreatingProject && event.stopPropagation()}
+            <IconButton
+              // disabled={projects.length === 1}
+              onClick={handleDeleteIconButtonClick}
+              // sx={{
+              //   '.MuiSvgIcon-root': {
+              //     ...(project.selected &&
+              //       projects.length === 1 && {
+              //         fill: 'rgba(0, 0, 0, 0.3)',
+              //       }),
+              //   },
+              // }}
             >
-              <IconButton
-                // disabled={projects.length === 1}
-                onClick={handleDeleteIconButtonClick}
-                // sx={{
-                //   '.MuiSvgIcon-root': {
-                //     ...(project.selected &&
-                //       projects.length === 1 && {
-                //         fill: 'rgba(0, 0, 0, 0.3)',
-                //       }),
-                //   },
-                // }}
-              >
-                <DeleteIcon fontSize='small' />
-              </IconButton>
-            </Box>
-          </Tooltip>
+              <DeleteIcon fontSize='small' />
+            </IconButton>
+          </Box>
+          {/* </Tooltip> */}
         </CardActions>
       </Card>
       <UpsertProjectDialog
         mode='CREATE'
-        open={isSaveProjectDialogOpen}
-        onClose={closeSaveProjectDialog}
+        open={isCreateProjectDialogOpen}
+        onClose={closeCreateProjectDialog}
         project={project}
         loading={isCreatingProject}
-        onSave={handleProjectSave}
+        onCreate={handleProjectCreate}
       />
       <UpsertProjectDialog
         mode='EDIT'

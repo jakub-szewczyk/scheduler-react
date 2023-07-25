@@ -1,14 +1,25 @@
 import { SignInContainer } from '@/components/SignIn/styles/SignIn.styled'
 import { SignIn as ClerkSignIn, useClerk } from '@clerk/clerk-react'
-import { CircularProgress } from '@mui/material'
+import { Box, CircularProgress } from '@mui/material'
 
 const SignIn = () => {
   const { loaded } = useClerk()
 
-  return (
+  return loaded ? (
     <SignInContainer>
-      {loaded ? <ClerkSignIn /> : <CircularProgress />}
+      <ClerkSignIn />
     </SignInContainer>
+  ) : (
+    <Box
+      sx={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+      }}
+    >
+      <CircularProgress />
+    </Box>
   )
 }
 

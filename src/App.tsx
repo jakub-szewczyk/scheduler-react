@@ -1,13 +1,13 @@
 import { ClerkProvider } from '@clerk/clerk-react'
 import { CssBaseline, ThemeProvider } from '@mui/material'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { AxiosError } from 'axios'
 import { useState } from 'react'
 import { RouterProvider } from 'react-router-dom'
 import useSnackbarStore from './hooks/useSnackbarStore'
 import Snackbar from './layout/Snackbar/Snackbar'
 import router from './router'
 import theme from './theme'
-import { AxiosError } from 'axios'
 
 const App = () => {
   const openSnackbar = useSnackbarStore((state) => state.open)
