@@ -1,6 +1,5 @@
-import useProjects from '@/hooks/useProjects'
-import { asteriskSuffix } from '@/modules/common'
-import * as PROJECT from '@/modules/project'
+import { getAllProjects } from '@/services/project'
+import { useAuth } from '@clerk/clerk-react'
 import PendingActionsIcon from '@mui/icons-material/PendingActions'
 import {
   AppBar,
@@ -11,17 +10,36 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material'
+import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import ProfileMenu from './ProfileMenu'
 import WidgetsMenu from './WidgetsMenu'
-import { useUser } from '@clerk/clerk-react'
+import { useLocalStorage } from 'usehooks-ts'
 
 const Navbar = () => {
+  const [selectedProjectId, setSelectedProjectId] = useLocalStorage<
+    string | null
+  >('selectedProjectId', null)
+
   const navigate = useNavigate()
 
-  const { isSignedIn } = useUser()
+  const { isSignedIn, getToken } = useAuth()
 
-  const { project, projects, setProjects } = useProjects()
+  const { data: projects, isSuccess } = useQuery(
+    ['projects'],
+    async () => getAllProjects(await getToken()),
+    {
+      enabled: !!isSignedIn,
+      onSuccess: (projects) => {
+        if (
+          selectedProjectId &&
+          projects.map((project) => project.id).includes(selectedProjectId)
+        )
+          return
+        setSelectedProjectId(projects[0].id)
+      },
+    }
+  )
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -51,15 +69,14 @@ const Navbar = () => {
               Scheduler
             </Typography>
           </Stack>
-          {isSignedIn && (
+          {isSignedIn && isSuccess && (
             <>
               <Select
                 size='small'
                 variant='standard'
-                value={project.name}
-                onChange={(event) =>
-                  setProjects(PROJECT.select(event.target.value))
-                }
+                value={selectedProjectId || ''} // NOTE: https://tinyurl.com/yem9vdhy
+                onChange={(event) => setSelectedProjectId(event.target.value)}
+                disabled={projects.length === 0} // TODO: Might be a temporary condition.
                 sx={{ minWidth: 80, width: 120, maxWidth: 120 }}
                 MenuProps={{
                   anchorOrigin: {
@@ -96,8 +113,8 @@ const Navbar = () => {
               >
                 {projects.map((project) => (
                   <MenuItem
-                    key={project.name}
-                    value={project.name}
+                    key={project.id}
+                    value={project.id}
                     sx={{
                       maxWidth: 240,
                       overflow: 'hidden',
@@ -106,7 +123,7 @@ const Navbar = () => {
                     }}
                   >
                     <Typography variant='inherit' noWrap>
-                      {asteriskSuffix(project.name)}
+                      {project.name}
                     </Typography>
                   </MenuItem>
                 ))}

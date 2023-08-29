@@ -50,9 +50,9 @@ const Snackbar = () => {
         }}
       >
         <Alert severity='info' icon={false} sx={{ width: '100%' }}>
-          <Stack direction='row' alignItems='center' columnGap={1.5}>
+          <Stack direction='row' alignItems='center' columnGap={2}>
             <CircularProgress size={16} />
-            <Typography>Loading, please wait...</Typography>
+            <Typography fontSize={14}>Loading, please wait...</Typography>
           </Stack>
         </Alert>
       </MuiSnackbar>

@@ -12,6 +12,11 @@ import {
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
+/**
+ * TODO:
+ * Disable menu items if no project is selected.
+ * Redirect to the projects page if no project is selected.
+ */
 const WidgetsMenu = () => {
   const [menu, setMenu] = useState<HTMLElement | null>(null)
 

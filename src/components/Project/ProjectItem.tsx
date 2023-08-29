@@ -18,7 +18,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { FormikHelpers } from 'formik'
 import { MouseEventHandler } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useBoolean } from 'usehooks-ts'
+import { useBoolean, useLocalStorage } from 'usehooks-ts'
 import DeleteProjectDialog from './DeleteProjectDialog'
 import UpsertProjectDialog from './UpsertProjectDialog'
 
@@ -27,6 +27,12 @@ interface ProjectItemProps {
 }
 
 const ProjectItem = ({ project }: ProjectItemProps) => {
+  const [selectedProjectId, setSelectedProjectId] = useLocalStorage<
+    string | null
+  >('selectedProjectId', null)
+
+  const isProjectSelected = project.id === selectedProjectId
+
   const {
     value: isCreateProjectDialogOpen,
     setFalse: closeCreateProjectDialog,
@@ -109,7 +115,7 @@ const ProjectItem = ({ project }: ProjectItemProps) => {
   }
 
   const handleProjectSelect = () => {
-    // TODO: Handle project select
+    setSelectedProjectId(project.id)
     navigate('/schedules')
   }
 
@@ -143,15 +149,15 @@ const ProjectItem = ({ project }: ProjectItemProps) => {
           flexDirection: 'column',
           height: '100%',
           cursor: 'pointer',
-          ...(project.selected && {
+          ...(isProjectSelected && {
             color: (theme) => theme.palette.common.black,
           }),
-          ...(project.selected && {
+          ...(isProjectSelected && {
             bgcolor: (theme) => theme.palette.primary.main,
           }),
           '&:hover': {
             bgcolor: (theme) =>
-              project.selected
+              isProjectSelected
                 ? theme.palette.primary.dark
                 : 'rgba(255, 255, 255, 0.08)',
           },
@@ -172,7 +178,7 @@ const ProjectItem = ({ project }: ProjectItemProps) => {
           }}
           sx={{
             pb: 0,
-            ...(project.selected && {
+            ...(isProjectSelected && {
               '.MuiCardHeader-subheader': {
                 color: (theme) => theme.palette.grey['900'],
               },
@@ -199,7 +205,7 @@ const ProjectItem = ({ project }: ProjectItemProps) => {
           sx={{
             mt: 'auto',
             '.MuiSvgIcon-root': {
-              ...(project.selected && {
+              ...(isProjectSelected && {
                 fill: (theme) => theme.palette.common.black,
               }),
             },
@@ -212,7 +218,7 @@ const ProjectItem = ({ project }: ProjectItemProps) => {
               onClick={handleCreateIconButtonClick}
               // sx={{
               //   '.MuiSvgIcon-root': {
-              //     ...(project.selected &&
+              //     ...(isProjectSelected &&
               //       any(isUnsaved, projects) && {
               //         fill: 'rgba(0, 0, 0, 0.3)',
               //       }),
@@ -241,7 +247,7 @@ const ProjectItem = ({ project }: ProjectItemProps) => {
               onClick={handleDeleteIconButtonClick}
               // sx={{
               //   '.MuiSvgIcon-root': {
-              //     ...(project.selected &&
+              //     ...(isProjectSelected &&
               //       projects.length === 1 && {
               //         fill: 'rgba(0, 0, 0, 0.3)',
               //       }),
