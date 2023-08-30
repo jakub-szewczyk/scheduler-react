@@ -11,6 +11,7 @@ import {
   CardContent,
   CardHeader,
   IconButton,
+  Tooltip,
   Typography,
 } from '@mui/material'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -24,9 +25,10 @@ import UpsertProjectDialog from './UpsertProjectDialog'
 
 interface ProjectItemProps {
   project: Project
+  projects: Project[]
 }
 
-const ProjectItem = ({ project }: ProjectItemProps) => {
+const ProjectItem = ({ project, projects }: ProjectItemProps) => {
   const [selectedProjectId, setSelectedProjectId] = useLocalStorage<
     string | null
   >('selectedProjectId', null)
@@ -214,17 +216,7 @@ const ProjectItem = ({ project }: ProjectItemProps) => {
           <Box
             onClick={(event) => isCreatingProject && event.stopPropagation()}
           >
-            <IconButton
-              onClick={handleCreateIconButtonClick}
-              // sx={{
-              //   '.MuiSvgIcon-root': {
-              //     ...(isProjectSelected &&
-              //       any(isUnsaved, projects) && {
-              //         fill: 'rgba(0, 0, 0, 0.3)',
-              //       }),
-              //   },
-              // }}
-            >
+            <IconButton onClick={handleCreateIconButtonClick}>
               <AddIcon fontSize='small' />
             </IconButton>
           </Box>
@@ -235,29 +227,29 @@ const ProjectItem = ({ project }: ProjectItemProps) => {
               <EditIcon fontSize='small' />
             </IconButton>
           </Box>
-          {/* <Tooltip
+          <Tooltip
             placement='left'
             title={projects.length === 1 && 'At least one project is required'}
-          > */}
-          <Box
-            onClick={(event) => isCreatingProject && event.stopPropagation()}
           >
-            <IconButton
-              // disabled={projects.length === 1}
-              onClick={handleDeleteIconButtonClick}
-              // sx={{
-              //   '.MuiSvgIcon-root': {
-              //     ...(isProjectSelected &&
-              //       projects.length === 1 && {
-              //         fill: 'rgba(0, 0, 0, 0.3)',
-              //       }),
-              //   },
-              // }}
+            <Box
+              onClick={(event) => isCreatingProject && event.stopPropagation()}
             >
-              <DeleteIcon fontSize='small' />
-            </IconButton>
-          </Box>
-          {/* </Tooltip> */}
+              <IconButton
+                disabled={projects.length === 1}
+                onClick={handleDeleteIconButtonClick}
+                sx={{
+                  '.MuiSvgIcon-root': {
+                    ...(isProjectSelected &&
+                      projects.length === 1 && {
+                        fill: 'rgba(0, 0, 0, 0.3)',
+                      }),
+                  },
+                }}
+              >
+                <DeleteIcon fontSize='small' />
+              </IconButton>
+            </Box>
+          </Tooltip>
         </CardActions>
       </Card>
       <UpsertProjectDialog

@@ -33,11 +33,13 @@ const Projects = () => {
       {isSuccess &&
         projects.map((project) => (
           <Grid key={project.name} xs={12} sm={6} md={4} lg={3} xl={12 / 5}>
-            <ProjectItem project={project} />
+            <ProjectItem project={project} projects={projects} />
           </Grid>
         ))}
       {isError && (
-        <Typography color='error'>Failed to fetch projects</Typography>
+        <Typography color='error'>
+          Something went wrong: fetching projects failed. Please try again.
+        </Typography>
       )}
     </ProjectContainer>
   )

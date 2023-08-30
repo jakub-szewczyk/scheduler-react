@@ -25,21 +25,21 @@ const Navbar = () => {
 
   const { isSignedIn, getToken } = useAuth()
 
-  const { data: projects, isSuccess } = useQuery(
-    ['projects'],
-    async () => getAllProjects(await getToken()),
-    {
-      enabled: !!isSignedIn,
-      onSuccess: (projects) => {
-        if (
-          selectedProjectId &&
-          projects.map((project) => project.id).includes(selectedProjectId)
-        )
-          return
-        setSelectedProjectId(projects[0].id)
-      },
-    }
-  )
+  const {
+    data: projects,
+    isLoading,
+    isError,
+  } = useQuery(['projects'], async () => getAllProjects(await getToken()), {
+    enabled: !!isSignedIn,
+    onSuccess: (projects) => {
+      if (
+        selectedProjectId &&
+        projects.map((project) => project.id).includes(selectedProjectId)
+      )
+        return
+      setSelectedProjectId(projects[0].id)
+    },
+  })
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -69,14 +69,14 @@ const Navbar = () => {
               Scheduler
             </Typography>
           </Stack>
-          {isSignedIn && isSuccess && (
+          {isSignedIn && (
             <>
               <Select
                 size='small'
                 variant='standard'
                 value={selectedProjectId || ''} // NOTE: https://tinyurl.com/yem9vdhy
                 onChange={(event) => setSelectedProjectId(event.target.value)}
-                disabled={projects.length === 0} // TODO: Might be a temporary condition.
+                disabled={isLoading || isError}
                 sx={{ minWidth: 80, width: 120, maxWidth: 120 }}
                 MenuProps={{
                   anchorOrigin: {
@@ -111,7 +111,7 @@ const Navbar = () => {
                   },
                 }}
               >
-                {projects.map((project) => (
+                {projects?.map((project) => (
                   <MenuItem
                     key={project.id}
                     value={project.id}
@@ -134,7 +134,9 @@ const Navbar = () => {
                 columnGap={1}
                 marginLeft='auto'
               >
-                <WidgetsMenu />
+                <WidgetsMenu
+                  iconButtonProps={{ disabled: isLoading || isError }}
+                />
                 <ProfileMenu />
               </Stack>
             </>

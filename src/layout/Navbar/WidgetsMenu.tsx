@@ -4,6 +4,7 @@ import ViewListIcon from '@mui/icons-material/ViewList'
 import WidgetsIcon from '@mui/icons-material/Widgets'
 import {
   IconButton,
+  IconButtonProps,
   ListItemIcon,
   ListItemText,
   Menu,
@@ -12,12 +13,11 @@ import {
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-/**
- * TODO:
- * Disable menu items if no project is selected.
- * Redirect to the projects page if no project is selected.
- */
-const WidgetsMenu = () => {
+interface WidgetsMenuProps {
+  iconButtonProps?: IconButtonProps
+}
+
+const WidgetsMenu = ({ iconButtonProps }: WidgetsMenuProps) => {
   const [menu, setMenu] = useState<HTMLElement | null>(null)
 
   const navigate = useNavigate()
@@ -41,7 +41,10 @@ const WidgetsMenu = () => {
 
   return (
     <>
-      <IconButton onClick={(event) => setMenu(event.currentTarget)}>
+      <IconButton
+        onClick={(event) => setMenu(event.currentTarget)}
+        {...iconButtonProps}
+      >
         <WidgetsIcon />
       </IconButton>
       <Menu
