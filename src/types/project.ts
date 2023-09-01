@@ -7,6 +7,4 @@ export interface Project {
   description?: string | null
 }
 
-// export type ProjectsEndomorphism = (projects: Project[]) => Project[]
-
 export type InitialValues = ReturnType<typeof initialValues>

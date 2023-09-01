@@ -192,6 +192,7 @@ const ProjectItem = ({ project, projects }: ProjectItemProps) => {
         />
         <CardContent sx={{ pb: '0.5rem !important' }}>
           <Typography
+            variant='body2'
             sx={{
               overflow: 'hidden',
               display: '-webkit-box',
@@ -216,14 +217,14 @@ const ProjectItem = ({ project, projects }: ProjectItemProps) => {
           <Box
             onClick={(event) => isCreatingProject && event.stopPropagation()}
           >
-            <IconButton onClick={handleCreateIconButtonClick}>
+            <IconButton size='small' onClick={handleCreateIconButtonClick}>
               <AddIcon fontSize='small' />
             </IconButton>
           </Box>
           <Box
             onClick={(event) => isCreatingProject && event.stopPropagation()}
           >
-            <IconButton onClick={handleEditIconButtonClick}>
+            <IconButton size='small' onClick={handleEditIconButtonClick}>
               <EditIcon fontSize='small' />
             </IconButton>
           </Box>
@@ -235,6 +236,7 @@ const ProjectItem = ({ project, projects }: ProjectItemProps) => {
               onClick={(event) => isCreatingProject && event.stopPropagation()}
             >
               <IconButton
+                size='small'
                 disabled={projects.length === 1}
                 onClick={handleDeleteIconButtonClick}
                 sx={{

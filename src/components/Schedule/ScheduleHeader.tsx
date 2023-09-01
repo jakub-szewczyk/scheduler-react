@@ -8,11 +8,16 @@ import { asteriskSuffix } from '../../modules/common'
 import * as SCHEDULE from '../../modules/schedule'
 import SaveScheduleDialog from '../ScheduleActions/SaveScheduleDialog'
 import useProjects from '@/hooks/useProjects'
+import { Schedule } from '@/types/schedule'
 
-const ScheduleHeader = () => {
+interface ScheduleHeaderProps {
+  schedule: Schedule
+}
+
+const ScheduleHeader = ({ schedule }: ScheduleHeaderProps) => {
   const { project } = useProjects()
 
-  const { schedule, schedules, setSchedules } = useSchedules()
+  // const { schedule, schedules, setSchedules } = useSchedules()
 
   const {
     value: isSaveScheduleDialogOpen,
@@ -21,7 +26,7 @@ const ScheduleHeader = () => {
   } = useBoolean()
 
   const handleScheduleSave = ({ name }: { name: string }) => {
-    setSchedules(pipe(name, trim, SCHEDULE.save(project)))
+    // setSchedules(pipe(name, trim, SCHEDULE.save(project)))
     closeSaveScheduleDialog()
   }
 
@@ -46,13 +51,13 @@ const ScheduleHeader = () => {
           {asteriskSuffix(schedule.name)}
         </Typography>
       </Stack>
-      <SaveScheduleDialog
+      {/* <SaveScheduleDialog
         open={isSaveScheduleDialogOpen}
         onClose={closeSaveScheduleDialog}
         schedule={schedule}
         schedules={schedules}
         onSave={handleScheduleSave}
-      />
+      /> */}
     </>
   )
 }

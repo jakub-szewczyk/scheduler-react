@@ -16,6 +16,8 @@ const App = () => {
     new QueryClient({
       defaultOptions: {
         queries: {
+          staleTime: Infinity,
+          cacheTime: 0,
           onError: (error) =>
             openSnackbar({
               message:

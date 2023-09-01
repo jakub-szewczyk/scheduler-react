@@ -5,14 +5,14 @@ import Avatar from '@mui/material/Avatar'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
 import ListItemText from '@mui/material/ListItemText'
 import { formatDistanceToNow } from 'date-fns'
-import { useBoolean } from 'usehooks-ts'
+import { useBoolean, useReadLocalStorage } from 'usehooks-ts'
 import { asteriskSuffix } from '../../modules/common'
 import { Schedule } from '../../types/schedule'
 import DeleteScheduleDialog from './DeleteScheduleDialog'
 
 interface SchedulesDrawerItemProps {
-  schedule: Schedule
-  schedules: Schedule[]
+  schedule: Pick<Schedule, 'id' | 'createdAt' | 'name'>
+  schedules: Pick<Schedule, 'id' | 'createdAt' | 'name'>[]
   onDelete: (name: string) => void
   onSelect: (name: string) => void
 }
@@ -23,6 +23,10 @@ const SchedulesDrawerItem = ({
   onDelete,
   onSelect,
 }: SchedulesDrawerItemProps) => {
+  const selectedScheduleId = useReadLocalStorage<string | null>(
+    'selectedScheduleId'
+  )
+
   const {
     value: isDeleteDialogOpen,
     setFalse: closeDeleteDialog,
@@ -36,7 +40,7 @@ const SchedulesDrawerItem = ({
           <ListItemAvatar>
             <Avatar
               sx={{
-                ...(schedule.selected && {
+                ...(schedule.id === selectedScheduleId && {
                   bgcolor: (theme) => theme.palette.primary.main,
                 }),
               }}
@@ -73,12 +77,12 @@ const SchedulesDrawerItem = ({
           </Box>
         </Tooltip>
       </Stack>
-      <DeleteScheduleDialog
+      {/* <DeleteScheduleDialog
         open={isDeleteDialogOpen}
         onClose={closeDeleteDialog}
         schedule={schedule}
         onDelete={onDelete}
-      />
+      /> */}
     </>
   )
 }

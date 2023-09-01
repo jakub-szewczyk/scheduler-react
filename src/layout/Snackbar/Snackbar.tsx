@@ -35,7 +35,7 @@ const Snackbar = () => {
         autoHideDuration={isFetching > 0 ? null : 6000}
         anchorOrigin={{
           vertical: 'bottom',
-          horizontal: 'right',
+          horizontal: 'left',
         }}
       >
         <Alert severity={severity} onClose={handleClose} sx={{ width: '100%' }}>
@@ -46,7 +46,7 @@ const Snackbar = () => {
         open={isFetching > 0}
         anchorOrigin={{
           vertical: 'bottom',
-          horizontal: 'right',
+          horizontal: 'left',
         }}
       >
         <Alert severity='info' icon={false} sx={{ width: '100%' }}>

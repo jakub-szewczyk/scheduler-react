@@ -1,10 +1,9 @@
 import { Row } from './row'
 
 export interface Schedule {
-  name: string
-  project: string
-  selected: boolean
+  id: string
   createdAt: string
+  name: string
   rows: Row[]
 }
 

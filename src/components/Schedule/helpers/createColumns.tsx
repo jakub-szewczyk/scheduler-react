@@ -1,40 +1,31 @@
 import { GridColDef } from '@mui/x-data-grid'
-import { Dispatch, SetStateAction } from 'react'
-import DayCell from '../DayCell'
-import TimeCell from '../TimeCell'
+import { Updater } from 'use-immer'
 import { Row } from '../../../types/row'
+import DayCell from '../DayCell'
 import NotificationCell from '../NotificationCell'
+import TimeCell from '../TimeCell'
 
-const createColumns = (
-  rows: Row[],
-  setRows: Dispatch<SetStateAction<Row[]>>
-): GridColDef[] => [
+const createColumns = (setRows: Updater<Row[]>): GridColDef[] => [
   {
     field: 'day',
     headerName: 'Day',
     sortable: false,
     width: 155,
-    renderCell: (params) => (
-      <DayCell {...params} rows={rows} setRows={setRows} />
-    ),
+    renderCell: (params) => <DayCell {...params} setRows={setRows} />,
   },
   {
     field: 'starts',
     headerName: 'Starts',
     sortable: false,
     width: 165,
-    renderCell: (params) => (
-      <TimeCell {...params} rows={rows} setRows={setRows} />
-    ),
+    renderCell: (params) => <TimeCell {...params} setRows={setRows} />,
   },
   {
     field: 'ends',
     headerName: 'Ends',
     sortable: false,
     width: 165,
-    renderCell: (params) => (
-      <TimeCell {...params} rows={rows} setRows={setRows} />
-    ),
+    renderCell: (params) => <TimeCell {...params} setRows={setRows} />,
   },
   {
     field: 'room',

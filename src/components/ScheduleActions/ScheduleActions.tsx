@@ -88,8 +88,6 @@ const ScheduleActions = () => {
         open={isSchedulesDrawerOpen}
         onOpen={openSchedulesDrawer}
         onClose={closeSchedulesDrawer}
-        schedule={schedule}
-        schedules={schedules}
         onCreate={handleScheduleCreate}
         onDelete={handleScheduleDelete}
         onSelect={handleScheduleSelect}

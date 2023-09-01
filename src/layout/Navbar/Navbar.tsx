@@ -11,17 +11,25 @@ import {
   Typography,
 } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useEventListener, useLocalStorage } from 'usehooks-ts'
 import ProfileMenu from './ProfileMenu'
 import WidgetsMenu from './WidgetsMenu'
-import { useLocalStorage } from 'usehooks-ts'
 
 const Navbar = () => {
+  const [isScrollYOffsetNoticeable, setIsScrollYOffsetNoticeable] =
+    useState(false)
+
   const [selectedProjectId, setSelectedProjectId] = useLocalStorage<
     string | null
   >('selectedProjectId', null)
 
   const navigate = useNavigate()
+
+  useEventListener('scroll', () =>
+    setIsScrollYOffsetNoticeable(window.scrollY > 20)
+  )
 
   const { isSignedIn, getToken } = useAuth()
 
@@ -43,7 +51,16 @@ const Navbar = () => {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar elevation={0}>
+      <AppBar
+        elevation={0}
+        sx={{
+          transition: 'background 0.25s',
+          ...(isScrollYOffsetNoticeable && {
+            bgcolor: 'rgba(0, 0, 0, 0.25)',
+            backdropFilter: 'blur(3px)',
+          }),
+        }}
+      >
         <Toolbar
           sx={{
             columnGap: {
