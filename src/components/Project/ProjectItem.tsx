@@ -53,9 +53,9 @@ const ProjectItem = ({ project, projects }: ProjectItemProps) => {
     setTrue: openDeleteProjectDialog,
   } = useBoolean()
 
-  const { getToken } = useAuth()
-
   const navigate = useNavigate()
+
+  const { getToken } = useAuth()
 
   const queryClient = useQueryClient()
 
@@ -65,7 +65,7 @@ const ProjectItem = ({ project, projects }: ProjectItemProps) => {
         createProject(await getToken(), data),
       {
         onSuccess: () => {
-          queryClient.invalidateQueries(['projects'])
+          queryClient.invalidateQueries(['projects'], { exact: true })
           closeCreateProjectDialog()
         },
       }
@@ -77,7 +77,7 @@ const ProjectItem = ({ project, projects }: ProjectItemProps) => {
         updateProject(await getToken(), data),
       {
         onSuccess: () => {
-          queryClient.invalidateQueries(['projects'])
+          queryClient.invalidateQueries(['projects'], { exact: true })
           closeEditProjectDialog()
         },
       }
@@ -89,7 +89,7 @@ const ProjectItem = ({ project, projects }: ProjectItemProps) => {
         deleteProject(await getToken(), data),
       {
         onSuccess: () => {
-          queryClient.invalidateQueries(['projects'])
+          queryClient.invalidateQueries(['projects'], { exact: true })
           closeDeleteProjectDialog()
         },
       }

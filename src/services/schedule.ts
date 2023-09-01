@@ -28,3 +28,22 @@ export const getSchedule = ({
   api<Schedule>(`/projects/${projectId}/schedules/${scheduleId}`, {
     headers: { Authorization: `Bearer ${token}` },
   }).then(({ data }) => data)
+
+interface CreateSchedulePayload {
+  projectId: string
+  name: string
+  token: string | null
+}
+
+export const createSchedule = ({
+  projectId,
+  name,
+  token,
+}: CreateSchedulePayload) =>
+  api
+    .post<Pick<Schedule, 'id' | 'createdAt' | 'name'>>(
+      `/projects/${projectId}/schedules`,
+      { name },
+      { headers: { Authorization: `Bearer ${token}` } }
+    )
+    .then(({ data }) => data)

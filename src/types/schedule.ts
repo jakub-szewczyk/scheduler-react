@@ -1,3 +1,4 @@
+import { initialValues } from '@/modules/schedule'
 import { Row } from './row'
 
 export interface Schedule {
@@ -7,4 +8,4 @@ export interface Schedule {
   rows: Row[]
 }
 
-export type SchedulesEndomorphism = (schedules: Schedule[]) => Schedule[]
+export type InitialValues = ReturnType<typeof initialValues>

@@ -1,33 +1,28 @@
+import { InitialValues, Schedule } from '@/types/schedule'
 import EditIcon from '@mui/icons-material/Edit'
 import { IconButton, Stack, Typography } from '@mui/material'
-import { pipe } from 'fp-ts/lib/function'
-import { trim } from 'ramda'
 import { useBoolean } from 'usehooks-ts'
-import useSchedules from '../../hooks/useSchedules'
-import { asteriskSuffix } from '../../modules/common'
-import * as SCHEDULE from '../../modules/schedule'
-import SaveScheduleDialog from '../ScheduleActions/SaveScheduleDialog'
-import useProjects from '@/hooks/useProjects'
-import { Schedule } from '@/types/schedule'
+import UpsertScheduleDialog from './UpsertScheduleDialog'
+import { FormikHelpers } from 'formik'
 
 interface ScheduleHeaderProps {
   schedule: Schedule
 }
 
 const ScheduleHeader = ({ schedule }: ScheduleHeaderProps) => {
-  const { project } = useProjects()
-
-  // const { schedule, schedules, setSchedules } = useSchedules()
-
   const {
-    value: isSaveScheduleDialogOpen,
-    setFalse: closeSaveScheduleDialog,
-    setTrue: openSaveScheduleDialog,
+    value: isEditScheduleDialogOpen,
+    setFalse: closeEditScheduleDialog,
+    setTrue: openEditScheduleDialog,
   } = useBoolean()
 
-  const handleScheduleSave = ({ name }: { name: string }) => {
-    // setSchedules(pipe(name, trim, SCHEDULE.save(project)))
-    closeSaveScheduleDialog()
+  const handleScheduleEdit = (
+    values: InitialValues,
+    formikHelpers: FormikHelpers<InitialValues>
+  ) => {
+    // TODO: Handle updating schedule's name
+    console.log('values', values)
+    closeEditScheduleDialog()
   }
 
   return (
@@ -44,20 +39,21 @@ const ScheduleHeader = ({ schedule }: ScheduleHeaderProps) => {
         maxWidth={(theme) => theme.breakpoints.values.lg}
         marginX='auto'
       >
-        <IconButton size='small' onClick={openSaveScheduleDialog}>
+        <IconButton size='small' onClick={openEditScheduleDialog}>
           <EditIcon fontSize='small' />
         </IconButton>
         <Typography maxWidth={(theme) => theme.breakpoints.values.sm} noWrap>
-          {asteriskSuffix(schedule.name)}
+          {schedule.name}
         </Typography>
       </Stack>
-      {/* <SaveScheduleDialog
-        open={isSaveScheduleDialogOpen}
-        onClose={closeSaveScheduleDialog}
+      <UpsertScheduleDialog
+        mode='EDIT'
+        open={isEditScheduleDialogOpen}
+        onClose={closeEditScheduleDialog}
         schedule={schedule}
-        schedules={schedules}
-        onSave={handleScheduleSave}
-      /> */}
+        loading={false}
+        onEdit={handleScheduleEdit}
+      />
     </>
   )
 }

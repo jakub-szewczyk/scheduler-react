@@ -19,8 +19,8 @@ import SchedulesDrawerItemSkeleton from './SchedulesDrawerItemSkeleton'
 
 interface SchedulesDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
   onCreate: MouseEventHandler<HTMLButtonElement> | undefined
-  onDelete: (name: string) => void
-  onSelect: (name: string) => void
+  onDelete: (scheduleId: string) => void
+  onSelect: (scheduleId: string) => void
 }
 
 const SchedulesDrawer = ({
@@ -40,10 +40,10 @@ const SchedulesDrawer = ({
 
   const {
     data: schedules,
-    isLoading,
-    isSuccess,
+    isLoading: isEachScheduleLoading,
+    isSuccess: isEachScheduleFetchedSuccessfully,
   } = useQuery(
-    [selectedProjectId, 'schedules'],
+    ['projects', selectedProjectId, 'schedules'],
     async () =>
       getAllSchedules({
         projectId: selectedProjectId!,
@@ -73,7 +73,7 @@ const SchedulesDrawer = ({
       >
         <Stack spacing={2} overflow='auto'>
           <Typography variant='h6' align='center'>
-            Create or load schedules
+            Select & manage schedules
           </Typography>
           <List
             sx={{
@@ -82,11 +82,11 @@ const SchedulesDrawer = ({
               borderRadius: 1,
             }}
           >
-            {isLoading &&
+            {isEachScheduleLoading &&
               Array(3)
                 .fill(null)
                 .map((_, index) => <SchedulesDrawerItemSkeleton key={index} />)}
-            {isSuccess &&
+            {isEachScheduleFetchedSuccessfully &&
               schedules.map((schedule) => (
                 <SchedulesDrawerItem
                   key={schedule.name}

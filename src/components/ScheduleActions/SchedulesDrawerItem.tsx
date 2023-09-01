@@ -6,15 +6,14 @@ import ListItemAvatar from '@mui/material/ListItemAvatar'
 import ListItemText from '@mui/material/ListItemText'
 import { formatDistanceToNow } from 'date-fns'
 import { useBoolean, useReadLocalStorage } from 'usehooks-ts'
-import { asteriskSuffix } from '../../modules/common'
 import { Schedule } from '../../types/schedule'
 import DeleteScheduleDialog from './DeleteScheduleDialog'
 
 interface SchedulesDrawerItemProps {
   schedule: Pick<Schedule, 'id' | 'createdAt' | 'name'>
   schedules: Pick<Schedule, 'id' | 'createdAt' | 'name'>[]
-  onDelete: (name: string) => void
-  onSelect: (name: string) => void
+  onDelete: (scheduleId: string) => void
+  onSelect: (scheduleId: string) => void
 }
 
 const SchedulesDrawerItem = ({
@@ -28,15 +27,15 @@ const SchedulesDrawerItem = ({
   )
 
   const {
-    value: isDeleteDialogOpen,
-    setFalse: closeDeleteDialog,
-    setTrue: openDeleteDialog,
+    value: isDeleteScheduleDialogOpen,
+    setFalse: closeDeleteScheduleDialog,
+    setTrue: openDeleteScheduleDialog,
   } = useBoolean(false)
 
   return (
     <>
       <Stack direction='row' alignItems='start'>
-        <ListItemButton onClick={() => onSelect(schedule.name)}>
+        <ListItemButton onClick={() => onSelect(schedule.id)}>
           <ListItemAvatar>
             <Avatar
               sx={{
@@ -49,7 +48,7 @@ const SchedulesDrawerItem = ({
             </Avatar>
           </ListItemAvatar>
           <ListItemText
-            primary={asteriskSuffix(schedule.name)}
+            primary={schedule.name}
             secondary={formatDistanceToNow(new Date(schedule.createdAt), {
               addSuffix: true,
             })}
@@ -70,19 +69,19 @@ const SchedulesDrawerItem = ({
             <IconButton
               size='small'
               disabled={schedules.length === 1}
-              onClick={openDeleteDialog}
+              onClick={openDeleteScheduleDialog}
             >
               <CloseIcon fontSize='small' />
             </IconButton>
           </Box>
         </Tooltip>
       </Stack>
-      {/* <DeleteScheduleDialog
-        open={isDeleteDialogOpen}
-        onClose={closeDeleteDialog}
+      <DeleteScheduleDialog
+        open={isDeleteScheduleDialogOpen}
+        onClose={closeDeleteScheduleDialog}
         schedule={schedule}
         onDelete={onDelete}
-      /> */}
+      />
     </>
   )
 }
