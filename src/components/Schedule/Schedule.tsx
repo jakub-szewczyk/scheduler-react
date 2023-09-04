@@ -1,8 +1,12 @@
 import DataChangeBar from '@/layout/DataChangeBar/DataChangeBar'
+import { updateScheduleRows } from '@/services/row'
 import { Row } from '@/types/row'
 import { Schedule as ISchedule } from '@/types/schedule'
+import { useAuth } from '@clerk/clerk-react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { equals } from 'ramda'
 import { Updater } from 'use-immer'
+import { useReadLocalStorage } from 'usehooks-ts'
 import * as TABLE from '../../modules/table'
 import ScheduleHeader from './ScheduleHeader'
 import createColumns from './helpers/createColumns'
@@ -15,6 +19,25 @@ interface ScheduleProps {
 }
 
 const Schedule = ({ schedule, rows, setRows }: ScheduleProps) => {
+  const selectedProjectId = useReadLocalStorage<string | null>(
+    'selectedProjectId'
+  )
+
+  const { getToken } = useAuth()
+
+  const queryClient = useQueryClient()
+
+  const {
+    mutate: updateScheduleRowsMutation,
+    isLoading: isUpdatingScheduleRows,
+  } = useMutation(updateScheduleRows, {
+    onSuccess: () =>
+      queryClient.invalidateQueries(
+        ['projects', selectedProjectId, 'schedules', schedule.id],
+        { exact: true }
+      ),
+  })
+
   const columns = createColumns(setRows)
 
   return (
@@ -41,15 +64,23 @@ const Schedule = ({ schedule, rows, setRows }: ScheduleProps) => {
           onCellEditCommit={({ field, value, id }) =>
             setRows((rows) => {
               const row = rows.find((row) => row.id === id)!
-              row[field as keyof Row] = value
+              row[field as keyof Pick<Row, 'room' | 'subject'>] = value
             })
           }
         />
       </DataGridContainer>
       {!equals(rows, schedule.rows) && (
         <DataChangeBar
+          loading={isUpdatingScheduleRows}
           onDiscard={() => setRows(schedule.rows)}
-          onSave={alert}
+          onSave={async () =>
+            updateScheduleRowsMutation({
+              projectId: selectedProjectId!,
+              scheduleId: schedule.id,
+              rows,
+              token: await getToken(),
+            })
+          }
         />
       )}
     </>

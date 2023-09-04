@@ -21,7 +21,13 @@ const DayCell = ({ id, value, row, setRows }: DayCellProps) => (
     {row.rowId ? (
       <IconButton
         size='small'
-        onClick={() => setRows((rows) => rows.filter((row) => row.id !== id))}
+        onClick={() =>
+          setRows((rows) =>
+            rows
+              .filter((row) => row.id !== id)
+              .map((rows, index) => ({ ...rows, index }))
+          )
+        }
       >
         <RemoveIcon fontSize='small' />
       </IconButton>
@@ -29,19 +35,18 @@ const DayCell = ({ id, value, row, setRows }: DayCellProps) => (
       <IconButton
         size='small'
         onClick={() =>
-          setRows(
-            (rows) =>
-              void rows.splice(
-                rows.findIndex((row) => row.id === id) +
-                  rows.filter((row) => row.rowId === id).length +
-                  1,
-                0,
-                {
-                  id: nanoid(),
-                  rowId: id.toString(),
-                }
-              )
-          )
+          setRows((rows) => {
+            const index =
+              rows.findIndex((row) => row.id === id) +
+              rows.filter((row) => row.rowId === id).length +
+              1
+            rows.splice(index, 0, {
+              id: nanoid(),
+              rowId: id.toString(),
+              index,
+            })
+            rows.forEach((row, index) => void (row.index = index))
+          })
         }
       >
         <AddIcon fontSize='small' />

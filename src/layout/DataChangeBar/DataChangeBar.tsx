@@ -1,5 +1,6 @@
 import PublishIcon from '@mui/icons-material/Publish'
 import UndoIcon from '@mui/icons-material/Undo'
+import { LoadingButton } from '@mui/lab'
 import {
   Box,
   Button,
@@ -10,11 +11,16 @@ import {
 } from '@mui/material'
 
 interface DataChangeBarProps {
+  loading?: boolean
   onDiscard: () => void
   onSave: () => void
 }
 
-const DataChangeBar = ({ onDiscard, onSave }: DataChangeBarProps) => {
+const DataChangeBar = ({
+  loading = false,
+  onDiscard,
+  onSave,
+}: DataChangeBarProps) => {
   const theme = useTheme()
 
   const matches = useMediaQuery(theme.breakpoints.up('sm'))
@@ -40,19 +46,21 @@ const DataChangeBar = ({ onDiscard, onSave }: DataChangeBarProps) => {
           <Button
             size={matches ? 'medium' : 'small'}
             variant='outlined'
+            disabled={loading}
             startIcon={<UndoIcon />}
             onClick={onDiscard}
           >
             Discard
           </Button>
-          <Button
+          <LoadingButton
             size={matches ? 'medium' : 'small'}
             variant='outlined'
+            loading={loading}
             endIcon={<PublishIcon />}
             onClick={onSave}
           >
             Save
-          </Button>
+          </LoadingButton>
         </Stack>
       </Stack>
     </Box>

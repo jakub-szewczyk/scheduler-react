@@ -1,14 +1,11 @@
-export type Day = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday'
+import { Notification } from './notification'
 
-interface Notification {
-  time: string
-  active: boolean
-  // title: string
-}
+export type Day = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday'
 
 export interface Row {
   id: string
   rowId?: string | null
+  index: number
   day?: Day
   starts?: string | null
   ends?: string | null
