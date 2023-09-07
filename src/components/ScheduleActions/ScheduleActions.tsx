@@ -64,12 +64,11 @@ const ScheduleActions = ({ schedule }: ScheduleActionsProps) => {
 
   const { mutate: updateScheduleMutation, isLoading: isScheduleUpdating } =
     useMutation(updateSchedule, {
-      onSuccess: ({ id }) => {
+      onSuccess: () => {
         queryClient.invalidateQueries([
           'projects',
           selectedProjectId,
           'schedules',
-          id,
         ])
         closeEditScheduleDialog()
       },
@@ -77,12 +76,6 @@ const ScheduleActions = ({ schedule }: ScheduleActionsProps) => {
 
   const handleScheduleSelect = (scheduleId: string) => {
     setSelectedScheduleId(scheduleId)
-    closeSchedulesDrawer()
-  }
-
-  const handleScheduleDelete = (scheduleId: string) => {
-    // TODO: Handle deleting schedule
-    console.log('scheduleId', scheduleId)
     closeSchedulesDrawer()
   }
 
@@ -145,7 +138,6 @@ const ScheduleActions = ({ schedule }: ScheduleActionsProps) => {
         onClose={closeSchedulesDrawer}
         onSelect={handleScheduleSelect}
         onCreate={openCreateScheduleDialog}
-        onDelete={handleScheduleDelete}
       />
       <UpsertScheduleDialog
         mode='CREATE'

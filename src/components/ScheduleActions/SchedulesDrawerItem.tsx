@@ -8,20 +8,25 @@ import { formatDistanceToNow } from 'date-fns'
 import { useBoolean, useReadLocalStorage } from 'usehooks-ts'
 import { Schedule } from '../../types/schedule'
 import DeleteScheduleDialog from './DeleteScheduleDialog'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useAuth } from '@clerk/clerk-react'
+import { deleteSchedule } from '@/services/schedule'
 
 interface SchedulesDrawerItemProps {
   schedule: Pick<Schedule, 'id' | 'createdAt' | 'name'>
   schedules: Pick<Schedule, 'id' | 'createdAt' | 'name'>[]
-  onDelete: (scheduleId: string) => void
   onSelect: (scheduleId: string) => void
 }
 
 const SchedulesDrawerItem = ({
   schedule,
   schedules,
-  onDelete,
   onSelect,
 }: SchedulesDrawerItemProps) => {
+  const selectedProjectId = useReadLocalStorage<string | null>(
+    'selectedProjectId'
+  )
+
   const selectedScheduleId = useReadLocalStorage<string | null>(
     'selectedScheduleId'
   )
@@ -31,6 +36,28 @@ const SchedulesDrawerItem = ({
     setFalse: closeDeleteScheduleDialog,
     setTrue: openDeleteScheduleDialog,
   } = useBoolean(false)
+
+  const { getToken } = useAuth()
+
+  const queryClient = useQueryClient()
+
+  const { mutate: deleteScheduleMutation, isLoading: isScheduleDeleting } =
+    useMutation(deleteSchedule, {
+      onSuccess: () => {
+        queryClient.invalidateQueries(
+          ['projects', selectedProjectId, 'schedules'],
+          { exact: true }
+        )
+        closeDeleteScheduleDialog()
+      },
+    })
+
+  const handleScheduleDelete = async (scheduleId: string) =>
+    deleteScheduleMutation({
+      projectId: selectedProjectId!,
+      scheduleId,
+      token: await getToken(),
+    })
 
   return (
     <>
@@ -80,7 +107,8 @@ const SchedulesDrawerItem = ({
         open={isDeleteScheduleDialogOpen}
         onClose={closeDeleteScheduleDialog}
         schedule={schedule}
-        onDelete={onDelete}
+        loading={isScheduleDeleting}
+        onDelete={handleScheduleDelete}
       />
     </>
   )

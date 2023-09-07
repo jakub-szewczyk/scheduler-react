@@ -29,12 +29,11 @@ const ScheduleHeader = ({ schedule }: ScheduleHeaderProps) => {
 
   const { mutate: updateScheduleMutation, isLoading: isScheduleUpdating } =
     useMutation(updateSchedule, {
-      onSuccess: ({ id }) => {
+      onSuccess: () => {
         queryClient.invalidateQueries([
           'projects',
           selectedProjectId,
           'schedules',
-          id,
         ])
         closeEditScheduleDialog()
       },

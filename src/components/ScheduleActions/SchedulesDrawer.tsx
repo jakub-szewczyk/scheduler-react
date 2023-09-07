@@ -19,13 +19,11 @@ import SchedulesDrawerItemSkeleton from './SchedulesDrawerItemSkeleton'
 
 interface SchedulesDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
   onCreate: MouseEventHandler<HTMLButtonElement> | undefined
-  onDelete: (scheduleId: string) => void
   onSelect: (scheduleId: string) => void
 }
 
 const SchedulesDrawer = ({
   onCreate,
-  onDelete,
   onSelect,
   ...props
 }: SchedulesDrawerProps) => {
@@ -93,7 +91,6 @@ const SchedulesDrawer = ({
                   schedule={schedule}
                   schedules={schedules}
                   onSelect={onSelect}
-                  onDelete={onDelete}
                 />
               ))}
           </List>

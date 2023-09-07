@@ -70,3 +70,20 @@ export const updateSchedule = ({
       }
     )
     .then(({ data }) => data)
+
+interface DeleteSchedulePayload {
+  projectId: string
+  scheduleId: string
+  token: string | null
+}
+
+export const deleteSchedule = ({
+  projectId,
+  scheduleId,
+  token,
+}: DeleteSchedulePayload) =>
+  api
+    .delete<Schedule>(`/projects/${projectId}/schedules/${scheduleId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    .then(({ data }) => data)
