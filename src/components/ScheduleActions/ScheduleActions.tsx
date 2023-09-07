@@ -1,5 +1,5 @@
 import { exportToXLSX } from '@/modules/schedule'
-import { createSchedule } from '@/services/schedule'
+import { createSchedule, updateSchedule } from '@/services/schedule'
 import { InitialValues, Schedule } from '@/types/schedule'
 import { useAuth } from '@clerk/clerk-react'
 import DownloadIcon from '@mui/icons-material/Download'
@@ -62,6 +62,19 @@ const ScheduleActions = ({ schedule }: ScheduleActionsProps) => {
       },
     })
 
+  const { mutate: updateScheduleMutation, isLoading: isScheduleUpdating } =
+    useMutation(updateSchedule, {
+      onSuccess: ({ id }) => {
+        queryClient.invalidateQueries([
+          'projects',
+          selectedProjectId,
+          'schedules',
+          id,
+        ])
+        closeEditScheduleDialog()
+      },
+    })
+
   const handleScheduleSelect = (scheduleId: string) => {
     setSelectedScheduleId(scheduleId)
     closeSchedulesDrawer()
@@ -83,14 +96,16 @@ const ScheduleActions = ({ schedule }: ScheduleActionsProps) => {
       token: await getToken(),
     })
 
-  const handleScheduleEdit = (
+  const handleScheduleEdit = async (
     values: InitialValues,
     formikHelpers: FormikHelpers<InitialValues>
-  ) => {
-    // TODO: Handle updating schedule's name
-    console.log('values', values)
-    closeEditScheduleDialog()
-  }
+  ) =>
+    updateScheduleMutation({
+      projectId: selectedProjectId!,
+      scheduleId: schedule.id,
+      name: values.name,
+      token: await getToken(),
+    })
 
   return (
     <>
@@ -145,7 +160,7 @@ const ScheduleActions = ({ schedule }: ScheduleActionsProps) => {
         open={isEditScheduleDialogOpen}
         onClose={closeEditScheduleDialog}
         schedule={schedule}
-        loading={false}
+        loading={isScheduleUpdating}
         onEdit={handleScheduleEdit}
       />
     </>

@@ -47,3 +47,26 @@ export const createSchedule = ({
       { headers: { Authorization: `Bearer ${token}` } }
     )
     .then(({ data }) => data)
+
+interface UpdateSchedulePayload {
+  projectId: string
+  scheduleId: string
+  name: string
+  token: string | null
+}
+
+export const updateSchedule = ({
+  projectId,
+  scheduleId,
+  name,
+  token,
+}: UpdateSchedulePayload) =>
+  api
+    .put<Schedule>(
+      `/projects/${projectId}/schedules/${scheduleId}`,
+      { name },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    )
+    .then(({ data }) => data)

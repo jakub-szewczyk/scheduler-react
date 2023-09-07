@@ -1,29 +1,55 @@
+import { updateSchedule } from '@/services/schedule'
 import { InitialValues, Schedule } from '@/types/schedule'
+import { useAuth } from '@clerk/clerk-react'
 import EditIcon from '@mui/icons-material/Edit'
 import { IconButton, Stack, Typography } from '@mui/material'
-import { useBoolean } from 'usehooks-ts'
-import UpsertScheduleDialog from './UpsertScheduleDialog'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { FormikHelpers } from 'formik'
+import { useBoolean, useReadLocalStorage } from 'usehooks-ts'
+import UpsertScheduleDialog from './UpsertScheduleDialog'
 
 interface ScheduleHeaderProps {
   schedule: Schedule
 }
 
 const ScheduleHeader = ({ schedule }: ScheduleHeaderProps) => {
+  const selectedProjectId = useReadLocalStorage<string | null>(
+    'selectedProjectId'
+  )
+
   const {
     value: isEditScheduleDialogOpen,
     setFalse: closeEditScheduleDialog,
     setTrue: openEditScheduleDialog,
   } = useBoolean()
 
-  const handleScheduleEdit = (
+  const { getToken } = useAuth()
+
+  const queryClient = useQueryClient()
+
+  const { mutate: updateScheduleMutation, isLoading: isScheduleUpdating } =
+    useMutation(updateSchedule, {
+      onSuccess: ({ id }) => {
+        queryClient.invalidateQueries([
+          'projects',
+          selectedProjectId,
+          'schedules',
+          id,
+        ])
+        closeEditScheduleDialog()
+      },
+    })
+
+  const handleScheduleEdit = async (
     values: InitialValues,
     formikHelpers: FormikHelpers<InitialValues>
-  ) => {
-    // TODO: Handle updating schedule's name
-    console.log('values', values)
-    closeEditScheduleDialog()
-  }
+  ) =>
+    updateScheduleMutation({
+      projectId: selectedProjectId!,
+      scheduleId: schedule.id,
+      name: values.name,
+      token: await getToken(),
+    })
 
   return (
     <>
@@ -51,7 +77,7 @@ const ScheduleHeader = ({ schedule }: ScheduleHeaderProps) => {
         open={isEditScheduleDialogOpen}
         onClose={closeEditScheduleDialog}
         schedule={schedule}
-        loading={false}
+        loading={isScheduleUpdating}
         onEdit={handleScheduleEdit}
       />
     </>
