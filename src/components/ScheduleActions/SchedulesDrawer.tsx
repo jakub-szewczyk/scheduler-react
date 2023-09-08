@@ -8,6 +8,7 @@ import {
   Stack,
   SwipeableDrawer,
   SwipeableDrawerProps,
+  Theme,
   Typography,
 } from '@mui/material'
 import List from '@mui/material/List'
@@ -78,6 +79,23 @@ const SchedulesDrawer = ({
               overflow: 'auto',
               bgcolor: 'rgba(255, 255, 255, 0.05)',
               borderRadius: 1,
+              '::-webkit-scrollbar': {
+                width: {
+                  xs: 4,
+                  sm: 8,
+                },
+              },
+              '::-webkit-scrollbar-track': {
+                bgcolor: (theme: Theme) => theme.palette.secondary.light,
+                borderRadius: (theme: Theme) => theme.shape.borderRadius,
+              },
+              '::-webkit-scrollbar-thumb': {
+                bgcolor: (theme: Theme) => theme.palette.primary.main,
+                borderRadius: (theme: Theme) => theme.shape.borderRadius,
+                '&:hover': {
+                  bgcolor: (theme: Theme) => theme.palette.primary.dark,
+                },
+              },
             }}
           >
             {isEachScheduleLoading &&
