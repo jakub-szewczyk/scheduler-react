@@ -39,3 +39,26 @@ export const createBoard = ({ projectId, name, token }: CreateBoardPayload) =>
       { headers: { Authorization: `Bearer ${token}` } }
     )
     .then(({ data }) => data)
+
+interface UpdateBoardPayload {
+  projectId: string
+  boardId: string
+  name: string
+  token: string | null
+}
+
+export const updateBoard = ({
+  projectId,
+  boardId,
+  name,
+  token,
+}: UpdateBoardPayload) =>
+  api
+    .put<Board>(
+      `/projects/${projectId}/boards/${boardId}`,
+      { name },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    )
+    .then(({ data }) => data)

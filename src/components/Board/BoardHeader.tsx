@@ -1,8 +1,12 @@
 import { asteriskSuffix } from '@/modules/common'
-import { Board } from '@/types/board'
+import { updateBoard } from '@/services/board'
+import { Board, InitialValues } from '@/types/board'
+import { useAuth } from '@clerk/clerk-react'
 import EditIcon from '@mui/icons-material/Edit'
 import { IconButton, Stack, Typography } from '@mui/material'
-import { useBoolean } from 'usehooks-ts'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { FormikHelpers } from 'formik'
+import { useBoolean, useReadLocalStorage } from 'usehooks-ts'
 import UpsertBoardDialog from '../BoardActions/UpsertBoardDialog'
 
 interface BoardHeaderProps {
@@ -10,16 +14,38 @@ interface BoardHeaderProps {
 }
 
 const BoardHeader = ({ board }: BoardHeaderProps) => {
+  const selectedProjectId = useReadLocalStorage<string | null>(
+    'selectedProjectId'
+  )
+
   const {
     value: isEditBoardDialogOpen,
     setFalse: closeEditBoardDialog,
     setTrue: openEditBoardDialog,
   } = useBoolean()
 
-  const handleBoardEdit = ({ name }: { name: string }) => {
-    // setBoards(pipe(name, trim, BOARD.save(project)))
-    closeEditBoardDialog()
-  }
+  const { getToken } = useAuth()
+
+  const queryClient = useQueryClient()
+
+  const { mutate: updateBoardMutation, isLoading: isBoardUpdating } =
+    useMutation(updateBoard, {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['projects', selectedProjectId, 'boards'])
+        closeEditBoardDialog()
+      },
+    })
+
+  const handleBoardEdit = async (
+    values: InitialValues,
+    formikHelpers: FormikHelpers<InitialValues>
+  ) =>
+    updateBoardMutation({
+      projectId: selectedProjectId!,
+      boardId: board.id,
+      name: values.name,
+      token: await getToken(),
+    })
 
   return (
     <>
@@ -47,6 +73,7 @@ const BoardHeader = ({ board }: BoardHeaderProps) => {
         open={isEditBoardDialogOpen}
         onClose={closeEditBoardDialog}
         board={board}
+        loading={isBoardUpdating}
         onEdit={handleBoardEdit}
       />
     </>

@@ -1,3 +1,4 @@
+import { createBoard, updateBoard } from '@/services/board'
 import { Board, InitialValues } from '@/types/board'
 import { Issue } from '@/types/issue'
 import { Status } from '@/types/status'
@@ -15,7 +16,6 @@ import UpsertIssueDialog from '../Board/UpsertIssueDialog'
 import UpsertStatusDialog from '../Board/UpsertStatusDialog'
 import BoardsDrawer from './BoardsDrawer'
 import UpsertBoardDialog from './UpsertBoardDialog'
-import { createBoard } from '@/services/board'
 
 interface BoardActionsProps {
   board: Board
@@ -77,17 +77,13 @@ const BoardActions = ({ board }: BoardActionsProps) => {
       },
     })
 
-  // const { mutate: updateBoardMutation, isLoading: isBoardUpdating } =
-  //   useMutation(updateBoard, {
-  //     onSuccess: () => {
-  //       queryClient.invalidateQueries([
-  //         'projects',
-  //         selectedProjectId,
-  //         'boards',
-  //       ])
-  //       closeEditBoardDialog()
-  //     },
-  //   })
+  const { mutate: updateBoardMutation, isLoading: isBoardUpdating } =
+    useMutation(updateBoard, {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['projects', selectedProjectId, 'boards'])
+        closeEditBoardDialog()
+      },
+    })
 
   const handleBoardSelect = (boardId: string) => {
     setSelectedBoardId(boardId)
@@ -107,13 +103,13 @@ const BoardActions = ({ board }: BoardActionsProps) => {
   const handleBoardEdit = async (
     values: InitialValues,
     formikHelpers: FormikHelpers<InitialValues>
-  ) => {}
-  // updateBoardMutation({
-  //   projectId: selectedProjectId!,
-  //   boardId: board.id,
-  //   name: values.name,
-  //   token: await getToken(),
-  // })
+  ) =>
+    updateBoardMutation({
+      projectId: selectedProjectId!,
+      boardId: board.id,
+      name: values.name,
+      token: await getToken(),
+    })
 
   const handleStatusCreate = ({ title }: Pick<Status, 'title'>) => {
     // setStatuses(STATUS.create(title))
@@ -180,6 +176,7 @@ const BoardActions = ({ board }: BoardActionsProps) => {
         open={isEditBoardDialogOpen}
         onClose={closeEditBoardDialog}
         board={board}
+        loading={isBoardUpdating}
         onEdit={handleBoardEdit}
       />
       <UpsertStatusDialog
