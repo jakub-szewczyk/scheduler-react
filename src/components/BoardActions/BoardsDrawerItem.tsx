@@ -1,16 +1,17 @@
+import { deleteBoard } from '@/services/board'
+import { useAuth } from '@clerk/clerk-react'
 import CloseIcon from '@mui/icons-material/Close'
 import ViewKanbanIcon from '@mui/icons-material/ViewKanban'
 import { Box, IconButton, ListItemButton, Stack, Tooltip } from '@mui/material'
 import Avatar from '@mui/material/Avatar'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
 import ListItemText from '@mui/material/ListItemText'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { formatDistanceToNow } from 'date-fns'
 import { useBoolean, useReadLocalStorage } from 'usehooks-ts'
 import { asteriskSuffix } from '../../modules/common'
 import { Board } from '../../types/board'
 import DeleteBoardDialog from './DeleteBoardDialog'
-import { useAuth } from '@clerk/clerk-react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 interface BoardsDrawerItemProps {
   board: Pick<Board, 'id' | 'createdAt' | 'name'>
@@ -39,23 +40,23 @@ const BoardsDrawerItem = ({
 
   const queryClient = useQueryClient()
 
-  // const { mutate: deleteBoardMutation, isLoading: isBoardDeleting } =
-  //   useMutation(deleteBoard, {
-  //     onSuccess: () => {
-  //       queryClient.invalidateQueries(
-  //         ['projects', selectedProjectId, 'boards'],
-  //         { exact: true }
-  //       )
-  //       closeDeleteBoardDialog()
-  //     },
-  //   })
+  const { mutate: deleteBoardMutation, isLoading: isBoardDeleting } =
+    useMutation(deleteBoard, {
+      onSuccess: () => {
+        queryClient.invalidateQueries(
+          ['projects', selectedProjectId, 'boards'],
+          { exact: true }
+        )
+        closeDeleteBoardDialog()
+      },
+    })
 
-  const handleBoardDelete = async (boardId: string) => {}
-  // deleteBoardMutation({
-  //   projectId: selectedProjectId!,
-  //   scheduleId: boardId,
-  //   token: await getToken(),
-  // })
+  const handleBoardDelete = async (boardId: string) =>
+    deleteBoardMutation({
+      projectId: selectedProjectId!,
+      boardId,
+      token: await getToken(),
+    })
 
   return (
     <>
@@ -105,7 +106,7 @@ const BoardsDrawerItem = ({
         open={isDeleteBoardDialogOpen}
         onClose={closeDeleteBoardDialog}
         board={board}
-        // loading={isBoardDeleting}
+        loading={isBoardDeleting}
         onDelete={handleBoardDelete}
       />
     </>

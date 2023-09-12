@@ -62,3 +62,20 @@ export const updateBoard = ({
       }
     )
     .then(({ data }) => data)
+
+interface DeleteBoardPayload {
+  projectId: string
+  boardId: string
+  token: string | null
+}
+
+export const deleteBoard = ({
+  projectId,
+  boardId,
+  token,
+}: DeleteBoardPayload) =>
+  api
+    .delete<Board>(`/projects/${projectId}/boards/${boardId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    .then(({ data }) => data)
