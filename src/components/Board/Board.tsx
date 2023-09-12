@@ -1,17 +1,22 @@
+import { Status } from '@/types/status'
+import { Dispatch, SetStateAction } from 'react'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
-import useBoards from '../../hooks/useBoards'
 import StrictModeDroppable from '../../layout/StrictModeDroppable/StrictModeDroppable'
 import * as STATUS from '../../modules/status'
 import BoardHeader from './BoardHeader'
 import StatusColumn from './StatusColumn'
 import { BoardContainer } from './styles/Board.styled'
+import { equals } from 'ramda'
+import { Board as IBoard } from '@/types/board'
+import DataChangeBar from '@/layout/DataChangeBar/DataChangeBar'
 
-const Board = () => {
-  const {
-    board: { statuses },
-    setStatuses,
-  } = useBoards()
+interface BoardProps {
+  board: IBoard
+  statuses: Status[]
+  setStatuses: Dispatch<SetStateAction<Status[]>>
+}
 
+const Board = ({ board, statuses, setStatuses }: BoardProps) => {
   const handleDragEnd = ({ source, destination }: DropResult) => {
     if (
       !destination ||
@@ -24,7 +29,7 @@ const Board = () => {
 
   return (
     <>
-      <BoardHeader />
+      <BoardHeader board={board} />
       <DragDropContext onDragEnd={handleDragEnd}>
         <StrictModeDroppable
           droppableId='board'
@@ -47,6 +52,22 @@ const Board = () => {
           )}
         </StrictModeDroppable>
       </DragDropContext>
+      {!equals(statuses, board.statuses) && (
+        <DataChangeBar
+          // loading={isUpdatingBoardStatuses}
+          onDiscard={() => setStatuses(board.statuses)}
+          onSave={
+            () => console.log(statuses)
+            // async () =>
+            // updateBoardStatusesMutation({
+            //   projectId: selectedProjectId!,
+            //   boardId: board.id,
+            //   statuses,
+            //   token: await getToken(),
+            // })
+          }
+        />
+      )}
     </>
   )
 }

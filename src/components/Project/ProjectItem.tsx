@@ -151,10 +151,9 @@ const ProjectItem = ({ project, projects }: ProjectItemProps) => {
           flexDirection: 'column',
           height: '100%',
           cursor: 'pointer',
+          bgcolor: 'rgba(0, 0, 0, 0.35)',
           ...(isProjectSelected && {
             color: (theme) => theme.palette.common.black,
-          }),
-          ...(isProjectSelected && {
             bgcolor: (theme) => theme.palette.primary.main,
           }),
           '&:hover': {

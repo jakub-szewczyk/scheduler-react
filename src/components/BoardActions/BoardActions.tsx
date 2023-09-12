@@ -1,30 +1,35 @@
+import { Board, InitialValues } from '@/types/board'
+import { Issue } from '@/types/issue'
+import { Status } from '@/types/status'
+import { useAuth } from '@clerk/clerk-react'
 import EditIcon from '@mui/icons-material/Edit'
-import SaveIcon from '@mui/icons-material/Save'
 import TableRowsIcon from '@mui/icons-material/TableRows'
 import ViewColumnIcon from '@mui/icons-material/ViewColumn'
 import ViewKanbanIcon from '@mui/icons-material/ViewKanban'
 import { SpeedDial, SpeedDialAction } from '@mui/material'
 import SpeedDialIcon from '@mui/material/SpeedDialIcon'
-import { pipe } from 'fp-ts/lib/function'
-import { trim } from 'ramda'
-import { useBoolean } from 'usehooks-ts'
-import useBoards from '../../hooks/useBoards'
-import * as BOARD from '../../modules/board'
-import * as ISSUE from '@/modules/issue'
-import * as STATUS from '@/modules/status'
-import { isUnsaved } from '../../modules/common'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { FormikHelpers } from 'formik'
+import { useBoolean, useLocalStorage, useReadLocalStorage } from 'usehooks-ts'
 import UpsertIssueDialog from '../Board/UpsertIssueDialog'
 import UpsertStatusDialog from '../Board/UpsertStatusDialog'
 import BoardsDrawer from './BoardsDrawer'
-import SaveBoardDialog from './SaveBoardDialog'
-import { Status } from '@/types/status'
-import useProjects from '@/hooks/useProjects'
-import { Issue } from '@/types/issue'
+import UpsertBoardDialog from './UpsertBoardDialog'
+import { createBoard } from '@/services/board'
 
-const BoardActions = () => {
-  const { project } = useProjects()
+interface BoardActionsProps {
+  board: Board
+}
 
-  const { board, boards, setBoards, setStatuses } = useBoards()
+const BoardActions = ({ board }: BoardActionsProps) => {
+  const selectedProjectId = useReadLocalStorage<string | null>(
+    'selectedProjectId'
+  )
+
+  const [, setSelectedBoardId] = useLocalStorage<string | null>(
+    'selectedBoardId',
+    null
+  )
 
   const {
     value: isBoardsDrawerOpen,
@@ -33,51 +38,91 @@ const BoardActions = () => {
   } = useBoolean()
 
   const {
-    value: isSaveBoardDialogOpen,
-    setFalse: closeSaveBoardDialog,
-    setTrue: openSaveBoardDialog,
+    value: isCreateBoardDialogOpen,
+    setFalse: closeCreateBoardDialog,
+    setTrue: openCreateBoardDialog,
   } = useBoolean()
 
   const {
-    value: isUpsertStatusDialogOpen,
-    setFalse: closeUpsertStatusDialog,
-    setTrue: openUpsertStatusDialog,
+    value: isEditBoardDialogOpen,
+    setFalse: closeEditBoardDialog,
+    setTrue: openEditBoardDialog,
+  } = useBoolean()
+
+  const {
+    value: isCreateStatusDialogOpen,
+    setFalse: closeCreateStatusDialog,
+    setTrue: openCreateStatusDialog,
   } = useBoolean(false)
 
   const {
-    value: isUpsertIssueDialogOpen,
-    setFalse: closeUpsertIssueDialog,
-    setTrue: openUpsertIssueDialog,
+    value: isCreateIssueDialogOpen,
+    setFalse: closeCreateIssueDialog,
+    setTrue: openCreateIssueDialog,
   } = useBoolean(false)
 
+  const { getToken } = useAuth()
+
+  const queryClient = useQueryClient()
+
+  const { mutate: createBoardMutation, isLoading: isBoardCreating } =
+    useMutation(createBoard, {
+      onSuccess: ({ id }) => {
+        queryClient.invalidateQueries(
+          ['projects', selectedProjectId, 'boards'],
+          { exact: true }
+        )
+        setSelectedBoardId(id)
+        closeCreateBoardDialog()
+      },
+    })
+
+  // const { mutate: updateBoardMutation, isLoading: isBoardUpdating } =
+  //   useMutation(updateBoard, {
+  //     onSuccess: () => {
+  //       queryClient.invalidateQueries([
+  //         'projects',
+  //         selectedProjectId,
+  //         'boards',
+  //       ])
+  //       closeEditBoardDialog()
+  //     },
+  //   })
+
+  const handleBoardSelect = (boardId: string) => {
+    setSelectedBoardId(boardId)
+    closeBoardsDrawer()
+  }
+
+  const handleBoardCreate = async (
+    values: InitialValues,
+    formikHelpers: FormikHelpers<InitialValues>
+  ) =>
+    createBoardMutation({
+      projectId: selectedProjectId!,
+      name: values.name,
+      token: await getToken(),
+    })
+
+  const handleBoardEdit = async (
+    values: InitialValues,
+    formikHelpers: FormikHelpers<InitialValues>
+  ) => {}
+  // updateBoardMutation({
+  //   projectId: selectedProjectId!,
+  //   boardId: board.id,
+  //   name: values.name,
+  //   token: await getToken(),
+  // })
+
   const handleStatusCreate = ({ title }: Pick<Status, 'title'>) => {
-    setStatuses(STATUS.create(title))
-    closeUpsertStatusDialog()
+    // setStatuses(STATUS.create(title))
+    closeCreateStatusDialog()
   }
 
   const handleIssueCreate = (issue: Issue) => {
-    setStatuses(ISSUE.create(issue))
-    closeUpsertIssueDialog()
-  }
-
-  const handleBoardCreate = () => {
-    setBoards(BOARD.create(project))
-    closeBoardsDrawer()
-  }
-
-  const handleBoardDelete = (name: string) => {
-    setBoards(BOARD.remove(project, name))
-    closeBoardsDrawer()
-  }
-
-  const handleBoardSelect = (name: string) => {
-    setBoards(BOARD.select(project, name))
-    closeBoardsDrawer()
-  }
-
-  const handleBoardSave = ({ name }: { name: string }) => {
-    setBoards(pipe(name, trim, BOARD.save(project)))
-    closeSaveBoardDialog()
+    // setStatuses(ISSUE.create(issue))
+    closeCreateIssueDialog()
   }
 
   return (
@@ -94,7 +139,7 @@ const BoardActions = () => {
         <SpeedDialAction
           tooltipTitle='Issue'
           icon={<TableRowsIcon />}
-          onClick={openUpsertIssueDialog}
+          onClick={openCreateIssueDialog}
           FabProps={{
             disabled: board.statuses.length === 0,
           }}
@@ -102,12 +147,12 @@ const BoardActions = () => {
         <SpeedDialAction
           tooltipTitle='Status'
           icon={<ViewColumnIcon />}
-          onClick={openUpsertStatusDialog}
+          onClick={openCreateStatusDialog}
         />
         <SpeedDialAction
-          tooltipTitle={isUnsaved(board) ? 'Save' : 'Rename'}
-          icon={isUnsaved(board) ? <SaveIcon /> : <EditIcon />}
-          onClick={openSaveBoardDialog}
+          tooltipTitle='Rename'
+          icon={<EditIcon />}
+          onClick={openEditBoardDialog}
         />
         <SpeedDialAction
           tooltipTitle='Boards'
@@ -119,30 +164,35 @@ const BoardActions = () => {
         open={isBoardsDrawerOpen}
         onOpen={openBoardsDrawer}
         onClose={closeBoardsDrawer}
-        board={board}
-        boards={boards}
-        onCreate={handleBoardCreate}
-        onDelete={handleBoardDelete}
         onSelect={handleBoardSelect}
+        onCreate={openCreateBoardDialog}
       />
-      <SaveBoardDialog
-        open={isSaveBoardDialogOpen}
-        onClose={closeSaveBoardDialog}
+      <UpsertBoardDialog
+        mode='CREATE'
+        open={isCreateBoardDialogOpen}
+        onClose={closeCreateBoardDialog}
         board={board}
-        boards={boards}
-        onSave={handleBoardSave}
+        loading={isBoardCreating}
+        onCreate={handleBoardCreate}
+      />
+      <UpsertBoardDialog
+        mode='EDIT'
+        open={isEditBoardDialogOpen}
+        onClose={closeEditBoardDialog}
+        board={board}
+        onEdit={handleBoardEdit}
       />
       <UpsertStatusDialog
-        open={isUpsertStatusDialogOpen}
-        onClose={closeUpsertStatusDialog}
         mode='CREATE'
+        open={isCreateStatusDialogOpen}
+        onClose={closeCreateStatusDialog}
         statuses={board.statuses}
         onCreate={handleStatusCreate}
       />
       <UpsertIssueDialog
-        open={isUpsertIssueDialogOpen}
-        onClose={closeUpsertIssueDialog}
         mode='CREATE'
+        open={isCreateIssueDialogOpen}
+        onClose={closeCreateIssueDialog}
         statuses={board.statuses}
         onCreate={handleIssueCreate}
       />

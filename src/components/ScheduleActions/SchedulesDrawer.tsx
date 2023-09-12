@@ -8,15 +8,14 @@ import {
   Stack,
   SwipeableDrawer,
   SwipeableDrawerProps,
-  Theme,
   Typography,
 } from '@mui/material'
 import List from '@mui/material/List'
 import { useQuery } from '@tanstack/react-query'
 import { MouseEventHandler } from 'react'
 import { useReadLocalStorage } from 'usehooks-ts'
+import DrawerItemSkeleton from '../../layout/DrawerItemSkeleton/DrawerItemSkeleton'
 import SchedulesDrawerItem from './SchedulesDrawerItem'
-import SchedulesDrawerItemSkeleton from './SchedulesDrawerItemSkeleton'
 
 interface SchedulesDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
   onCreate: MouseEventHandler<HTMLButtonElement> | undefined
@@ -86,14 +85,14 @@ const SchedulesDrawer = ({
                 },
               },
               '::-webkit-scrollbar-track': {
-                bgcolor: (theme: Theme) => theme.palette.secondary.light,
-                borderRadius: (theme: Theme) => theme.shape.borderRadius,
+                bgcolor: (theme) => theme.palette.secondary.light,
+                borderRadius: (theme) => theme.shape.borderRadius,
               },
               '::-webkit-scrollbar-thumb': {
-                bgcolor: (theme: Theme) => theme.palette.primary.main,
-                borderRadius: (theme: Theme) => theme.shape.borderRadius,
+                bgcolor: (theme) => theme.palette.primary.main,
+                borderRadius: (theme) => theme.shape.borderRadius,
                 '&:hover': {
-                  bgcolor: (theme: Theme) => theme.palette.primary.dark,
+                  bgcolor: (theme) => theme.palette.primary.dark,
                 },
               },
             }}
@@ -101,7 +100,7 @@ const SchedulesDrawer = ({
             {isEachScheduleLoading &&
               Array(3)
                 .fill(null)
-                .map((_, index) => <SchedulesDrawerItemSkeleton key={index} />)}
+                .map((_, index) => <DrawerItemSkeleton key={index} />)}
             {isEachScheduleFetchedSuccessfully &&
               schedules.map((schedule) => (
                 <SchedulesDrawerItem

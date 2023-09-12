@@ -9,7 +9,7 @@ import {
   Stack,
 } from '@mui/material'
 
-const SchedulesDrawerItemSkeleton = () => (
+const DrawerItemSkeleton = () => (
   <Stack direction='row' alignItems='start'>
     <ListItemButton>
       <ListItemAvatar>
@@ -28,4 +28,4 @@ const SchedulesDrawerItemSkeleton = () => (
   </Stack>
 )
 
-export default SchedulesDrawerItemSkeleton
+export default DrawerItemSkeleton

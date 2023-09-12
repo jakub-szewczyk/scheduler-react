@@ -30,6 +30,7 @@ const StatusColumn = ({
           width: 280,
           p: 0.75,
           mx: 1,
+          bgcolor: 'rgba(0, 0, 0, 0.35)',
         }}
       >
         <Paper

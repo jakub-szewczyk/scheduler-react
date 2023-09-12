@@ -1,3 +1,4 @@
+import { LoadingButton } from '@mui/lab'
 import { Button, Typography } from '@mui/material'
 import { MouseEventHandler } from 'react'
 import DraggableDialog, {
@@ -6,13 +7,15 @@ import DraggableDialog, {
 import { Board } from '../../types/board'
 
 interface DeleteBoardDialogProps extends DraggableDialogProps {
-  board: Board
-  onDelete: (name: string) => void
+  board: Pick<Board, 'id' | 'createdAt' | 'name'>
+  loading?: boolean
+  onDelete: (id: string) => void
   onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
 
 const DeleteBoardDialog = ({
   board,
+  loading = false,
   onDelete,
   onClose,
   onCancel = onClose as MouseEventHandler<HTMLButtonElement> | undefined,
@@ -30,9 +33,13 @@ const DeleteBoardDialog = ({
         <Button variant='outlined' onClick={onCancel}>
           Cancel
         </Button>
-        <Button variant='outlined' onClick={() => onDelete(board.name)}>
+        <LoadingButton
+          variant='outlined'
+          loading={loading}
+          onClick={() => onDelete(board.id)}
+        >
           Delete
-        </Button>
+        </LoadingButton>
       </>
     }
   />

@@ -52,6 +52,7 @@ const Schedule = ({ schedule, rows, setRows }: ScheduleProps) => {
               theme.breakpoints.values.lg,
               TABLE.calculateMaxWidth(columns)
             ),
+          bgcolor: 'rgba(0, 0, 0, 0.35)',
         }}
       >
         <DataGrid

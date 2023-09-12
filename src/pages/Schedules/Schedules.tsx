@@ -42,7 +42,9 @@ const Schedules = () => {
         onSuccess: (schedules) => {
           if (
             selectedScheduleId &&
-            schedules.map((project) => project.id).includes(selectedScheduleId)
+            schedules
+              .map((schedule) => schedule.id)
+              .includes(selectedScheduleId)
           )
             return
           setSelectedScheduleId(schedules[0].id)

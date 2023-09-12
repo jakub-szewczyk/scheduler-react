@@ -56,16 +56,14 @@ const UpsertScheduleDialog = ({
         >
           {() => (
             <Form id='schedule'>
-              <Stack spacing={2}>
-                <Field
-                  component={TextField}
-                  name='name'
-                  size='small'
-                  label='Name'
-                  helperText='Set schedule name'
-                  fullWidth
-                />
-              </Stack>
+              <Field
+                component={TextField}
+                name='name'
+                size='small'
+                label='Name'
+                helperText='Set schedule name'
+                fullWidth
+              />
             </Form>
           )}
         </Formik>

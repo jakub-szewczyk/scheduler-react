@@ -1,6 +1,7 @@
 import { Issue } from './issue'
 
 export interface Status {
+  id: string
   title: string
   issues: Issue[]
 }

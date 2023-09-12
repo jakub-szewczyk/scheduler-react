@@ -5,38 +5,66 @@ import Avatar from '@mui/material/Avatar'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
 import ListItemText from '@mui/material/ListItemText'
 import { formatDistanceToNow } from 'date-fns'
-import { useBoolean } from 'usehooks-ts'
+import { useBoolean, useReadLocalStorage } from 'usehooks-ts'
 import { asteriskSuffix } from '../../modules/common'
 import { Board } from '../../types/board'
 import DeleteBoardDialog from './DeleteBoardDialog'
+import { useAuth } from '@clerk/clerk-react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 interface BoardsDrawerItemProps {
-  board: Board
-  boards: Board[]
-  onDelete: (name: string) => void
-  onSelect: (name: string) => void
+  board: Pick<Board, 'id' | 'createdAt' | 'name'>
+  boards: Pick<Board, 'id' | 'createdAt' | 'name'>[]
+  onSelect: (id: string) => void
 }
 
 const BoardsDrawerItem = ({
   board,
   boards,
-  onDelete,
   onSelect,
 }: BoardsDrawerItemProps) => {
+  const selectedProjectId = useReadLocalStorage<string | null>(
+    'selectedProjectId'
+  )
+
+  const selectedBoardId = useReadLocalStorage<string | null>('selectedBoardId')
+
   const {
-    value: isDeleteDialogOpen,
-    setFalse: closeDeleteDialog,
-    setTrue: openDeleteDialog,
+    value: isDeleteBoardDialogOpen,
+    setFalse: closeDeleteBoardDialog,
+    setTrue: openDeleteBoardDialog,
   } = useBoolean(false)
+
+  const { getToken } = useAuth()
+
+  const queryClient = useQueryClient()
+
+  // const { mutate: deleteBoardMutation, isLoading: isBoardDeleting } =
+  //   useMutation(deleteBoard, {
+  //     onSuccess: () => {
+  //       queryClient.invalidateQueries(
+  //         ['projects', selectedProjectId, 'boards'],
+  //         { exact: true }
+  //       )
+  //       closeDeleteBoardDialog()
+  //     },
+  //   })
+
+  const handleBoardDelete = async (boardId: string) => {}
+  // deleteBoardMutation({
+  //   projectId: selectedProjectId!,
+  //   scheduleId: boardId,
+  //   token: await getToken(),
+  // })
 
   return (
     <>
       <Stack direction='row' alignItems='start'>
-        <ListItemButton onClick={() => onSelect(board.name)}>
+        <ListItemButton onClick={() => onSelect(board.id)}>
           <ListItemAvatar>
             <Avatar
               sx={{
-                ...(board.selected && {
+                ...(board.id === selectedBoardId && {
                   bgcolor: (theme) => theme.palette.primary.main,
                 }),
               }}
@@ -66,7 +94,7 @@ const BoardsDrawerItem = ({
             <IconButton
               size='small'
               disabled={boards.length === 1}
-              onClick={openDeleteDialog}
+              onClick={openDeleteBoardDialog}
             >
               <CloseIcon fontSize='small' />
             </IconButton>
@@ -74,10 +102,11 @@ const BoardsDrawerItem = ({
         </Tooltip>
       </Stack>
       <DeleteBoardDialog
-        open={isDeleteDialogOpen}
-        onClose={closeDeleteDialog}
+        open={isDeleteBoardDialogOpen}
+        onClose={closeDeleteBoardDialog}
         board={board}
-        onDelete={onDelete}
+        // loading={isBoardDeleting}
+        onDelete={handleBoardDelete}
       />
     </>
   )

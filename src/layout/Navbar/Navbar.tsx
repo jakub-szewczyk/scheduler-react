@@ -54,6 +54,7 @@ const Navbar = () => {
       <AppBar
         elevation={0}
         sx={{
+          bgcolor: 'rgba(0, 0, 0, 0.35)',
           transition: 'background 0.25s',
           ...(isScrollYOffsetNoticeable && {
             bgcolor: 'rgba(0, 0, 0, 0.25)',
