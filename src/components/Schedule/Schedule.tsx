@@ -70,7 +70,7 @@ const Schedule = ({ schedule, rows, setRows }: ScheduleProps) => {
           }
         />
       </DataGridContainer>
-      {!equals(rows, schedule.rows) && (
+      {(!equals(rows, schedule.rows) || isUpdatingScheduleRows) && (
         <DataChangeBar
           loading={isUpdatingScheduleRows}
           onDiscard={() => setRows(schedule.rows)}

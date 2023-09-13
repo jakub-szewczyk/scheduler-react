@@ -9,6 +9,10 @@ import { BoardContainer } from './styles/Board.styled'
 import { equals } from 'ramda'
 import { Board as IBoard } from '@/types/board'
 import DataChangeBar from '@/layout/DataChangeBar/DataChangeBar'
+import { useReadLocalStorage } from 'usehooks-ts'
+import { useAuth } from '@clerk/clerk-react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { updateBoardStatuses } from '@/services/status'
 
 interface BoardProps {
   board: IBoard
@@ -17,6 +21,25 @@ interface BoardProps {
 }
 
 const Board = ({ board, statuses, setStatuses }: BoardProps) => {
+  const selectedProjectId = useReadLocalStorage<string | null>(
+    'selectedProjectId'
+  )
+
+  const { getToken } = useAuth()
+
+  const queryClient = useQueryClient()
+
+  const {
+    mutate: updateBoardStatusesMutation,
+    isLoading: isUpdatingBoardStatuses,
+  } = useMutation(updateBoardStatuses, {
+    onSuccess: () =>
+      queryClient.invalidateQueries(
+        ['projects', selectedProjectId, 'boards', board.id],
+        { exact: true }
+      ),
+  })
+
   const handleDragEnd = ({ source, destination }: DropResult) => {
     if (
       !destination ||
@@ -52,19 +75,17 @@ const Board = ({ board, statuses, setStatuses }: BoardProps) => {
           )}
         </StrictModeDroppable>
       </DragDropContext>
-      {!equals(statuses, board.statuses) && (
+      {(!equals(statuses, board.statuses) || isUpdatingBoardStatuses) && (
         <DataChangeBar
-          // loading={isUpdatingBoardStatuses}
+          loading={isUpdatingBoardStatuses}
           onDiscard={() => setStatuses(board.statuses)}
-          onSave={
-            () => console.log(statuses)
-            // async () =>
-            // updateBoardStatusesMutation({
-            //   projectId: selectedProjectId!,
-            //   boardId: board.id,
-            //   statuses,
-            //   token: await getToken(),
-            // })
+          onSave={async () =>
+            updateBoardStatusesMutation({
+              projectId: selectedProjectId!,
+              boardId: board.id,
+              statuses,
+              token: await getToken(),
+            })
           }
         />
       )}
