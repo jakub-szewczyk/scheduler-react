@@ -1,4 +1,4 @@
-import { Issue } from '@/types/issue'
+import { Issue, UpsertedIssue } from '@/types/issue'
 import { Status } from '@/types/status'
 import { Button, Stack, Theme, Typography } from '@mui/material'
 import { Field, Form, Formik, FormikHelpers } from 'formik'
@@ -10,15 +10,17 @@ import DraggableDialog, {
   DraggableDialogProps,
 } from '../../layout/DraggableDialog/DraggableDialog'
 import { upsertIssueValidationSchema } from './validation/validationSchema'
+import { LoadingButton } from '@mui/lab'
 
 type SubmitHandler = (
-  values: Issue,
-  formikHelpers: FormikHelpers<Issue>
+  values: UpsertedIssue,
+  formikHelpers: FormikHelpers<UpsertedIssue>
 ) => void
 
 interface IssueDialogProps extends DraggableDialogProps {
   issue?: Issue
   statuses?: Status[]
+  loading?: boolean
   onCreate?: SubmitHandler
   onEdit?: SubmitHandler
   onInsertAbove?: SubmitHandler
@@ -61,6 +63,7 @@ const UpsertIssueDialog = ({
   mode,
   issue,
   statuses,
+  loading = false,
   onCreate,
   onEdit,
   onInsertAbove,
@@ -155,9 +158,14 @@ const UpsertIssueDialog = ({
           <Button variant='outlined' onClick={onCancel}>
             Cancel
           </Button>
-          <Button type='submit' form='issue' variant='outlined'>
+          <LoadingButton
+            type='submit'
+            form='issue'
+            variant='outlined'
+            loading={loading}
+          >
             Save
-          </Button>
+          </LoadingButton>
         </>
       }
     />

@@ -1,6 +1,9 @@
+import * as ISSUE from '@/modules/issue'
+import * as STATUS from '@/modules/status'
 import { createBoard, updateBoard } from '@/services/board'
+import { updateBoardStatuses } from '@/services/status'
 import { Board, InitialValues } from '@/types/board'
-import { Issue } from '@/types/issue'
+import { UpsertedIssue } from '@/types/issue'
 import { Status } from '@/types/status'
 import { useAuth } from '@clerk/clerk-react'
 import EditIcon from '@mui/icons-material/Edit'
@@ -85,6 +88,20 @@ const BoardActions = ({ board }: BoardActionsProps) => {
       },
     })
 
+  const {
+    mutate: updateBoardStatusesMutation,
+    isLoading: isUpdatingBoardStatuses,
+  } = useMutation(updateBoardStatuses, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(
+        ['projects', selectedProjectId, 'boards', board.id],
+        { exact: true }
+      )
+      closeCreateStatusDialog()
+      closeCreateIssueDialog()
+    },
+  })
+
   const handleBoardSelect = (boardId: string) => {
     setSelectedBoardId(boardId)
     closeBoardsDrawer()
@@ -111,15 +128,21 @@ const BoardActions = ({ board }: BoardActionsProps) => {
       token: await getToken(),
     })
 
-  const handleStatusCreate = ({ title }: Pick<Status, 'title'>) => {
-    // setStatuses(STATUS.create(title))
-    closeCreateStatusDialog()
-  }
+  const handleStatusCreate = async ({ title }: Pick<Status, 'title'>) =>
+    updateBoardStatusesMutation({
+      projectId: selectedProjectId!,
+      boardId: board.id,
+      statuses: STATUS.create(title)(board.statuses),
+      token: await getToken(),
+    })
 
-  const handleIssueCreate = (issue: Issue) => {
-    // setStatuses(ISSUE.create(issue))
-    closeCreateIssueDialog()
-  }
+  const handleIssueCreate = async (issue: UpsertedIssue) =>
+    updateBoardStatusesMutation({
+      projectId: selectedProjectId!,
+      boardId: board.id,
+      statuses: ISSUE.create(issue)(board.statuses),
+      token: await getToken(),
+    })
 
   return (
     <>
@@ -184,6 +207,7 @@ const BoardActions = ({ board }: BoardActionsProps) => {
         open={isCreateStatusDialogOpen}
         onClose={closeCreateStatusDialog}
         statuses={board.statuses}
+        loading={isUpdatingBoardStatuses}
         onCreate={handleStatusCreate}
       />
       <UpsertIssueDialog
@@ -191,6 +215,7 @@ const BoardActions = ({ board }: BoardActionsProps) => {
         open={isCreateIssueDialogOpen}
         onClose={closeCreateIssueDialog}
         statuses={board.statuses}
+        loading={isUpdatingBoardStatuses}
         onCreate={handleIssueCreate}
       />
     </>

@@ -55,11 +55,7 @@ const StatusColumn = ({
           >
             {status.title}
           </Typography>
-          <StatusActionsMenu
-            status={status}
-            statuses={statuses}
-            setStatuses={setStatuses}
-          />
+          <StatusActionsMenu status={status} statuses={statuses} />
         </Paper>
         <StrictModeDroppable
           type='status'

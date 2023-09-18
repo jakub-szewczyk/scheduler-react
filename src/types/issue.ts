@@ -4,6 +4,8 @@ export interface Issue {
   content: string
 }
 
+export type UpsertedIssue = Omit<Issue, 'id'> & { id?: string }
+
 export type UpsertIssueDialogMode =
   | 'CREATE'
   | 'EDIT'

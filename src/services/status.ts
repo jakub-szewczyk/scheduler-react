@@ -5,7 +5,10 @@ import api from './api'
 interface UpdateBoardStatusesPayload {
   projectId: string
   boardId: string
-  statuses: (Pick<Status, 'id'> & { issues: Pick<Issue, 'id'>[] })[]
+  statuses: (Pick<Status, 'title'> & {
+    id?: string
+    issues: (Pick<Issue, 'title' | 'content'> & { id?: string })[]
+  })[]
   token: string | null
 }
 

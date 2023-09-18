@@ -28,13 +28,7 @@ const IssueItem = ({ index, issue, statuses, setStatuses }: IssueItemProps) => (
       >
         <CardHeader
           title={issue.title}
-          action={
-            <IssueActionsMenu
-              issue={issue}
-              statuses={statuses}
-              setStatuses={setStatuses}
-            />
-          }
+          action={<IssueActionsMenu issue={issue} statuses={statuses} />}
           titleTypographyProps={{
             variant: 'body1',
             noWrap: true,

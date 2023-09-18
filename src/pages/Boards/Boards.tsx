@@ -53,6 +53,7 @@ const Boards = () => {
   const {
     data: board,
     isLoading: isBoardLoading,
+    isSuccess: isBoardFetchedSuccessfully,
     isError: isBoardFetchedWithError,
   } = useQuery(
     ['projects', selectedProjectId, 'boards', selectedBoardId],
@@ -75,7 +76,7 @@ const Boards = () => {
    * TODO:
    * Test loading and error states.
    */
-  if (isBoardLoading || statuses.length === 0)
+  if (isBoardLoading || (!isBoardFetchedSuccessfully && statuses.length === 0))
     return (
       <Box
         sx={{
