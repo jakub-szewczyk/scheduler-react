@@ -24,7 +24,7 @@ export const updateBoardStatuses = ({
     })
     .then(({ data }) => data)
 
-interface RenameBoardStatusPayload {
+interface UpdateBoardStatusPayload {
   projectId: string
   boardId: string
   statusId: string
@@ -32,13 +32,13 @@ interface RenameBoardStatusPayload {
   token: string | null
 }
 
-export const renameBoardStatus = ({
+export const updateBoardStatus = ({
   projectId,
   boardId,
   statusId,
   title,
   token,
-}: RenameBoardStatusPayload) =>
+}: UpdateBoardStatusPayload) =>
   api
     .patch<Status>(
       `/projects/${projectId}/boards/${boardId}/statuses/${statusId}`,

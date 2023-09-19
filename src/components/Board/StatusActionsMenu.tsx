@@ -1,5 +1,5 @@
 import * as STATUS from '@/modules/status'
-import { renameBoardStatus, updateBoardStatuses } from '@/services/status'
+import { updateBoardStatus, updateBoardStatuses } from '@/services/status'
 import { Status, UpsertStatusDialogMode } from '@/types/status'
 import { useAuth } from '@clerk/clerk-react'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
@@ -73,9 +73,9 @@ const StatusActionsMenu = ({
   })
 
   const {
-    mutate: renameBoardStatusMutation,
-    isLoading: isRenamingBoardStatus,
-  } = useMutation(renameBoardStatus, {
+    mutate: updateBoardStatusMutation,
+    isLoading: isUpdatingBoardStatus,
+  } = useMutation(updateBoardStatus, {
     onSuccess: () => {
       queryClient.invalidateQueries(
         ['projects', selectedProjectId, 'boards', selectedBoardId],
@@ -109,7 +109,7 @@ const StatusActionsMenu = ({
   }
 
   const handleStatusEdit = async ({ title }: Pick<Status, 'title'>) =>
-    renameBoardStatusMutation({
+    updateBoardStatusMutation({
       projectId: selectedProjectId!,
       boardId: selectedBoardId!,
       statusId: status.id,
@@ -192,7 +192,7 @@ const StatusActionsMenu = ({
         onClose={closeUpsertDialog}
         status={status}
         statuses={statuses}
-        loading={isUpdatingBoardStatuses || isRenamingBoardStatus}
+        loading={isUpdatingBoardStatuses || isUpdatingBoardStatus}
         onEdit={handleStatusEdit}
         onInsertBefore={handleStatusInsertBefore}
         onInsertAfter={handleStatusInsertAfter}
