@@ -1,5 +1,5 @@
 import * as STATUS from '@/modules/status'
-import { updateBoardStatuses } from '@/services/status'
+import { renameBoardStatus, updateBoardStatuses } from '@/services/status'
 import { Status, UpsertStatusDialogMode } from '@/types/status'
 import { useAuth } from '@clerk/clerk-react'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
@@ -72,6 +72,19 @@ const StatusActionsMenu = ({
     },
   })
 
+  const {
+    mutate: renameBoardStatusMutation,
+    isLoading: isRenamingBoardStatus,
+  } = useMutation(renameBoardStatus, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(
+        ['projects', selectedProjectId, 'boards', selectedBoardId],
+        { exact: true }
+      )
+      closeUpsertDialog()
+    },
+  })
+
   const handleEditMenuItemClick = () => {
     setMenu(null)
     setMode('EDIT')
@@ -95,11 +108,14 @@ const StatusActionsMenu = ({
     openUpsertDialog()
   }
 
-  // TODO: Handle status edit
-  const handleStatusEdit = ({ title }: Pick<Status, 'title'>) => {
-    // setStatuses(STATUS.update(status.title, title))
-    closeUpsertDialog()
-  }
+  const handleStatusEdit = async ({ title }: Pick<Status, 'title'>) =>
+    renameBoardStatusMutation({
+      projectId: selectedProjectId!,
+      boardId: selectedBoardId!,
+      statusId: status.id,
+      title,
+      token: await getToken(),
+    })
 
   const handleStatusDelete = async ({ id }: Status) =>
     updateBoardStatusesMutation({
@@ -176,7 +192,7 @@ const StatusActionsMenu = ({
         onClose={closeUpsertDialog}
         status={status}
         statuses={statuses}
-        loading={isUpdatingBoardStatuses}
+        loading={isUpdatingBoardStatuses || isRenamingBoardStatus}
         onEdit={handleStatusEdit}
         onInsertBefore={handleStatusInsertBefore}
         onInsertAfter={handleStatusInsertAfter}

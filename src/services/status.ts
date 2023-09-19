@@ -23,3 +23,28 @@ export const updateBoardStatuses = ({
       headers: { Authorization: `Bearer ${token}` },
     })
     .then(({ data }) => data)
+
+interface RenameBoardStatusPayload {
+  projectId: string
+  boardId: string
+  statusId: string
+  title: Status['title']
+  token: string | null
+}
+
+export const renameBoardStatus = ({
+  projectId,
+  boardId,
+  statusId,
+  title,
+  token,
+}: RenameBoardStatusPayload) =>
+  api
+    .patch<Status>(
+      `/projects/${projectId}/boards/${boardId}/statuses/${statusId}`,
+      { title },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    )
+    .then(({ data }) => data)
