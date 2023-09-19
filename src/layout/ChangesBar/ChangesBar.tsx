@@ -10,17 +10,17 @@ import {
   useTheme,
 } from '@mui/material'
 
-interface DataChangeBarProps {
+interface ChangesBarProps {
   loading?: boolean
   onDiscard: () => void
   onSave: () => void
 }
 
-const DataChangeBar = ({
+const ChangesBar = ({
   loading = false,
   onDiscard,
   onSave,
-}: DataChangeBarProps) => {
+}: ChangesBarProps) => {
   const theme = useTheme()
 
   const matches = useMediaQuery(theme.breakpoints.up('sm'))
@@ -67,4 +67,4 @@ const DataChangeBar = ({
   )
 }
 
-export default DataChangeBar
+export default ChangesBar

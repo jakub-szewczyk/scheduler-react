@@ -24,9 +24,14 @@ import { updateBoardStatuses } from '@/services/status'
 interface IssueActionsMenuProps {
   issue: Issue
   statuses: Status[]
+  disabled?: boolean
 }
 
-const IssueActionsMenu = ({ issue, statuses }: IssueActionsMenuProps) => {
+const IssueActionsMenu = ({
+  issue,
+  statuses,
+  disabled,
+}: IssueActionsMenuProps) => {
   const [menu, setMenu] = useState<HTMLElement | null>(null)
 
   const [mode, setMode] =
@@ -125,6 +130,7 @@ const IssueActionsMenu = ({ issue, statuses }: IssueActionsMenuProps) => {
     <>
       <IconButton
         size='small'
+        disabled={disabled}
         onClick={(event) => setMenu(event.currentTarget)}
       >
         <MoreVertIcon fontSize='small' />

@@ -23,9 +23,14 @@ import UpsertStatusDialog from './UpsertStatusDialog'
 interface StatusActionsMenuProps {
   status: Status
   statuses: Status[]
+  disabled?: boolean
 }
 
-const StatusActionsMenu = ({ status, statuses }: StatusActionsMenuProps) => {
+const StatusActionsMenu = ({
+  status,
+  statuses,
+  disabled,
+}: StatusActionsMenuProps) => {
   const [menu, setMenu] = useState<HTMLElement | null>(null)
 
   const [mode, setMode] =
@@ -124,6 +129,7 @@ const StatusActionsMenu = ({ status, statuses }: StatusActionsMenuProps) => {
     <>
       <IconButton
         size='small'
+        disabled={disabled}
         onClick={(event) => setMenu(event.currentTarget)}
         sx={{
           position: 'absolute',
@@ -131,6 +137,9 @@ const StatusActionsMenu = ({ status, statuses }: StatusActionsMenuProps) => {
           right: 8,
           translate: '0 -50%',
           color: 'inherit',
+          ':disabled': {
+            color: 'rgba(0, 0, 0, 0.3)',
+          },
         }}
       >
         <MoreVertIcon fontSize='small' />

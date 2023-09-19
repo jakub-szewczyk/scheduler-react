@@ -1,4 +1,4 @@
-import DataChangeBar from '@/layout/DataChangeBar/DataChangeBar'
+import ChangesBar from '@/layout/ChangesBar/ChangesBar'
 import { updateScheduleRows } from '@/services/row'
 import { Row } from '@/types/row'
 import { Schedule as ISchedule } from '@/types/schedule'
@@ -40,6 +40,8 @@ const Schedule = ({ schedule, rows, setRows }: ScheduleProps) => {
 
   const columns = createColumns(setRows)
 
+  const hasChanges = !equals(rows, schedule.rows) || isUpdatingScheduleRows
+
   return (
     <>
       <ScheduleHeader schedule={schedule} />
@@ -70,8 +72,8 @@ const Schedule = ({ schedule, rows, setRows }: ScheduleProps) => {
           }
         />
       </DataGridContainer>
-      {(!equals(rows, schedule.rows) || isUpdatingScheduleRows) && (
-        <DataChangeBar
+      {hasChanges && (
+        <ChangesBar
           loading={isUpdatingScheduleRows}
           onDiscard={() => setRows(schedule.rows)}
           onSave={async () =>

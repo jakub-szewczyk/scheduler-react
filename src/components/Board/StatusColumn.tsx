@@ -1,23 +1,22 @@
+import { Status } from '@/types/status'
 import { Paper, Stack, Typography } from '@mui/material'
-import { Dispatch, SetStateAction } from 'react'
 import { Draggable } from 'react-beautiful-dnd'
 import StrictModeDroppable from '../../layout/StrictModeDroppable/StrictModeDroppable'
 import IssueItem from './IssueItem'
 import StatusActionsMenu from './StatusActionsMenu'
-import { Status } from '@/types/status'
 
 interface StatusColumnProps {
   index: number
   status: Status
   statuses: Status[]
-  setStatuses: Dispatch<SetStateAction<Status[]>>
+  disabled?: boolean
 }
 
 const StatusColumn = ({
   index,
   status,
   statuses,
-  setStatuses,
+  disabled = false,
 }: StatusColumnProps) => (
   <Draggable draggableId={status.id} index={index}>
     {({ draggableProps, dragHandleProps, innerRef }) => (
@@ -55,7 +54,11 @@ const StatusColumn = ({
           >
             {status.title}
           </Typography>
-          <StatusActionsMenu status={status} statuses={statuses} />
+          <StatusActionsMenu
+            status={status}
+            statuses={statuses}
+            disabled={disabled}
+          />
         </Paper>
         <StrictModeDroppable type='status' droppableId={status.id}>
           {({ droppableProps, innerRef, placeholder }) => (
@@ -71,7 +74,7 @@ const StatusColumn = ({
                   index={index}
                   issue={issue}
                   statuses={statuses}
-                  setStatuses={setStatuses}
+                  disabled={disabled}
                 />
               ))}
               {placeholder}

@@ -8,7 +8,7 @@ import StatusColumn from './StatusColumn'
 import { BoardContainer } from './styles/Board.styled'
 import { equals } from 'ramda'
 import { Board as IBoard } from '@/types/board'
-import DataChangeBar from '@/layout/DataChangeBar/DataChangeBar'
+import ChangesBar from '@/layout/ChangesBar/ChangesBar'
 import { useReadLocalStorage } from 'usehooks-ts'
 import { useAuth } from '@clerk/clerk-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -50,6 +50,9 @@ const Board = ({ board, statuses, setStatuses }: BoardProps) => {
     setStatuses(STATUS.drag({ source, destination }))
   }
 
+  const hasChanges =
+    !equals(statuses, board.statuses) || isUpdatingBoardStatuses
+
   return (
     <>
       <BoardHeader board={board} />
@@ -67,7 +70,7 @@ const Board = ({ board, statuses, setStatuses }: BoardProps) => {
                   index={index}
                   status={status}
                   statuses={statuses}
-                  setStatuses={setStatuses}
+                  disabled={hasChanges}
                 />
               ))}
               {placeholder}
@@ -75,8 +78,8 @@ const Board = ({ board, statuses, setStatuses }: BoardProps) => {
           )}
         </StrictModeDroppable>
       </DragDropContext>
-      {(!equals(statuses, board.statuses) || isUpdatingBoardStatuses) && (
-        <DataChangeBar
+      {hasChanges && (
+        <ChangesBar
           loading={isUpdatingBoardStatuses}
           onDiscard={() => setStatuses(board.statuses)}
           onSave={async () =>
