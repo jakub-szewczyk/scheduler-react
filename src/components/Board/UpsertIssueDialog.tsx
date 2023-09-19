@@ -92,11 +92,7 @@ const UpsertIssueDialog = ({
               title: mode === 'EDIT' ? issue.title : '',
               content: mode === 'EDIT' ? issue.content : '',
             }}
-            validationSchema={upsertIssueValidationSchema(
-              mode,
-              issue,
-              statuses
-            )}
+            validationSchema={upsertIssueValidationSchema}
             onSubmit={onSubmit(mode)}
           >
             {() => (

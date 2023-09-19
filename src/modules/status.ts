@@ -1,17 +1,7 @@
 import { DropResultLocation } from '@/types/board'
-import { UpsertedStatus, Status } from '@/types/status'
-import { pipe } from 'fp-ts/lib/function'
+import { Status, UpsertedStatus } from '@/types/status'
 import produce from 'immer'
-import {
-  remove as _remove,
-  curry,
-  equals,
-  findIndex,
-  join,
-  move,
-  split,
-  tail,
-} from 'ramda'
+import { remove as _remove, curry, findIndex, move } from 'ramda'
 import { DraggableLocation } from 'react-beautiful-dnd'
 
 export const create = (title: string) =>
@@ -59,8 +49,7 @@ export const insertAfter = (statusBeforeId: string, title: string) =>
   })
 
 const matchByDraggableLocation = curry(
-  ({ droppableId }: DraggableLocation, { title }: Status) =>
-    pipe(droppableId, split('-'), tail, join('-'), equals(title))
+  ({ droppableId }: DraggableLocation, { id }: Status) => droppableId === id
 )
 
 const dragStatus = ({ source, destination }: DropResultLocation) =>

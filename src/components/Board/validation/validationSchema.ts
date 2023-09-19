@@ -1,4 +1,3 @@
-import { UpsertIssueDialogMode, UpsertedIssue } from '@/types/issue'
 import { Status, UpsertStatusDialogMode } from '@/types/status'
 import { prop } from 'fp-ts-ramda'
 import { map } from 'fp-ts/lib/Array'
@@ -29,25 +28,7 @@ export const upsertStatusValidationSchema = (
       ),
   })
 
-export const upsertIssueValidationSchema = (
-  mode: UpsertIssueDialogMode,
-  issue: UpsertedIssue | undefined,
-  statuses: Status[]
-) =>
-  object().shape({
-    title: string().trim().required('Required'),
-    // .test(
-    //   'unique status titles',
-    //   'This title has already been used by one of your issues',
-    //   (title = '') =>
-    //     !pipe(
-    //       statuses.flatMap((status) => status.issues),
-    //       mode === 'EDIT' && issue
-    //         ? filter(({ title }) => title !== issue.title)
-    //         : identity,
-    //       map(prop('title')),
-    //       includes(title)
-    //     )
-    // ),
-    content: string().trim().required('Required'),
-  })
+export const upsertIssueValidationSchema = object().shape({
+  title: string().trim().required('Required'),
+  content: string().trim().required('Required'),
+})

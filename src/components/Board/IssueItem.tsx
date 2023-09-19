@@ -13,7 +13,7 @@ interface IssueItemProps {
 }
 
 const IssueItem = ({ index, issue, statuses, setStatuses }: IssueItemProps) => (
-  <Draggable draggableId={`issue-${issue.title}`} index={index}>
+  <Draggable draggableId={issue.id} index={index}>
     {({ draggableProps, dragHandleProps, innerRef }) => (
       <Card
         {...draggableProps}

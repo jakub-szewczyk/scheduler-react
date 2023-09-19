@@ -63,7 +63,7 @@ const Board = ({ board, statuses, setStatuses }: BoardProps) => {
             <BoardContainer {...droppableProps} ref={innerRef}>
               {statuses.map((status, index) => (
                 <StatusColumn
-                  key={status.title}
+                  key={status.id}
                   index={index}
                   status={status}
                   statuses={statuses}
