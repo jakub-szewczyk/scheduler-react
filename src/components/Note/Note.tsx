@@ -46,6 +46,11 @@ const Note = forwardRef<Editor>((_, ref) => {
             '.public-DraftEditorPlaceholder-root': {
               display: isPlaceholderVisible(editorState) ? 'block' : 'none',
             },
+            '.public-DraftEditor-content': {
+              '.public-DraftStyleDefault-pre, blockquote': {
+                bgcolor: 'rgba(0, 0, 0, 0.35)',
+              },
+            },
           }}
         >
           <Editor
