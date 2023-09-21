@@ -20,6 +20,7 @@ import UpsertIssueDialog from './UpsertIssueDialog'
 import { useAuth } from '@clerk/clerk-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { updateBoardStatuses } from '@/services/status'
+import { updateBoardIssue } from '@/services/issue'
 
 interface IssueActionsMenuProps {
   issue: Issue
@@ -73,6 +74,17 @@ const IssueActionsMenu = ({
     },
   })
 
+  const { mutate: updateBoardIssueMutation, isLoading: isUpdatingBoardIssue } =
+    useMutation(updateBoardIssue, {
+      onSuccess: () => {
+        queryClient.invalidateQueries(
+          ['projects', selectedProjectId, 'boards', selectedBoardId],
+          { exact: true }
+        )
+        closeUpsertDialog()
+      },
+    })
+
   const handleEditMenuItemClick = () => {
     setMenu(null)
     setMode('EDIT')
@@ -96,11 +108,18 @@ const IssueActionsMenu = ({
     openUpsertDialog()
   }
 
-  // TODO: Handle issue edit
-  const handleIssueEdit = (values: UpsertedIssue) => {
-    // setStatuses(ISSUE.update(issue.title, values))
-    closeUpsertDialog()
-  }
+  const handleIssueEdit = async ({ title, content }: UpsertedIssue) =>
+    updateBoardIssueMutation({
+      projectId: selectedProjectId!,
+      boardId: selectedBoardId!,
+      statusId: statuses.find((status) =>
+        status.issues.map((issue) => issue.id).includes(issue.id)
+      )!.id,
+      issueId: issue.id,
+      title,
+      content,
+      token: await getToken(),
+    })
 
   const handleIssueDelete = async ({ id }: Issue) =>
     updateBoardStatusesMutation({
@@ -167,7 +186,7 @@ const IssueActionsMenu = ({
         mode={mode}
         issue={issue}
         statuses={statuses}
-        loading={isUpdatingBoardStatuses}
+        loading={isUpdatingBoardStatuses || isUpdatingBoardIssue}
         onEdit={handleIssueEdit}
         onInsertAbove={handleIssueInsertAbove}
         onInsertBelow={handleIssueInsertBelow}
