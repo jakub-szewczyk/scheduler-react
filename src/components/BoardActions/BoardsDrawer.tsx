@@ -19,7 +19,7 @@ import BoardsDrawerItem from './BoardsDrawerItem'
 
 interface BoardsDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
   onCreate: MouseEventHandler<HTMLButtonElement> | undefined
-  onSelect: (id: string) => void
+  onSelect: (boardId: string) => void
 }
 
 const BoardsDrawer = ({ onSelect, onCreate, ...props }: BoardsDrawerProps) => {

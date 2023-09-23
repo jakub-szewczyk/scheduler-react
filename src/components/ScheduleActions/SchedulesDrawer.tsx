@@ -104,7 +104,7 @@ const SchedulesDrawer = ({
             {isEachScheduleFetchedSuccessfully &&
               schedules.map((schedule) => (
                 <SchedulesDrawerItem
-                  key={schedule.name}
+                  key={schedule.id}
                   schedule={schedule}
                   schedules={schedules}
                   onSelect={onSelect}

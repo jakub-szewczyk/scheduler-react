@@ -17,84 +17,22 @@ import {
   convertFromRaw,
   convertToRaw,
 } from 'draft-js'
-import produce from 'immer'
 import { ReactNode } from 'react'
-import { Project } from '@/types/project'
 // @ts-ignore
 import html2pdf from 'html2pdf.js'
+import { isEmpty, isNil, or } from 'ramda'
 
-export const initialValues = (): Note[] => [
-  {
-    name: 'unsaved',
-    project: 'unsaved',
-    selected: true,
-    createdAt: new Date().toISOString(),
-    editorState: EditorState.createEmpty(),
-  },
-]
-
-export const serialize = (note: Note) => ({
-  ...note,
-  editorState: convertToRaw(
-    (note.editorState as EditorState).getCurrentContent()
-  ),
+export const initialValues = (mode: 'CREATE' | 'EDIT', note: Note) => ({
+  name: mode === 'EDIT' ? note.name || '' : '',
 })
 
-const deserialize = (note: Note) => ({
-  ...note,
-  editorState: EditorState.createWithContent(
-    convertFromRaw(note.editorState as RawDraftContentState)
-  ),
-})
+export const serialize = (editorState: EditorState) =>
+  convertToRaw(editorState.getCurrentContent())
 
-export const initialState = (): Note[] =>
-  localStorage.getItem('notes')
-    ? JSON.parse(localStorage.getItem('notes')!).map(deserialize)
-    : initialValues()
-
-export const create = (project: Project) =>
-  produce((notes: Note[]) => {
-    notes.forEach(
-      (notes) => notes.project === project.name && (notes.selected = false)
-    )
-    notes.push({ ...initialValues()[0], project: project.name })
-  })
-
-export const remove = (project: Project, name: string) =>
-  produce((notes: Note[]) => {
-    const noteIndex = notes.findIndex(
-      (notes) => notes.project === project.name && notes.name === name
-    )
-    const [removedNote] = notes.splice(noteIndex, 1)
-    if (removedNote.selected) {
-      const projectNotes = notes.filter((note) => note.project === project.name)
-      projectNotes[projectNotes.length - 1].selected = true
-    }
-  })
-
-export const select = (project: Project, name: string) =>
-  produce((notes: Note[]) =>
-    notes.forEach(
-      (note) =>
-        note.project === project.name && (note.selected = note.name === name)
-    )
-  )
-
-export const save = (project: Project) => (name: string) =>
-  produce((notes: Note[]) =>
-    notes.forEach(
-      (note) =>
-        note.project === project.name && note.selected && (note.name = name)
-    )
-  )
-
-export const calculateSubState = (editorState: EditorState, project: Project) =>
-  produce((notes: Note[]) => {
-    const note = notes.find(
-      (note) => note.project === project.name && note.selected
-    )!
-    note.editorState = editorState
-  })
+export const deserialize = (editorState: RawDraftContentState) =>
+  or(isNil(editorState), isEmpty(editorState))
+    ? EditorState.createEmpty()
+    : EditorState.createWithContent(convertFromRaw(editorState))
 
 export const exportToPDF = (editor: Editor, filename?: string) => {
   const html = editor.editorContainer?.cloneNode(true) as HTMLElement

@@ -9,7 +9,7 @@ import { Schedule } from '../../types/schedule'
 interface DeleteScheduleDialogProps extends DraggableDialogProps {
   schedule: Pick<Schedule, 'id' | 'createdAt' | 'name'>
   loading?: boolean
-  onDelete: (id: string) => void
+  onDelete: (scheduleId: string) => void
   onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
 

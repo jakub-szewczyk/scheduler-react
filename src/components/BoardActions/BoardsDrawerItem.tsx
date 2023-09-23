@@ -9,14 +9,13 @@ import ListItemText from '@mui/material/ListItemText'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { formatDistanceToNow } from 'date-fns'
 import { useBoolean, useReadLocalStorage } from 'usehooks-ts'
-import { asteriskSuffix } from '../../modules/common'
 import { Board } from '../../types/board'
 import DeleteBoardDialog from './DeleteBoardDialog'
 
 interface BoardsDrawerItemProps {
   board: Pick<Board, 'id' | 'createdAt' | 'name'>
   boards: Pick<Board, 'id' | 'createdAt' | 'name'>[]
-  onSelect: (id: string) => void
+  onSelect: (boardId: string) => void
 }
 
 const BoardsDrawerItem = ({
@@ -74,7 +73,7 @@ const BoardsDrawerItem = ({
             </Avatar>
           </ListItemAvatar>
           <ListItemText
-            primary={asteriskSuffix(board.name)}
+            primary={board.name}
             secondary={formatDistanceToNow(new Date(board.createdAt), {
               addSuffix: true,
             })}

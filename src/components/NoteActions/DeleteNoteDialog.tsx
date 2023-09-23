@@ -1,4 +1,5 @@
 import { Note } from '@/types/note'
+import { LoadingButton } from '@mui/lab'
 import { Button, Typography } from '@mui/material'
 import { MouseEventHandler } from 'react'
 import DraggableDialog, {
@@ -6,13 +7,15 @@ import DraggableDialog, {
 } from '../../layout/DraggableDialog/DraggableDialog'
 
 interface DeleteNoteDialogProps extends DraggableDialogProps {
-  note: Note
-  onDelete: (name: string) => void
+  note: Pick<Note, 'id' | 'createdAt' | 'name'>
+  loading?: boolean
+  onDelete: (noteId: string) => void
   onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
 
 const DeleteNoteDialog = ({
   note,
+  loading = false,
   onDelete,
   onClose,
   onCancel = onClose as MouseEventHandler<HTMLButtonElement> | undefined,
@@ -30,9 +33,13 @@ const DeleteNoteDialog = ({
         <Button variant='outlined' onClick={onCancel}>
           Cancel
         </Button>
-        <Button variant='outlined' onClick={() => onDelete(note.name)}>
+        <LoadingButton
+          variant='outlined'
+          loading={loading}
+          onClick={() => onDelete(note.id)}
+        >
           Delete
-        </Button>
+        </LoadingButton>
       </>
     }
   />

@@ -1,4 +1,3 @@
-import { asteriskSuffix } from '@/modules/common'
 import { updateBoard } from '@/services/board'
 import { Board, InitialValues } from '@/types/board'
 import { useAuth } from '@clerk/clerk-react'
@@ -65,7 +64,7 @@ const BoardHeader = ({ board }: BoardHeaderProps) => {
           <EditIcon fontSize='small' />
         </IconButton>
         <Typography maxWidth={(theme) => theme.breakpoints.values.sm} noWrap>
-          {asteriskSuffix(board.name)}
+          {board.name}
         </Typography>
       </Stack>
       <UpsertBoardDialog

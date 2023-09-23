@@ -1,4 +1,6 @@
-import { Note } from '@/types/note'
+import { initialValues } from '@/modules/note'
+import { InitialValues, Note } from '@/types/note'
+import { LoadingButton } from '@mui/lab'
 import { Button, Stack, Typography } from '@mui/material'
 import { Field, Form, Formik, FormikHelpers } from 'formik'
 import { TextField } from 'formik-mui'
@@ -6,40 +8,51 @@ import { MouseEventHandler } from 'react'
 import DraggableDialog, {
   DraggableDialogProps,
 } from '../../layout/DraggableDialog/DraggableDialog'
-import { isUnsaved } from '../../modules/common'
 import validationSchema from './validation/validationSchema'
 
-interface SaveNoteDialogProps extends DraggableDialogProps {
+interface NoteDialogProps extends DraggableDialogProps {
   note: Note
-  notes: Note[]
-  onSave: (
-    values: { name: string },
-    formikHelpers: FormikHelpers<{ name: string }>
-  ) => void
+  loading?: boolean
   onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
 
-const SaveNoteDialog = ({
+interface CreateNoteDialogProps {
+  mode: 'CREATE'
+  onCreate: (
+    values: InitialValues,
+    formikHelpers: FormikHelpers<InitialValues>
+  ) => void
+}
+
+interface EditNoteDialogProps {
+  mode: 'EDIT'
+  onEdit: (
+    values: InitialValues,
+    formikHelpers: FormikHelpers<InitialValues>
+  ) => void
+}
+
+type UpsertNoteDialogProps = NoteDialogProps &
+  (CreateNoteDialogProps | EditNoteDialogProps)
+
+const UpsertNoteDialog = ({
   note,
-  notes,
-  onSave,
+  loading = false,
   onClose,
   onCancel = onClose as MouseEventHandler<HTMLButtonElement> | undefined,
   ...props
-}: SaveNoteDialogProps) => (
+}: UpsertNoteDialogProps) => (
   <DraggableDialog
     {...props}
     onClose={onClose}
-    dialogTitle={isUnsaved(note) ? 'Save note' : 'Rename note'}
+    dialogTitle={props.mode === 'CREATE' ? 'Create note' : 'Edit note'}
     dialogContent={
       <Stack spacing={3}>
         <Typography>Choose a name for your note</Typography>
         <Formik
-          initialValues={{
-            name: isUnsaved(note) ? '' : note.name,
-          }}
-          validationSchema={validationSchema(note, notes)}
-          onSubmit={onSave}
+          initialValues={initialValues(props.mode, note)}
+          validationSchema={validationSchema}
+          onSubmit={props.mode === 'CREATE' ? props.onCreate : props.onEdit}
         >
           {() => (
             <Form id='note'>
@@ -61,12 +74,17 @@ const SaveNoteDialog = ({
         <Button variant='outlined' onClick={onCancel}>
           Cancel
         </Button>
-        <Button type='submit' form='note' variant='outlined'>
+        <LoadingButton
+          type='submit'
+          form='note'
+          variant='outlined'
+          loading={loading}
+        >
           Save
-        </Button>
+        </LoadingButton>
       </>
     }
   />
 )
 
-export default SaveNoteDialog
+export default UpsertNoteDialog

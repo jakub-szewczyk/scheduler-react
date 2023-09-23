@@ -1,42 +1,68 @@
 import { Note } from '@/types/note'
+import { useAuth } from '@clerk/clerk-react'
 import CloseIcon from '@mui/icons-material/Close'
 import StickyNote2Icon from '@mui/icons-material/StickyNote2'
 import { Box, IconButton, ListItemButton, Stack, Tooltip } from '@mui/material'
 import Avatar from '@mui/material/Avatar'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
 import ListItemText from '@mui/material/ListItemText'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { formatDistanceToNow } from 'date-fns'
-import { useBoolean } from 'usehooks-ts'
-import { asteriskSuffix } from '../../modules/common'
+import { useBoolean, useReadLocalStorage } from 'usehooks-ts'
 import DeleteNoteDialog from './DeleteNoteDialog'
+import { deleteNote } from '@/services/note'
 
 interface NotesDrawerItemProps {
-  note: Note
-  notes: Note[]
-  onDelete: (name: string) => void
-  onSelect: (name: string) => void
+  note: Pick<Note, 'id' | 'createdAt' | 'name'>
+  notes: Pick<Note, 'id' | 'createdAt' | 'name'>[]
+  onSelect: (noteId: string) => void
 }
 
-const NotesDrawerItem = ({
-  note,
-  notes,
-  onDelete,
-  onSelect,
-}: NotesDrawerItemProps) => {
+const NotesDrawerItem = ({ note, notes, onSelect }: NotesDrawerItemProps) => {
+  const selectedProjectId = useReadLocalStorage<string | null>(
+    'selectedProjectId'
+  )
+
+  const selectedNoteId = useReadLocalStorage<string | null>('selectedNoteId')
+
   const {
-    value: isDeleteDialogOpen,
-    setFalse: closeDeleteDialog,
-    setTrue: openDeleteDialog,
+    value: isDeleteNoteDialogOpen,
+    setFalse: closeDeleteNoteDialog,
+    setTrue: openDeleteNoteDialog,
   } = useBoolean(false)
+
+  const { getToken } = useAuth()
+
+  const queryClient = useQueryClient()
+
+  const { mutate: deleteNoteMutation, isLoading: isNoteDeleting } = useMutation(
+    deleteNote,
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(
+          ['projects', selectedProjectId, 'notes'],
+          { exact: true }
+        )
+        closeDeleteNoteDialog()
+      },
+    }
+  )
+
+  const handleNoteDelete = async (noteId: string) =>
+    deleteNoteMutation({
+      projectId: selectedProjectId!,
+      noteId,
+      token: await getToken(),
+    })
 
   return (
     <>
       <Stack direction='row' alignItems='start'>
-        <ListItemButton onClick={() => onSelect(note.name)}>
+        <ListItemButton onClick={() => onSelect(note.id)}>
           <ListItemAvatar>
             <Avatar
               sx={{
-                ...(note.selected && {
+                ...(note.id === selectedNoteId && {
                   bgcolor: (theme) => theme.palette.primary.main,
                 }),
               }}
@@ -45,7 +71,7 @@ const NotesDrawerItem = ({
             </Avatar>
           </ListItemAvatar>
           <ListItemText
-            primary={asteriskSuffix(note.name)}
+            primary={note.name}
             secondary={formatDistanceToNow(new Date(note.createdAt), {
               addSuffix: true,
             })}
@@ -66,7 +92,7 @@ const NotesDrawerItem = ({
             <IconButton
               size='small'
               disabled={notes.length === 1}
-              onClick={openDeleteDialog}
+              onClick={openDeleteNoteDialog}
             >
               <CloseIcon fontSize='small' />
             </IconButton>
@@ -74,10 +100,11 @@ const NotesDrawerItem = ({
         </Tooltip>
       </Stack>
       <DeleteNoteDialog
-        open={isDeleteDialogOpen}
-        onClose={closeDeleteDialog}
+        open={isDeleteNoteDialogOpen}
+        onClose={closeDeleteNoteDialog}
         note={note}
-        onDelete={onDelete}
+        loading={isNoteDeleting}
+        onDelete={handleNoteDelete}
       />
     </>
   )

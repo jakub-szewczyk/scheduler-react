@@ -31,6 +31,7 @@ const ChangesBar = ({
         position: 'fixed',
         left: 0,
         bottom: 0,
+        zIndex: (theme) => theme.zIndex.fab,
         width: '100%',
         height: {
           xs: 44,

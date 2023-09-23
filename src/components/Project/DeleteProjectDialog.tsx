@@ -9,7 +9,7 @@ import { LoadingButton } from '@mui/lab'
 interface DeleteProjectDialogProps extends DraggableDialogProps {
   project: Project
   loading?: boolean
-  onDelete: (name: string) => void
+  onDelete: (projectId: string) => void
   onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
 
@@ -36,7 +36,7 @@ const DeleteProjectDialog = ({
         <LoadingButton
           variant='outlined'
           loading={loading}
-          onClick={() => onDelete(project.name)}
+          onClick={() => onDelete(project.id)}
         >
           Delete
         </LoadingButton>

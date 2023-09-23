@@ -9,7 +9,7 @@ import { Board } from '../../types/board'
 interface DeleteBoardDialogProps extends DraggableDialogProps {
   board: Pick<Board, 'id' | 'createdAt' | 'name'>
   loading?: boolean
-  onDelete: (id: string) => void
+  onDelete: (boardId: string) => void
   onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
 
