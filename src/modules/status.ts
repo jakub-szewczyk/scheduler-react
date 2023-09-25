@@ -1,45 +1,35 @@
 import { DropResultLocation } from '@/types/board'
-import { Status } from '@/types/status'
-import { pipe } from 'fp-ts/lib/function'
+import { Status, UpsertedStatus } from '@/types/status'
 import produce from 'immer'
-import {
-  remove as _remove,
-  curry,
-  equals,
-  findIndex,
-  join,
-  move,
-  split,
-  tail,
-} from 'ramda'
+import { remove as _remove, curry, findIndex, move } from 'ramda'
 import { DraggableLocation } from 'react-beautiful-dnd'
 
 export const create = (title: string) =>
   produce(
-    (statuses: Status[]) =>
+    (statuses: UpsertedStatus[]) =>
       void statuses.unshift({
         title: title.trim().toLowerCase(),
         issues: [],
       })
   )
 
-export const update = (previousTitle: string, currentTitle: string) =>
+export const update = (statusId: string, title: string) =>
   produce((statuses: Status[]) => {
-    const status = statuses.find((status) => status.title === previousTitle)!
-    status.title = currentTitle.trim().toLowerCase()
+    const status = statuses.find((status) => status.id === statusId)!
+    status.title = title.trim().toLowerCase()
   })
 
-export const remove = (title: string) => (statuses: Status[]) =>
+export const remove = (statusId: string) => (statuses: UpsertedStatus[]) =>
   _remove(
-    findIndex((status) => status.title === title, statuses),
+    findIndex((status) => status.id === statusId, statuses),
     1,
     statuses
   )
 
-export const insertBefore = (statusAfterTitle: string, title: string) =>
-  produce((statuses: Status[]) => {
+export const insertBefore = (statusAfterId: string, title: string) =>
+  produce((statuses: UpsertedStatus[]) => {
     const statusAfterIndex = statuses.findIndex(
-      (status) => status.title === statusAfterTitle
+      (status) => status.id === statusAfterId
     )!
     statuses.splice(statusAfterIndex, 0, {
       title: title.trim().toLowerCase(),
@@ -47,10 +37,10 @@ export const insertBefore = (statusAfterTitle: string, title: string) =>
     })
   })
 
-export const insertAfter = (statusAfterBefore: string, title: string) =>
-  produce((statuses: Status[]) => {
+export const insertAfter = (statusBeforeId: string, title: string) =>
+  produce((statuses: UpsertedStatus[]) => {
     const statusBeforeIndex = statuses.findIndex(
-      (status) => status.title === statusAfterBefore
+      (status) => status.id === statusBeforeId
     )!
     statuses.splice(statusBeforeIndex + 1, 0, {
       title: title.trim().toLowerCase(),
@@ -59,8 +49,7 @@ export const insertAfter = (statusAfterBefore: string, title: string) =>
   })
 
 const matchByDraggableLocation = curry(
-  ({ droppableId }: DraggableLocation, { title }: Status) =>
-    pipe(droppableId, split('-'), tail, join('-'), equals(title))
+  ({ droppableId }: DraggableLocation, { id }: Status) => droppableId === id
 )
 
 const dragStatus = ({ source, destination }: DropResultLocation) =>

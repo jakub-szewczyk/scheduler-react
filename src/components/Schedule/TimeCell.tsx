@@ -2,20 +2,23 @@ import { TextField } from '@mui/material'
 import { GridRenderCellParams } from '@mui/x-data-grid'
 import { DesktopTimePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
-import { Dispatch, SetStateAction } from 'react'
-import * as ROW from '../../modules/row'
+import { Updater } from 'use-immer'
 import { Row } from '../../types/row'
 
 interface TimeCellProps extends GridRenderCellParams<any, Row> {
-  rows: Row[]
-  setRows: Dispatch<SetStateAction<Row[]>>
+  setRows: Updater<Row[]>
 }
 
-const TimeCell = ({ id, field, row, rows, setRows }: TimeCellProps) => (
+const TimeCell = ({ id, field, row, setRows }: TimeCellProps) => (
   <LocalizationProvider dateAdapter={AdapterDateFns}>
     <DesktopTimePicker
       value={row[field as keyof Row] || null}
-      onChange={(value) => setRows(ROW.update(field, value, id, rows))}
+      onChange={(value) =>
+        setRows((rows) => {
+          const row = rows.find((row) => row.id === id)!
+          row[field as keyof Pick<Row, 'starts' | 'ends'>] = value as string
+        })
+      }
       renderInput={(params) => (
         <TextField
           {...params}

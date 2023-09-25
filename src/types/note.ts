@@ -1,14 +1,14 @@
+import { initialValues } from '@/modules/note'
 import { EditorState, RawDraftContentState } from 'draft-js'
 
 export interface Note {
+  id: string
   name: string
-  project: string
-  selected: boolean
   createdAt: string
   editorState: EditorState | RawDraftContentState
 }
 
-export type NotesEndomorphism = (notes: Note[]) => Note[]
+export type InitialValues = ReturnType<typeof initialValues>
 
 export type DraftBlockStyleType =
   | 'unstyled'

@@ -1,6 +1,5 @@
-import useProjects from '@/hooks/useProjects'
-import { asteriskSuffix } from '@/modules/common'
-import * as PROJECT from '@/modules/project'
+import { getAllProjects } from '@/services/project'
+import { useAuth } from '@clerk/clerk-react'
 import PendingActionsIcon from '@mui/icons-material/PendingActions'
 import {
   AppBar,
@@ -11,21 +10,58 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material'
+import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useEventListener, useLocalStorage } from 'usehooks-ts'
 import ProfileMenu from './ProfileMenu'
 import WidgetsMenu from './WidgetsMenu'
-import { useUser } from '@clerk/clerk-react'
 
 const Navbar = () => {
+  const [isScrollYOffsetNoticeable, setIsScrollYOffsetNoticeable] =
+    useState(false)
+
+  const [selectedProjectId, setSelectedProjectId] = useLocalStorage<
+    string | null
+  >('selectedProjectId', null)
+
   const navigate = useNavigate()
 
-  const { isSignedIn } = useUser()
+  useEventListener('scroll', () =>
+    setIsScrollYOffsetNoticeable(window.scrollY > 20)
+  )
 
-  const { project, projects, setProjects } = useProjects()
+  const { isSignedIn, getToken } = useAuth()
+
+  const {
+    data: projects,
+    isLoading,
+    isError,
+  } = useQuery(['projects'], async () => getAllProjects(await getToken()), {
+    enabled: !!isSignedIn,
+    onSuccess: (projects) => {
+      if (
+        selectedProjectId &&
+        projects.map((project) => project.id).includes(selectedProjectId)
+      )
+        return
+      setSelectedProjectId(projects[0].id)
+    },
+  })
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar elevation={0}>
+      <AppBar
+        elevation={0}
+        sx={{
+          bgcolor: 'rgba(0, 0, 0, 0.35)',
+          transition: 'background 0.25s',
+          ...(isScrollYOffsetNoticeable && {
+            bgcolor: 'rgba(0, 0, 0, 0.25)',
+            backdropFilter: 'blur(3px)',
+          }),
+        }}
+      >
         <Toolbar
           sx={{
             columnGap: {
@@ -56,10 +92,9 @@ const Navbar = () => {
               <Select
                 size='small'
                 variant='standard'
-                value={project.name}
-                onChange={(event) =>
-                  setProjects(PROJECT.select(event.target.value))
-                }
+                value={selectedProjectId || ''} // NOTE: https://tinyurl.com/yem9vdhy
+                onChange={(event) => setSelectedProjectId(event.target.value)}
+                disabled={isLoading || isError}
                 sx={{ minWidth: 80, width: 120, maxWidth: 120 }}
                 MenuProps={{
                   anchorOrigin: {
@@ -94,10 +129,10 @@ const Navbar = () => {
                   },
                 }}
               >
-                {projects.map((project) => (
+                {projects?.map((project) => (
                   <MenuItem
-                    key={project.name}
-                    value={project.name}
+                    key={project.id}
+                    value={project.id}
                     sx={{
                       maxWidth: 240,
                       overflow: 'hidden',
@@ -106,7 +141,7 @@ const Navbar = () => {
                     }}
                   >
                     <Typography variant='inherit' noWrap>
-                      {asteriskSuffix(project.name)}
+                      {project.name}
                     </Typography>
                   </MenuItem>
                 ))}
@@ -117,7 +152,9 @@ const Navbar = () => {
                 columnGap={1}
                 marginLeft='auto'
               >
-                <WidgetsMenu />
+                <WidgetsMenu
+                  iconButtonProps={{ disabled: isLoading || isError }}
+                />
                 <ProfileMenu />
               </Stack>
             </>

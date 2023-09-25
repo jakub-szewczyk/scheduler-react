@@ -1,29 +1,54 @@
+import { updateSchedule } from '@/services/schedule'
+import { InitialValues, Schedule } from '@/types/schedule'
+import { useAuth } from '@clerk/clerk-react'
 import EditIcon from '@mui/icons-material/Edit'
 import { IconButton, Stack, Typography } from '@mui/material'
-import { pipe } from 'fp-ts/lib/function'
-import { trim } from 'ramda'
-import { useBoolean } from 'usehooks-ts'
-import useSchedules from '../../hooks/useSchedules'
-import { asteriskSuffix } from '../../modules/common'
-import * as SCHEDULE from '../../modules/schedule'
-import SaveScheduleDialog from '../ScheduleActions/SaveScheduleDialog'
-import useProjects from '@/hooks/useProjects'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { FormikHelpers } from 'formik'
+import { useBoolean, useReadLocalStorage } from 'usehooks-ts'
+import UpsertScheduleDialog from './UpsertScheduleDialog'
 
-const ScheduleHeader = () => {
-  const { project } = useProjects()
+interface ScheduleHeaderProps {
+  schedule: Schedule
+}
 
-  const { schedule, schedules, setSchedules } = useSchedules()
+const ScheduleHeader = ({ schedule }: ScheduleHeaderProps) => {
+  const selectedProjectId = useReadLocalStorage<string | null>(
+    'selectedProjectId'
+  )
 
   const {
-    value: isSaveScheduleDialogOpen,
-    setFalse: closeSaveScheduleDialog,
-    setTrue: openSaveScheduleDialog,
+    value: isEditScheduleDialogOpen,
+    setFalse: closeEditScheduleDialog,
+    setTrue: openEditScheduleDialog,
   } = useBoolean()
 
-  const handleScheduleSave = ({ name }: { name: string }) => {
-    setSchedules(pipe(name, trim, SCHEDULE.save(project)))
-    closeSaveScheduleDialog()
-  }
+  const { getToken } = useAuth()
+
+  const queryClient = useQueryClient()
+
+  const { mutate: updateScheduleMutation, isLoading: isScheduleUpdating } =
+    useMutation(updateSchedule, {
+      onSuccess: () => {
+        queryClient.invalidateQueries([
+          'projects',
+          selectedProjectId,
+          'schedules',
+        ])
+        closeEditScheduleDialog()
+      },
+    })
+
+  const handleScheduleEdit = async (
+    values: InitialValues,
+    formikHelpers: FormikHelpers<InitialValues>
+  ) =>
+    updateScheduleMutation({
+      projectId: selectedProjectId!,
+      scheduleId: schedule.id,
+      name: values.name,
+      token: await getToken(),
+    })
 
   return (
     <>
@@ -39,19 +64,20 @@ const ScheduleHeader = () => {
         maxWidth={(theme) => theme.breakpoints.values.lg}
         marginX='auto'
       >
-        <IconButton size='small' onClick={openSaveScheduleDialog}>
+        <IconButton size='small' onClick={openEditScheduleDialog}>
           <EditIcon fontSize='small' />
         </IconButton>
         <Typography maxWidth={(theme) => theme.breakpoints.values.sm} noWrap>
-          {asteriskSuffix(schedule.name)}
+          {schedule.name}
         </Typography>
       </Stack>
-      <SaveScheduleDialog
-        open={isSaveScheduleDialogOpen}
-        onClose={closeSaveScheduleDialog}
+      <UpsertScheduleDialog
+        mode='EDIT'
+        open={isEditScheduleDialogOpen}
+        onClose={closeEditScheduleDialog}
         schedule={schedule}
-        schedules={schedules}
-        onSave={handleScheduleSave}
+        loading={isScheduleUpdating}
+        onEdit={handleScheduleEdit}
       />
     </>
   )

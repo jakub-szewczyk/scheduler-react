@@ -1,19 +1,9 @@
-import useBoards from '@/hooks/useBoards'
-import useNotes from '@/hooks/useNotes'
-import useSchedules from '@/hooks/useSchedules'
-import * as BOARD from '@/modules/board'
-import { asteriskSuffix, isUnsaved } from '@/modules/common'
-import * as NOTE from '@/modules/note'
-import * as PROJECT from '@/modules/project'
-import * as SCHEDULE from '@/modules/schedule'
-import { BoardsEndomorphism } from '@/types/board'
-import { NotesEndomorphism } from '@/types/note'
-import { Project } from '@/types/project'
-import { SchedulesEndomorphism } from '@/types/schedule'
+import { createProject, deleteProject, updateProject } from '@/services/project'
+import { InitialValues, Project } from '@/types/project'
+import { useAuth } from '@clerk/clerk-react'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
-import SaveIcon from '@mui/icons-material/Save'
 import {
   Box,
   Card,
@@ -24,32 +14,37 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { formatDistanceToNow } from 'date-fns'
-import { pipe } from 'fp-ts/lib/function'
-import { __, any, concat, map, trim } from 'ramda'
-import { Dispatch, MouseEventHandler, SetStateAction } from 'react'
+import { FormikHelpers } from 'formik'
+import { MouseEventHandler } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useBoolean } from 'usehooks-ts'
+import { useBoolean, useLocalStorage } from 'usehooks-ts'
 import DeleteProjectDialog from './DeleteProjectDialog'
-import SaveProjectDialog from './SaveProjectDialog'
+import UpsertProjectDialog from './UpsertProjectDialog'
 
 interface ProjectItemProps {
   project: Project
   projects: Project[]
-  setProjects: Dispatch<SetStateAction<Project[]>>
 }
 
-const ProjectItem = ({ project, projects, setProjects }: ProjectItemProps) => {
-  const navigate = useNavigate()
+const ProjectItem = ({ project, projects }: ProjectItemProps) => {
+  const [selectedProjectId, setSelectedProjectId] = useLocalStorage<
+    string | null
+  >('selectedProjectId', null)
 
-  const { setNotes } = useNotes()
-  const { setBoards } = useBoards()
-  const { setSchedules } = useSchedules()
+  const isProjectSelected = project.id === selectedProjectId
 
   const {
-    value: isSaveProjectDialogOpen,
-    setFalse: closeSaveProjectDialog,
-    setTrue: openSaveProjectDialog,
+    value: isCreateProjectDialogOpen,
+    setFalse: closeCreateProjectDialog,
+    setTrue: openCreateProjectDialog,
+  } = useBoolean()
+
+  const {
+    value: isEditProjectDialogOpen,
+    setFalse: closeEditProjectDialog,
+    setTrue: openEditProjectDialog,
   } = useBoolean()
 
   const {
@@ -58,21 +53,60 @@ const ProjectItem = ({ project, projects, setProjects }: ProjectItemProps) => {
     setTrue: openDeleteProjectDialog,
   } = useBoolean()
 
+  const navigate = useNavigate()
+
+  const { getToken } = useAuth()
+
+  const queryClient = useQueryClient()
+
+  const { mutate: createProjectMutation, isLoading: isCreatingProject } =
+    useMutation(
+      async (data: Pick<Project, 'name' | 'description'>) =>
+        createProject(await getToken(), data),
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries(['projects'], { exact: true })
+          closeCreateProjectDialog()
+        },
+      }
+    )
+
+  const { mutate: updateProjectMutation, isLoading: isUpdatingProject } =
+    useMutation(
+      async (data: Pick<Project, 'id' | 'name' | 'description'>) =>
+        updateProject(await getToken(), data),
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries(['projects'], { exact: true })
+          closeEditProjectDialog()
+        },
+      }
+    )
+
+  const { mutate: deleteProjectMutation, isLoading: isDeletingProject } =
+    useMutation(
+      async (data: Pick<Project, 'id'>) =>
+        deleteProject(await getToken(), data),
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries(['projects'], { exact: true })
+          closeDeleteProjectDialog()
+        },
+      }
+    )
+
   const handleCreateIconButtonClick:
     | MouseEventHandler<HTMLButtonElement>
     | undefined = (event) => {
     event.stopPropagation()
-    setProjects(PROJECT.create)
-    setNotes(concat(__, NOTE.initialValues()))
-    setBoards(concat(__, BOARD.initialValues()))
-    setSchedules(concat(__, SCHEDULE.initialValues()))
+    openCreateProjectDialog()
   }
 
-  const handleSaveIconButtonClick:
+  const handleEditIconButtonClick:
     | MouseEventHandler<HTMLButtonElement>
     | undefined = (event) => {
     event.stopPropagation()
-    openSaveProjectDialog()
+    openEditProjectDialog()
   }
 
   const handleDeleteIconButtonClick:
@@ -83,37 +117,29 @@ const ProjectItem = ({ project, projects, setProjects }: ProjectItemProps) => {
   }
 
   const handleProjectSelect = () => {
-    setProjects(PROJECT.select(project.name))
+    setSelectedProjectId(project.id)
     navigate('/schedules')
   }
 
-  const handleProjectSave = ({ name }: { name: string }) => {
-    setProjects(pipe(name, trim, PROJECT.save(project.name)))
-    setNotes(
-      map(
-        pipe(name, trim, PROJECT.updateForeignKey(project))
-      ) as NotesEndomorphism
+  const handleProjectCreate = (
+    { name, description }: InitialValues,
+    { setSubmitting }: FormikHelpers<InitialValues>
+  ) =>
+    createProjectMutation(
+      { name, ...(description && { description }) },
+      { onError: () => setSubmitting(false) }
     )
-    setBoards(
-      map(
-        pipe(name, trim, PROJECT.updateForeignKey(project))
-      ) as BoardsEndomorphism
-    )
-    setSchedules(
-      map(
-        pipe(name, trim, PROJECT.updateForeignKey(project))
-      ) as SchedulesEndomorphism
-    )
-    closeSaveProjectDialog()
-  }
 
-  const handleProjectDelete = (name: string) => {
-    setProjects(PROJECT.remove(name))
-    setNotes(PROJECT.cascadeDelete(name) as NotesEndomorphism)
-    setBoards(PROJECT.cascadeDelete(name) as BoardsEndomorphism)
-    setSchedules(PROJECT.cascadeDelete(name) as SchedulesEndomorphism)
-    closeDeleteProjectDialog()
-  }
+  const handleProjectEdit = (
+    { name, description }: InitialValues,
+    { setSubmitting }: FormikHelpers<InitialValues>
+  ) =>
+    updateProjectMutation(
+      { id: project.id, name, ...(description && { description }) },
+      { onError: () => setSubmitting(false) }
+    )
+
+  const handleProjectDelete = () => deleteProjectMutation({ id: project.id })
 
   return (
     <>
@@ -121,23 +147,25 @@ const ProjectItem = ({ project, projects, setProjects }: ProjectItemProps) => {
         elevation={0}
         onClick={handleProjectSelect}
         sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
           cursor: 'pointer',
-          ...(project.selected && {
+          bgcolor: 'rgba(0, 0, 0, 0.35)',
+          ...(isProjectSelected && {
             color: (theme) => theme.palette.common.black,
-          }),
-          ...(project.selected && {
             bgcolor: (theme) => theme.palette.primary.main,
           }),
           '&:hover': {
             bgcolor: (theme) =>
-              project.selected
+              isProjectSelected
                 ? theme.palette.primary.dark
                 : 'rgba(255, 255, 255, 0.08)',
           },
         }}
       >
         <CardHeader
-          title={asteriskSuffix(project.name)}
+          title={project.name}
           subheader={formatDistanceToNow(new Date(project.createdAt), {
             addSuffix: true,
           })}
@@ -151,7 +179,7 @@ const ProjectItem = ({ project, projects, setProjects }: ProjectItemProps) => {
           }}
           sx={{
             pb: 0,
-            ...(project.selected && {
+            ...(isProjectSelected && {
               '.MuiCardHeader-subheader': {
                 color: (theme) => theme.palette.grey['900'],
               },
@@ -161,12 +189,13 @@ const ProjectItem = ({ project, projects, setProjects }: ProjectItemProps) => {
             },
           }}
         />
-        <CardContent sx={{ pb: '1rem !important' }}>
+        <CardContent sx={{ pb: '0.5rem !important' }}>
           <Typography
+            variant='body2'
             sx={{
               overflow: 'hidden',
               display: '-webkit-box',
-              WebkitLineClamp: '2',
+              WebkitLineClamp: '1',
               WebkitBoxOrient: 'vertical',
             }}
           >
@@ -176,63 +205,42 @@ const ProjectItem = ({ project, projects, setProjects }: ProjectItemProps) => {
         <CardActions
           disableSpacing
           sx={{
+            mt: 'auto',
             '.MuiSvgIcon-root': {
-              ...(project.selected && {
+              ...(isProjectSelected && {
                 fill: (theme) => theme.palette.common.black,
               }),
             },
           }}
         >
-          <Tooltip
-            placement='left'
-            title={
-              any(isUnsaved, projects) &&
-              'All projects must be saved before creating a new one'
-            }
+          <Box
+            onClick={(event) => isCreatingProject && event.stopPropagation()}
           >
-            <Box
-              onClick={(event) =>
-                any(isUnsaved, projects) && event.stopPropagation()
-              }
-            >
-              <IconButton
-                disabled={any(isUnsaved, projects)}
-                onClick={handleCreateIconButtonClick}
-                sx={{
-                  '.MuiSvgIcon-root': {
-                    ...(project.selected &&
-                      any(isUnsaved, projects) && {
-                        fill: 'rgba(0, 0, 0, 0.3)',
-                      }),
-                  },
-                }}
-              >
-                <AddIcon fontSize='small' />
-              </IconButton>
-            </Box>
-          </Tooltip>
-          <IconButton onClick={handleSaveIconButtonClick}>
-            {isUnsaved(project) ? (
-              <SaveIcon fontSize='small' />
-            ) : (
+            <IconButton size='small' onClick={handleCreateIconButtonClick}>
+              <AddIcon fontSize='small' />
+            </IconButton>
+          </Box>
+          <Box
+            onClick={(event) => isCreatingProject && event.stopPropagation()}
+          >
+            <IconButton size='small' onClick={handleEditIconButtonClick}>
               <EditIcon fontSize='small' />
-            )}
-          </IconButton>
+            </IconButton>
+          </Box>
           <Tooltip
             placement='left'
             title={projects.length === 1 && 'At least one project is required'}
           >
             <Box
-              onClick={(event) =>
-                projects.length === 1 && event.stopPropagation()
-              }
+              onClick={(event) => isCreatingProject && event.stopPropagation()}
             >
               <IconButton
+                size='small'
                 disabled={projects.length === 1}
                 onClick={handleDeleteIconButtonClick}
                 sx={{
                   '.MuiSvgIcon-root': {
-                    ...(project.selected &&
+                    ...(isProjectSelected &&
                       projects.length === 1 && {
                         fill: 'rgba(0, 0, 0, 0.3)',
                       }),
@@ -245,17 +253,27 @@ const ProjectItem = ({ project, projects, setProjects }: ProjectItemProps) => {
           </Tooltip>
         </CardActions>
       </Card>
-      <SaveProjectDialog
-        open={isSaveProjectDialogOpen}
-        onClose={closeSaveProjectDialog}
+      <UpsertProjectDialog
+        mode='CREATE'
+        open={isCreateProjectDialogOpen}
+        onClose={closeCreateProjectDialog}
         project={project}
-        projects={projects}
-        onSave={handleProjectSave}
+        loading={isCreatingProject}
+        onCreate={handleProjectCreate}
+      />
+      <UpsertProjectDialog
+        mode='EDIT'
+        open={isEditProjectDialogOpen}
+        onClose={closeEditProjectDialog}
+        project={project}
+        loading={isUpdatingProject}
+        onEdit={handleProjectEdit}
       />
       <DeleteProjectDialog
         open={isDeleteProjectDialogOpen}
         onClose={closeDeleteProjectDialog}
         project={project}
+        loading={isDeletingProject}
         onDelete={handleProjectDelete}
       />
     </>

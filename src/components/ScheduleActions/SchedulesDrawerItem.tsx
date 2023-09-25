@@ -5,38 +5,68 @@ import Avatar from '@mui/material/Avatar'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
 import ListItemText from '@mui/material/ListItemText'
 import { formatDistanceToNow } from 'date-fns'
-import { useBoolean } from 'usehooks-ts'
-import { asteriskSuffix } from '../../modules/common'
+import { useBoolean, useReadLocalStorage } from 'usehooks-ts'
 import { Schedule } from '../../types/schedule'
 import DeleteScheduleDialog from './DeleteScheduleDialog'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useAuth } from '@clerk/clerk-react'
+import { deleteSchedule } from '@/services/schedule'
 
 interface SchedulesDrawerItemProps {
-  schedule: Schedule
-  schedules: Schedule[]
-  onDelete: (name: string) => void
-  onSelect: (name: string) => void
+  schedule: Pick<Schedule, 'id' | 'createdAt' | 'name'>
+  schedules: Pick<Schedule, 'id' | 'createdAt' | 'name'>[]
+  onSelect: (scheduleId: string) => void
 }
 
 const SchedulesDrawerItem = ({
   schedule,
   schedules,
-  onDelete,
   onSelect,
 }: SchedulesDrawerItemProps) => {
+  const selectedProjectId = useReadLocalStorage<string | null>(
+    'selectedProjectId'
+  )
+
+  const selectedScheduleId = useReadLocalStorage<string | null>(
+    'selectedScheduleId'
+  )
+
   const {
-    value: isDeleteDialogOpen,
-    setFalse: closeDeleteDialog,
-    setTrue: openDeleteDialog,
+    value: isDeleteScheduleDialogOpen,
+    setFalse: closeDeleteScheduleDialog,
+    setTrue: openDeleteScheduleDialog,
   } = useBoolean(false)
+
+  const { getToken } = useAuth()
+
+  const queryClient = useQueryClient()
+
+  const { mutate: deleteScheduleMutation, isLoading: isScheduleDeleting } =
+    useMutation(deleteSchedule, {
+      onSuccess: () => {
+        queryClient.invalidateQueries(
+          ['projects', selectedProjectId, 'schedules'],
+          { exact: true }
+        )
+        closeDeleteScheduleDialog()
+      },
+    })
+
+  const handleScheduleDelete = async (scheduleId: string) =>
+    deleteScheduleMutation({
+      projectId: selectedProjectId!,
+      scheduleId,
+      token: await getToken(),
+    })
 
   return (
     <>
       <Stack direction='row' alignItems='start'>
-        <ListItemButton onClick={() => onSelect(schedule.name)}>
+        <ListItemButton onClick={() => onSelect(schedule.id)}>
           <ListItemAvatar>
             <Avatar
               sx={{
-                ...(schedule.selected && {
+                ...(schedule.id === selectedScheduleId && {
                   bgcolor: (theme) => theme.palette.primary.main,
                 }),
               }}
@@ -45,7 +75,7 @@ const SchedulesDrawerItem = ({
             </Avatar>
           </ListItemAvatar>
           <ListItemText
-            primary={asteriskSuffix(schedule.name)}
+            primary={schedule.name}
             secondary={formatDistanceToNow(new Date(schedule.createdAt), {
               addSuffix: true,
             })}
@@ -66,7 +96,7 @@ const SchedulesDrawerItem = ({
             <IconButton
               size='small'
               disabled={schedules.length === 1}
-              onClick={openDeleteDialog}
+              onClick={openDeleteScheduleDialog}
             >
               <CloseIcon fontSize='small' />
             </IconButton>
@@ -74,10 +104,11 @@ const SchedulesDrawerItem = ({
         </Tooltip>
       </Stack>
       <DeleteScheduleDialog
-        open={isDeleteDialogOpen}
-        onClose={closeDeleteDialog}
+        open={isDeleteScheduleDialogOpen}
+        onClose={closeDeleteScheduleDialog}
         schedule={schedule}
-        onDelete={onDelete}
+        loading={isScheduleDeleting}
+        onDelete={handleScheduleDelete}
       />
     </>
   )

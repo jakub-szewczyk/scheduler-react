@@ -8,6 +8,9 @@ export const NoteContainer = styled(Box)(({ theme }) => ({
     width: 'calc(100% - 48px)',
     marginBlock: '1.5rem',
   },
+  '& > .MuiPaper-root': {
+    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+  },
 }))
 
 export const ToolbarContainer = styled(Paper)(({ theme }) => ({

@@ -1,29 +1,52 @@
-import useNotes from '@/hooks/useNotes'
-import { asteriskSuffix } from '@/modules/common'
-import * as NOTE from '@/modules/note'
+import { updateNote } from '@/services/note'
+import { InitialValues, Note } from '@/types/note'
+import { useAuth } from '@clerk/clerk-react'
 import EditIcon from '@mui/icons-material/Edit'
 import { IconButton, Stack, Typography } from '@mui/material'
-import { pipe } from 'fp-ts/lib/function'
-import { trim } from 'ramda'
-import { useBoolean } from 'usehooks-ts'
-import SaveNoteDialog from '../NoteActions/SaveNoteDialog'
-import useProjects from '@/hooks/useProjects'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { FormikHelpers } from 'formik'
+import { useBoolean, useReadLocalStorage } from 'usehooks-ts'
+import UpsertNoteDialog from '../NoteActions/UpsertNoteDialog'
 
-const NoteHeader = () => {
-  const { project } = useProjects()
+interface NoteHeaderProps {
+  note: Note
+}
 
-  const { note, notes, setNotes } = useNotes()
+const NoteHeader = ({ note }: NoteHeaderProps) => {
+  const selectedProjectId = useReadLocalStorage<string | null>(
+    'selectedProjectId'
+  )
 
   const {
-    value: isSaveNoteDialogOpen,
-    setFalse: closeSaveNoteDialog,
-    setTrue: openSaveNoteDialog,
+    value: isEditNoteDialogOpen,
+    setFalse: closeEditNoteDialog,
+    setTrue: openEditNoteDialog,
   } = useBoolean()
 
-  const handleNoteSave = ({ name }: { name: string }) => {
-    setNotes(pipe(name, trim, NOTE.save(project)))
-    closeSaveNoteDialog()
-  }
+  const { getToken } = useAuth()
+
+  const queryClient = useQueryClient()
+
+  const { mutate: updateNoteMutation, isLoading: isNoteUpdating } = useMutation(
+    updateNote,
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['projects', selectedProjectId, 'notes'])
+        closeEditNoteDialog()
+      },
+    }
+  )
+
+  const handleNoteEdit = async (
+    values: InitialValues,
+    formikHelpers: FormikHelpers<InitialValues>
+  ) =>
+    updateNoteMutation({
+      projectId: selectedProjectId!,
+      noteId: note.id,
+      name: values.name,
+      token: await getToken(),
+    })
 
   return (
     <>
@@ -39,19 +62,20 @@ const NoteHeader = () => {
         maxWidth={(theme) => theme.breakpoints.values.lg}
         marginX='auto'
       >
-        <IconButton size='small' onClick={openSaveNoteDialog}>
+        <IconButton size='small' onClick={openEditNoteDialog}>
           <EditIcon fontSize='small' />
         </IconButton>
         <Typography maxWidth={(theme) => theme.breakpoints.values.sm} noWrap>
-          {asteriskSuffix(note.name)}
+          {note.name}
         </Typography>
       </Stack>
-      <SaveNoteDialog
-        open={isSaveNoteDialogOpen}
-        onClose={closeSaveNoteDialog}
+      <UpsertNoteDialog
+        mode='EDIT'
+        open={isEditNoteDialogOpen}
+        onClose={closeEditNoteDialog}
         note={note}
-        notes={notes}
-        onSave={handleNoteSave}
+        loading={isNoteUpdating}
+        onEdit={handleNoteEdit}
       />
     </>
   )

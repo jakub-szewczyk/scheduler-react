@@ -1,21 +1,50 @@
-import useSchedules from '../../hooks/useSchedules'
-import * as ROW from '../../modules/row'
+import ChangesBar from '@/layout/ChangesBar/ChangesBar'
+import { updateScheduleRows } from '@/services/row'
+import { Row } from '@/types/row'
+import { Schedule as ISchedule } from '@/types/schedule'
+import { useAuth } from '@clerk/clerk-react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { equals } from 'ramda'
+import { Updater } from 'use-immer'
+import { useReadLocalStorage } from 'usehooks-ts'
 import * as TABLE from '../../modules/table'
 import ScheduleHeader from './ScheduleHeader'
 import createColumns from './helpers/createColumns'
 import { DataGrid, DataGridContainer } from './styles/DataGrid.styled'
 
-const Schedule = () => {
-  const {
-    schedule: { rows },
-    setRows,
-  } = useSchedules()
+interface ScheduleProps {
+  schedule: ISchedule
+  rows: Row[]
+  setRows: Updater<Row[]>
+}
 
-  const columns = createColumns(rows, setRows)
+const Schedule = ({ schedule, rows, setRows }: ScheduleProps) => {
+  const selectedProjectId = useReadLocalStorage<string | null>(
+    'selectedProjectId'
+  )
+
+  const { getToken } = useAuth()
+
+  const queryClient = useQueryClient()
+
+  const {
+    mutate: updateScheduleRowsMutation,
+    isLoading: isUpdatingScheduleRows,
+  } = useMutation(updateScheduleRows, {
+    onSuccess: () =>
+      queryClient.invalidateQueries(
+        ['projects', selectedProjectId, 'schedules', schedule.id],
+        { exact: true }
+      ),
+  })
+
+  const columns = createColumns(setRows)
+
+  const hasChanges = !equals(rows, schedule.rows) || isUpdatingScheduleRows
 
   return (
     <>
-      <ScheduleHeader />
+      <ScheduleHeader schedule={schedule} />
       <DataGridContainer
         elevation={0}
         height={TABLE.calculateHeight(rows)}
@@ -25,6 +54,7 @@ const Schedule = () => {
               theme.breakpoints.values.lg,
               TABLE.calculateMaxWidth(columns)
             ),
+          bgcolor: 'rgba(0, 0, 0, 0.35)',
         }}
       >
         <DataGrid
@@ -35,10 +65,27 @@ const Schedule = () => {
           columns={columns}
           rows={rows}
           onCellEditCommit={({ field, value, id }) =>
-            setRows(ROW.update(field, value, id, rows))
+            setRows((rows) => {
+              const row = rows.find((row) => row.id === id)!
+              row[field as keyof Pick<Row, 'room' | 'subject'>] = value
+            })
           }
         />
       </DataGridContainer>
+      {hasChanges && (
+        <ChangesBar
+          loading={isUpdatingScheduleRows}
+          onDiscard={() => setRows(schedule.rows)}
+          onSave={async () =>
+            updateScheduleRowsMutation({
+              projectId: selectedProjectId!,
+              scheduleId: schedule.id,
+              rows,
+              token: await getToken(),
+            })
+          }
+        />
+      )}
     </>
   )
 }

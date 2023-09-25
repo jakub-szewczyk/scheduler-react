@@ -1,11 +1,11 @@
+import { initialValues } from '@/modules/schedule'
 import { Row } from './row'
 
 export interface Schedule {
-  name: string
-  project: string
-  selected: boolean
+  id: string
   createdAt: string
+  name: string
   rows: Row[]
 }
 
-export type SchedulesEndomorphism = (schedules: Schedule[]) => Schedule[]
+export type InitialValues = ReturnType<typeof initialValues>

@@ -1,3 +1,5 @@
+import { Status } from '@/types/status'
+import { LoadingButton } from '@mui/lab'
 import { Button, Stack, Typography } from '@mui/material'
 import { Field, Form, Formik, FormikHelpers } from 'formik'
 import { TextField } from 'formik-mui'
@@ -8,7 +10,6 @@ import DraggableDialog, {
   DraggableDialogProps,
 } from '../../layout/DraggableDialog/DraggableDialog'
 import { upsertStatusValidationSchema } from './validation/validationSchema'
-import { Status } from '@/types/status'
 
 type SubmitHandler = (
   values: Pick<Status, 'title'>,
@@ -18,6 +19,7 @@ type SubmitHandler = (
 interface StatusDialogProps extends DraggableDialogProps {
   status?: Status
   statuses?: Status[]
+  loading?: boolean
   onCreate?: SubmitHandler
   onEdit?: SubmitHandler
   onInsertBefore?: SubmitHandler
@@ -60,6 +62,7 @@ const UpsertStatusDialog = ({
   mode,
   status,
   statuses,
+  loading = false,
   onCreate,
   onEdit,
   onInsertBefore,
@@ -114,9 +117,14 @@ const UpsertStatusDialog = ({
           <Button variant='outlined' onClick={onCancel}>
             Cancel
           </Button>
-          <Button type='submit' form='status' variant='outlined'>
+          <LoadingButton
+            type='submit'
+            form='status'
+            variant='outlined'
+            loading={loading}
+          >
             Save
-          </Button>
+          </LoadingButton>
         </>
       }
     />

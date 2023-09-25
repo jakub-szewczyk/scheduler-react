@@ -3,3 +3,9 @@ export interface NotificationConfiguration {
   time: string | null
   title: string
 }
+
+export interface Notification {
+  time: string
+  active: boolean
+  // title: string
+}

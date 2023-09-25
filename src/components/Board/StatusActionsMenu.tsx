@@ -1,5 +1,7 @@
 import * as STATUS from '@/modules/status'
+import { updateBoardStatus, updateBoardStatuses } from '@/services/status'
 import { Status, UpsertStatusDialogMode } from '@/types/status'
+import { useAuth } from '@clerk/clerk-react'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -12,35 +14,76 @@ import {
   Menu,
   MenuItem,
 } from '@mui/material'
-import { Dispatch, SetStateAction, useState } from 'react'
-import { useBoolean } from 'usehooks-ts'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
+import { useBoolean, useReadLocalStorage } from 'usehooks-ts'
 import DeleteStatusDialog from './DeleteStatusDialog'
 import UpsertStatusDialog from './UpsertStatusDialog'
 
 interface StatusActionsMenuProps {
   status: Status
   statuses: Status[]
-  setStatuses: Dispatch<SetStateAction<Status[]>>
+  disabled?: boolean
 }
 
 const StatusActionsMenu = ({
   status,
   statuses,
-  setStatuses,
+  disabled,
 }: StatusActionsMenuProps) => {
   const [menu, setMenu] = useState<HTMLElement | null>(null)
+
   const [mode, setMode] =
     useState<Exclude<UpsertStatusDialogMode, 'CREATE'>>('EDIT')
+
+  const selectedProjectId = useReadLocalStorage<string | null>(
+    'selectedProjectId'
+  )
+
+  const selectedBoardId = useReadLocalStorage<string | null>('selectedBoardId')
+
   const {
     value: isUpsertDialogOpen,
     setFalse: closeUpsertDialog,
     setTrue: openUpsertDialog,
   } = useBoolean(false)
+
   const {
     value: isDeleteDialogOpen,
     setFalse: closeDeleteDialog,
     setTrue: openDeleteDialog,
   } = useBoolean(false)
+
+  const { getToken } = useAuth()
+
+  const queryClient = useQueryClient()
+
+  const {
+    mutate: updateBoardStatusesMutation,
+    isLoading: isUpdatingBoardStatuses,
+  } = useMutation(updateBoardStatuses, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(
+        ['projects', selectedProjectId, 'boards', selectedBoardId],
+        { exact: true }
+      )
+      closeUpsertDialog()
+      closeDeleteDialog()
+    },
+  })
+
+  const {
+    mutate: updateBoardStatusMutation,
+    isLoading: isUpdatingBoardStatus,
+  } = useMutation(updateBoardStatus, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(
+        ['projects', selectedProjectId, 'boards', selectedBoardId],
+        { exact: true }
+      )
+      closeUpsertDialog()
+    },
+  })
 
   const handleEditMenuItemClick = () => {
     setMenu(null)
@@ -65,30 +108,44 @@ const StatusActionsMenu = ({
     openUpsertDialog()
   }
 
-  const handleStatusEdit = ({ title }: Pick<Status, 'title'>) => {
-    setStatuses(STATUS.update(status.title, title))
-    closeUpsertDialog()
-  }
+  const handleStatusEdit = async ({ title }: Pick<Status, 'title'>) =>
+    updateBoardStatusMutation({
+      projectId: selectedProjectId!,
+      boardId: selectedBoardId!,
+      statusId: status.id,
+      title,
+      token: await getToken(),
+    })
 
-  const handleStatusDelete = ({ title }: Pick<Status, 'title'>) => {
-    setStatuses(STATUS.remove(title))
-    closeDeleteDialog()
-  }
+  const handleStatusDelete = async ({ id }: Status) =>
+    updateBoardStatusesMutation({
+      projectId: selectedProjectId!,
+      boardId: selectedBoardId!,
+      statuses: STATUS.remove(id)(statuses),
+      token: await getToken(),
+    })
 
-  const handleStatusInsertBefore = ({ title }: Pick<Status, 'title'>) => {
-    setStatuses(STATUS.insertBefore(status.title, title))
-    closeUpsertDialog()
-  }
+  const handleStatusInsertBefore = async ({ title }: Pick<Status, 'title'>) =>
+    updateBoardStatusesMutation({
+      projectId: selectedProjectId!,
+      boardId: selectedBoardId!,
+      statuses: STATUS.insertBefore(status.id, title)(statuses),
+      token: await getToken(),
+    })
 
-  const handleStatusInsertAfter = ({ title }: Pick<Status, 'title'>) => {
-    setStatuses(STATUS.insertAfter(status.title, title))
-    closeUpsertDialog()
-  }
+  const handleStatusInsertAfter = async ({ title }: Pick<Status, 'title'>) =>
+    updateBoardStatusesMutation({
+      projectId: selectedProjectId!,
+      boardId: selectedBoardId!,
+      statuses: STATUS.insertAfter(status.id, title)(statuses),
+      token: await getToken(),
+    })
 
   return (
     <>
       <IconButton
         size='small'
+        disabled={disabled}
         onClick={(event) => setMenu(event.currentTarget)}
         sx={{
           position: 'absolute',
@@ -96,6 +153,9 @@ const StatusActionsMenu = ({
           right: 8,
           translate: '0 -50%',
           color: 'inherit',
+          ':disabled': {
+            color: 'rgba(0, 0, 0, 0.3)',
+          },
         }}
       >
         <MoreVertIcon fontSize='small' />
@@ -127,11 +187,12 @@ const StatusActionsMenu = ({
         </MenuItem>
       </Menu>
       <UpsertStatusDialog
+        mode={mode}
         open={isUpsertDialogOpen}
         onClose={closeUpsertDialog}
-        mode={mode}
         status={status}
         statuses={statuses}
+        loading={isUpdatingBoardStatuses || isUpdatingBoardStatus}
         onEdit={handleStatusEdit}
         onInsertBefore={handleStatusInsertBefore}
         onInsertAfter={handleStatusInsertAfter}
@@ -140,6 +201,7 @@ const StatusActionsMenu = ({
         open={isDeleteDialogOpen}
         onClose={closeDeleteDialog}
         status={status}
+        loading={isUpdatingBoardStatuses}
         onDelete={handleStatusDelete}
       />
     </>

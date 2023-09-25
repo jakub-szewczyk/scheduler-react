@@ -1,45 +1,58 @@
+import { initialValues } from '@/modules/schedule'
+import { InitialValues, Schedule } from '@/types/schedule'
+import { LoadingButton } from '@mui/lab'
 import { Button, Stack, Typography } from '@mui/material'
 import { Field, Form, Formik, FormikHelpers } from 'formik'
 import { TextField } from 'formik-mui'
 import { MouseEventHandler } from 'react'
-import { isUnsaved } from '../../modules/common'
-import { Schedule } from '../../types/schedule'
 import DraggableDialog, {
   DraggableDialogProps,
 } from '../../layout/DraggableDialog/DraggableDialog'
 import validationSchema from './validation/validationSchema'
 
-interface SaveScheduleDialogProps extends DraggableDialogProps {
+interface ScheduleDialogProps extends DraggableDialogProps {
   schedule: Schedule
-  schedules: Schedule[]
-  onSave: (
-    values: { name: string },
-    formikHelpers: FormikHelpers<{ name: string }>
-  ) => void
+  loading?: boolean
   onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
 
-const SaveScheduleDialog = ({
+interface CreateScheduleDialogProps {
+  mode: 'CREATE'
+  onCreate: (
+    values: InitialValues,
+    formikHelpers: FormikHelpers<InitialValues>
+  ) => void
+}
+
+interface EditScheduleDialogProps {
+  mode: 'EDIT'
+  onEdit: (
+    values: InitialValues,
+    formikHelpers: FormikHelpers<InitialValues>
+  ) => void
+}
+
+type UpsertScheduleDialogProps = ScheduleDialogProps &
+  (CreateScheduleDialogProps | EditScheduleDialogProps)
+
+const UpsertScheduleDialog = ({
   schedule,
-  schedules,
-  onSave,
+  loading = false,
   onClose,
   onCancel = onClose as MouseEventHandler<HTMLButtonElement> | undefined,
   ...props
-}: SaveScheduleDialogProps) => (
+}: UpsertScheduleDialogProps) => (
   <DraggableDialog
     {...props}
     onClose={onClose}
-    dialogTitle={isUnsaved(schedule) ? 'Save schedule' : 'Rename schedule'}
+    dialogTitle={props.mode === 'CREATE' ? 'Create schedule' : 'Edit schedule'}
     dialogContent={
       <Stack spacing={3}>
         <Typography>Choose a name for your schedule</Typography>
         <Formik
-          initialValues={{
-            name: isUnsaved(schedule) ? '' : schedule.name,
-          }}
-          validationSchema={validationSchema(schedule, schedules)}
-          onSubmit={onSave}
+          initialValues={initialValues(props.mode, schedule)}
+          validationSchema={validationSchema}
+          onSubmit={props.mode === 'CREATE' ? props.onCreate : props.onEdit}
         >
           {() => (
             <Form id='schedule'>
@@ -61,12 +74,17 @@ const SaveScheduleDialog = ({
         <Button variant='outlined' onClick={onCancel}>
           Cancel
         </Button>
-        <Button type='submit' form='schedule' variant='outlined'>
+        <LoadingButton
+          type='submit'
+          form='schedule'
+          variant='outlined'
+          loading={loading}
+        >
           Save
-        </Button>
+        </LoadingButton>
       </>
     }
   />
 )
 
-export default SaveScheduleDialog
+export default UpsertScheduleDialog

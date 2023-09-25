@@ -1,25 +1,24 @@
+import { Status } from '@/types/status'
 import { Paper, Stack, Typography } from '@mui/material'
-import { Dispatch, SetStateAction } from 'react'
 import { Draggable } from 'react-beautiful-dnd'
 import StrictModeDroppable from '../../layout/StrictModeDroppable/StrictModeDroppable'
 import IssueItem from './IssueItem'
 import StatusActionsMenu from './StatusActionsMenu'
-import { Status } from '@/types/status'
 
 interface StatusColumnProps {
   index: number
   status: Status
   statuses: Status[]
-  setStatuses: Dispatch<SetStateAction<Status[]>>
+  disabled?: boolean
 }
 
 const StatusColumn = ({
   index,
   status,
   statuses,
-  setStatuses,
+  disabled = false,
 }: StatusColumnProps) => (
-  <Draggable draggableId={`status-${status.title}`} index={index}>
+  <Draggable draggableId={status.id} index={index}>
     {({ draggableProps, dragHandleProps, innerRef }) => (
       <Paper
         {...draggableProps}
@@ -30,6 +29,7 @@ const StatusColumn = ({
           width: 280,
           p: 0.75,
           mx: 1,
+          bgcolor: 'rgba(0, 0, 0, 0.35)',
         }}
       >
         <Paper
@@ -57,13 +57,10 @@ const StatusColumn = ({
           <StatusActionsMenu
             status={status}
             statuses={statuses}
-            setStatuses={setStatuses}
+            disabled={disabled}
           />
         </Paper>
-        <StrictModeDroppable
-          type='status'
-          droppableId={`status-${status.title}`}
-        >
+        <StrictModeDroppable type='status' droppableId={status.id}>
           {({ droppableProps, innerRef, placeholder }) => (
             <Stack
               {...droppableProps}
@@ -73,11 +70,11 @@ const StatusColumn = ({
             >
               {status.issues.map((issue, index) => (
                 <IssueItem
-                  key={issue.title}
+                  key={issue.id}
                   index={index}
                   issue={issue}
                   statuses={statuses}
-                  setStatuses={setStatuses}
+                  disabled={disabled}
                 />
               ))}
               {placeholder}

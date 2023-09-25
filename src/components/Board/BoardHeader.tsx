@@ -1,29 +1,50 @@
-import useBoards from '@/hooks/useBoards'
-import * as BOARD from '@/modules/board'
-import { asteriskSuffix } from '@/modules/common'
+import { updateBoard } from '@/services/board'
+import { Board, InitialValues } from '@/types/board'
+import { useAuth } from '@clerk/clerk-react'
 import EditIcon from '@mui/icons-material/Edit'
 import { IconButton, Stack, Typography } from '@mui/material'
-import { pipe } from 'fp-ts/lib/function'
-import { trim } from 'ramda'
-import { useBoolean } from 'usehooks-ts'
-import SaveBoardDialog from '../BoardActions/SaveBoardDialog'
-import useProjects from '@/hooks/useProjects'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { FormikHelpers } from 'formik'
+import { useBoolean, useReadLocalStorage } from 'usehooks-ts'
+import UpsertBoardDialog from '../BoardActions/UpsertBoardDialog'
 
-const BoardHeader = () => {
-  const { project } = useProjects()
+interface BoardHeaderProps {
+  board: Board
+}
 
-  const { board, boards, setBoards } = useBoards()
+const BoardHeader = ({ board }: BoardHeaderProps) => {
+  const selectedProjectId = useReadLocalStorage<string | null>(
+    'selectedProjectId'
+  )
 
   const {
-    value: isSaveBoardDialogOpen,
-    setFalse: closeSaveBoardDialog,
-    setTrue: openSaveBoardDialog,
+    value: isEditBoardDialogOpen,
+    setFalse: closeEditBoardDialog,
+    setTrue: openEditBoardDialog,
   } = useBoolean()
 
-  const handleBoardSave = ({ name }: { name: string }) => {
-    setBoards(pipe(name, trim, BOARD.save(project)))
-    closeSaveBoardDialog()
-  }
+  const { getToken } = useAuth()
+
+  const queryClient = useQueryClient()
+
+  const { mutate: updateBoardMutation, isLoading: isBoardUpdating } =
+    useMutation(updateBoard, {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['projects', selectedProjectId, 'boards'])
+        closeEditBoardDialog()
+      },
+    })
+
+  const handleBoardEdit = async (
+    values: InitialValues,
+    formikHelpers: FormikHelpers<InitialValues>
+  ) =>
+    updateBoardMutation({
+      projectId: selectedProjectId!,
+      boardId: board.id,
+      name: values.name,
+      token: await getToken(),
+    })
 
   return (
     <>
@@ -39,19 +60,20 @@ const BoardHeader = () => {
         maxWidth={(theme) => theme.breakpoints.values.lg}
         marginX='auto'
       >
-        <IconButton size='small' onClick={openSaveBoardDialog}>
+        <IconButton size='small' onClick={openEditBoardDialog}>
           <EditIcon fontSize='small' />
         </IconButton>
         <Typography maxWidth={(theme) => theme.breakpoints.values.sm} noWrap>
-          {asteriskSuffix(board.name)}
+          {board.name}
         </Typography>
       </Stack>
-      <SaveBoardDialog
-        open={isSaveBoardDialogOpen}
-        onClose={closeSaveBoardDialog}
+      <UpsertBoardDialog
+        mode='EDIT'
+        open={isEditBoardDialogOpen}
+        onClose={closeEditBoardDialog}
         board={board}
-        boards={boards}
-        onSave={handleBoardSave}
+        loading={isBoardUpdating}
+        onEdit={handleBoardEdit}
       />
     </>
   )

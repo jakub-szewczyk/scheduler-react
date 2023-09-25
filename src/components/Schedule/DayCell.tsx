@@ -2,16 +2,15 @@ import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import { IconButton, Stack, Typography } from '@mui/material'
 import { GridRenderCellParams } from '@mui/x-data-grid'
-import { Dispatch, SetStateAction } from 'react'
-import * as ROW from '../../modules/row'
+import { nanoid } from 'nanoid'
+import { Updater } from 'use-immer'
 import { Row } from '../../types/row'
 
 interface DayCellProps extends GridRenderCellParams {
-  rows: Row[]
-  setRows: Dispatch<SetStateAction<Row[]>>
+  setRows: Updater<Row[]>
 }
 
-const DayCell = ({ id, value, rows, setRows }: DayCellProps) => (
+const DayCell = ({ id, value, row, setRows }: DayCellProps) => (
   <Stack
     direction='row'
     justifyContent='space-between'
@@ -19,13 +18,38 @@ const DayCell = ({ id, value, rows, setRows }: DayCellProps) => (
     width='100%'
   >
     <Typography>{value}</Typography>
-    {id === value ? (
-      <IconButton size='small' onClick={() => setRows(ROW.create(id, rows))}>
-        <AddIcon fontSize='small' />
+    {row.rowId ? (
+      <IconButton
+        size='small'
+        onClick={() =>
+          setRows((rows) =>
+            rows
+              .filter((row) => row.id !== id)
+              .map((rows, index) => ({ ...rows, index }))
+          )
+        }
+      >
+        <RemoveIcon fontSize='small' />
       </IconButton>
     ) : (
-      <IconButton size='small' onClick={() => setRows(ROW.remove(id, rows))}>
-        <RemoveIcon fontSize='small' />
+      <IconButton
+        size='small'
+        onClick={() =>
+          setRows((rows) => {
+            const index =
+              rows.findIndex((row) => row.id === id) +
+              rows.filter((row) => row.rowId === id).length +
+              1
+            rows.splice(index, 0, {
+              id: nanoid(),
+              rowId: id.toString(),
+              index,
+            })
+            rows.forEach((row, index) => void (row.index = index))
+          })
+        }
+      >
+        <AddIcon fontSize='small' />
       </IconButton>
     )}
   </Stack>

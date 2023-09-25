@@ -1,15 +1,15 @@
 import { DraggableLocation } from 'react-beautiful-dnd'
 import { Status } from './status'
+import { initialValues } from '@/modules/board'
 
 export interface Board {
-  name: string
-  project: string
-  selected: boolean
+  id: string
   createdAt: string
+  name: string
   statuses: Status[]
 }
 
-export type BoardsEndomorphism = (boards: Board[]) => Board[]
+export type InitialValues = ReturnType<typeof initialValues>
 
 export type DropResultLocation = {
   source: DraggableLocation
