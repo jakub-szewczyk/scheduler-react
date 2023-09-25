@@ -1,6 +1,9 @@
 import ChangesBar from '@/layout/ChangesBar/ChangesBar'
 import { isPlaceholderVisible, serialize } from '@/modules/note'
+import { updateEditorState } from '@/services/editorState'
 import { Note as INote } from '@/types/note'
+import { useAuth } from '@clerk/clerk-react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { DraftHandleValue, Editor, EditorState, RichUtils } from 'draft-js'
 import 'draft-js/dist/Draft.css'
 import { equals, omit } from 'ramda'
@@ -11,6 +14,7 @@ import {
   forwardRef,
   useState,
 } from 'react'
+import { useReadLocalStorage } from 'usehooks-ts'
 import NoteHeader from './NoteHeader'
 import Toolbar from './Toolbar'
 import { EditorContainer, NoteContainer } from './styles/Note.styled'
@@ -23,20 +27,25 @@ interface NoteProps {
 
 const Note = forwardRef<Editor, NoteProps>(
   ({ note, editorState, setEditorState }, ref) => {
-    const editorRef = ref as RefObject<Editor>
+    const selectedProjectId = useReadLocalStorage<string | null>(
+      'selectedProjectId'
+    )
 
     const [spellCheck, setSpellCheck] = useState(true)
 
-    const hasChanges = !equals(
-      {
-        ...serialize(editorState),
-        blocks: serialize(editorState).blocks.map(omit(['key'])),
-      },
-      {
-        ...serialize(note.editorState),
-        blocks: serialize(note.editorState).blocks.map(omit(['key'])),
-      }
-    )
+    const editorRef = ref as RefObject<Editor>
+
+    const { getToken } = useAuth()
+
+    const queryClient = useQueryClient()
+
+    const {
+      mutate: updateEditorStateMutation,
+      isLoading: isEditorStateUpdating,
+    } = useMutation(updateEditorState, {
+      onSuccess: () =>
+        queryClient.invalidateQueries(['projects', selectedProjectId, 'notes']),
+    })
 
     const handleKeyCommand = (
       command: string,
@@ -51,10 +60,26 @@ const Note = forwardRef<Editor, NoteProps>(
       return 'not-handled'
     }
 
+    /**
+     * TODO:
+     * Handle state reset without the flicker
+     * caused by complete input clearing.
+     */
     const handleDiscard = () => {
       setEditorState(EditorState.createEmpty())
       setTimeout(() => setEditorState(note.editorState), 0)
     }
+
+    const hasChanges = !equals(
+      {
+        ...serialize(editorState),
+        blocks: serialize(editorState).blocks.map(omit(['key'])),
+      },
+      {
+        ...serialize(note.editorState),
+        blocks: serialize(note.editorState).blocks.map(omit(['key'])),
+      }
+    )
 
     return (
       <>
@@ -94,20 +119,15 @@ const Note = forwardRef<Editor, NoteProps>(
         </NoteContainer>
         {hasChanges && (
           <ChangesBar
-            loading={false /* isUpdatingEditorState */}
+            loading={isEditorStateUpdating}
             onDiscard={handleDiscard}
-            onSave={
-              async () =>
-                console.log(
-                  'editorState',
-                  JSON.stringify(serialize(editorState))
-                )
-              // updateEditorStateMutation({
-              //   projectId: selectedProjectId!,
-              //   noteId: note.id,
-              //   editorState,
-              //   token: await getToken(),
-              // })
+            onSave={async () =>
+              updateEditorStateMutation({
+                projectId: selectedProjectId!,
+                noteId: note.id,
+                editorState: serialize(editorState),
+                token: await getToken(),
+              })
             }
           />
         )}
