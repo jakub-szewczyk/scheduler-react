@@ -27,13 +27,13 @@ interface NoteProps {
 
 const Note = forwardRef<Editor, NoteProps>(
   ({ note, editorState, setEditorState }, ref) => {
-    const selectedProjectId = useReadLocalStorage<string | null>(
-      'selectedProjectId'
-    )
+    const editorRef = ref as RefObject<Editor>
 
     const [spellCheck, setSpellCheck] = useState(true)
 
-    const editorRef = ref as RefObject<Editor>
+    const selectedProjectId = useReadLocalStorage<string | null>(
+      'selectedProjectId'
+    )
 
     const { getToken } = useAuth()
 

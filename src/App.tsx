@@ -45,7 +45,7 @@ const App = () => {
       appearance={{
         variables: {
           colorPrimary: theme.palette.primary.main,
-          colorBackground: theme.palette.secondary.dark,
+          colorBackground: 'rgba(0, 0, 0, 0.35)',
           colorText: theme.palette.text.primary,
           colorTextSecondary: theme.palette.text.secondary,
           colorTextOnPrimaryBackground: theme.palette.common.black,

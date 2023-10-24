@@ -1,21 +1,19 @@
+import useSnackbarStore from '@/hooks/useSnackbarStore'
+import { useAuth } from '@clerk/clerk-react'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone'
 import { Box, IconButton, Stack, Tooltip } from '@mui/material'
 import { GridRenderCellParams } from '@mui/x-data-grid'
-import { none } from 'fp-ts/lib/Option'
-import { pipe } from 'fp-ts/lib/function'
-import { once, trim } from 'ramda'
-import { Dispatch, MouseEventHandler, SetStateAction, useCallback } from 'react'
-import { useBoolean, useInterval } from 'usehooks-ts'
+import { MouseEventHandler } from 'react'
+import { Updater } from 'use-immer'
+import { useBoolean } from 'usehooks-ts'
 import * as NOTIFICATION from '../../modules/notification'
-import * as ROW from '../../modules/row'
-import * as TIME from '../../modules/time'
 import { NotificationConfiguration } from '../../types/notification'
 import { Row } from '../../types/row'
 import NotificationDialog from './NotificationDialog'
 
 interface NotificationCellProps extends GridRenderCellParams<any, Row> {
-  setRows: Dispatch<SetStateAction<Row[]>>
+  setRows: Updater<Row[]>
 }
 
 const NotificationCell = ({
@@ -30,63 +28,53 @@ const NotificationCell = ({
     setTrue: openNotificationDialog,
   } = useBoolean(false)
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const notifyOnce = useCallback(
-    pipe(row.notification?.title || 'Notification', NOTIFICATION.notify, once),
-    [row.notification?.time]
-  )
+  const openSnackbar = useSnackbarStore((state) => state.open)
 
-  /**
-   * TODO:
-   * Lift this hook up as it is only
-   * notifying when the component is rendered.
-   * Consider adding a service worker to further improve notifications behavior.
-   */
-  useInterval(
-    () =>
-      row.notification?.active &&
-      TIME.matches(row.notification?.time, Date.now())
-        ? notifyOnce()
-        : none,
-    1000
-  )
+  const { getToken } = useAuth()
 
   const handleNotificationIconButtonClick:
     | MouseEventHandler<HTMLButtonElement>
-    | undefined = () =>
-    setRows(
-      ROW.update(
-        field,
-        {
-          time: row.notification?.time || row.starts,
+    | undefined = async () => {
+    try {
+      await NOTIFICATION.subscribe(await getToken())
+      setRows((rows) => {
+        const row = rows.find((row) => row.id === id)!
+        row.notification = {
+          time: new Date(row.starts as string).toISOString(),
           active: !row.notification?.active,
-          title: row.notification?.title,
-        },
-        id
-      )
-    )
+        }
+      })
+    } catch (error) {
+      openSnackbar({ message: (error as Error).message, severity: 'warning' })
+    }
+  }
 
   const handleNotificationIconButtonContextMenu:
     | MouseEventHandler<HTMLButtonElement>
-    | undefined = (event) => {
+    | undefined = async (event) => {
     event.preventDefault()
     openNotificationDialog()
+    try {
+      await NOTIFICATION.subscribe(await getToken())
+    } catch (error) {
+      openSnackbar({ message: (error as Error).message, severity: 'warning' })
+    }
   }
 
   const handleNotificationConfigurationSave = (
     values: NotificationConfiguration
   ) => {
-    setRows(
-      ROW.update(
-        'notification',
-        {
-          active: !!row.notification?.active,
-          time: NOTIFICATION.calculateTime(row.starts!, values),
-          title: trim(values.title),
-        },
-        id
-      )
-    )
+    // setRows(
+    //   ROW.update(
+    //     'notification',
+    //     {
+    //       active: !!row.notification?.active,
+    //       time: NOTIFICATION.calculateTime(row.starts!, values),
+    //       title: trim(values.title),
+    //     },
+    //     id
+    //   )
+    // )
     closeNotificationDialog()
   }
 

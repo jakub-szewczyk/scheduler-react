@@ -17,7 +17,7 @@ const DayCell = ({ id, value, row, setRows }: DayCellProps) => (
     alignItems='center'
     width='100%'
   >
-    <Typography>{value}</Typography>
+    {<Typography>{!row.rowId && value}</Typography>}
     {row.rowId ? (
       <IconButton
         size='small'
@@ -44,6 +44,7 @@ const DayCell = ({ id, value, row, setRows }: DayCellProps) => (
               id: nanoid(),
               rowId: id.toString(),
               index,
+              day: value,
             })
             rows.forEach((row, index) => void (row.index = index))
           })
