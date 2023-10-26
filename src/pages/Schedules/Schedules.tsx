@@ -69,6 +69,18 @@ const Schedules = () => {
         !!selectedScheduleId &&
         isEachScheduleFetchedSuccessfully &&
         schedules.map((schedule) => schedule.id).includes(selectedScheduleId),
+      select: (schedule) => ({
+        ...schedule,
+        rows: schedule.rows.map((row) => ({
+          ...row,
+          ...(row.notification && {
+            notification: {
+              ...row.notification,
+              title: row.notification?.title || '',
+            },
+          }),
+        })),
+      }),
       onSuccess: (schedule) => setRows(schedule.rows),
     }
   )

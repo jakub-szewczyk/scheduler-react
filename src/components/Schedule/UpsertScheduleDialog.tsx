@@ -8,7 +8,7 @@ import { MouseEventHandler } from 'react'
 import DraggableDialog, {
   DraggableDialogProps,
 } from '../../layout/DraggableDialog/DraggableDialog'
-import validationSchema from './validation/validationSchema'
+import { scheduleValidationSchema } from './validation/validationSchema'
 
 interface ScheduleDialogProps extends DraggableDialogProps {
   schedule: Schedule
@@ -51,7 +51,7 @@ const UpsertScheduleDialog = ({
         <Typography>Choose a name for your schedule</Typography>
         <Formik
           initialValues={initialValues(props.mode, schedule)}
-          validationSchema={validationSchema}
+          validationSchema={scheduleValidationSchema}
           onSubmit={props.mode === 'CREATE' ? props.onCreate : props.onEdit}
         >
           {() => (

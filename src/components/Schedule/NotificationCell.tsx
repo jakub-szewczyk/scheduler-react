@@ -4,6 +4,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications'
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone'
 import { Box, IconButton, Stack, Tooltip } from '@mui/material'
 import { GridRenderCellParams } from '@mui/x-data-grid'
+import { trim } from 'ramda'
 import { MouseEventHandler } from 'react'
 import { Updater } from 'use-immer'
 import { useBoolean } from 'usehooks-ts'
@@ -16,12 +17,7 @@ interface NotificationCellProps extends GridRenderCellParams<any, Row> {
   setRows: Updater<Row[]>
 }
 
-const NotificationCell = ({
-  id,
-  field,
-  row,
-  setRows,
-}: NotificationCellProps) => {
+const NotificationCell = ({ id, row, setRows }: NotificationCellProps) => {
   const {
     value: isNotificationDialogOpen,
     setFalse: closeNotificationDialog,
@@ -40,8 +36,11 @@ const NotificationCell = ({
       setRows((rows) => {
         const row = rows.find((row) => row.id === id)!
         row.notification = {
-          time: new Date(row.starts as string).toISOString(),
+          time:
+            row.notification?.time ||
+            new Date(row.starts as string).toISOString(),
           active: !row.notification?.active,
+          title: row.notification?.title || '',
         }
       })
     } catch (error) {
@@ -64,17 +63,14 @@ const NotificationCell = ({
   const handleNotificationConfigurationSave = (
     values: NotificationConfiguration
   ) => {
-    // setRows(
-    //   ROW.update(
-    //     'notification',
-    //     {
-    //       active: !!row.notification?.active,
-    //       time: NOTIFICATION.calculateTime(row.starts!, values),
-    //       title: trim(values.title),
-    //     },
-    //     id
-    //   )
-    // )
+    setRows((rows) => {
+      const row = rows.find((row) => row.id === id)!
+      row.notification = {
+        time: NOTIFICATION.calculateTime(row.starts!, values)!,
+        active: !!row.notification?.active,
+        title: trim(values.title),
+      }
+    })
     closeNotificationDialog()
   }
 

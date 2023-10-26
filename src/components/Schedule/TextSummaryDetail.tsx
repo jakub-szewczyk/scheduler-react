@@ -2,7 +2,7 @@ import { Typography } from '@mui/material'
 
 interface TextSummaryDetailProps {
   label: string
-  children: string | undefined
+  children?: string | null
 }
 
 const TextSummaryDetail = ({ label, children }: TextSummaryDetailProps) =>

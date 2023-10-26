@@ -19,7 +19,7 @@ import * as NOTIFICATION from '../../modules/notification'
 import DraggableDialog, {
   DraggableDialogProps,
 } from '../../layout/DraggableDialog/DraggableDialog'
-import validationSchema from './validation/validationSchema'
+import { notificationValidationSchema } from './validation/validationSchema'
 import TextSummaryDetail from './TextSummaryDetail'
 import TimeSummaryDetail from './TimeSummaryDetail'
 import { Row } from '../../types/row'
@@ -56,7 +56,7 @@ const NotificationDialog = ({
             row.notification?.time,
             row.notification?.title
           )}
-          validationSchema={validationSchema}
+          validationSchema={notificationValidationSchema}
           onSubmit={onSave}
           enableReinitialize
         >

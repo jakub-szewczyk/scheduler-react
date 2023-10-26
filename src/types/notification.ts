@@ -7,5 +7,5 @@ export interface NotificationConfiguration {
 export interface Notification {
   time: string
   active: boolean
-  // title: string
+  title?: string
 }

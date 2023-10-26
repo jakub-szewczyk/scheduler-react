@@ -1,26 +1,17 @@
 import { registerPushSubscription } from '@/services/notification'
-import { Task } from 'fp-ts/lib/Task'
+import { isValid } from 'date-fns'
 import { equals, isNil } from 'ramda'
 import { NotificationConfiguration } from '../types/notification'
 import * as TIME from './time'
-
-const isPermissionGranted = equals('granted')
-
-export const notify =
-  (title: string, options?: NotificationOptions): Task<Notification> =>
-  () =>
-    isPermissionGranted(Notification.permission)
-      ? Promise.resolve(new Notification(title, options))
-      : Notification.requestPermission().then(
-          () => new Notification(title, options)
-        )
 
 export const calculateTime = (
   starts: string,
   values: NotificationConfiguration
 ) =>
   isNaN(+values.notification)
-    ? values.time
+    ? isValid(values.time)
+      ? new Date(values.time!).toISOString()
+      : values.time
     : TIME.subtractMinutes(starts, +values.notification)
 
 export const calculateConfiguration = (
@@ -64,7 +55,6 @@ export const calculateConfiguration = (
         title,
       }
 
-// TODO: Clean up this module
 const urlBase64ToUint8Array = (base64String: string) => {
   const data = window.atob(
     (base64String + '='.repeat((4 - (base64String.length % 4)) % 4))
