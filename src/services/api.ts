@@ -1,11 +1,7 @@
 import axios from 'axios'
 
-/**
- * TODO:
- * Save `baseURL` in .env file.
- */
 const api = axios.create({
-  baseURL: 'http://localhost:3000/api',
+  baseURL: import.meta.env.VITE_BASE_API_URL,
 })
 
 export default api
