@@ -1,3 +1,4 @@
+import useInterceptors from '@/hooks/useInterceptors'
 import { getAllProjects } from '@/services/project'
 import { useAuth } from '@clerk/clerk-react'
 import PendingActionsIcon from '@mui/icons-material/PendingActions'
@@ -33,19 +34,31 @@ const Navbar = () => {
 
   const { isSignedIn, getToken } = useAuth()
 
+  // TODO: Replace with infinite scrolling
   const {
     data: projects,
     isLoading,
     isError,
-  } = useQuery(['projects'], async () => getAllProjects(await getToken()), {
+  } = useQuery(['projects'], () => getAllProjects(), {
     enabled: !!isSignedIn,
     onSuccess: (projects) => {
       if (
         selectedProjectId &&
-        projects.map((project) => project.id).includes(selectedProjectId)
+        projects.content
+          .map((project) => project.id)
+          .includes(selectedProjectId)
       )
         return
-      setSelectedProjectId(projects[0].id)
+      setSelectedProjectId(projects.content[0].id)
+    },
+  })
+
+  useInterceptors({
+    request: {
+      onFulfilled: async (config) => {
+        config.headers.Authorization = `Bearer ${await getToken()}`
+        return config
+      },
     },
   })
 
@@ -129,7 +142,7 @@ const Navbar = () => {
                   },
                 }}
               >
-                {projects?.map((project) => (
+                {projects?.content.map((project) => (
                   <MenuItem
                     key={project.id}
                     value={project.id}

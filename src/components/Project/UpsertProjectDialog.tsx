@@ -16,24 +16,24 @@ interface ProjectDialogProps extends DraggableDialogProps {
   onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
 
-interface CreateProjectDialogProps {
-  mode: 'CREATE'
-  onCreate: (
+interface InsertProjectDialogProps {
+  mode: 'insert'
+  onInsert: (
     values: InitialValues,
     formikHelpers: FormikHelpers<InitialValues>
   ) => void
 }
 
-interface EditProjectDialogProps {
-  mode: 'EDIT'
-  onEdit: (
+interface UpdateProjectDialogProps {
+  mode: 'update'
+  onUpdate: (
     values: InitialValues,
     formikHelpers: FormikHelpers<InitialValues>
   ) => void
 }
 
 type UpsertProjectDialogProps = ProjectDialogProps &
-  (CreateProjectDialogProps | EditProjectDialogProps)
+  (InsertProjectDialogProps | UpdateProjectDialogProps)
 
 const UpsertProjectDialog = ({
   project,
@@ -45,7 +45,7 @@ const UpsertProjectDialog = ({
   <DraggableDialog
     {...props}
     onClose={onClose}
-    dialogTitle={props.mode === 'CREATE' ? 'Create project' : 'Edit project'}
+    dialogTitle={props.mode === 'insert' ? 'Create project' : 'Edit project'}
     dialogContent={
       <Stack spacing={3}>
         <Typography>
@@ -54,7 +54,7 @@ const UpsertProjectDialog = ({
         <Formik
           initialValues={initialValues(props.mode, project)}
           validationSchema={validationSchema}
-          onSubmit={props.mode === 'CREATE' ? props.onCreate : props.onEdit}
+          onSubmit={props.mode === 'insert' ? props.onInsert : props.onUpdate}
         >
           {() => (
             <Form id='project'>

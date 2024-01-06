@@ -1,6 +1,8 @@
 import { Project } from '@/types/project'
 
-export const initialValues = (mode: 'CREATE' | 'EDIT', project: Project) => ({
-  name: mode === 'EDIT' ? project.name || '' : '',
-  description: mode === 'EDIT' ? project.description || '' : '',
+export const PROJECTS_PAGE_SIZE = 10
+
+export const initialValues = (mode: 'insert' | 'update', project: Project) => ({
+  name: mode === 'update' ? project.name : '',
+  description: mode === 'update' ? project.description || '' : '',
 })
