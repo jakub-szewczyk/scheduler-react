@@ -1,74 +1,50 @@
 import { ProjectContainer } from '@/components/Project/styles/Project.styles'
-import { getAllProjects } from '@/services/project'
-import { getAllSchedules, getSchedule } from '@/services/schedule'
+import { getSchedule, getSchedules } from '@/services/schedule'
+import { Project } from '@/types/project'
 import { Row } from '@/types/row'
-import { useAuth } from '@clerk/clerk-react'
+import { Schedule as ISchedule } from '@/types/schedule'
 import { Box, CircularProgress, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { useImmer } from 'use-immer'
 import { useLocalStorage, useReadLocalStorage } from 'usehooks-ts'
 import Schedule from '../../components/Schedule/Schedule'
 import ScheduleActions from '../../components/ScheduleActions/ScheduleActions'
+import { getProjects } from '@/services/project'
+import { Navigate } from 'react-router-dom'
 
 const Schedules = () => {
   const [rows, setRows] = useImmer<Row[]>([])
 
-  const selectedProjectId = useReadLocalStorage<string | null>(
-    'selectedProjectId'
+  const selectedProject = useReadLocalStorage<Pick<
+    Project,
+    'id' | 'name'
+  > | null>('selectedProject')
+
+  const [selectedSchedule, setSelectedSchedule] = useLocalStorage<Pick<
+    ISchedule,
+    'id' | 'name' | 'createdAt'
+  > | null>('selectedSchedule', null)
+
+  const { data: schedules } = useQuery(
+    ['projects', selectedProject?.id, 'schedules'],
+    () => getSchedules({ projectId: selectedProject!.id }),
+    { enabled: !selectedSchedule }
   )
-
-  const [selectedScheduleId, setSelectedScheduleId] = useLocalStorage<
-    string | null
-  >('selectedScheduleId', null)
-
-  const { getToken } = useAuth()
-
-  const { data: projects, isSuccess: isEachProjectFetchedSuccessfully } =
-    useQuery(['projects'], async () => getAllProjects(await getToken()))
-
-  const { data: schedules, isSuccess: isEachScheduleFetchedSuccessfully } =
-    useQuery(
-      ['projects', selectedProjectId, 'schedules'],
-      async () =>
-        getAllSchedules({
-          projectId: selectedProjectId!,
-          token: await getToken(),
-        }),
-      {
-        enabled:
-          !!selectedProjectId &&
-          isEachProjectFetchedSuccessfully &&
-          projects.map((project) => project.id).includes(selectedProjectId),
-        onSuccess: (schedules) => {
-          if (
-            selectedScheduleId &&
-            schedules
-              .map((schedule) => schedule.id)
-              .includes(selectedScheduleId)
-          )
-            return
-          setSelectedScheduleId(schedules[0].id)
-        },
-      }
-    )
 
   const {
     data: schedule,
     isLoading: isScheduleLoading,
-    isError: isScheduleFetchedWithError,
+    isError: isScheduleFetchedUnsuccessfully,
   } = useQuery(
-    ['projects', selectedProjectId, 'schedules', selectedScheduleId],
+    ['projects', selectedProject?.id, 'schedules', selectedSchedule?.id],
     async () =>
       getSchedule({
-        projectId: selectedProjectId!,
-        scheduleId: selectedScheduleId!,
-        token: await getToken(),
+        projectId: selectedProject!.id,
+        scheduleId: selectedSchedule!.id,
       }),
     {
-      enabled:
-        !!selectedScheduleId &&
-        isEachScheduleFetchedSuccessfully &&
-        schedules.map((schedule) => schedule.id).includes(selectedScheduleId),
+      enabled: !!selectedProject && !!selectedSchedule,
+      // TODO: Simplify
       select: (schedule) => ({
         ...schedule,
         rows: schedule.rows.map((row) => ({
@@ -84,6 +60,8 @@ const Schedules = () => {
       onSuccess: (schedule) => setRows(schedule.rows),
     }
   )
+
+  if (!selectedProject) return <Navigate to='/' replace />
 
   /**
    * TODO:
@@ -103,7 +81,7 @@ const Schedules = () => {
       </Box>
     )
 
-  if (isScheduleFetchedWithError)
+  if (isScheduleFetchedUnsuccessfully)
     return (
       <ProjectContainer>
         <Typography color='error'>

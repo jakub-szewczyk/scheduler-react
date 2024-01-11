@@ -1,6 +1,6 @@
 import { ProjectContainer } from '@/components/Project/styles/Project.styles'
 import { getAllBoards, getBoard } from '@/services/board'
-import { getAllProjects } from '@/services/project'
+import { getProjects } from '@/services/project'
 import { Status } from '@/types/status'
 import { useAuth } from '@clerk/clerk-react'
 import { Box, CircularProgress, Typography } from '@mui/material'
@@ -25,7 +25,7 @@ const Boards = () => {
   const { getToken } = useAuth()
 
   const { data: projects, isSuccess: isEachProjectFetchedSuccessfully } =
-    useQuery(['projects'], async () => getAllProjects(await getToken()))
+    useQuery(['projects'], async () => getProjects(await getToken()))
 
   const { data: boards, isSuccess: isEachBoardFetchedSuccessfully } = useQuery(
     ['projects', selectedProjectId, 'boards'],

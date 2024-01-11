@@ -1,6 +1,6 @@
 import DrawerItemSkeleton from '@/layout/DrawerItemSkeleton/DrawerItemSkeleton'
 import { getAllBoards } from '@/services/board'
-import { getAllProjects } from '@/services/project'
+import { getProjects } from '@/services/project'
 import { useAuth } from '@clerk/clerk-react'
 import AddIcon from '@mui/icons-material/Add'
 import {
@@ -30,7 +30,7 @@ const BoardsDrawer = ({ onSelect, onCreate, ...props }: BoardsDrawerProps) => {
   const { getToken } = useAuth()
 
   const { data: projects, isSuccess: isEachProjectFetchedSuccessfully } =
-    useQuery(['projects'], async () => getAllProjects(await getToken()))
+    useQuery(['projects'], async () => getProjects(await getToken()))
 
   const {
     data: boards,

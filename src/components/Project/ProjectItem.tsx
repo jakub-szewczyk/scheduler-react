@@ -17,8 +17,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { formatDistanceToNow } from 'date-fns'
 import { FormikHelpers } from 'formik'
 import { MouseEventHandler } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useBoolean, useLocalStorage } from 'usehooks-ts'
+import { useSearchParams } from 'react-router-dom'
+import { useBoolean } from 'usehooks-ts'
 import DeleteProjectDialog from './DeleteProjectDialog'
 import UpsertProjectDialog from './UpsertProjectDialog'
 
@@ -27,7 +27,7 @@ interface ProjectItemProps {
   disableDelete?: boolean
   onAfterCreate?: () => void
   onAfterUpdate?: () => void
-  onAfterDelete?: () => void
+  onAfterDelete?: (project: Project) => void
 }
 
 const ProjectItem = ({
@@ -37,11 +37,9 @@ const ProjectItem = ({
   onAfterUpdate,
   onAfterDelete,
 }: ProjectItemProps) => {
-  const [selectedProjectId, setSelectedProjectId] = useLocalStorage<
-    string | null
-  >('selectedProjectId', null)
+  const [searchParams, setSearchParams] = useSearchParams()
 
-  const isProjectSelected = project.id === selectedProjectId
+  const isProjectSelected = project.id === searchParams.get('projectId')
 
   const {
     value: isCreateProjectDialogOpen,
@@ -61,35 +59,57 @@ const ProjectItem = ({
     setTrue: openDeleteProjectDialog,
   } = useBoolean()
 
-  const navigate = useNavigate()
-
   const queryClient = useQueryClient()
 
   const { mutate: createProjectMutation, isLoading: isCreatingProject } =
     useMutation(createProject, {
-      onSuccess: (project) => {
-        queryClient.invalidateQueries(['projects'])
+      onSuccess: async (project) => {
+        await Promise.all([
+          queryClient.invalidateQueries(['infinite']),
+          queryClient.invalidateQueries(['projects']),
+        ])
         closeCreateProjectDialog()
-        setSelectedProjectId(project.id)
+        setSearchParams(
+          (searchParams) => ({
+            ...Object.fromEntries(searchParams),
+            projectId: project.id,
+            projectName: project.name,
+            page: '0',
+          }),
+          { replace: +searchParams.get('page')! === 0 }
+        )
         onAfterCreate?.()
       },
     })
 
   const { mutate: updateProjectMutation, isLoading: isUpdatingProject } =
     useMutation(updateProject, {
-      onSuccess: () => {
-        queryClient.invalidateQueries(['projects'])
+      onSuccess: async () => {
+        await Promise.all([
+          queryClient.invalidateQueries(['infinite']),
+          queryClient.invalidateQueries(['projects']),
+        ])
         closeEditProjectDialog()
+        setSearchParams(
+          (searchParams) => ({
+            ...Object.fromEntries(searchParams),
+            projectName: project.name,
+          }),
+          { replace: true }
+        )
         onAfterUpdate?.()
       },
     })
 
   const { mutate: deleteProjectMutation, isLoading: isDeletingProject } =
     useMutation(deleteProject, {
-      onSuccess: () => {
-        queryClient.invalidateQueries(['projects'])
+      onSuccess: async (project) => {
+        await Promise.all([
+          queryClient.invalidateQueries(['infinite']),
+          queryClient.invalidateQueries(['projects']),
+        ])
         closeDeleteProjectDialog()
-        onAfterDelete?.()
+        onAfterDelete?.(project)
       },
     })
 
@@ -114,10 +134,16 @@ const ProjectItem = ({
       openDeleteProjectDialog()
     }
 
-  const handleProjectSelect = () => {
-    setSelectedProjectId(project.id)
-    navigate('/schedules')
-  }
+  // TODO: Navigate to `/projects/:projectId/schedules`
+  const handleProjectSelect = () =>
+    setSearchParams(
+      (searchParams) => ({
+        ...Object.fromEntries(searchParams),
+        projectId: project.id,
+        projectName: project.name,
+      }),
+      { replace: true }
+    )
 
   const handleProjectCreate = (
     { name, description }: InitialValues,
@@ -255,7 +281,6 @@ const ProjectItem = ({
         mode='insert'
         open={isCreateProjectDialogOpen}
         onClose={closeCreateProjectDialog}
-        project={project}
         loading={isCreatingProject}
         onInsert={handleProjectCreate}
       />

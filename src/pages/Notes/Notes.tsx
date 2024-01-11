@@ -3,7 +3,7 @@ import NoteActions from '@/components/NoteActions/NoteActions'
 import { ProjectContainer } from '@/components/Project/styles/Project.styles'
 import { deserialize } from '@/modules/note'
 import { getAllNotes, getNote } from '@/services/note'
-import { getAllProjects } from '@/services/project'
+import { getProjects } from '@/services/project'
 import { useAuth } from '@clerk/clerk-react'
 import { Box, CircularProgress, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
@@ -31,7 +31,7 @@ const Notes = () => {
   const { getToken } = useAuth()
 
   const { data: projects, isSuccess: isEachProjectFetchedSuccessfully } =
-    useQuery(['projects'], async () => getAllProjects(await getToken()))
+    useQuery(['projects'], async () => getProjects(await getToken()))
 
   const { data: notes, isSuccess: isEachNoteFetchedSuccessfully } = useQuery(
     ['projects', selectedProjectId, 'notes'],

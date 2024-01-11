@@ -7,10 +7,13 @@ type GetAllProjectsParams = Partial<{
   size: number
 }>
 
-export const getAllProjects = (params?: GetAllProjectsParams) =>
+export const getProjects = (params?: GetAllProjectsParams) =>
   api<PaginableResponse<Project[]>>('/projects', { params }).then(
     ({ data }) => data
   )
+
+export const getProject = (projectId: string) =>
+  api<Project>(`/projects/${projectId}`).then(({ data }) => data)
 
 export const createProject = (data: Pick<Project, 'name' | 'description'>) =>
   api.post<Project>('/projects', data).then(({ data }) => data)

@@ -1,17 +1,16 @@
 import { InitialValues, Project } from '@/types/project'
+import { LoadingButton } from '@mui/lab'
 import { Button, Stack, Theme, Typography } from '@mui/material'
 import { Field, Form, Formik, FormikHelpers } from 'formik'
 import { TextField } from 'formik-mui'
 import { MouseEventHandler } from 'react'
+import { match } from 'ts-pattern'
 import DraggableDialog, {
   DraggableDialogProps,
 } from '../../layout/DraggableDialog/DraggableDialog'
 import validationSchema from './validation/validationSchema'
-import { LoadingButton } from '@mui/lab'
-import { initialValues } from '@/modules/project'
 
 interface ProjectDialogProps extends DraggableDialogProps {
-  project: Project
   loading?: boolean
   onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
@@ -26,6 +25,7 @@ interface InsertProjectDialogProps {
 
 interface UpdateProjectDialogProps {
   mode: 'update'
+  project: Project
   onUpdate: (
     values: InitialValues,
     formikHelpers: FormikHelpers<InitialValues>
@@ -36,7 +36,6 @@ type UpsertProjectDialogProps = ProjectDialogProps &
   (InsertProjectDialogProps | UpdateProjectDialogProps)
 
 const UpsertProjectDialog = ({
-  project,
   loading = false,
   onClose,
   onCancel = onClose as MouseEventHandler<HTMLButtonElement> | undefined,
@@ -52,7 +51,13 @@ const UpsertProjectDialog = ({
           Choose a name and description that best fit your project needs
         </Typography>
         <Formik
-          initialValues={initialValues(props.mode, project)}
+          initialValues={match(props)
+            .with({ mode: 'insert' }, () => ({ name: '', description: '' }))
+            .with({ mode: 'update' }, (props) => ({
+              name: props.project.name,
+              description: props.project.description || '',
+            }))
+            .exhaustive()}
           validationSchema={validationSchema}
           onSubmit={props.mode === 'insert' ? props.onInsert : props.onUpdate}
         >

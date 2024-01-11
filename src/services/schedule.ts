@@ -1,33 +1,24 @@
 import { Schedule } from '@/types/schedule'
 import api from './api'
 
-interface GetAllSchedulesPayload {
+interface GetAllSchedulesParams {
   projectId: string
-  token: string | null
 }
 
-export const getAllSchedules = ({ projectId, token }: GetAllSchedulesPayload) =>
+export const getSchedules = ({ projectId }: GetAllSchedulesParams) =>
   api<Pick<Schedule, 'id' | 'createdAt' | 'name'>[]>(
-    `/projects/${projectId}/schedules`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
+    `/projects/${projectId}/schedules`
   ).then(({ data }) => data)
 
-interface GetSchedulePayload {
+interface GetScheduleParams {
   projectId: string
   scheduleId: string
-  token: string | null
 }
 
-export const getSchedule = ({
-  projectId,
-  scheduleId,
-  token,
-}: GetSchedulePayload) =>
-  api<Schedule>(`/projects/${projectId}/schedules/${scheduleId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  }).then(({ data }) => data)
+export const getSchedule = ({ projectId, scheduleId }: GetScheduleParams) =>
+  api<Schedule>(`/projects/${projectId}/schedules/${scheduleId}`).then(
+    ({ data }) => data
+  )
 
 interface CreateSchedulePayload {
   projectId: string
