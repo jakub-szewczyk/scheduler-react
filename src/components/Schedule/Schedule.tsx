@@ -2,15 +2,19 @@ import ChangesBar from '@/layout/ChangesBar/ChangesBar'
 import { updateScheduleRows } from '@/services/row'
 import { Row } from '@/types/row'
 import { Schedule as ISchedule } from '@/types/schedule'
-import { useAuth } from '@clerk/clerk-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { equals } from 'ramda'
+import { useParams } from 'react-router-dom'
 import { Updater } from 'use-immer'
-import { useReadLocalStorage } from 'usehooks-ts'
 import * as TABLE from '../../modules/table'
 import ScheduleHeader from './ScheduleHeader'
 import createColumns from './helpers/createColumns'
 import { DataGrid, DataGridContainer } from './styles/DataGrid.styled'
+
+type Params = {
+  projectId: string
+  scheduleId: string
+}
 
 interface ScheduleProps {
   schedule: ISchedule
@@ -19,11 +23,7 @@ interface ScheduleProps {
 }
 
 const Schedule = ({ schedule, rows, setRows }: ScheduleProps) => {
-  const selectedProjectId = useReadLocalStorage<string | null>(
-    'selectedProjectId'
-  )
-
-  const { getToken } = useAuth()
+  const params = useParams<Params>()
 
   const queryClient = useQueryClient()
 
@@ -33,7 +33,7 @@ const Schedule = ({ schedule, rows, setRows }: ScheduleProps) => {
   } = useMutation(updateScheduleRows, {
     onSuccess: () =>
       queryClient.invalidateQueries(
-        ['projects', selectedProjectId, 'schedules', schedule.id],
+        ['projects', params.projectId, 'schedules', schedule.id],
         { exact: true }
       ),
   })
@@ -78,10 +78,9 @@ const Schedule = ({ schedule, rows, setRows }: ScheduleProps) => {
           onDiscard={() => setRows(schedule.rows)}
           onSave={async () =>
             updateScheduleRowsMutation({
-              projectId: selectedProjectId!,
+              projectId: params.projectId!,
               scheduleId: schedule.id,
               rows,
-              token: await getToken(),
             })
           }
         />

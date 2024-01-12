@@ -1,6 +1,4 @@
-import { getProjects } from '@/services/project'
 import { getSchedules } from '@/services/schedule'
-import { useAuth } from '@clerk/clerk-react'
 import AddIcon from '@mui/icons-material/Add'
 import {
   Box,
@@ -13,9 +11,14 @@ import {
 import List from '@mui/material/List'
 import { useQuery } from '@tanstack/react-query'
 import { MouseEventHandler } from 'react'
-import { useReadLocalStorage } from 'usehooks-ts'
+import { useParams } from 'react-router-dom'
 import DrawerItemSkeleton from '../../layout/DrawerItemSkeleton/DrawerItemSkeleton'
 import SchedulesDrawerItem from './SchedulesDrawerItem'
+
+type Params = {
+  projectId: string
+  scheduleId: string
+}
 
 interface SchedulesDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
   onCreate: MouseEventHandler<HTMLButtonElement> | undefined
@@ -27,32 +30,16 @@ const SchedulesDrawer = ({
   onSelect,
   ...props
 }: SchedulesDrawerProps) => {
-  const selectedProjectId = useReadLocalStorage<string | null>(
-    'selectedProjectId'
-  )
-
-  const { getToken } = useAuth()
-
-  const { data: projects, isSuccess: isEachProjectFetchedSuccessfully } =
-    useQuery(['projects'], async () => getProjects(await getToken()))
+  const params = useParams<Params>()
 
   const {
     data: schedules,
     isLoading: isEachScheduleLoading,
     isSuccess: isEachScheduleFetchedSuccessfully,
-  } = useQuery(
-    ['projects', selectedProjectId, 'schedules'],
-    async () =>
-      getSchedules({
-        projectId: selectedProjectId!,
-        token: await getToken(),
-      }),
-    {
-      enabled:
-        !!selectedProjectId &&
-        isEachProjectFetchedSuccessfully &&
-        projects.map((project) => project.id).includes(selectedProjectId),
-    }
+  } = useQuery(['projects', params.projectId, 'schedules'], () =>
+    getSchedules({
+      projectId: params.projectId!,
+    })
   )
 
   return (

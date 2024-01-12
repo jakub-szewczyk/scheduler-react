@@ -1,34 +1,40 @@
 import { ProjectContainer } from '@/components/Project/styles/Project.styles'
 import { getSchedule, getSchedules } from '@/services/schedule'
-import { Project } from '@/types/project'
 import { Row } from '@/types/row'
-import { Schedule as ISchedule } from '@/types/schedule'
 import { Box, CircularProgress, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useImmer } from 'use-immer'
-import { useLocalStorage, useReadLocalStorage } from 'usehooks-ts'
 import Schedule from '../../components/Schedule/Schedule'
 import ScheduleActions from '../../components/ScheduleActions/ScheduleActions'
-import { getProjects } from '@/services/project'
-import { Navigate } from 'react-router-dom'
+
+type Params = {
+  projectId: string
+  scheduleId: string
+}
 
 const Schedules = () => {
   const [rows, setRows] = useImmer<Row[]>([])
 
-  const selectedProject = useReadLocalStorage<Pick<
-    Project,
-    'id' | 'name'
-  > | null>('selectedProject')
+  const [searchParams] = useSearchParams()
 
-  const [selectedSchedule, setSelectedSchedule] = useLocalStorage<Pick<
-    ISchedule,
-    'id' | 'name' | 'createdAt'
-  > | null>('selectedSchedule', null)
+  const params = useParams<Params>()
 
-  const { data: schedules } = useQuery(
-    ['projects', selectedProject?.id, 'schedules'],
-    () => getSchedules({ projectId: selectedProject!.id }),
-    { enabled: !selectedSchedule }
+  const navigate = useNavigate()
+
+  useQuery(
+    ['projects', params.projectId, 'schedules'],
+    () => getSchedules({ projectId: params.projectId! }),
+    {
+      enabled: !params.scheduleId,
+      onSuccess: (schedules) =>
+        !params.scheduleId &&
+        navigate(
+          `/projects/${params.projectId}/schedules/${schedules[0].id
+          }?${searchParams.toString()}`,
+          { replace: true }
+        ),
+    }
   )
 
   const {
@@ -36,15 +42,14 @@ const Schedules = () => {
     isLoading: isScheduleLoading,
     isError: isScheduleFetchedUnsuccessfully,
   } = useQuery(
-    ['projects', selectedProject?.id, 'schedules', selectedSchedule?.id],
+    ['projects', params.projectId, 'schedules', params.scheduleId],
     async () =>
       getSchedule({
-        projectId: selectedProject!.id,
-        scheduleId: selectedSchedule!.id,
+        projectId: params.projectId!,
+        scheduleId: params.scheduleId!,
       }),
     {
-      enabled: !!selectedProject && !!selectedSchedule,
-      // TODO: Simplify
+      enabled: !!params.scheduleId,
       select: (schedule) => ({
         ...schedule,
         rows: schedule.rows.map((row) => ({
@@ -61,12 +66,6 @@ const Schedules = () => {
     }
   )
 
-  if (!selectedProject) return <Navigate to='/' replace />
-
-  /**
-   * TODO:
-   * Test loading and error states.
-   */
   if (isScheduleLoading || rows.length === 0)
     return (
       <Box
@@ -81,6 +80,10 @@ const Schedules = () => {
       </Box>
     )
 
+  /**
+   * TODO:
+   * Improve error display.
+   */
   if (isScheduleFetchedUnsuccessfully)
     return (
       <ProjectContainer>

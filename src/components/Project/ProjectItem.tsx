@@ -17,7 +17,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { formatDistanceToNow } from 'date-fns'
 import { FormikHelpers } from 'formik'
 import { MouseEventHandler } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useBoolean } from 'usehooks-ts'
 import DeleteProjectDialog from './DeleteProjectDialog'
 import UpsertProjectDialog from './UpsertProjectDialog'
@@ -38,6 +38,8 @@ const ProjectItem = ({
   onAfterDelete,
 }: ProjectItemProps) => {
   const [searchParams, setSearchParams] = useSearchParams()
+
+  const navigate = useNavigate()
 
   const isProjectSelected = project.id === searchParams.get('projectId')
 
@@ -134,8 +136,7 @@ const ProjectItem = ({
       openDeleteProjectDialog()
     }
 
-  // TODO: Navigate to `/projects/:projectId/schedules`
-  const handleProjectSelect = () =>
+  const handleProjectSelect = () => {
     setSearchParams(
       (searchParams) => ({
         ...Object.fromEntries(searchParams),
@@ -144,6 +145,14 @@ const ProjectItem = ({
       }),
       { replace: true }
     )
+    navigate(
+      `/projects/${project.id}/schedules?${new URLSearchParams({
+        ...Object.fromEntries(searchParams),
+        projectId: project.id,
+        projectName: project.name,
+      })}`
+    )
+  }
 
   const handleProjectCreate = (
     { name, description }: InitialValues,

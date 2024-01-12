@@ -9,21 +9,31 @@ import {
   CircularProgress,
   MenuItem,
   Select,
+  SelectChangeEvent,
   Stack,
   Toolbar,
   Typography,
 } from '@mui/material'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { ChangeEvent, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useEventListener } from 'usehooks-ts'
 import ProfileMenu from './ProfileMenu'
 import WidgetsMenu from './WidgetsMenu'
+
+type Params = {
+  projectId: string
+  scheduleId: string
+  boardId: string
+  noteId: string
+}
 
 const Navbar = () => {
   const [isScrollYOffset, setIsScrollYOffset] = useState(false)
 
   const [searchParams, setSearchParams] = useSearchParams()
+
+  const params = useParams<Params>()
 
   const navigate = useNavigate()
 
@@ -58,6 +68,44 @@ const Navbar = () => {
           : undefined,
     }
   )
+
+  const handleProjectChange = (event: SelectChangeEvent<string>) => {
+    const project = projects?.pages
+      .flatMap((page) => page.content)
+      .find((project) => project.id === event.target.value)!
+    setSearchParams(
+      (searchParams) => ({
+        ...Object.fromEntries(searchParams),
+        projectId: project.id,
+        projectName: project.name,
+      }),
+      { replace: true }
+    )
+    if (params.scheduleId)
+      return navigate(
+        `/projects/${project.id}/schedules?${new URLSearchParams({
+          ...Object.fromEntries(searchParams),
+          projectId: project.id,
+          projectName: project.name,
+        })}`
+      )
+    if (params.boardId)
+      return navigate(
+        `/projects/${project.id}/boards?${new URLSearchParams({
+          ...Object.fromEntries(searchParams),
+          projectId: project.id,
+          projectName: project.name,
+        })}`
+      )
+    if (params.noteId)
+      return navigate(
+        `/projects/${project.id}/notes?${new URLSearchParams({
+          ...Object.fromEntries(searchParams),
+          projectId: project.id,
+          projectName: project.name,
+        })}`
+      )
+  }
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -108,19 +156,7 @@ const Navbar = () => {
                   isEachProjectLoading ||
                   isEachProjectFetchedUnsuccessfully
                 }
-                onChange={(event) => {
-                  const project = projects?.pages
-                    .flatMap((page) => page.content)
-                    .find((project) => project.id === event.target.value)!
-                  setSearchParams(
-                    (searchParams) => ({
-                      ...Object.fromEntries(searchParams),
-                      projectId: project.id,
-                      projectName: project.name,
-                    }),
-                    { replace: true }
-                  )
-                }}
+                onChange={handleProjectChange}
                 sx={{ minWidth: 80, width: 120, maxWidth: 120 }}
                 MenuProps={{
                   anchorOrigin: {

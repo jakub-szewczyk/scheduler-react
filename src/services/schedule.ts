@@ -23,19 +23,13 @@ export const getSchedule = ({ projectId, scheduleId }: GetScheduleParams) =>
 interface CreateSchedulePayload {
   projectId: string
   name: string
-  token: string | null
 }
 
-export const createSchedule = ({
-  projectId,
-  name,
-  token,
-}: CreateSchedulePayload) =>
+export const createSchedule = ({ projectId, name }: CreateSchedulePayload) =>
   api
     .post<Pick<Schedule, 'id' | 'createdAt' | 'name'>>(
       `/projects/${projectId}/schedules`,
-      { name },
-      { headers: { Authorization: `Bearer ${token}` } }
+      { name }
     )
     .then(({ data }) => data)
 
@@ -43,38 +37,26 @@ interface UpdateSchedulePayload {
   projectId: string
   scheduleId: string
   name: string
-  token: string | null
 }
 
 export const updateSchedule = ({
   projectId,
   scheduleId,
   name,
-  token,
 }: UpdateSchedulePayload) =>
   api
-    .put<Schedule>(
-      `/projects/${projectId}/schedules/${scheduleId}`,
-      { name },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    )
+    .put<Schedule>(`/projects/${projectId}/schedules/${scheduleId}`, { name })
     .then(({ data }) => data)
 
 interface DeleteSchedulePayload {
   projectId: string
   scheduleId: string
-  token: string | null
 }
 
 export const deleteSchedule = ({
   projectId,
   scheduleId,
-  token,
 }: DeleteSchedulePayload) =>
   api
-    .delete<Schedule>(`/projects/${projectId}/schedules/${scheduleId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    .delete<Schedule>(`/projects/${projectId}/schedules/${scheduleId}`)
     .then(({ data }) => data)

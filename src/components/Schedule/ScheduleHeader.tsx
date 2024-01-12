@@ -1,38 +1,39 @@
 import { updateSchedule } from '@/services/schedule'
 import { InitialValues, Schedule } from '@/types/schedule'
-import { useAuth } from '@clerk/clerk-react'
 import EditIcon from '@mui/icons-material/Edit'
 import { IconButton, Stack, Typography } from '@mui/material'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { FormikHelpers } from 'formik'
-import { useBoolean, useReadLocalStorage } from 'usehooks-ts'
+import { useParams } from 'react-router-dom'
+import { useBoolean } from 'usehooks-ts'
 import UpsertScheduleDialog from './UpsertScheduleDialog'
+
+type Params = {
+  projectId: string
+  scheduleId: string
+}
 
 interface ScheduleHeaderProps {
   schedule: Schedule
 }
 
 const ScheduleHeader = ({ schedule }: ScheduleHeaderProps) => {
-  const selectedProjectId = useReadLocalStorage<string | null>(
-    'selectedProjectId'
-  )
-
   const {
     value: isEditScheduleDialogOpen,
     setFalse: closeEditScheduleDialog,
     setTrue: openEditScheduleDialog,
   } = useBoolean()
 
-  const { getToken } = useAuth()
+  const params = useParams<Params>()
 
   const queryClient = useQueryClient()
 
   const { mutate: updateScheduleMutation, isLoading: isScheduleUpdating } =
     useMutation(updateSchedule, {
-      onSuccess: () => {
-        queryClient.invalidateQueries([
+      onSuccess: async () => {
+        await queryClient.invalidateQueries([
           'projects',
-          selectedProjectId,
+          params.projectId,
           'schedules',
         ])
         closeEditScheduleDialog()
@@ -41,13 +42,12 @@ const ScheduleHeader = ({ schedule }: ScheduleHeaderProps) => {
 
   const handleScheduleEdit = async (
     values: InitialValues,
-    formikHelpers: FormikHelpers<InitialValues>
+    _: FormikHelpers<InitialValues>
   ) =>
     updateScheduleMutation({
-      projectId: selectedProjectId!,
+      projectId: params.projectId!,
       scheduleId: schedule.id,
       name: values.name,
-      token: await getToken(),
     })
 
   return (
