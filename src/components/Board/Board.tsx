@@ -1,18 +1,22 @@
+import ChangesBar from '@/layout/ChangesBar/ChangesBar'
+import { updateBoardStatuses } from '@/services/status'
+import { Board as IBoard } from '@/types/board'
 import { Status } from '@/types/status'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { equals } from 'ramda'
 import { Dispatch, SetStateAction } from 'react'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
+import { useParams } from 'react-router-dom'
 import StrictModeDroppable from '../../layout/StrictModeDroppable/StrictModeDroppable'
 import * as STATUS from '../../modules/status'
 import BoardHeader from './BoardHeader'
 import StatusColumn from './StatusColumn'
 import { BoardContainer } from './styles/Board.styled'
-import { equals } from 'ramda'
-import { Board as IBoard } from '@/types/board'
-import ChangesBar from '@/layout/ChangesBar/ChangesBar'
-import { useReadLocalStorage } from 'usehooks-ts'
-import { useAuth } from '@clerk/clerk-react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { updateBoardStatuses } from '@/services/status'
+
+type Params = {
+  projectId: string
+  boardId: string
+}
 
 interface BoardProps {
   board: IBoard
@@ -21,11 +25,7 @@ interface BoardProps {
 }
 
 const Board = ({ board, statuses, setStatuses }: BoardProps) => {
-  const selectedProjectId = useReadLocalStorage<string | null>(
-    'selectedProjectId'
-  )
-
-  const { getToken } = useAuth()
+  const params = useParams<Params>()
 
   const queryClient = useQueryClient()
 
@@ -35,7 +35,7 @@ const Board = ({ board, statuses, setStatuses }: BoardProps) => {
   } = useMutation(updateBoardStatuses, {
     onSuccess: () =>
       queryClient.invalidateQueries(
-        ['projects', selectedProjectId, 'boards', board.id],
+        ['projects', params.projectId, 'boards', params.boardId],
         { exact: true }
       ),
   })
@@ -84,10 +84,9 @@ const Board = ({ board, statuses, setStatuses }: BoardProps) => {
           onDiscard={() => setStatuses(board.statuses)}
           onSave={async () =>
             updateBoardStatusesMutation({
-              projectId: selectedProjectId!,
+              projectId: params.projectId!,
               boardId: board.id,
               statuses,
-              token: await getToken(),
             })
           }
         />

@@ -11,7 +11,14 @@ import {
   MenuItem,
 } from '@mui/material'
 import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+
+type Params = {
+  projectId: string
+  scheduleId: string
+  boardId: string
+  noteId: string
+}
 
 interface WidgetsMenuProps {
   iconButtonProps?: IconButtonProps
@@ -20,22 +27,49 @@ interface WidgetsMenuProps {
 const WidgetsMenu = ({ iconButtonProps }: WidgetsMenuProps) => {
   const [menu, setMenu] = useState<HTMLElement | null>(null)
 
+  const [searchParams] = useSearchParams()
+
+  const params = useParams<Params>()
+
   const navigate = useNavigate()
 
-  const { pathname } = useLocation()
-
   const handleNotesMenuItemClick = () => {
-    navigate('/notes')
+    if (params.noteId) return setMenu(null)
+    navigate({
+      pathname: `/projects/${searchParams.get('projectId')}/notes`,
+      search: new URLSearchParams({
+        projectId: searchParams.get('projectId')!,
+        projectName: searchParams.get('projectName')!,
+      }).toString(),
+    })
     setMenu(null)
   }
 
+  // TODO:
+  // Fix board module
   const handleBoardsMenuItemClick = () => {
-    navigate('/boards')
+    if (params.boardId) return setMenu(null)
+    navigate({
+      pathname: `/projects/${searchParams.get('projectId')}/boards`,
+      search: new URLSearchParams({
+        projectId: searchParams.get('projectId')!,
+        projectName: searchParams.get('projectName')!,
+      }).toString(),
+    })
     setMenu(null)
   }
 
+  // TODO:
+  // Fix note module
   const handleSchedulesMenuItemClick = () => {
-    navigate('/schedules')
+    if (params.scheduleId) return setMenu(null)
+    navigate({
+      pathname: `/projects/${searchParams.get('projectId')}/schedules`,
+      search: new URLSearchParams({
+        projectId: searchParams.get('projectId')!,
+        projectName: searchParams.get('projectName')!,
+      }).toString(),
+    })
     setMenu(null)
   }
 
@@ -54,17 +88,14 @@ const WidgetsMenu = ({ iconButtonProps }: WidgetsMenuProps) => {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <MenuItem
-          selected={pathname === '/notes'}
-          onClick={handleNotesMenuItemClick}
-        >
+        <MenuItem selected={!!params.noteId} onClick={handleNotesMenuItemClick}>
           <ListItemIcon>
             <StickyNote2Icon fontSize='small' />
           </ListItemIcon>
           <ListItemText>Notes</ListItemText>
         </MenuItem>
         <MenuItem
-          selected={pathname === '/boards'}
+          selected={!!params.boardId}
           onClick={handleBoardsMenuItemClick}
         >
           <ListItemIcon>
@@ -73,7 +104,7 @@ const WidgetsMenu = ({ iconButtonProps }: WidgetsMenuProps) => {
           <ListItemText>Boards</ListItemText>
         </MenuItem>
         <MenuItem
-          selected={pathname === '/schedules'}
+          selected={!!params.scheduleId}
           onClick={handleSchedulesMenuItemClick}
         >
           <ListItemIcon>

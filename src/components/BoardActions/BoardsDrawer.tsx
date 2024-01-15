@@ -1,5 +1,5 @@
 import DrawerItemSkeleton from '@/layout/DrawerItemSkeleton/DrawerItemSkeleton'
-import { getAllBoards } from '@/services/board'
+import { getBoards } from '@/services/board'
 import { getProjects } from '@/services/project'
 import { useAuth } from '@clerk/clerk-react'
 import AddIcon from '@mui/icons-material/Add'
@@ -16,6 +16,12 @@ import { useQuery } from '@tanstack/react-query'
 import { MouseEventHandler } from 'react'
 import { useReadLocalStorage } from 'usehooks-ts'
 import BoardsDrawerItem from './BoardsDrawerItem'
+import { useParams } from 'react-router-dom'
+
+type Params = {
+  projectId: string
+  boardId: string
+}
 
 interface BoardsDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
   onCreate: MouseEventHandler<HTMLButtonElement> | undefined
@@ -23,32 +29,16 @@ interface BoardsDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
 }
 
 const BoardsDrawer = ({ onSelect, onCreate, ...props }: BoardsDrawerProps) => {
-  const selectedProjectId = useReadLocalStorage<string | null>(
-    'selectedProjectId'
-  )
-
-  const { getToken } = useAuth()
-
-  const { data: projects, isSuccess: isEachProjectFetchedSuccessfully } =
-    useQuery(['projects'], async () => getProjects(await getToken()))
+  const params = useParams<Params>()
 
   const {
     data: boards,
     isLoading: isEachBoardLoading,
     isSuccess: isEachBoardFetchedSuccessfully,
-  } = useQuery(
-    ['projects', selectedProjectId, 'boards'],
-    async () =>
-      getAllBoards({
-        projectId: selectedProjectId!,
-        token: await getToken(),
-      }),
-    {
-      enabled:
-        !!selectedProjectId &&
-        isEachProjectFetchedSuccessfully &&
-        projects.map((project) => project.id).includes(selectedProjectId),
-    }
+  } = useQuery(['projects', params.projectId, 'boards'], () =>
+    getBoards({
+      projectId: params.projectId!,
+    })
   )
 
   return (

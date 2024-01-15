@@ -54,20 +54,26 @@ const SchedulesDrawerItem = ({
         const index = schedules.findIndex(({ id }) => id === schedule.id)
         if (isScheduleSelected && index === 0)
           return navigate(
-            `/projects/${params.projectId}/schedules/${schedules[index + 1].id
-            }?${searchParams.toString()}`,
+            {
+              pathname: `/projects/${params.projectId}/schedules/${schedules[index + 1].id
+                }`,
+              search: searchParams.toString(),
+            },
             { replace: true }
           )
         if (isScheduleSelected && index > 0)
           return navigate(
-            `/projects/${params.projectId}/schedules/${schedules[index - 1].id
-            }?${searchParams.toString()}`,
+            {
+              pathname: `/projects/${params.projectId}/schedules/${schedules[index - 1].id
+                }`,
+              search: searchParams.toString(),
+            },
             { replace: true }
           )
       },
     })
 
-  const handleScheduleDelete = async (scheduleId: string) =>
+  const handleScheduleDelete = (scheduleId: string) =>
     deleteScheduleMutation({
       projectId: params.projectId!,
       scheduleId,

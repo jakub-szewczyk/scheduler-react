@@ -30,8 +30,10 @@ const Schedules = () => {
       onSuccess: (schedules) =>
         !params.scheduleId &&
         navigate(
-          `/projects/${params.projectId}/schedules/${schedules[0].id
-          }?${searchParams.toString()}`,
+          {
+            pathname: `/projects/${params.projectId}/schedules/${schedules[0].id}`,
+            search: searchParams.toString(),
+          },
           { replace: true }
         ),
     }

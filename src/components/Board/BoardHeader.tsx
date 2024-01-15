@@ -1,49 +1,53 @@
 import { updateBoard } from '@/services/board'
 import { Board, InitialValues } from '@/types/board'
-import { useAuth } from '@clerk/clerk-react'
 import EditIcon from '@mui/icons-material/Edit'
 import { IconButton, Stack, Typography } from '@mui/material'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { FormikHelpers } from 'formik'
-import { useBoolean, useReadLocalStorage } from 'usehooks-ts'
+import { useParams } from 'react-router-dom'
+import { useBoolean } from 'usehooks-ts'
 import UpsertBoardDialog from '../BoardActions/UpsertBoardDialog'
+
+type Params = {
+  projectId: string
+  boardId: string
+}
 
 interface BoardHeaderProps {
   board: Board
 }
 
 const BoardHeader = ({ board }: BoardHeaderProps) => {
-  const selectedProjectId = useReadLocalStorage<string | null>(
-    'selectedProjectId'
-  )
-
   const {
     value: isEditBoardDialogOpen,
     setFalse: closeEditBoardDialog,
     setTrue: openEditBoardDialog,
   } = useBoolean()
 
-  const { getToken } = useAuth()
+  const params = useParams<Params>()
 
   const queryClient = useQueryClient()
 
   const { mutate: updateBoardMutation, isLoading: isBoardUpdating } =
     useMutation(updateBoard, {
-      onSuccess: () => {
-        queryClient.invalidateQueries(['projects', selectedProjectId, 'boards'])
+      onSuccess: async () => {
+        await queryClient.invalidateQueries([
+          'projects',
+          params.projectId,
+          'boards',
+        ])
         closeEditBoardDialog()
       },
     })
 
-  const handleBoardEdit = async (
+  const handleBoardEdit = (
     values: InitialValues,
-    formikHelpers: FormikHelpers<InitialValues>
+    _: FormikHelpers<InitialValues>
   ) =>
     updateBoardMutation({
-      projectId: selectedProjectId!,
+      projectId: params.projectId!,
       boardId: board.id,
       name: values.name,
-      token: await getToken(),
     })
 
   return (

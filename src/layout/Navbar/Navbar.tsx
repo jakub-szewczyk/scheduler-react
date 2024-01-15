@@ -83,27 +83,39 @@ const Navbar = () => {
     )
     if (params.scheduleId)
       return navigate(
-        `/projects/${project.id}/schedules?${new URLSearchParams({
-          ...Object.fromEntries(searchParams),
-          projectId: project.id,
-          projectName: project.name,
-        })}`
+        {
+          pathname: `/projects/${project.id}/schedules`,
+          search: new URLSearchParams({
+            ...Object.fromEntries(searchParams),
+            projectId: project.id,
+            projectName: project.name,
+          }).toString(),
+        },
+        { replace: true }
       )
     if (params.boardId)
       return navigate(
-        `/projects/${project.id}/boards?${new URLSearchParams({
-          ...Object.fromEntries(searchParams),
-          projectId: project.id,
-          projectName: project.name,
-        })}`
+        {
+          pathname: `/projects/${project.id}/boards`,
+          search: new URLSearchParams({
+            ...Object.fromEntries(searchParams),
+            projectId: project.id,
+            projectName: project.name,
+          }).toString(),
+        },
+        { replace: true }
       )
     if (params.noteId)
       return navigate(
-        `/projects/${project.id}/notes?${new URLSearchParams({
-          ...Object.fromEntries(searchParams),
-          projectId: project.id,
-          projectName: project.name,
-        })}`
+        {
+          pathname: `/projects/${project.id}/notes`,
+          search: new URLSearchParams({
+            ...Object.fromEntries(searchParams),
+            projectId: project.id,
+            projectName: project.name,
+          }).toString(),
+        },
+        { replace: true }
       )
   }
 

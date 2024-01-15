@@ -40,7 +40,7 @@ const ScheduleHeader = ({ schedule }: ScheduleHeaderProps) => {
       },
     })
 
-  const handleScheduleEdit = async (
+  const handleScheduleEdit = (
     values: InitialValues,
     _: FormikHelpers<InitialValues>
   ) =>

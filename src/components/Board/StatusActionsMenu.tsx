@@ -1,7 +1,6 @@
 import * as STATUS from '@/modules/status'
 import { updateBoardStatus, updateBoardStatuses } from '@/services/status'
 import { Status, UpsertStatusDialogMode } from '@/types/status'
-import { useAuth } from '@clerk/clerk-react'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -16,9 +15,15 @@ import {
 } from '@mui/material'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { useBoolean, useReadLocalStorage } from 'usehooks-ts'
+import { useParams } from 'react-router-dom'
+import { useBoolean } from 'usehooks-ts'
 import DeleteStatusDialog from './DeleteStatusDialog'
 import UpsertStatusDialog from './UpsertStatusDialog'
+
+type Params = {
+  projectId: string
+  boardId: string
+}
 
 interface StatusActionsMenuProps {
   status: Status
@@ -36,12 +41,6 @@ const StatusActionsMenu = ({
   const [mode, setMode] =
     useState<Exclude<UpsertStatusDialogMode, 'CREATE'>>('EDIT')
 
-  const selectedProjectId = useReadLocalStorage<string | null>(
-    'selectedProjectId'
-  )
-
-  const selectedBoardId = useReadLocalStorage<string | null>('selectedBoardId')
-
   const {
     value: isUpsertDialogOpen,
     setFalse: closeUpsertDialog,
@@ -54,7 +53,7 @@ const StatusActionsMenu = ({
     setTrue: openDeleteDialog,
   } = useBoolean(false)
 
-  const { getToken } = useAuth()
+  const params = useParams<Params>()
 
   const queryClient = useQueryClient()
 
@@ -62,9 +61,9 @@ const StatusActionsMenu = ({
     mutate: updateBoardStatusesMutation,
     isLoading: isUpdatingBoardStatuses,
   } = useMutation(updateBoardStatuses, {
-    onSuccess: () => {
-      queryClient.invalidateQueries(
-        ['projects', selectedProjectId, 'boards', selectedBoardId],
+    onSuccess: async () => {
+      await queryClient.invalidateQueries(
+        ['projects', params.projectId, 'boards', params.boardId],
         { exact: true }
       )
       closeUpsertDialog()
@@ -76,9 +75,9 @@ const StatusActionsMenu = ({
     mutate: updateBoardStatusMutation,
     isLoading: isUpdatingBoardStatus,
   } = useMutation(updateBoardStatus, {
-    onSuccess: () => {
-      queryClient.invalidateQueries(
-        ['projects', selectedProjectId, 'boards', selectedBoardId],
+    onSuccess: async () => {
+      await queryClient.invalidateQueries(
+        ['projects', params.projectId, 'boards', params.boardId],
         { exact: true }
       )
       closeUpsertDialog()
@@ -108,37 +107,33 @@ const StatusActionsMenu = ({
     openUpsertDialog()
   }
 
-  const handleStatusEdit = async ({ title }: Pick<Status, 'title'>) =>
+  const handleStatusEdit = ({ title }: Pick<Status, 'title'>) =>
     updateBoardStatusMutation({
-      projectId: selectedProjectId!,
-      boardId: selectedBoardId!,
+      projectId: params.projectId!,
+      boardId: params.boardId!,
       statusId: status.id,
       title,
-      token: await getToken(),
     })
 
   const handleStatusDelete = async ({ id }: Status) =>
     updateBoardStatusesMutation({
-      projectId: selectedProjectId!,
-      boardId: selectedBoardId!,
+      projectId: params.projectId!,
+      boardId: params.boardId!,
       statuses: STATUS.remove(id)(statuses),
-      token: await getToken(),
     })
 
-  const handleStatusInsertBefore = async ({ title }: Pick<Status, 'title'>) =>
+  const handleStatusInsertBefore = ({ title }: Pick<Status, 'title'>) =>
     updateBoardStatusesMutation({
-      projectId: selectedProjectId!,
-      boardId: selectedBoardId!,
+      projectId: params.projectId!,
+      boardId: params.boardId!,
       statuses: STATUS.insertBefore(status.id, title)(statuses),
-      token: await getToken(),
     })
 
-  const handleStatusInsertAfter = async ({ title }: Pick<Status, 'title'>) =>
+  const handleStatusInsertAfter = ({ title }: Pick<Status, 'title'>) =>
     updateBoardStatusesMutation({
-      projectId: selectedProjectId!,
-      boardId: selectedBoardId!,
+      projectId: params.projectId!,
+      boardId: params.boardId!,
       statuses: STATUS.insertAfter(status.id, title)(statuses),
-      token: await getToken(),
     })
 
   return (

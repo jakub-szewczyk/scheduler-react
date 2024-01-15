@@ -5,7 +5,6 @@ import { updateBoardStatuses } from '@/services/status'
 import { Board, InitialValues } from '@/types/board'
 import { UpsertedIssue } from '@/types/issue'
 import { Status } from '@/types/status'
-import { useAuth } from '@clerk/clerk-react'
 import EditIcon from '@mui/icons-material/Edit'
 import TableRowsIcon from '@mui/icons-material/TableRows'
 import ViewColumnIcon from '@mui/icons-material/ViewColumn'
@@ -14,26 +13,23 @@ import { SpeedDial, SpeedDialAction } from '@mui/material'
 import SpeedDialIcon from '@mui/material/SpeedDialIcon'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { FormikHelpers } from 'formik'
-import { useBoolean, useLocalStorage, useReadLocalStorage } from 'usehooks-ts'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useBoolean } from 'usehooks-ts'
 import UpsertIssueDialog from '../Board/UpsertIssueDialog'
 import UpsertStatusDialog from '../Board/UpsertStatusDialog'
 import BoardsDrawer from './BoardsDrawer'
 import UpsertBoardDialog from './UpsertBoardDialog'
+
+type Params = {
+  projectId: string
+  boardId: string
+}
 
 interface BoardActionsProps {
   board: Board
 }
 
 const BoardActions = ({ board }: BoardActionsProps) => {
-  const selectedProjectId = useReadLocalStorage<string | null>(
-    'selectedProjectId'
-  )
-
-  const [, setSelectedBoardId] = useLocalStorage<string | null>(
-    'selectedBoardId',
-    null
-  )
-
   const {
     value: isBoardsDrawerOpen,
     setFalse: closeBoardsDrawer,
@@ -64,26 +60,37 @@ const BoardActions = ({ board }: BoardActionsProps) => {
     setTrue: openCreateIssueDialog,
   } = useBoolean(false)
 
-  const { getToken } = useAuth()
+  const [searchParams] = useSearchParams()
+
+  const params = useParams<Params>()
+
+  const navigate = useNavigate()
 
   const queryClient = useQueryClient()
 
   const { mutate: createBoardMutation, isLoading: isBoardCreating } =
     useMutation(createBoard, {
-      onSuccess: ({ id }) => {
-        queryClient.invalidateQueries(
-          ['projects', selectedProjectId, 'boards'],
+      onSuccess: async (board) => {
+        await queryClient.invalidateQueries(
+          ['projects', params.projectId, 'boards'],
           { exact: true }
         )
-        setSelectedBoardId(id)
+        navigate({
+          pathname: `/projects/${params.projectId}/boards/${board.id}`,
+          search: searchParams.toString(),
+        })
         closeCreateBoardDialog()
       },
     })
 
   const { mutate: updateBoardMutation, isLoading: isBoardUpdating } =
     useMutation(updateBoard, {
-      onSuccess: () => {
-        queryClient.invalidateQueries(['projects', selectedProjectId, 'boards'])
+      onSuccess: async () => {
+        await queryClient.invalidateQueries([
+          'projects',
+          params.projectId,
+          'boards',
+        ])
         closeEditBoardDialog()
       },
     })
@@ -92,9 +99,9 @@ const BoardActions = ({ board }: BoardActionsProps) => {
     mutate: updateBoardStatusesMutation,
     isLoading: isUpdatingBoardStatuses,
   } = useMutation(updateBoardStatuses, {
-    onSuccess: () => {
-      queryClient.invalidateQueries(
-        ['projects', selectedProjectId, 'boards', board.id],
+    onSuccess: async () => {
+      await queryClient.invalidateQueries(
+        ['projects', params.projectId, 'boards', params.boardId],
         { exact: true }
       )
       closeCreateStatusDialog()
@@ -103,45 +110,44 @@ const BoardActions = ({ board }: BoardActionsProps) => {
   })
 
   const handleBoardSelect = (boardId: string) => {
-    setSelectedBoardId(boardId)
+    navigate({
+      pathname: `/projects/${params.projectId}/boards/${boardId}`,
+      search: searchParams.toString(),
+    })
     closeBoardsDrawer()
   }
 
-  const handleBoardCreate = async (
+  const handleBoardCreate = (
     values: InitialValues,
-    formikHelpers: FormikHelpers<InitialValues>
+    _: FormikHelpers<InitialValues>
   ) =>
     createBoardMutation({
-      projectId: selectedProjectId!,
+      projectId: params.projectId!,
       name: values.name,
-      token: await getToken(),
     })
 
-  const handleBoardEdit = async (
+  const handleBoardEdit = (
     values: InitialValues,
-    formikHelpers: FormikHelpers<InitialValues>
+    _: FormikHelpers<InitialValues>
   ) =>
     updateBoardMutation({
-      projectId: selectedProjectId!,
+      projectId: params.projectId!,
       boardId: board.id,
       name: values.name,
-      token: await getToken(),
     })
 
-  const handleStatusCreate = async ({ title }: Pick<Status, 'title'>) =>
+  const handleStatusCreate = ({ title }: Pick<Status, 'title'>) =>
     updateBoardStatusesMutation({
-      projectId: selectedProjectId!,
+      projectId: params.projectId!,
       boardId: board.id,
       statuses: STATUS.create(title)(board.statuses),
-      token: await getToken(),
     })
 
-  const handleIssueCreate = async (issue: UpsertedIssue) =>
+  const handleIssueCreate = (issue: UpsertedIssue) =>
     updateBoardStatusesMutation({
-      projectId: selectedProjectId!,
+      projectId: params.projectId!,
       boardId: board.id,
       statuses: ISSUE.create(issue)(board.statuses),
-      token: await getToken(),
     })
 
   return (

@@ -57,10 +57,10 @@ const ScheduleActions = ({ schedule }: ScheduleActionsProps) => {
           ['projects', params.projectId, 'schedules'],
           { exact: true }
         )
-        navigate(
-          `/projects/${params.projectId}/schedules/${schedule.id
-          }?${searchParams.toString()}`
-        )
+        navigate({
+          pathname: `/projects/${params.projectId}/schedules/${schedule.id}`,
+          search: searchParams.toString(),
+        })
         closeCreateScheduleDialog()
       },
     })
@@ -78,14 +78,14 @@ const ScheduleActions = ({ schedule }: ScheduleActionsProps) => {
     })
 
   const handleScheduleSelect = (scheduleId: string) => {
-    navigate(
-      `/projects/${params.projectId
-      }/schedules/${scheduleId}?${searchParams.toString()}`
-    )
+    navigate({
+      pathname: `/projects/${params.projectId}/schedules/${scheduleId}`,
+      search: searchParams.toString(),
+    })
     closeSchedulesDrawer()
   }
 
-  const handleScheduleCreate = async (
+  const handleScheduleCreate = (
     values: InitialValues,
     _: FormikHelpers<InitialValues>
   ) =>
@@ -94,7 +94,7 @@ const ScheduleActions = ({ schedule }: ScheduleActionsProps) => {
       name: values.name,
     })
 
-  const handleScheduleEdit = async (
+  const handleScheduleEdit =  (
     values: InitialValues,
     _: FormikHelpers<InitialValues>
   ) =>

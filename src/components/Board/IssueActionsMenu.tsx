@@ -1,5 +1,7 @@
-import { Issue, UpsertIssueDialogMode, UpsertedIssue } from '@/types/issue'
 import * as ISSUE from '@/modules/issue'
+import { updateBoardIssue } from '@/services/issue'
+import { updateBoardStatuses } from '@/services/status'
+import { Issue, UpsertIssueDialogMode, UpsertedIssue } from '@/types/issue'
 import { Status } from '@/types/status'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
@@ -13,14 +15,17 @@ import {
   Menu,
   MenuItem,
 } from '@mui/material'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { useBoolean, useReadLocalStorage } from 'usehooks-ts'
+import { useParams } from 'react-router-dom'
+import { useBoolean } from 'usehooks-ts'
 import DeleteIssueDialog from './DeleteIssueDialog'
 import UpsertIssueDialog from './UpsertIssueDialog'
-import { useAuth } from '@clerk/clerk-react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { updateBoardStatuses } from '@/services/status'
-import { updateBoardIssue } from '@/services/issue'
+
+type Params = {
+  projectId: string
+  boardId: string
+}
 
 interface IssueActionsMenuProps {
   issue: Issue
@@ -38,12 +43,6 @@ const IssueActionsMenu = ({
   const [mode, setMode] =
     useState<Exclude<UpsertIssueDialogMode, 'CREATE'>>('EDIT')
 
-  const selectedProjectId = useReadLocalStorage<string | null>(
-    'selectedProjectId'
-  )
-
-  const selectedBoardId = useReadLocalStorage<string | null>('selectedBoardId')
-
   const {
     value: isUpsertDialogOpen,
     setFalse: closeUpsertDialog,
@@ -56,7 +55,7 @@ const IssueActionsMenu = ({
     setTrue: openDeleteDialog,
   } = useBoolean(false)
 
-  const { getToken } = useAuth()
+  const params = useParams<Params>()
 
   const queryClient = useQueryClient()
 
@@ -64,9 +63,9 @@ const IssueActionsMenu = ({
     mutate: updateBoardStatusesMutation,
     isLoading: isUpdatingBoardStatuses,
   } = useMutation(updateBoardStatuses, {
-    onSuccess: () => {
-      queryClient.invalidateQueries(
-        ['projects', selectedProjectId, 'boards', selectedBoardId],
+    onSuccess: async () => {
+      await queryClient.invalidateQueries(
+        ['projects', params.projectId, 'boards', params.boardId],
         { exact: true }
       )
       closeUpsertDialog()
@@ -76,9 +75,9 @@ const IssueActionsMenu = ({
 
   const { mutate: updateBoardIssueMutation, isLoading: isUpdatingBoardIssue } =
     useMutation(updateBoardIssue, {
-      onSuccess: () => {
-        queryClient.invalidateQueries(
-          ['projects', selectedProjectId, 'boards', selectedBoardId],
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(
+          ['projects', params.projectId, 'boards', params.boardId],
           { exact: true }
         )
         closeUpsertDialog()
@@ -108,41 +107,37 @@ const IssueActionsMenu = ({
     openUpsertDialog()
   }
 
-  const handleIssueEdit = async ({ title, content }: UpsertedIssue) =>
+  const handleIssueEdit = ({ title, content }: UpsertedIssue) =>
     updateBoardIssueMutation({
-      projectId: selectedProjectId!,
-      boardId: selectedBoardId!,
+      projectId: params.projectId!,
+      boardId: params.boardId!,
       statusId: statuses.find((status) =>
         status.issues.map((issue) => issue.id).includes(issue.id)
       )!.id,
       issueId: issue.id,
       title,
       content,
-      token: await getToken(),
     })
 
-  const handleIssueDelete = async ({ id }: Issue) =>
+  const handleIssueDelete = ({ id }: Issue) =>
     updateBoardStatusesMutation({
-      projectId: selectedProjectId!,
-      boardId: selectedBoardId!,
+      projectId: params.projectId!,
+      boardId: params.boardId!,
       statuses: ISSUE.remove(id)(statuses),
-      token: await getToken(),
     })
 
-  const handleIssueInsertAbove = async (values: UpsertedIssue) =>
+  const handleIssueInsertAbove = (values: UpsertedIssue) =>
     updateBoardStatusesMutation({
-      projectId: selectedProjectId!,
-      boardId: selectedBoardId!,
+      projectId: params.projectId!,
+      boardId: params.boardId!,
       statuses: ISSUE.insertAbove(issue.id, values)(statuses),
-      token: await getToken(),
     })
 
-  const handleIssueInsertBelow = async (values: UpsertedIssue) =>
+  const handleIssueInsertBelow = (values: UpsertedIssue) =>
     updateBoardStatusesMutation({
-      projectId: selectedProjectId!,
-      boardId: selectedBoardId!,
+      projectId: params.projectId!,
+      boardId: params.boardId!,
       statuses: ISSUE.insertBelow(issue.id, values)(statuses),
-      token: await getToken(),
     })
 
   return (
