@@ -1,7 +1,5 @@
 import DrawerItemSkeleton from '@/layout/DrawerItemSkeleton/DrawerItemSkeleton'
 import { getBoards } from '@/services/board'
-import { getProjects } from '@/services/project'
-import { useAuth } from '@clerk/clerk-react'
 import AddIcon from '@mui/icons-material/Add'
 import {
   Box,
@@ -14,9 +12,8 @@ import {
 import List from '@mui/material/List'
 import { useQuery } from '@tanstack/react-query'
 import { MouseEventHandler } from 'react'
-import { useReadLocalStorage } from 'usehooks-ts'
-import BoardsDrawerItem from './BoardsDrawerItem'
 import { useParams } from 'react-router-dom'
+import BoardsDrawerItem from './BoardsDrawerItem'
 
 type Params = {
   projectId: string

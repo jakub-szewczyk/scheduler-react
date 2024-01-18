@@ -45,7 +45,7 @@ const Boards = () => {
     isError: isBoardFetchedUnsuccessfully,
   } = useQuery(
     ['projects', params.projectId, 'boards', params.boardId],
-    async () =>
+    () =>
       getBoard({
         projectId: params.projectId!,
         boardId: params.boardId!,

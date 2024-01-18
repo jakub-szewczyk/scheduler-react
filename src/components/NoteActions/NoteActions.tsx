@@ -1,7 +1,6 @@
 import { exportToPDF } from '@/modules/note'
 import { createNote, updateNote } from '@/services/note'
 import { InitialValues, Note } from '@/types/note'
-import { useAuth } from '@clerk/clerk-react'
 import DownloadIcon from '@mui/icons-material/Download'
 import EditIcon from '@mui/icons-material/Edit'
 import StickyNote2Icon from '@mui/icons-material/StickyNote2'
@@ -11,9 +10,15 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Editor } from 'draft-js'
 import { FormikHelpers } from 'formik'
 import { RefObject, forwardRef } from 'react'
-import { useBoolean, useLocalStorage, useReadLocalStorage } from 'usehooks-ts'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useBoolean } from 'usehooks-ts'
 import NotesDrawer from './NotesDrawer'
 import UpsertNoteDialog from './UpsertNoteDialog'
+
+type Params = {
+  projectId: string
+  noteId: string
+}
 
 interface NoteActionsProps {
   note: Note
@@ -21,15 +26,6 @@ interface NoteActionsProps {
 
 const NoteActions = forwardRef<Editor, NoteActionsProps>(({ note }, ref) => {
   const editorRef = ref as RefObject<Editor>
-
-  const selectedProjectId = useReadLocalStorage<string | null>(
-    'selectedProjectId'
-  )
-
-  const [, setSelectedNoteId] = useLocalStorage<string | null>(
-    'selectedNoteId',
-    null
-  )
 
   const {
     value: isNotesDrawerOpen,
@@ -49,19 +45,26 @@ const NoteActions = forwardRef<Editor, NoteActionsProps>(({ note }, ref) => {
     setTrue: openEditNoteDialog,
   } = useBoolean()
 
-  const { getToken } = useAuth()
+  const [searchParams] = useSearchParams()
+
+  const params = useParams<Params>()
+
+  const navigate = useNavigate()
 
   const queryClient = useQueryClient()
 
   const { mutate: createNoteMutation, isLoading: isNoteCreating } = useMutation(
     createNote,
     {
-      onSuccess: ({ id }) => {
-        queryClient.invalidateQueries(
-          ['projects', selectedProjectId, 'notes'],
+      onSuccess: async (note) => {
+        await queryClient.invalidateQueries(
+          ['projects', params.projectId, 'notes'],
           { exact: true }
         )
-        setSelectedNoteId(id)
+        navigate({
+          pathname: `/projects/${params.projectId}/notes/${note.id}`,
+          search: searchParams.toString(),
+        })
         closeCreateNoteDialog()
       },
     }
@@ -70,37 +73,42 @@ const NoteActions = forwardRef<Editor, NoteActionsProps>(({ note }, ref) => {
   const { mutate: updateNoteMutation, isLoading: isNoteUpdating } = useMutation(
     updateNote,
     {
-      onSuccess: () => {
-        queryClient.invalidateQueries(['projects', selectedProjectId, 'notes'])
+      onSuccess: async () => {
+        await queryClient.invalidateQueries([
+          'projects',
+          params.projectId,
+          'notes',
+        ])
         closeEditNoteDialog()
       },
     }
   )
 
   const handleNoteSelect = (noteId: string) => {
-    setSelectedNoteId(noteId)
+    navigate({
+      pathname: `/projects/${params.projectId}/notes/${noteId}`,
+      search: searchParams.toString(),
+    })
     closeNotesDrawer()
   }
 
-  const handleNoteCreate = async (
+  const handleNoteCreate = (
     values: InitialValues,
-    formikHelpers: FormikHelpers<InitialValues>
+    _: FormikHelpers<InitialValues>
   ) =>
     createNoteMutation({
-      projectId: selectedProjectId!,
+      projectId: params.projectId!,
       name: values.name,
-      token: await getToken(),
     })
 
-  const handleNoteEdit = async (
+  const handleNoteEdit = (
     values: InitialValues,
-    formikHelpers: FormikHelpers<InitialValues>
+    _: FormikHelpers<InitialValues>
   ) =>
     updateNoteMutation({
-      projectId: selectedProjectId!,
+      projectId: params.projectId!,
       noteId: note.id,
       name: values.name,
-      token: await getToken(),
     })
 
   return (

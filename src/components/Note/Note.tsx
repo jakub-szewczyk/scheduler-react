@@ -2,7 +2,6 @@ import ChangesBar from '@/layout/ChangesBar/ChangesBar'
 import { isPlaceholderVisible, serialize } from '@/modules/note'
 import { updateEditorState } from '@/services/editorState'
 import { Note as INote } from '@/types/note'
-import { useAuth } from '@clerk/clerk-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { DraftHandleValue, Editor, EditorState, RichUtils } from 'draft-js'
 import 'draft-js/dist/Draft.css'
@@ -14,10 +13,15 @@ import {
   forwardRef,
   useState,
 } from 'react'
-import { useReadLocalStorage } from 'usehooks-ts'
+import { useParams } from 'react-router-dom'
 import NoteHeader from './NoteHeader'
 import Toolbar from './Toolbar'
 import { EditorContainer, NoteContainer } from './styles/Note.styled'
+
+type Params = {
+  projectId: string
+  noteId: string
+}
 
 interface NoteProps {
   note: INote & { editorState: EditorState }
@@ -31,11 +35,7 @@ const Note = forwardRef<Editor, NoteProps>(
 
     const [spellCheck, setSpellCheck] = useState(true)
 
-    const selectedProjectId = useReadLocalStorage<string | null>(
-      'selectedProjectId'
-    )
-
-    const { getToken } = useAuth()
+    const params = useParams<Params>()
 
     const queryClient = useQueryClient()
 
@@ -44,13 +44,13 @@ const Note = forwardRef<Editor, NoteProps>(
       isLoading: isEditorStateUpdating,
     } = useMutation(updateEditorState, {
       onSuccess: () =>
-        queryClient.invalidateQueries(['projects', selectedProjectId, 'notes']),
+        queryClient.invalidateQueries(['projects', params.projectId, 'notes']),
     })
 
     const handleKeyCommand = (
       command: string,
       editorState: EditorState,
-      eventTimeStamp: number
+      _: number
     ): DraftHandleValue => {
       const newEditorState = RichUtils.handleKeyCommand(editorState, command)
       if (newEditorState) {
@@ -121,12 +121,11 @@ const Note = forwardRef<Editor, NoteProps>(
           <ChangesBar
             loading={isEditorStateUpdating}
             onDiscard={handleDiscard}
-            onSave={async () =>
+            onSave={() =>
               updateEditorStateMutation({
-                projectId: selectedProjectId!,
+                projectId: params.projectId!,
                 noteId: note.id,
                 editorState: serialize(editorState),
-                token: await getToken(),
               })
             }
           />

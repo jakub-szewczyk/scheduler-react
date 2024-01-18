@@ -45,7 +45,7 @@ const Schedules = () => {
     isError: isScheduleFetchedUnsuccessfully,
   } = useQuery(
     ['projects', params.projectId, 'schedules', params.scheduleId],
-    async () =>
+    () =>
       getSchedule({
         projectId: params.projectId!,
         scheduleId: params.scheduleId!,

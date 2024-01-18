@@ -1,5 +1,5 @@
+import { deleteNote } from '@/services/note'
 import { Note } from '@/types/note'
-import { useAuth } from '@clerk/clerk-react'
 import CloseIcon from '@mui/icons-material/Close'
 import StickyNote2Icon from '@mui/icons-material/StickyNote2'
 import { Box, IconButton, ListItemButton, Stack, Tooltip } from '@mui/material'
@@ -8,9 +8,14 @@ import ListItemAvatar from '@mui/material/ListItemAvatar'
 import ListItemText from '@mui/material/ListItemText'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { formatDistanceToNow } from 'date-fns'
-import { useBoolean, useReadLocalStorage } from 'usehooks-ts'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useBoolean } from 'usehooks-ts'
 import DeleteNoteDialog from './DeleteNoteDialog'
-import { deleteNote } from '@/services/note'
+
+type Params = {
+  projectId: string
+  noteId: string
+}
 
 interface NotesDrawerItemProps {
   note: Pick<Note, 'id' | 'createdAt' | 'name'>
@@ -19,40 +24,57 @@ interface NotesDrawerItemProps {
 }
 
 const NotesDrawerItem = ({ note, notes, onSelect }: NotesDrawerItemProps) => {
-  const selectedProjectId = useReadLocalStorage<string | null>(
-    'selectedProjectId'
-  )
-
-  const selectedNoteId = useReadLocalStorage<string | null>('selectedNoteId')
-
   const {
     value: isDeleteNoteDialogOpen,
     setFalse: closeDeleteNoteDialog,
     setTrue: openDeleteNoteDialog,
   } = useBoolean(false)
 
-  const { getToken } = useAuth()
+  const [searchParams] = useSearchParams()
+
+  const params = useParams<Params>()
+
+  const navigate = useNavigate()
 
   const queryClient = useQueryClient()
 
   const { mutate: deleteNoteMutation, isLoading: isNoteDeleting } = useMutation(
     deleteNote,
     {
-      onSuccess: () => {
-        queryClient.invalidateQueries(
-          ['projects', selectedProjectId, 'notes'],
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(
+          ['projects', params.projectId, 'notes'],
           { exact: true }
         )
         closeDeleteNoteDialog()
+        const isNoteSelected = note.id === params.noteId
+        const index = notes.findIndex(({ id }) => id === note.id)
+        if (isNoteSelected && index === 0)
+          return navigate(
+            {
+              pathname: `/projects/${params.projectId}/notes/${notes[index + 1].id
+                }`,
+              search: searchParams.toString(),
+            },
+            { replace: true }
+          )
+        if (isNoteSelected && index > 0)
+          return navigate(
+            {
+              pathname: `/projects/${params.projectId}/notes/${notes[index - 1].id
+                }`,
+              search: searchParams.toString(),
+            },
+            { replace: true }
+          )
       },
     }
   )
 
-  const handleNoteDelete = async (noteId: string) =>
+  const handleNoteDelete = (noteId: string) =>
     deleteNoteMutation({
-      projectId: selectedProjectId!,
+      projectId: params.projectId!,
       noteId,
-      token: await getToken(),
     })
 
   return (
@@ -62,7 +84,7 @@ const NotesDrawerItem = ({ note, notes, onSelect }: NotesDrawerItemProps) => {
           <ListItemAvatar>
             <Avatar
               sx={{
-                ...(note.id === selectedNoteId && {
+                ...(note.id === params.noteId && {
                   bgcolor: (theme) => theme.palette.primary.main,
                 }),
               }}

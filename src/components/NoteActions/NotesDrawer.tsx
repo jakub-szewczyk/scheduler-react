@@ -1,7 +1,5 @@
 import DrawerItemSkeleton from '@/layout/DrawerItemSkeleton/DrawerItemSkeleton'
-import { getAllNotes } from '@/services/note'
-import { getProjects } from '@/services/project'
-import { useAuth } from '@clerk/clerk-react'
+import { getNotes } from '@/services/note'
 import AddIcon from '@mui/icons-material/Add'
 import {
   Box,
@@ -14,8 +12,13 @@ import {
 import List from '@mui/material/List'
 import { useQuery } from '@tanstack/react-query'
 import { MouseEventHandler } from 'react'
-import { useReadLocalStorage } from 'usehooks-ts'
+import { useParams } from 'react-router-dom'
 import NotesDrawerItem from './NotesDrawerItem'
+
+type Params = {
+  projectId: string
+  boardId: string
+}
 
 interface NotesDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
   onCreate: MouseEventHandler<HTMLButtonElement> | undefined
@@ -23,32 +26,14 @@ interface NotesDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
 }
 
 const NotesDrawer = ({ onCreate, onSelect, ...props }: NotesDrawerProps) => {
-  const selectedProjectId = useReadLocalStorage<string | null>(
-    'selectedProjectId'
-  )
-
-  const { getToken } = useAuth()
-
-  const { data: projects, isSuccess: isEachProjectFetchedSuccessfully } =
-    useQuery(['projects'], async () => getProjects(await getToken()))
+  const params = useParams<Params>()
 
   const {
     data: notes,
     isLoading: isEachNoteLoading,
     isSuccess: isEachNoteFetchedSuccessfully,
-  } = useQuery(
-    ['projects', selectedProjectId, 'notes'],
-    async () =>
-      getAllNotes({
-        projectId: selectedProjectId!,
-        token: await getToken(),
-      }),
-    {
-      enabled:
-        !!selectedProjectId &&
-        isEachProjectFetchedSuccessfully &&
-        projects.map((project) => project.id).includes(selectedProjectId),
-    }
+  } = useQuery(['projects', params.projectId, 'notes'], () =>
+    getNotes({ projectId: params.projectId! })
   )
 
   return (

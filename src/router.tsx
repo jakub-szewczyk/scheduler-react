@@ -56,7 +56,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: '/projects/:projectId/notes/noteId',
+        path: '/projects/:projectId/notes/:noteId',
         element: (
           <>
             <SignedIn>

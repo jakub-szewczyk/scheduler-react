@@ -45,8 +45,6 @@ const WidgetsMenu = ({ iconButtonProps }: WidgetsMenuProps) => {
     setMenu(null)
   }
 
-  // TODO:
-  // Fix board module
   const handleBoardsMenuItemClick = () => {
     if (params.boardId) return setMenu(null)
     navigate({
@@ -59,8 +57,6 @@ const WidgetsMenu = ({ iconButtonProps }: WidgetsMenuProps) => {
     setMenu(null)
   }
 
-  // TODO:
-  // Fix note module
   const handleSchedulesMenuItemClick = () => {
     if (params.scheduleId) return setMenu(null)
     navigate({

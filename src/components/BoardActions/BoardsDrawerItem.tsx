@@ -28,13 +28,13 @@ const BoardsDrawerItem = ({
   boards,
   onSelect,
 }: BoardsDrawerItemProps) => {
-  const [searchParams] = useSearchParams()
-
   const {
     value: isDeleteBoardDialogOpen,
     setFalse: closeDeleteBoardDialog,
     setTrue: openDeleteBoardDialog,
   } = useBoolean(false)
+
+  const [searchParams] = useSearchParams()
 
   const params = useParams<Params>()
 

@@ -3,40 +3,31 @@ import api from './api'
 
 interface GetAllNotesPayload {
   projectId: string
-  token: string | null
 }
 
-export const getAllNotes = ({ projectId, token }: GetAllNotesPayload) =>
+export const getNotes = ({ projectId }: GetAllNotesPayload) =>
   api<Pick<Note, 'id' | 'createdAt' | 'name'>[]>(
-    `/projects/${projectId}/notes`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
+    `/projects/${projectId}/notes`
   ).then(({ data }) => data)
 
 interface GetNotePayload {
   projectId: string
   noteId: string
-  token: string | null
 }
 
-export const getNote = ({ projectId, noteId, token }: GetNotePayload) =>
-  api<Note>(`/projects/${projectId}/notes/${noteId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  }).then(({ data }) => data)
+export const getNote = ({ projectId, noteId }: GetNotePayload) =>
+  api<Note>(`/projects/${projectId}/notes/${noteId}`).then(({ data }) => data)
 
 interface CreateNotePayload {
   projectId: string
   name: string
-  token: string | null
 }
 
-export const createNote = ({ projectId, name, token }: CreateNotePayload) =>
+export const createNote = ({ projectId, name }: CreateNotePayload) =>
   api
     .post<Pick<Note, 'id' | 'createdAt' | 'name'>>(
       `/projects/${projectId}/notes`,
-      { name },
-      { headers: { Authorization: `Bearer ${token}` } }
+      { name }
     )
     .then(({ data }) => data)
 
@@ -44,34 +35,19 @@ interface UpdateNotePayload {
   projectId: string
   noteId: string
   name: string
-  token: string | null
 }
 
-export const updateNote = ({
-  projectId,
-  noteId,
-  name,
-  token,
-}: UpdateNotePayload) =>
+export const updateNote = ({ projectId, noteId, name }: UpdateNotePayload) =>
   api
-    .put<Note>(
-      `/projects/${projectId}/notes/${noteId}`,
-      { name },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    )
+    .put<Note>(`/projects/${projectId}/notes/${noteId}`, { name })
     .then(({ data }) => data)
 
 interface DeleteNotePayload {
   projectId: string
   noteId: string
-  token: string | null
 }
 
-export const deleteNote = ({ projectId, noteId, token }: DeleteNotePayload) =>
+export const deleteNote = ({ projectId, noteId }: DeleteNotePayload) =>
   api
-    .delete<Note>(`/projects/${projectId}/notes/${noteId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    .delete<Note>(`/projects/${projectId}/notes/${noteId}`)
     .then(({ data }) => data)

@@ -29,7 +29,7 @@ const Schedule = ({ schedule, rows, setRows }: ScheduleProps) => {
 
   const {
     mutate: updateScheduleRowsMutation,
-    isLoading: isUpdatingScheduleRows,
+    isLoading: isEachScheduleRowUpdating,
   } = useMutation(updateScheduleRows, {
     onSuccess: () =>
       queryClient.invalidateQueries(
@@ -40,7 +40,7 @@ const Schedule = ({ schedule, rows, setRows }: ScheduleProps) => {
 
   const columns = createColumns(setRows)
 
-  const hasChanges = !equals(rows, schedule.rows) || isUpdatingScheduleRows
+  const hasChanges = !equals(rows, schedule.rows) || isEachScheduleRowUpdating
 
   return (
     <>
@@ -74,9 +74,9 @@ const Schedule = ({ schedule, rows, setRows }: ScheduleProps) => {
       </DataGridContainer>
       {hasChanges && (
         <ChangesBar
-          loading={isUpdatingScheduleRows}
+          loading={isEachScheduleRowUpdating}
           onDiscard={() => setRows(schedule.rows)}
-          onSave={async () =>
+          onSave={() =>
             updateScheduleRowsMutation({
               projectId: params.projectId!,
               scheduleId: schedule.id,

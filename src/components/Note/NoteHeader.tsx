@@ -1,51 +1,55 @@
 import { updateNote } from '@/services/note'
 import { InitialValues, Note } from '@/types/note'
-import { useAuth } from '@clerk/clerk-react'
 import EditIcon from '@mui/icons-material/Edit'
 import { IconButton, Stack, Typography } from '@mui/material'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { FormikHelpers } from 'formik'
-import { useBoolean, useReadLocalStorage } from 'usehooks-ts'
+import { useParams } from 'react-router-dom'
+import { useBoolean } from 'usehooks-ts'
 import UpsertNoteDialog from '../NoteActions/UpsertNoteDialog'
+
+type Params = {
+  projectId: string
+  noteId: string
+}
 
 interface NoteHeaderProps {
   note: Note
 }
 
 const NoteHeader = ({ note }: NoteHeaderProps) => {
-  const selectedProjectId = useReadLocalStorage<string | null>(
-    'selectedProjectId'
-  )
-
   const {
     value: isEditNoteDialogOpen,
     setFalse: closeEditNoteDialog,
     setTrue: openEditNoteDialog,
   } = useBoolean()
 
-  const { getToken } = useAuth()
+  const params = useParams<Params>()
 
   const queryClient = useQueryClient()
 
   const { mutate: updateNoteMutation, isLoading: isNoteUpdating } = useMutation(
     updateNote,
     {
-      onSuccess: () => {
-        queryClient.invalidateQueries(['projects', selectedProjectId, 'notes'])
+      onSuccess: async () => {
+        await queryClient.invalidateQueries([
+          'projects',
+          params.projectId,
+          'notes',
+        ])
         closeEditNoteDialog()
       },
     }
   )
 
-  const handleNoteEdit = async (
+  const handleNoteEdit = (
     values: InitialValues,
-    formikHelpers: FormikHelpers<InitialValues>
+    _: FormikHelpers<InitialValues>
   ) =>
     updateNoteMutation({
-      projectId: selectedProjectId!,
+      projectId: params.projectId!,
       noteId: note.id,
       name: values.name,
-      token: await getToken(),
     })
 
   return (
@@ -80,4 +84,5 @@ const NoteHeader = ({ note }: NoteHeaderProps) => {
     </>
   )
 }
+
 export default NoteHeader

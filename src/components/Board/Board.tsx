@@ -31,7 +31,7 @@ const Board = ({ board, statuses, setStatuses }: BoardProps) => {
 
   const {
     mutate: updateBoardStatusesMutation,
-    isLoading: isUpdatingBoardStatuses,
+    isLoading: isEachBoardStatusUpdating,
   } = useMutation(updateBoardStatuses, {
     onSuccess: () =>
       queryClient.invalidateQueries(
@@ -51,7 +51,7 @@ const Board = ({ board, statuses, setStatuses }: BoardProps) => {
   }
 
   const hasChanges =
-    !equals(statuses, board.statuses) || isUpdatingBoardStatuses
+    !equals(statuses, board.statuses) || isEachBoardStatusUpdating
 
   return (
     <>
@@ -80,9 +80,9 @@ const Board = ({ board, statuses, setStatuses }: BoardProps) => {
       </DragDropContext>
       {hasChanges && (
         <ChangesBar
-          loading={isUpdatingBoardStatuses}
+          loading={isEachBoardStatusUpdating}
           onDiscard={() => setStatuses(board.statuses)}
-          onSave={async () =>
+          onSave={() =>
             updateBoardStatusesMutation({
               projectId: params.projectId!,
               boardId: board.id,

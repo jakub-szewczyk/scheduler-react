@@ -28,13 +28,13 @@ const SchedulesDrawerItem = ({
   schedules,
   onSelect,
 }: SchedulesDrawerItemProps) => {
-  const [searchParams] = useSearchParams()
-
   const {
     value: isDeleteScheduleDialogOpen,
     setFalse: closeDeleteScheduleDialog,
     setTrue: openDeleteScheduleDialog,
   } = useBoolean(false)
+
+  const [searchParams] = useSearchParams()
 
   const params = useParams<Params>()
 

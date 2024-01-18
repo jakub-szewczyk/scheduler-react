@@ -82,4 +82,5 @@ const BoardHeader = ({ board }: BoardHeaderProps) => {
     </>
   )
 }
+
 export default BoardHeader
