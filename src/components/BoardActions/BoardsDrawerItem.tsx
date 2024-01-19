@@ -1,6 +1,6 @@
+import { PostIconNavy } from '@/layout/PostIcon/PostIcon.styled'
 import { deleteBoard } from '@/services/board'
 import CloseIcon from '@mui/icons-material/Close'
-import ViewKanbanIcon from '@mui/icons-material/ViewKanban'
 import { Box, IconButton, ListItemButton, Stack, Tooltip } from '@mui/material'
 import Avatar from '@mui/material/Avatar'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
@@ -91,7 +91,7 @@ const BoardsDrawerItem = ({
                 }),
               }}
             >
-              <ViewKanbanIcon />
+              <PostIconNavy style={{ width: 18, height: 18 }} />
             </Avatar>
           </ListItemAvatar>
           <ListItemText

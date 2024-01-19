@@ -1,3 +1,4 @@
+import { PostIconWhite } from '@/layout/PostIcon/PostIcon.styled'
 import * as ISSUE from '@/modules/issue'
 import * as STATUS from '@/modules/status'
 import { createBoard, updateBoard } from '@/services/board'
@@ -6,9 +7,7 @@ import { Board, InitialValues } from '@/types/board'
 import { UpsertedIssue } from '@/types/issue'
 import { Status } from '@/types/status'
 import EditIcon from '@mui/icons-material/Edit'
-import TableRowsIcon from '@mui/icons-material/TableRows'
-import ViewColumnIcon from '@mui/icons-material/ViewColumn'
-import ViewKanbanIcon from '@mui/icons-material/ViewKanban'
+import PostAddIcon from '@mui/icons-material/PostAdd'
 import { SpeedDial, SpeedDialAction } from '@mui/material'
 import SpeedDialIcon from '@mui/material/SpeedDialIcon'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -163,7 +162,7 @@ const BoardActions = ({ board }: BoardActionsProps) => {
       >
         <SpeedDialAction
           tooltipTitle='Issue'
-          icon={<TableRowsIcon />}
+          icon={<PostAddIcon />}
           onClick={openCreateIssueDialog}
           FabProps={{
             disabled: board.statuses.length === 0,
@@ -171,7 +170,11 @@ const BoardActions = ({ board }: BoardActionsProps) => {
         />
         <SpeedDialAction
           tooltipTitle='Status'
-          icon={<ViewColumnIcon />}
+          icon={
+            <PostAddIcon
+              sx={{ transform: 'rotateZ(-90deg) rotateX(180deg)' }}
+            />
+          }
           onClick={openCreateStatusDialog}
         />
         <SpeedDialAction
@@ -181,7 +184,7 @@ const BoardActions = ({ board }: BoardActionsProps) => {
         />
         <SpeedDialAction
           tooltipTitle='Boards'
-          icon={<ViewKanbanIcon />}
+          icon={<PostIconWhite />}
           onClick={openBoardsDrawer}
         />
       </SpeedDial>

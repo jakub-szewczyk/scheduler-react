@@ -3,8 +3,8 @@ import { createSchedule, updateSchedule } from '@/services/schedule'
 import { InitialValues, Schedule } from '@/types/schedule'
 import DownloadIcon from '@mui/icons-material/Download'
 import EditIcon from '@mui/icons-material/Edit'
+import PendingActionsIcon from '@mui/icons-material/PendingActions'
 import PrintIcon from '@mui/icons-material/Print'
-import ViewListIcon from '@mui/icons-material/ViewList'
 import { SpeedDial, SpeedDialAction } from '@mui/material'
 import SpeedDialIcon from '@mui/material/SpeedDialIcon'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -94,7 +94,7 @@ const ScheduleActions = ({ schedule }: ScheduleActionsProps) => {
       name: values.name,
     })
 
-  const handleScheduleEdit =  (
+  const handleScheduleEdit = (
     values: InitialValues,
     _: FormikHelpers<InitialValues>
   ) =>
@@ -132,7 +132,7 @@ const ScheduleActions = ({ schedule }: ScheduleActionsProps) => {
         />
         <SpeedDialAction
           tooltipTitle='Schedules'
-          icon={<ViewListIcon />}
+          icon={<PendingActionsIcon />}
           onClick={openSchedulesDrawer}
         />
       </SpeedDial>

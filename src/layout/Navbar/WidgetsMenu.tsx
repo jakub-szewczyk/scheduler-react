@@ -1,7 +1,6 @@
+import AppsIcon from '@mui/icons-material/Apps'
+import PendingActionsIcon from '@mui/icons-material/PendingActions'
 import StickyNote2Icon from '@mui/icons-material/StickyNote2'
-import ViewKanbanIcon from '@mui/icons-material/ViewKanban'
-import ViewListIcon from '@mui/icons-material/ViewList'
-import WidgetsIcon from '@mui/icons-material/Widgets'
 import {
   IconButton,
   IconButtonProps,
@@ -12,6 +11,7 @@ import {
 } from '@mui/material'
 import { useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { PostIconWhite } from '../PostIcon/PostIcon.styled'
 
 type Params = {
   projectId: string
@@ -75,7 +75,7 @@ const WidgetsMenu = ({ iconButtonProps }: WidgetsMenuProps) => {
         onClick={(event) => setMenu(event.currentTarget)}
         {...iconButtonProps}
       >
-        <WidgetsIcon />
+        <AppsIcon />
       </IconButton>
       <Menu
         open={!!menu}
@@ -95,7 +95,7 @@ const WidgetsMenu = ({ iconButtonProps }: WidgetsMenuProps) => {
           onClick={handleBoardsMenuItemClick}
         >
           <ListItemIcon>
-            <ViewKanbanIcon fontSize='small' />
+            <PostIconWhite style={{ marginLeft: 2 }} />
           </ListItemIcon>
           <ListItemText>Boards</ListItemText>
         </MenuItem>
@@ -104,7 +104,7 @@ const WidgetsMenu = ({ iconButtonProps }: WidgetsMenuProps) => {
           onClick={handleSchedulesMenuItemClick}
         >
           <ListItemIcon>
-            <ViewListIcon fontSize='small' />
+            <PendingActionsIcon fontSize='small' />
           </ListItemIcon>
           <ListItemText>Schedules</ListItemText>
         </MenuItem>

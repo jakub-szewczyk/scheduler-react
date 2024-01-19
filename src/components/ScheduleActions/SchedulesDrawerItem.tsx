@@ -1,6 +1,6 @@
 import { deleteSchedule } from '@/services/schedule'
 import CloseIcon from '@mui/icons-material/Close'
-import ViewListIcon from '@mui/icons-material/ViewList'
+import PendingActionsIcon from '@mui/icons-material/PendingActions'
 import { Box, IconButton, ListItemButton, Stack, Tooltip } from '@mui/material'
 import Avatar from '@mui/material/Avatar'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
@@ -91,7 +91,7 @@ const SchedulesDrawerItem = ({
                 }),
               }}
             >
-              <ViewListIcon />
+              <PendingActionsIcon />
             </Avatar>
           </ListItemAvatar>
           <ListItemText
