@@ -37,7 +37,7 @@ const Notes = () => {
         !params.noteId &&
         navigate(
           {
-            pathname: `/projects/${params.projectId}/notes/${notes[0].id}`,
+            pathname: `/projects/${params.projectId}/notes/${notes.content[0].id}`,
             search: searchParams.toString(),
           },
           { replace: true }

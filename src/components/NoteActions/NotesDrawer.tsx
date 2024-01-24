@@ -28,6 +28,7 @@ interface NotesDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
 const NotesDrawer = ({ onCreate, onSelect, ...props }: NotesDrawerProps) => {
   const params = useParams<Params>()
 
+  // TODO: Implement infinite scrolling
   const {
     data: notes,
     isLoading: isEachNoteLoading,
@@ -83,11 +84,11 @@ const NotesDrawer = ({ onCreate, onSelect, ...props }: NotesDrawerProps) => {
                 .fill(null)
                 .map((_, index) => <DrawerItemSkeleton key={index} />)}
             {isEachNoteFetchedSuccessfully &&
-              notes.map((note) => (
+              notes.content.map((note) => (
                 <NotesDrawerItem
                   key={note.id}
                   note={note}
-                  notes={notes}
+                  notes={notes.content}
                   onSelect={onSelect}
                 />
               ))}

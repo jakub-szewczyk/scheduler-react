@@ -1,21 +1,24 @@
 import { Note } from '@/types/note'
 import api from './api'
+import { PaginatedResponse } from '@/types/api'
 
-interface GetAllNotesPayload {
+interface GetNotesParams {
   projectId: string
 }
 
-export const getNotes = ({ projectId }: GetAllNotesPayload) =>
-  api<Pick<Note, 'id' | 'createdAt' | 'name'>[]>(
-    `/projects/${projectId}/notes`
-  ).then(({ data }) => data)
+type GetNotesResponse = PaginatedResponse<
+  Pick<Note, 'id' | 'createdAt' | 'name'>[]
+>
 
-interface GetNotePayload {
+export const getNotes = ({ projectId }: GetNotesParams) =>
+  api<GetNotesResponse>(`/projects/${projectId}/notes`).then(({ data }) => data)
+
+interface GetNoteParams {
   projectId: string
   noteId: string
 }
 
-export const getNote = ({ projectId, noteId }: GetNotePayload) =>
+export const getNote = ({ projectId, noteId }: GetNoteParams) =>
   api<Note>(`/projects/${projectId}/notes/${noteId}`).then(({ data }) => data)
 
 interface CreateNotePayload {

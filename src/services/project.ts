@@ -1,16 +1,16 @@
-import { PaginableResponse } from '@/types/api'
+import { PaginatedResponse } from '@/types/api'
 import { Project } from '@/types/project'
 import api from './api'
 
-type GetAllProjectsParams = Partial<{
+type GetProjectsParams = Partial<{
   page: number
   size: number
 }>
 
-export const getProjects = (params?: GetAllProjectsParams) =>
-  api<PaginableResponse<Project[]>>('/projects', { params }).then(
-    ({ data }) => data
-  )
+type GetProjectsResponse = PaginatedResponse<Project[]>
+
+export const getProjects = (params?: GetProjectsParams) =>
+  api<GetProjectsResponse>('/projects', { params }).then(({ data }) => data)
 
 export const getProject = (projectId: string) =>
   api<Project>(`/projects/${projectId}`).then(({ data }) => data)

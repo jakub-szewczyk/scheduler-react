@@ -1,14 +1,21 @@
 import { Schedule } from '@/types/schedule'
 import api from './api'
+import { PaginatedResponse } from '@/types/api'
 
-interface GetAllSchedulesParams {
+interface GetSchedulesParams {
   projectId: string
+  page?: number
+  size?: number
 }
 
-export const getSchedules = ({ projectId }: GetAllSchedulesParams) =>
-  api<Pick<Schedule, 'id' | 'createdAt' | 'name'>[]>(
-    `/projects/${projectId}/schedules`
-  ).then(({ data }) => data)
+type GetSchedulesResponse = PaginatedResponse<
+  Pick<Schedule, 'id' | 'createdAt' | 'name'>[]
+>
+
+export const getSchedules = ({ projectId, ...params }: GetSchedulesParams) =>
+  api<GetSchedulesResponse>(`/projects/${projectId}/schedules`, {
+    params,
+  }).then(({ data }) => data)
 
 interface GetScheduleParams {
   projectId: string

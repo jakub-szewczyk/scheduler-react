@@ -52,11 +52,7 @@ const ScheduleActions = ({ schedule }: ScheduleActionsProps) => {
 
   const { mutate: createScheduleMutation, isLoading: isScheduleCreating } =
     useMutation(createSchedule, {
-      onSuccess: async (schedule) => {
-        await queryClient.invalidateQueries(
-          ['projects', params.projectId, 'schedules'],
-          { exact: true }
-        )
+      onSuccess: (schedule) => {
         navigate({
           pathname: `/projects/${params.projectId}/schedules/${schedule.id}`,
           search: searchParams.toString(),
@@ -68,10 +64,18 @@ const ScheduleActions = ({ schedule }: ScheduleActionsProps) => {
   const { mutate: updateScheduleMutation, isLoading: isScheduleUpdating } =
     useMutation(updateSchedule, {
       onSuccess: async () => {
-        await queryClient.invalidateQueries([
-          'projects',
-          params.projectId,
-          'schedules',
+        await Promise.all([
+          queryClient.invalidateQueries([
+            'projects',
+            params.projectId,
+            'schedules',
+          ]),
+          queryClient.invalidateQueries([
+            'infinite',
+            'projects',
+            params.projectId,
+            'schedules',
+          ]),
         ])
         closeEditScheduleDialog()
       },
@@ -87,22 +91,28 @@ const ScheduleActions = ({ schedule }: ScheduleActionsProps) => {
 
   const handleScheduleCreate = (
     values: InitialValues,
-    _: FormikHelpers<InitialValues>
+    { setSubmitting }: FormikHelpers<InitialValues>
   ) =>
-    createScheduleMutation({
-      projectId: params.projectId!,
-      name: values.name,
-    })
+    createScheduleMutation(
+      {
+        projectId: params.projectId!,
+        name: values.name,
+      },
+      { onSettled: () => setSubmitting(false) }
+    )
 
   const handleScheduleEdit = (
     values: InitialValues,
-    _: FormikHelpers<InitialValues>
+    { setSubmitting }: FormikHelpers<InitialValues>
   ) =>
-    updateScheduleMutation({
-      projectId: params.projectId!,
-      scheduleId: schedule.id,
-      name: values.name,
-    })
+    updateScheduleMutation(
+      {
+        projectId: params.projectId!,
+        scheduleId: schedule.id,
+        name: values.name,
+      },
+      { onSettled: () => setSubmitting(false) }
+    )
 
   return (
     <>
@@ -144,7 +154,7 @@ const ScheduleActions = ({ schedule }: ScheduleActionsProps) => {
         onCreate={openCreateScheduleDialog}
       />
       <UpsertScheduleDialog
-        mode='CREATE'
+        mode='insert'
         open={isCreateScheduleDialogOpen}
         onClose={closeCreateScheduleDialog}
         schedule={schedule}
@@ -152,7 +162,7 @@ const ScheduleActions = ({ schedule }: ScheduleActionsProps) => {
         onCreate={handleScheduleCreate}
       />
       <UpsertScheduleDialog
-        mode='EDIT'
+        mode='update'
         open={isEditScheduleDialogOpen}
         onClose={closeEditScheduleDialog}
         schedule={schedule}

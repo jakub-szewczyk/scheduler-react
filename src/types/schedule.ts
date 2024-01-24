@@ -1,4 +1,3 @@
-import { initialValues } from '@/modules/schedule'
 import { Row } from './row'
 
 export interface Schedule {
@@ -8,4 +7,4 @@ export interface Schedule {
   rows: Row[]
 }
 
-export type InitialValues = ReturnType<typeof initialValues>
+export type InitialValues = { name: string }

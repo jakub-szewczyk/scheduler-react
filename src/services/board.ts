@@ -1,21 +1,26 @@
 import { Board } from '@/types/board'
 import api from './api'
+import { PaginatedResponse } from '@/types/api'
 
-interface GetAllBoardsPayload {
+interface GetBoardsParams {
   projectId: string
 }
 
-export const getBoards = ({ projectId }: GetAllBoardsPayload) =>
-  api<Pick<Board, 'id' | 'createdAt' | 'name'>[]>(
-    `/projects/${projectId}/boards`
-  ).then(({ data }) => data)
+type GetBoardsResponse = PaginatedResponse<
+  Pick<Board, 'id' | 'createdAt' | 'name'>[]
+>
 
-interface GetBoardPayload {
+export const getBoards = ({ projectId }: GetBoardsParams) =>
+  api<GetBoardsResponse>(`/projects/${projectId}/boards`).then(
+    ({ data }) => data
+  )
+
+interface GetBoardParams {
   projectId: string
   boardId: string
 }
 
-export const getBoard = ({ projectId, boardId }: GetBoardPayload) =>
+export const getBoard = ({ projectId, boardId }: GetBoardParams) =>
   api<Board>(`/projects/${projectId}/boards/${boardId}`).then(
     ({ data }) => data
   )

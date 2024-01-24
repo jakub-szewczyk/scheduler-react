@@ -31,10 +31,18 @@ const ScheduleHeader = ({ schedule }: ScheduleHeaderProps) => {
   const { mutate: updateScheduleMutation, isLoading: isScheduleUpdating } =
     useMutation(updateSchedule, {
       onSuccess: async () => {
-        await queryClient.invalidateQueries([
-          'projects',
-          params.projectId,
-          'schedules',
+        await Promise.all([
+          queryClient.invalidateQueries([
+            'projects',
+            params.projectId,
+            'schedules',
+          ]),
+          queryClient.invalidateQueries([
+            'infinite',
+            'projects',
+            params.projectId,
+            'schedules',
+          ]),
         ])
         closeEditScheduleDialog()
       },
@@ -42,13 +50,16 @@ const ScheduleHeader = ({ schedule }: ScheduleHeaderProps) => {
 
   const handleScheduleEdit = (
     values: InitialValues,
-    _: FormikHelpers<InitialValues>
+    { setSubmitting }: FormikHelpers<InitialValues>
   ) =>
-    updateScheduleMutation({
-      projectId: params.projectId!,
-      scheduleId: schedule.id,
-      name: values.name,
-    })
+    updateScheduleMutation(
+      {
+        projectId: params.projectId!,
+        scheduleId: schedule.id,
+        name: values.name,
+      },
+      { onSettled: () => setSubmitting(false) }
+    )
 
   return (
     <>
@@ -72,7 +83,7 @@ const ScheduleHeader = ({ schedule }: ScheduleHeaderProps) => {
         </Typography>
       </Stack>
       <UpsertScheduleDialog
-        mode='EDIT'
+        mode='update'
         open={isEditScheduleDialogOpen}
         onClose={closeEditScheduleDialog}
         schedule={schedule}

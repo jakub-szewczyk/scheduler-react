@@ -28,6 +28,7 @@ interface BoardsDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
 const BoardsDrawer = ({ onSelect, onCreate, ...props }: BoardsDrawerProps) => {
   const params = useParams<Params>()
 
+  // TODO: Implement infinite scrolling
   const {
     data: boards,
     isLoading: isEachBoardLoading,
@@ -85,11 +86,11 @@ const BoardsDrawer = ({ onSelect, onCreate, ...props }: BoardsDrawerProps) => {
                 .fill(null)
                 .map((_, index) => <DrawerItemSkeleton key={index} />)}
             {isEachBoardFetchedSuccessfully &&
-              boards.map((board) => (
+              boards.content.map((board) => (
                 <BoardsDrawerItem
                   key={board.name}
                   board={board}
-                  boards={boards}
+                  boards={boards.content}
                   onSelect={onSelect}
                 />
               ))}

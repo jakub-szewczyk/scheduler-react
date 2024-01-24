@@ -1,4 +1,4 @@
-export interface PaginableResponse<T> {
+export interface PaginatedResponse<T> {
   content: T
   page: number
   size: number

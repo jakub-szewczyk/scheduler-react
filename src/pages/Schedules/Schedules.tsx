@@ -31,7 +31,7 @@ const Schedules = () => {
         !params.scheduleId &&
         navigate(
           {
-            pathname: `/projects/${params.projectId}/schedules/${schedules[0].id}`,
+            pathname: `/projects/${params.projectId}/schedules/${schedules.content[0].id}`,
             search: searchParams.toString(),
           },
           { replace: true }

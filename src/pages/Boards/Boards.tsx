@@ -31,7 +31,7 @@ const Boards = () => {
         !params.boardId &&
         navigate(
           {
-            pathname: `/projects/${params.projectId}/boards/${boards[0].id}`,
+            pathname: `/projects/${params.projectId}/boards/${boards.content[0].id}`,
             search: searchParams.toString(),
           },
           { replace: true }

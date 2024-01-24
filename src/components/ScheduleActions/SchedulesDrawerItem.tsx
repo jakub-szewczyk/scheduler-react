@@ -45,11 +45,6 @@ const SchedulesDrawerItem = ({
   const { mutate: deleteScheduleMutation, isLoading: isScheduleDeleting } =
     useMutation(deleteSchedule, {
       onSuccess: async (schedule) => {
-        await queryClient.invalidateQueries(
-          ['projects', params.projectId, 'schedules'],
-          { exact: true }
-        )
-        closeDeleteScheduleDialog()
         const isScheduleSelected = schedule.id === params.scheduleId
         const index = schedules.findIndex(({ id }) => id === schedule.id)
         if (isScheduleSelected && index === 0)
@@ -70,6 +65,13 @@ const SchedulesDrawerItem = ({
             },
             { replace: true }
           )
+        await queryClient.invalidateQueries([
+          'infinite',
+          'projects',
+          params.projectId,
+          'schedules',
+        ])
+        closeDeleteScheduleDialog()
       },
     })
 
