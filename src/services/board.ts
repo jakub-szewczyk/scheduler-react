@@ -4,14 +4,16 @@ import { PaginatedResponse } from '@/types/api'
 
 interface GetBoardsParams {
   projectId: string
+  page?: number
+  size?: number
 }
 
 type GetBoardsResponse = PaginatedResponse<
   Pick<Board, 'id' | 'createdAt' | 'name'>[]
 >
 
-export const getBoards = ({ projectId }: GetBoardsParams) =>
-  api<GetBoardsResponse>(`/projects/${projectId}/boards`).then(
+export const getBoards = ({ projectId, ...params }: GetBoardsParams) =>
+  api<GetBoardsResponse>(`/projects/${projectId}/boards`, { params }).then(
     ({ data }) => data
   )
 

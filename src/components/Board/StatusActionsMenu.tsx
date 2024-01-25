@@ -19,6 +19,7 @@ import { useParams } from 'react-router-dom'
 import { useBoolean } from 'usehooks-ts'
 import DeleteStatusDialog from './DeleteStatusDialog'
 import UpsertStatusDialog from './UpsertStatusDialog'
+import { FormikHelpers } from 'formik'
 
 type Params = {
   projectId: string
@@ -39,7 +40,7 @@ const StatusActionsMenu = ({
   const [menu, setMenu] = useState<HTMLElement | null>(null)
 
   const [mode, setMode] =
-    useState<Exclude<UpsertStatusDialogMode, 'CREATE'>>('EDIT')
+    useState<Exclude<UpsertStatusDialogMode, 'insert'>>('update')
 
   const {
     value: isUpsertDialogOpen,
@@ -86,7 +87,7 @@ const StatusActionsMenu = ({
 
   const handleEditMenuItemClick = () => {
     setMenu(null)
-    setMode('EDIT')
+    setMode('update')
     openUpsertDialog()
   }
 
@@ -97,13 +98,13 @@ const StatusActionsMenu = ({
 
   const handleInsertBeforeMenuItemClick = () => {
     setMenu(null)
-    setMode('INSERT_BEFORE')
+    setMode('insert_before')
     openUpsertDialog()
   }
 
   const handleInsertAfterMenuItemClick = () => {
     setMenu(null)
-    setMode('INSERT_AFTER')
+    setMode('insert_after')
     openUpsertDialog()
   }
 
@@ -122,19 +123,31 @@ const StatusActionsMenu = ({
       statuses: STATUS.remove(id)(statuses),
     })
 
-  const handleStatusInsertBefore = ({ title }: Pick<Status, 'title'>) =>
-    updateBoardStatusesMutation({
-      projectId: params.projectId!,
-      boardId: params.boardId!,
-      statuses: STATUS.insertBefore(status.id, title)(statuses),
-    })
+  const handleStatusInsertBefore = (
+    { title }: Pick<Status, 'title'>,
+    { setSubmitting }: FormikHelpers<Pick<Status, 'title'>>
+  ) =>
+    updateBoardStatusesMutation(
+      {
+        projectId: params.projectId!,
+        boardId: params.boardId!,
+        statuses: STATUS.insertBefore(status.id, title)(statuses),
+      },
+      { onSettled: () => setSubmitting(false) }
+    )
 
-  const handleStatusInsertAfter = ({ title }: Pick<Status, 'title'>) =>
-    updateBoardStatusesMutation({
-      projectId: params.projectId!,
-      boardId: params.boardId!,
-      statuses: STATUS.insertAfter(status.id, title)(statuses),
-    })
+  const handleStatusInsertAfter = (
+    { title }: Pick<Status, 'title'>,
+    { setSubmitting }: FormikHelpers<Pick<Status, 'title'>>
+  ) =>
+    updateBoardStatusesMutation(
+      {
+        projectId: params.projectId!,
+        boardId: params.boardId!,
+        statuses: STATUS.insertAfter(status.id, title)(statuses),
+      },
+      { onSettled: () => setSubmitting(false) }
+    )
 
   return (
     <>
@@ -162,7 +175,10 @@ const StatusActionsMenu = ({
           </ListItemIcon>
           <ListItemText>Edit</ListItemText>
         </MenuItem>
-        <MenuItem onClick={handleDeleteMenuItemClick}>
+        <MenuItem
+          disabled={statuses.length === 1}
+          onClick={handleDeleteMenuItemClick}
+        >
           <ListItemIcon>
             <DeleteIcon fontSize='small' />
           </ListItemIcon>

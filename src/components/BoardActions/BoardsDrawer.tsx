@@ -10,10 +10,12 @@ import {
   Typography,
 } from '@mui/material'
 import List from '@mui/material/List'
-import { useQuery } from '@tanstack/react-query'
-import { MouseEventHandler } from 'react'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { MouseEventHandler, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import BoardsDrawerItem from './BoardsDrawerItem'
+import { BOARDS_PAGE_SIZE } from '@/modules/board'
+import { useIntersectionObserver } from 'usehooks-ts'
 
 type Params = {
   projectId: string
@@ -28,16 +30,41 @@ interface BoardsDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
 const BoardsDrawer = ({ onSelect, onCreate, ...props }: BoardsDrawerProps) => {
   const params = useParams<Params>()
 
-  // TODO: Implement infinite scrolling
   const {
     data: boards,
     isLoading: isEachBoardLoading,
     isSuccess: isEachBoardFetchedSuccessfully,
-  } = useQuery(['projects', params.projectId, 'boards'], () =>
-    getBoards({
-      projectId: params.projectId!,
-    })
+    isFetchingNextPage: isFetchingNextBoardsPage,
+    hasNextPage: hasNextBoardsPage,
+    fetchNextPage: fetchNextBoardsPage,
+  } = useInfiniteQuery(
+    ['infinite', 'projects', params.projectId, 'boards'],
+    ({ pageParam = 0 }) =>
+      getBoards({
+        projectId: params.projectId!,
+        page: pageParam,
+        size: BOARDS_PAGE_SIZE,
+      }),
+    {
+      getNextPageParam: (lastPage) =>
+        lastPage.page < Math.ceil(lastPage.total / BOARDS_PAGE_SIZE) - 1
+          ? lastPage.page + 1
+          : undefined,
+    }
   )
+
+  const ref = useRef<HTMLDivElement | null>(null)
+
+  const entry = useIntersectionObserver(ref, {
+    freezeOnceVisible: isFetchingNextBoardsPage,
+  })
+
+  /* FIXME:
+   * Fix null ref bug.
+   */
+  useEffect(() => {
+    entry?.isIntersecting && fetchNextBoardsPage()
+  }, [entry?.isIntersecting, fetchNextBoardsPage])
 
   return (
     <SwipeableDrawer
@@ -86,14 +113,17 @@ const BoardsDrawer = ({ onSelect, onCreate, ...props }: BoardsDrawerProps) => {
                 .fill(null)
                 .map((_, index) => <DrawerItemSkeleton key={index} />)}
             {isEachBoardFetchedSuccessfully &&
-              boards.content.map((board) => (
-                <BoardsDrawerItem
-                  key={board.name}
-                  board={board}
-                  boards={boards.content}
-                  onSelect={onSelect}
-                />
-              ))}
+              boards.pages.flatMap((page) =>
+                page.content.map((board) => (
+                  <BoardsDrawerItem
+                    key={board.name}
+                    board={board}
+                    boards={boards.pages.flatMap((page) => page.content)}
+                    onSelect={onSelect}
+                  />
+                ))
+              )}
+            {hasNextBoardsPage && <DrawerItemSkeleton ref={ref} />}
           </List>
         </Stack>
         <Box>

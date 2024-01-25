@@ -12,7 +12,7 @@ export type UpsertedStatus = Omit<Status, 'id' | 'issues'> & {
 }
 
 export type UpsertStatusDialogMode =
-  | 'CREATE'
-  | 'EDIT'
-  | 'INSERT_BEFORE'
-  | 'INSERT_AFTER'
+  | 'insert'
+  | 'update'
+  | 'insert_before'
+  | 'insert_after'

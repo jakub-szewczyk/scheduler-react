@@ -41,7 +41,7 @@ const IssueActionsMenu = ({
   const [menu, setMenu] = useState<HTMLElement | null>(null)
 
   const [mode, setMode] =
-    useState<Exclude<UpsertIssueDialogMode, 'CREATE'>>('EDIT')
+    useState<Exclude<UpsertIssueDialogMode, 'insert'>>('update')
 
   const {
     value: isUpsertDialogOpen,
@@ -86,7 +86,7 @@ const IssueActionsMenu = ({
 
   const handleEditMenuItemClick = () => {
     setMenu(null)
-    setMode('EDIT')
+    setMode('update')
     openUpsertDialog()
   }
 
@@ -97,13 +97,13 @@ const IssueActionsMenu = ({
 
   const handleInsertAboveMenuItemClick = () => {
     setMenu(null)
-    setMode('INSERT_ABOVE')
+    setMode('insert_above')
     openUpsertDialog()
   }
 
   const handleInsertBelowMenuItemClick = () => {
     setMenu(null)
-    setMode('INSERT_BELOW')
+    setMode('insert_below')
     openUpsertDialog()
   }
 

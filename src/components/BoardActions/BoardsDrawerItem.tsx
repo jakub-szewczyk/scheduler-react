@@ -45,11 +45,6 @@ const BoardsDrawerItem = ({
   const { mutate: deleteBoardMutation, isLoading: isBoardDeleting } =
     useMutation(deleteBoard, {
       onSuccess: async () => {
-        await queryClient.invalidateQueries(
-          ['projects', params.projectId, 'boards'],
-          { exact: true }
-        )
-        closeDeleteBoardDialog()
         const isBoardSelected = board.id === params.boardId
         const index = boards.findIndex(({ id }) => id === board.id)
         if (isBoardSelected && index === 0)
@@ -70,6 +65,13 @@ const BoardsDrawerItem = ({
             },
             { replace: true }
           )
+        await queryClient.invalidateQueries([
+          'infinite',
+          'projects',
+          params.projectId,
+          'boards',
+        ])
+        closeDeleteBoardDialog()
       },
     })
 

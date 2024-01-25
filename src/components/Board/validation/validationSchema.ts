@@ -21,7 +21,9 @@ export const upsertStatusValidationSchema = (
         (title = '') =>
           !pipe(
             statuses,
-            mode === 'EDIT' && status ? STATUS.remove(status.title) : identity,
+            mode === 'update' && status
+              ? STATUS.remove(status.title)
+              : identity,
             map(prop('title')),
             includes(toLower(title))
           )

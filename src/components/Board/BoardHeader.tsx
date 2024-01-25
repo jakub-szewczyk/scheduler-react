@@ -31,10 +31,18 @@ const BoardHeader = ({ board }: BoardHeaderProps) => {
   const { mutate: updateBoardMutation, isLoading: isBoardUpdating } =
     useMutation(updateBoard, {
       onSuccess: async () => {
-        await queryClient.invalidateQueries([
-          'projects',
-          params.projectId,
-          'boards',
+        await Promise.all([
+          queryClient.invalidateQueries([
+            'projects',
+            params.projectId,
+            'boards',
+          ]),
+          queryClient.invalidateQueries([
+            'infinite',
+            'projects',
+            params.projectId,
+            'boards',
+          ]),
         ])
         closeEditBoardDialog()
       },
@@ -42,13 +50,16 @@ const BoardHeader = ({ board }: BoardHeaderProps) => {
 
   const handleBoardEdit = (
     values: InitialValues,
-    _: FormikHelpers<InitialValues>
+    { setSubmitting }: FormikHelpers<InitialValues>
   ) =>
-    updateBoardMutation({
-      projectId: params.projectId!,
-      boardId: board.id,
-      name: values.name,
-    })
+    updateBoardMutation(
+      {
+        projectId: params.projectId!,
+        boardId: board.id,
+        name: values.name,
+      },
+      { onSettled: () => setSubmitting(false) }
+    )
 
   return (
     <>
@@ -72,7 +83,7 @@ const BoardHeader = ({ board }: BoardHeaderProps) => {
         </Typography>
       </Stack>
       <UpsertBoardDialog
-        mode='EDIT'
+        mode='update'
         open={isEditBoardDialogOpen}
         onClose={closeEditBoardDialog}
         board={board}

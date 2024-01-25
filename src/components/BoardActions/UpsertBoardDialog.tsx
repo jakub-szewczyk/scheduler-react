@@ -1,9 +1,9 @@
-import { initialValues } from '@/modules/board'
 import { LoadingButton } from '@mui/lab'
 import { Button, Stack, Typography } from '@mui/material'
 import { Field, Form, Formik, FormikHelpers } from 'formik'
 import { TextField } from 'formik-mui'
 import { MouseEventHandler } from 'react'
+import { match } from 'ts-pattern'
 import DraggableDialog, {
   DraggableDialogProps,
 } from '../../layout/DraggableDialog/DraggableDialog'
@@ -16,16 +16,16 @@ interface BoardDialogProps extends DraggableDialogProps {
   onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
 
-interface CreateBoardDialogProps {
-  mode: 'CREATE'
+interface InsertBoardDialogProps {
+  mode: 'insert'
   onCreate: (
     values: InitialValues,
     formikHelpers: FormikHelpers<InitialValues>
   ) => void
 }
 
-interface EditBoardDialogProps {
-  mode: 'EDIT'
+interface UpdateBoardDialogProps {
+  mode: 'update'
   onEdit: (
     values: InitialValues,
     formikHelpers: FormikHelpers<InitialValues>
@@ -33,10 +33,9 @@ interface EditBoardDialogProps {
 }
 
 type UpsertBoardDialogProps = BoardDialogProps &
-  (CreateBoardDialogProps | EditBoardDialogProps)
+  (InsertBoardDialogProps | UpdateBoardDialogProps)
 
 const UpsertBoardDialog = ({
-  board,
   loading = false,
   onClose,
   onCancel = onClose as MouseEventHandler<HTMLButtonElement> | undefined,
@@ -45,14 +44,17 @@ const UpsertBoardDialog = ({
   <DraggableDialog
     {...props}
     onClose={onClose}
-    dialogTitle={props.mode === 'CREATE' ? 'Create board' : 'Edit board'}
+    dialogTitle={props.mode === 'insert' ? 'Create board' : 'Edit board'}
     dialogContent={
       <Stack spacing={3}>
         <Typography>Choose a name for your board</Typography>
         <Formik
-          initialValues={initialValues(props.mode, board)}
+          initialValues={match(props)
+            .with({ mode: 'insert' }, () => ({ name: '' }))
+            .with({ mode: 'update' }, (props) => ({ name: props.board.name }))
+            .exhaustive()}
           validationSchema={validationSchema}
-          onSubmit={props.mode === 'CREATE' ? props.onCreate : props.onEdit}
+          onSubmit={props.mode === 'insert' ? props.onCreate : props.onEdit}
         >
           {() => (
             <Form id='board'>

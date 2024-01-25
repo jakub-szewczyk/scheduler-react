@@ -69,11 +69,7 @@ const BoardActions = ({ board }: BoardActionsProps) => {
 
   const { mutate: createBoardMutation, isLoading: isBoardCreating } =
     useMutation(createBoard, {
-      onSuccess: async (board) => {
-        await queryClient.invalidateQueries(
-          ['projects', params.projectId, 'boards'],
-          { exact: true }
-        )
+      onSuccess: (board) => {
         navigate({
           pathname: `/projects/${params.projectId}/boards/${board.id}`,
           search: searchParams.toString(),
@@ -85,10 +81,18 @@ const BoardActions = ({ board }: BoardActionsProps) => {
   const { mutate: updateBoardMutation, isLoading: isBoardUpdating } =
     useMutation(updateBoard, {
       onSuccess: async () => {
-        await queryClient.invalidateQueries([
-          'projects',
-          params.projectId,
-          'boards',
+        await Promise.all([
+          queryClient.invalidateQueries([
+            'projects',
+            params.projectId,
+            'boards',
+          ]),
+          queryClient.invalidateQueries([
+            'infinite',
+            'projects',
+            params.projectId,
+            'boards',
+          ]),
         ])
         closeEditBoardDialog()
       },
@@ -118,22 +122,28 @@ const BoardActions = ({ board }: BoardActionsProps) => {
 
   const handleBoardCreate = (
     values: InitialValues,
-    _: FormikHelpers<InitialValues>
+    { setSubmitting }: FormikHelpers<InitialValues>
   ) =>
-    createBoardMutation({
-      projectId: params.projectId!,
-      name: values.name,
-    })
+    createBoardMutation(
+      {
+        projectId: params.projectId!,
+        name: values.name,
+      },
+      { onSettled: () => setSubmitting(false) }
+    )
 
   const handleBoardEdit = (
     values: InitialValues,
-    _: FormikHelpers<InitialValues>
+    { setSubmitting }: FormikHelpers<InitialValues>
   ) =>
-    updateBoardMutation({
-      projectId: params.projectId!,
-      boardId: board.id,
-      name: values.name,
-    })
+    updateBoardMutation(
+      {
+        projectId: params.projectId!,
+        boardId: board.id,
+        name: values.name,
+      },
+      { onSettled: () => setSubmitting(false) }
+    )
 
   const handleStatusCreate = ({ title }: Pick<Status, 'title'>) =>
     updateBoardStatusesMutation({
@@ -196,7 +206,7 @@ const BoardActions = ({ board }: BoardActionsProps) => {
         onCreate={openCreateBoardDialog}
       />
       <UpsertBoardDialog
-        mode='CREATE'
+        mode='insert'
         open={isCreateBoardDialogOpen}
         onClose={closeCreateBoardDialog}
         board={board}
@@ -204,7 +214,7 @@ const BoardActions = ({ board }: BoardActionsProps) => {
         onCreate={handleBoardCreate}
       />
       <UpsertBoardDialog
-        mode='EDIT'
+        mode='update'
         open={isEditBoardDialogOpen}
         onClose={closeEditBoardDialog}
         board={board}
@@ -212,7 +222,7 @@ const BoardActions = ({ board }: BoardActionsProps) => {
         onEdit={handleBoardEdit}
       />
       <UpsertStatusDialog
-        mode='CREATE'
+        mode='insert'
         open={isCreateStatusDialogOpen}
         onClose={closeCreateStatusDialog}
         statuses={board.statuses}
@@ -220,7 +230,7 @@ const BoardActions = ({ board }: BoardActionsProps) => {
         onCreate={handleStatusCreate}
       />
       <UpsertIssueDialog
-        mode='CREATE'
+        mode='insert'
         open={isCreateIssueDialogOpen}
         onClose={closeCreateIssueDialog}
         statuses={board.statuses}
