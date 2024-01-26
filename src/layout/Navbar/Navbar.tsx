@@ -15,7 +15,7 @@ import {
   Typography,
 } from '@mui/material'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { ChangeEvent, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useEventListener } from 'usehooks-ts'
 import ProfileMenu from './ProfileMenu'
@@ -202,7 +202,7 @@ const Navbar = () => {
                     },
                   },
                   PaperProps: {
-                    onScroll: (event: ChangeEvent<HTMLDivElement>) =>
+                    onScroll: (event: any) =>
                       event.target.scrollHeight ===
                       event.target.scrollTop + event.target.clientHeight &&
                       fetchNextProjectsPage(),
