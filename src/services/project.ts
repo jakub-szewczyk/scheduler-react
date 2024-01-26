@@ -1,37 +1,28 @@
+import { PaginatedResponse } from '@/types/api'
 import { Project } from '@/types/project'
 import api from './api'
 
-export const getAllProjects = (token: string | null) =>
-  api<Project[]>('/projects', {
-    headers: { Authorization: `Bearer ${token}` },
-  }).then(({ data }) => data)
+type GetProjectsParams = Partial<{
+  page: number
+  size: number
+}>
 
-export const createProject = (
-  token: string | null,
-  data: Pick<Project, 'name' | 'description'>
-) =>
-  api
-    .post('/projects', data, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    .then(({ data }) => data)
+type GetProjectsResponse = PaginatedResponse<Project[]>
 
-export const updateProject = (
-  token: string | null,
-  { id, ...data }: Pick<Project, 'id' | 'name' | 'description'>
-) =>
-  api
-    .put(`/projects/${id}`, data, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    .then(({ data }) => data)
+export const getProjects = (params?: GetProjectsParams) =>
+  api<GetProjectsResponse>('/projects', { params }).then(({ data }) => data)
 
-export const deleteProject = (
-  token: string | null,
-  { id }: Pick<Project, 'id'>
-) =>
-  api
-    .delete(`/projects/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    .then(({ data }) => data)
+export const getProject = (projectId: string) =>
+  api<Project>(`/projects/${projectId}`).then(({ data }) => data)
+
+export const createProject = (data: Pick<Project, 'name' | 'description'>) =>
+  api.post<Project>('/projects', data).then(({ data }) => data)
+
+export const updateProject = ({
+  id,
+  ...data
+}: Pick<Project, 'id' | 'name' | 'description'>) =>
+  api.put<Project>(`/projects/${id}`, data).then(({ data }) => data)
+
+export const deleteProject = ({ id }: Pick<Project, 'id'>) =>
+  api.delete<Project>(`/projects/${id}`).then(({ data }) => data)

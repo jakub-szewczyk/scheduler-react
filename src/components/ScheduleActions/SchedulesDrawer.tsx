@@ -1,6 +1,5 @@
-import { getAllProjects } from '@/services/project'
-import { getAllSchedules } from '@/services/schedule'
-import { useAuth } from '@clerk/clerk-react'
+import { SCHEDULES_PAGE_SIZE } from '@/modules/schedule'
+import { getSchedules } from '@/services/schedule'
 import AddIcon from '@mui/icons-material/Add'
 import {
   Box,
@@ -11,11 +10,17 @@ import {
   Typography,
 } from '@mui/material'
 import List from '@mui/material/List'
-import { useQuery } from '@tanstack/react-query'
-import { MouseEventHandler } from 'react'
-import { useReadLocalStorage } from 'usehooks-ts'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { MouseEventHandler, useEffect, useRef } from 'react'
+import { useParams } from 'react-router-dom'
+import { useIntersectionObserver } from 'usehooks-ts'
 import DrawerItemSkeleton from '../../layout/DrawerItemSkeleton/DrawerItemSkeleton'
 import SchedulesDrawerItem from './SchedulesDrawerItem'
+
+type Params = {
+  projectId: string
+  scheduleId: string
+}
 
 interface SchedulesDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
   onCreate: MouseEventHandler<HTMLButtonElement> | undefined
@@ -27,33 +32,43 @@ const SchedulesDrawer = ({
   onSelect,
   ...props
 }: SchedulesDrawerProps) => {
-  const selectedProjectId = useReadLocalStorage<string | null>(
-    'selectedProjectId'
-  )
-
-  const { getToken } = useAuth()
-
-  const { data: projects, isSuccess: isEachProjectFetchedSuccessfully } =
-    useQuery(['projects'], async () => getAllProjects(await getToken()))
+  const params = useParams<Params>()
 
   const {
     data: schedules,
     isLoading: isEachScheduleLoading,
     isSuccess: isEachScheduleFetchedSuccessfully,
-  } = useQuery(
-    ['projects', selectedProjectId, 'schedules'],
-    async () =>
-      getAllSchedules({
-        projectId: selectedProjectId!,
-        token: await getToken(),
+    isFetchingNextPage: isFetchingNextSchedulesPage,
+    hasNextPage: hasNextSchedulesPage,
+    fetchNextPage: fetchNextSchedulesPage,
+  } = useInfiniteQuery(
+    ['infinite', 'projects', params.projectId, 'schedules'],
+    ({ pageParam = 0 }) =>
+      getSchedules({
+        projectId: params.projectId!,
+        page: pageParam,
+        size: SCHEDULES_PAGE_SIZE,
       }),
     {
-      enabled:
-        !!selectedProjectId &&
-        isEachProjectFetchedSuccessfully &&
-        projects.map((project) => project.id).includes(selectedProjectId),
+      getNextPageParam: (lastPage) =>
+        lastPage.page < Math.ceil(lastPage.total / SCHEDULES_PAGE_SIZE) - 1
+          ? lastPage.page + 1
+          : undefined,
     }
   )
+
+  const ref = useRef<HTMLDivElement | null>(null)
+
+  const entry = useIntersectionObserver(ref, {
+    freezeOnceVisible: isFetchingNextSchedulesPage,
+  })
+
+  /* FIXME:
+   * Fix null ref bug.
+   */
+  useEffect(() => {
+    entry?.isIntersecting && fetchNextSchedulesPage()
+  }, [entry?.isIntersecting, fetchNextSchedulesPage])
 
   return (
     <SwipeableDrawer
@@ -102,14 +117,17 @@ const SchedulesDrawer = ({
                 .fill(null)
                 .map((_, index) => <DrawerItemSkeleton key={index} />)}
             {isEachScheduleFetchedSuccessfully &&
-              schedules.map((schedule) => (
-                <SchedulesDrawerItem
-                  key={schedule.id}
-                  schedule={schedule}
-                  schedules={schedules}
-                  onSelect={onSelect}
-                />
-              ))}
+              schedules.pages.flatMap((page) =>
+                page.content.map((schedule) => (
+                  <SchedulesDrawerItem
+                    key={schedule.id}
+                    schedule={schedule}
+                    schedules={schedules.pages.flatMap((page) => page.content)}
+                    onSelect={onSelect}
+                  />
+                ))
+              )}
+            {hasNextSchedulesPage && <DrawerItemSkeleton ref={ref} />}
           </List>
         </Stack>
         <Box>

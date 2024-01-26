@@ -1,16 +1,21 @@
+import { PostIconNavy } from '@/layout/PostIcon/PostIcon.styled'
 import { deleteBoard } from '@/services/board'
-import { useAuth } from '@clerk/clerk-react'
 import CloseIcon from '@mui/icons-material/Close'
-import ViewKanbanIcon from '@mui/icons-material/ViewKanban'
 import { Box, IconButton, ListItemButton, Stack, Tooltip } from '@mui/material'
 import Avatar from '@mui/material/Avatar'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
 import ListItemText from '@mui/material/ListItemText'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { formatDistanceToNow } from 'date-fns'
-import { useBoolean, useReadLocalStorage } from 'usehooks-ts'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useBoolean } from 'usehooks-ts'
 import { Board } from '../../types/board'
 import DeleteBoardDialog from './DeleteBoardDialog'
+
+type Params = {
+  projectId: string
+  boardId: string
+}
 
 interface BoardsDrawerItemProps {
   board: Pick<Board, 'id' | 'createdAt' | 'name'>
@@ -23,38 +28,57 @@ const BoardsDrawerItem = ({
   boards,
   onSelect,
 }: BoardsDrawerItemProps) => {
-  const selectedProjectId = useReadLocalStorage<string | null>(
-    'selectedProjectId'
-  )
-
-  const selectedBoardId = useReadLocalStorage<string | null>('selectedBoardId')
-
   const {
     value: isDeleteBoardDialogOpen,
     setFalse: closeDeleteBoardDialog,
     setTrue: openDeleteBoardDialog,
   } = useBoolean(false)
 
-  const { getToken } = useAuth()
+  const [searchParams] = useSearchParams()
+
+  const params = useParams<Params>()
+
+  const navigate = useNavigate()
 
   const queryClient = useQueryClient()
 
   const { mutate: deleteBoardMutation, isLoading: isBoardDeleting } =
     useMutation(deleteBoard, {
-      onSuccess: () => {
-        queryClient.invalidateQueries(
-          ['projects', selectedProjectId, 'boards'],
-          { exact: true }
-        )
+      onSuccess: async () => {
+        const isBoardSelected = board.id === params.boardId
+        const index = boards.findIndex(({ id }) => id === board.id)
+        if (isBoardSelected && index === 0)
+          return navigate(
+            {
+              pathname: `/projects/${params.projectId}/boards/${boards[index + 1].id
+                }`,
+              search: searchParams.toString(),
+            },
+            { replace: true }
+          )
+        if (isBoardSelected && index > 0)
+          return navigate(
+            {
+              pathname: `/projects/${params.projectId}/boards/${boards[index - 1].id
+                }`,
+              search: searchParams.toString(),
+            },
+            { replace: true }
+          )
+        await queryClient.invalidateQueries([
+          'infinite',
+          'projects',
+          params.projectId,
+          'boards',
+        ])
         closeDeleteBoardDialog()
       },
     })
 
-  const handleBoardDelete = async (boardId: string) =>
+  const handleBoardDelete = (boardId: string) =>
     deleteBoardMutation({
-      projectId: selectedProjectId!,
+      projectId: params.projectId!,
       boardId,
-      token: await getToken(),
     })
 
   return (
@@ -64,12 +88,12 @@ const BoardsDrawerItem = ({
           <ListItemAvatar>
             <Avatar
               sx={{
-                ...(board.id === selectedBoardId && {
+                ...(board.id === params.boardId && {
                   bgcolor: (theme) => theme.palette.primary.main,
                 }),
               }}
             >
-              <ViewKanbanIcon />
+              <PostIconNavy style={{ width: 18, height: 18 }} />
             </Avatar>
           </ListItemAvatar>
           <ListItemText

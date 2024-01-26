@@ -42,6 +42,8 @@ const App = () => {
   return (
     <ClerkProvider
       publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
+      afterSignInUrl='/projects'
+      afterSignUpUrl='/projects'
       appearance={{
         variables: {
           colorPrimary: theme.palette.primary.main,

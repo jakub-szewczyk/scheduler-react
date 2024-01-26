@@ -1,42 +1,42 @@
 import { Board } from '@/types/board'
 import api from './api'
+import { PaginatedResponse } from '@/types/api'
 
-interface GetAllBoardsPayload {
+interface GetBoardsParams {
   projectId: string
-  token: string | null
+  page?: number
+  size?: number
 }
 
-export const getAllBoards = ({ projectId, token }: GetAllBoardsPayload) =>
-  api<Pick<Board, 'id' | 'createdAt' | 'name'>[]>(
-    `/projects/${projectId}/boards`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  ).then(({ data }) => data)
+type GetBoardsResponse = PaginatedResponse<
+  Pick<Board, 'id' | 'createdAt' | 'name'>[]
+>
 
-interface GetBoardPayload {
+export const getBoards = ({ projectId, ...params }: GetBoardsParams) =>
+  api<GetBoardsResponse>(`/projects/${projectId}/boards`, { params }).then(
+    ({ data }) => data
+  )
+
+interface GetBoardParams {
   projectId: string
   boardId: string
-  token: string | null
 }
 
-export const getBoard = ({ projectId, boardId, token }: GetBoardPayload) =>
-  api<Board>(`/projects/${projectId}/boards/${boardId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  }).then(({ data }) => data)
+export const getBoard = ({ projectId, boardId }: GetBoardParams) =>
+  api<Board>(`/projects/${projectId}/boards/${boardId}`).then(
+    ({ data }) => data
+  )
 
 interface CreateBoardPayload {
   projectId: string
   name: string
-  token: string | null
 }
 
-export const createBoard = ({ projectId, name, token }: CreateBoardPayload) =>
+export const createBoard = ({ projectId, name }: CreateBoardPayload) =>
   api
     .post<Pick<Board, 'id' | 'createdAt' | 'name'>>(
       `/projects/${projectId}/boards`,
-      { name },
-      { headers: { Authorization: `Bearer ${token}` } }
+      { name }
     )
     .then(({ data }) => data)
 
@@ -44,38 +44,19 @@ interface UpdateBoardPayload {
   projectId: string
   boardId: string
   name: string
-  token: string | null
 }
 
-export const updateBoard = ({
-  projectId,
-  boardId,
-  name,
-  token,
-}: UpdateBoardPayload) =>
+export const updateBoard = ({ projectId, boardId, name }: UpdateBoardPayload) =>
   api
-    .put<Board>(
-      `/projects/${projectId}/boards/${boardId}`,
-      { name },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    )
+    .put<Board>(`/projects/${projectId}/boards/${boardId}`, { name })
     .then(({ data }) => data)
 
 interface DeleteBoardPayload {
   projectId: string
   boardId: string
-  token: string | null
 }
 
-export const deleteBoard = ({
-  projectId,
-  boardId,
-  token,
-}: DeleteBoardPayload) =>
+export const deleteBoard = ({ projectId, boardId }: DeleteBoardPayload) =>
   api
-    .delete<Board>(`/projects/${projectId}/boards/${boardId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    .delete<Board>(`/projects/${projectId}/boards/${boardId}`)
     .then(({ data }) => data)

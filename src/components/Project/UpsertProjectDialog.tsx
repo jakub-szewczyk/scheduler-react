@@ -1,42 +1,41 @@
 import { InitialValues, Project } from '@/types/project'
+import { LoadingButton } from '@mui/lab'
 import { Button, Stack, Theme, Typography } from '@mui/material'
 import { Field, Form, Formik, FormikHelpers } from 'formik'
 import { TextField } from 'formik-mui'
 import { MouseEventHandler } from 'react'
+import { match } from 'ts-pattern'
 import DraggableDialog, {
   DraggableDialogProps,
 } from '../../layout/DraggableDialog/DraggableDialog'
 import validationSchema from './validation/validationSchema'
-import { LoadingButton } from '@mui/lab'
-import { initialValues } from '@/modules/project'
 
 interface ProjectDialogProps extends DraggableDialogProps {
-  project: Project
   loading?: boolean
   onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
 
-interface CreateProjectDialogProps {
-  mode: 'CREATE'
-  onCreate: (
+interface InsertProjectDialogProps {
+  mode: 'insert'
+  onInsert: (
     values: InitialValues,
     formikHelpers: FormikHelpers<InitialValues>
   ) => void
 }
 
-interface EditProjectDialogProps {
-  mode: 'EDIT'
-  onEdit: (
+interface UpdateProjectDialogProps {
+  mode: 'update'
+  project: Project
+  onUpdate: (
     values: InitialValues,
     formikHelpers: FormikHelpers<InitialValues>
   ) => void
 }
 
 type UpsertProjectDialogProps = ProjectDialogProps &
-  (CreateProjectDialogProps | EditProjectDialogProps)
+  (InsertProjectDialogProps | UpdateProjectDialogProps)
 
 const UpsertProjectDialog = ({
-  project,
   loading = false,
   onClose,
   onCancel = onClose as MouseEventHandler<HTMLButtonElement> | undefined,
@@ -45,16 +44,22 @@ const UpsertProjectDialog = ({
   <DraggableDialog
     {...props}
     onClose={onClose}
-    dialogTitle={props.mode === 'CREATE' ? 'Create project' : 'Edit project'}
+    dialogTitle={props.mode === 'insert' ? 'Create project' : 'Edit project'}
     dialogContent={
       <Stack spacing={3}>
         <Typography>
           Choose a name and description that best fit your project needs
         </Typography>
         <Formik
-          initialValues={initialValues(props.mode, project)}
+          initialValues={match(props)
+            .with({ mode: 'insert' }, () => ({ name: '', description: '' }))
+            .with({ mode: 'update' }, (props) => ({
+              name: props.project.name,
+              description: props.project.description || '',
+            }))
+            .exhaustive()}
           validationSchema={validationSchema}
-          onSubmit={props.mode === 'CREATE' ? props.onCreate : props.onEdit}
+          onSubmit={props.mode === 'insert' ? props.onInsert : props.onUpdate}
         >
           {() => (
             <Form id='project'>

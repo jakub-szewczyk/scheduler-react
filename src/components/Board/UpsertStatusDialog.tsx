@@ -3,9 +3,8 @@ import { LoadingButton } from '@mui/lab'
 import { Button, Stack, Typography } from '@mui/material'
 import { Field, Form, Formik, FormikHelpers } from 'formik'
 import { TextField } from 'formik-mui'
-import { constant } from 'fp-ts/lib/function'
-import { cond, equals } from 'ramda'
 import { MouseEventHandler } from 'react'
+import { match } from 'ts-pattern'
 import DraggableDialog, {
   DraggableDialogProps,
 } from '../../layout/DraggableDialog/DraggableDialog'
@@ -27,108 +26,97 @@ interface StatusDialogProps extends DraggableDialogProps {
   onCancel?: MouseEventHandler<HTMLButtonElement> | undefined
 }
 
-interface CreateStatusDialogProps extends StatusDialogProps {
-  mode: 'CREATE'
+interface InsertStatusDialogProps extends StatusDialogProps {
+  mode: 'insert'
   statuses: Status[]
   onCreate: SubmitHandler
 }
 
-interface EditStatusDialogProps extends StatusDialogProps {
-  mode: 'EDIT'
+interface UpdateStatusDialogProps extends StatusDialogProps {
+  mode: 'update'
   status: Status
   statuses: Status[]
   onEdit: SubmitHandler
 }
 
 interface InsertBeforeStatusDialogProps extends StatusDialogProps {
-  mode: 'INSERT_BEFORE'
+  mode: 'insert_before'
   statuses: Status[]
   onInsertBefore: SubmitHandler
 }
 
 interface InsertAfterStatusDialogProps extends StatusDialogProps {
-  mode: 'INSERT_AFTER'
+  mode: 'insert_after'
   statuses: Status[]
   onInsertAfter: SubmitHandler
 }
 
 type UpsertStatusDialogProps =
-  | CreateStatusDialogProps
-  | EditStatusDialogProps
+  | InsertStatusDialogProps
+  | UpdateStatusDialogProps
   | InsertBeforeStatusDialogProps
   | InsertAfterStatusDialogProps
 
 const UpsertStatusDialog = ({
-  mode,
-  status,
-  statuses,
   loading = false,
-  onCreate,
-  onEdit,
-  onInsertBefore,
-  onInsertAfter,
   onClose,
   onCancel = onClose as MouseEventHandler<HTMLButtonElement> | undefined,
   ...props
-}: UpsertStatusDialogProps) => {
-  const onSubmit = cond([
-    [equals('CREATE'), constant(onCreate!)],
-    [equals('EDIT'), constant(onEdit!)],
-    [equals('INSERT_BEFORE'), constant(onInsertBefore!)],
-    [equals('INSERT_AFTER'), constant(onInsertAfter!)],
-  ])
-
-  return (
-    <DraggableDialog
-      {...props}
-      onClose={onClose}
-      dialogTitle={mode === 'EDIT' ? 'Edit status' : 'Create status'}
-      dialogContent={
-        <Stack spacing={3}>
-          <Typography>Choose a title for your status</Typography>
-          <Formik
-            initialValues={{
-              title: mode === 'EDIT' ? status.title : '',
-            }}
-            validationSchema={upsertStatusValidationSchema(
-              mode,
-              status,
-              statuses
-            )}
-            onSubmit={onSubmit(mode)}
-          >
-            {() => (
-              <Form id='status'>
-                <Field
-                  component={TextField}
-                  name='title'
-                  size='small'
-                  label='Title'
-                  helperText='Set status title'
-                  fullWidth
-                />
-              </Form>
-            )}
-          </Formik>
-        </Stack>
-      }
-      dialogActions={
-        <>
-          <Button variant='outlined' onClick={onCancel}>
-            Cancel
-          </Button>
-          <LoadingButton
-            type='submit'
-            form='status'
-            variant='outlined'
-            loading={loading}
-          >
-            Save
-          </LoadingButton>
-        </>
-      }
-    />
-  )
-}
+}: UpsertStatusDialogProps) => (
+  <DraggableDialog
+    {...props}
+    onClose={onClose}
+    dialogTitle={props.mode === 'update' ? 'Edit status' : 'Create status'}
+    dialogContent={
+      <Stack spacing={3}>
+        <Typography>Choose a title for your status</Typography>
+        <Formik
+          initialValues={{
+            title: props.mode === 'update' ? props.status.title : '',
+          }}
+          validationSchema={upsertStatusValidationSchema(
+            props.mode,
+            props.status,
+            props.statuses
+          )}
+          onSubmit={match(props)
+            .with({ mode: 'insert' }, (props) => props.onCreate)
+            .with({ mode: 'update' }, (props) => props.onEdit)
+            .with({ mode: 'insert_before' }, (props) => props.onInsertBefore)
+            .with({ mode: 'insert_after' }, (props) => props.onInsertAfter)
+            .exhaustive()}
+        >
+          {() => (
+            <Form id='status'>
+              <Field
+                component={TextField}
+                name='title'
+                size='small'
+                label='Title'
+                helperText='Set status title'
+                fullWidth
+              />
+            </Form>
+          )}
+        </Formik>
+      </Stack>
+    }
+    dialogActions={
+      <>
+        <Button variant='outlined' onClick={onCancel}>
+          Cancel
+        </Button>
+        <LoadingButton
+          type='submit'
+          form='status'
+          variant='outlined'
+          loading={loading}
+        >
+          Save
+        </LoadingButton>
+      </>
+    }
+  />
+)
 
 export default UpsertStatusDialog

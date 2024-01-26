@@ -9,19 +9,15 @@ interface UpdateBoardStatusesPayload {
     id?: string
     issues: (Pick<Issue, 'title' | 'content'> & { id?: string })[]
   })[]
-  token: string | null
 }
 
 export const updateBoardStatuses = ({
   projectId,
   boardId,
   statuses,
-  token,
 }: UpdateBoardStatusesPayload) =>
   api
-    .put(`/projects/${projectId}/boards/${boardId}/statuses`, statuses, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    .put(`/projects/${projectId}/boards/${boardId}/statuses`, statuses)
     .then(({ data }) => data)
 
 interface UpdateBoardStatusPayload {
@@ -29,7 +25,6 @@ interface UpdateBoardStatusPayload {
   boardId: string
   statusId: string
   title: Status['title']
-  token: string | null
 }
 
 export const updateBoardStatus = ({
@@ -37,14 +32,10 @@ export const updateBoardStatus = ({
   boardId,
   statusId,
   title,
-  token,
 }: UpdateBoardStatusPayload) =>
   api
     .patch<Status>(
       `/projects/${projectId}/boards/${boardId}/statuses/${statusId}`,
-      { title },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
+      { title }
     )
     .then(({ data }) => data)

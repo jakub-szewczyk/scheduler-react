@@ -1,54 +1,65 @@
 import { updateSchedule } from '@/services/schedule'
 import { InitialValues, Schedule } from '@/types/schedule'
-import { useAuth } from '@clerk/clerk-react'
 import EditIcon from '@mui/icons-material/Edit'
 import { IconButton, Stack, Typography } from '@mui/material'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { FormikHelpers } from 'formik'
-import { useBoolean, useReadLocalStorage } from 'usehooks-ts'
+import { useParams } from 'react-router-dom'
+import { useBoolean } from 'usehooks-ts'
 import UpsertScheduleDialog from './UpsertScheduleDialog'
+
+type Params = {
+  projectId: string
+  scheduleId: string
+}
 
 interface ScheduleHeaderProps {
   schedule: Schedule
 }
 
 const ScheduleHeader = ({ schedule }: ScheduleHeaderProps) => {
-  const selectedProjectId = useReadLocalStorage<string | null>(
-    'selectedProjectId'
-  )
-
   const {
     value: isEditScheduleDialogOpen,
     setFalse: closeEditScheduleDialog,
     setTrue: openEditScheduleDialog,
   } = useBoolean()
 
-  const { getToken } = useAuth()
+  const params = useParams<Params>()
 
   const queryClient = useQueryClient()
 
   const { mutate: updateScheduleMutation, isLoading: isScheduleUpdating } =
     useMutation(updateSchedule, {
-      onSuccess: () => {
-        queryClient.invalidateQueries([
-          'projects',
-          selectedProjectId,
-          'schedules',
+      onSuccess: async () => {
+        await Promise.all([
+          queryClient.invalidateQueries([
+            'projects',
+            params.projectId,
+            'schedules',
+          ]),
+          queryClient.invalidateQueries([
+            'infinite',
+            'projects',
+            params.projectId,
+            'schedules',
+          ]),
         ])
         closeEditScheduleDialog()
       },
     })
 
-  const handleScheduleEdit = async (
+  const handleScheduleEdit = (
     values: InitialValues,
-    formikHelpers: FormikHelpers<InitialValues>
+    { setSubmitting }: FormikHelpers<InitialValues>
   ) =>
-    updateScheduleMutation({
-      projectId: selectedProjectId!,
-      scheduleId: schedule.id,
-      name: values.name,
-      token: await getToken(),
-    })
+    updateScheduleMutation(
+      {
+        projectId: params.projectId!,
+        scheduleId: schedule.id,
+        name: values.name,
+      },
+      { onSettled: () => setSubmitting(false) }
+    )
 
   return (
     <>
@@ -72,7 +83,7 @@ const ScheduleHeader = ({ schedule }: ScheduleHeaderProps) => {
         </Typography>
       </Stack>
       <UpsertScheduleDialog
-        mode='EDIT'
+        mode='update'
         open={isEditScheduleDialogOpen}
         onClose={closeEditScheduleDialog}
         schedule={schedule}

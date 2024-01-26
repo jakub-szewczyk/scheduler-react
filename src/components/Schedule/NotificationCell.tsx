@@ -17,6 +17,7 @@ interface NotificationCellProps extends GridRenderCellParams<any, Row> {
   setRows: Updater<Row[]>
 }
 
+// TODO: Improve notification functionality
 const NotificationCell = ({ id, row, setRows }: NotificationCellProps) => {
   const {
     value: isNotificationDialogOpen,
@@ -31,34 +32,34 @@ const NotificationCell = ({ id, row, setRows }: NotificationCellProps) => {
   const handleNotificationIconButtonClick:
     | MouseEventHandler<HTMLButtonElement>
     | undefined = async () => {
-    try {
-      await NOTIFICATION.subscribe(await getToken())
-      setRows((rows) => {
-        const row = rows.find((row) => row.id === id)!
-        row.notification = {
-          time:
-            row.notification?.time ||
-            new Date(row.starts as string).toISOString(),
-          active: !row.notification?.active,
-          title: row.notification?.title || '',
-        }
-      })
-    } catch (error) {
-      openSnackbar({ message: (error as Error).message, severity: 'warning' })
+      try {
+        await NOTIFICATION.subscribe(await getToken())
+        setRows((rows) => {
+          const row = rows.find((row) => row.id === id)!
+          row.notification = {
+            time:
+              row.notification?.time ||
+              new Date(row.starts as string).toISOString(),
+            active: !row.notification?.active,
+            title: row.notification?.title || '',
+          }
+        })
+      } catch (error) {
+        openSnackbar({ message: (error as Error).message, severity: 'warning' })
+      }
     }
-  }
 
   const handleNotificationIconButtonContextMenu:
     | MouseEventHandler<HTMLButtonElement>
     | undefined = async (event) => {
-    event.preventDefault()
-    openNotificationDialog()
-    try {
-      await NOTIFICATION.subscribe(await getToken())
-    } catch (error) {
-      openSnackbar({ message: (error as Error).message, severity: 'warning' })
+      event.preventDefault()
+      openNotificationDialog()
+      try {
+        await NOTIFICATION.subscribe(await getToken())
+      } catch (error) {
+        openSnackbar({ message: (error as Error).message, severity: 'warning' })
+      }
     }
-  }
 
   const handleNotificationConfigurationSave = (
     values: NotificationConfiguration

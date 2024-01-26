@@ -1,7 +1,6 @@
 import DrawerItemSkeleton from '@/layout/DrawerItemSkeleton/DrawerItemSkeleton'
-import { getAllBoards } from '@/services/board'
-import { getAllProjects } from '@/services/project'
-import { useAuth } from '@clerk/clerk-react'
+import { BOARDS_PAGE_SIZE } from '@/modules/board'
+import { getBoards } from '@/services/board'
 import AddIcon from '@mui/icons-material/Add'
 import {
   Box,
@@ -12,10 +11,16 @@ import {
   Typography,
 } from '@mui/material'
 import List from '@mui/material/List'
-import { useQuery } from '@tanstack/react-query'
-import { MouseEventHandler } from 'react'
-import { useReadLocalStorage } from 'usehooks-ts'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { MouseEventHandler, useEffect, useRef } from 'react'
+import { useParams } from 'react-router-dom'
+import { useIntersectionObserver } from 'usehooks-ts'
 import BoardsDrawerItem from './BoardsDrawerItem'
+
+type Params = {
+  projectId: string
+  boardId: string
+}
 
 interface BoardsDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
   onCreate: MouseEventHandler<HTMLButtonElement> | undefined
@@ -23,33 +28,43 @@ interface BoardsDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
 }
 
 const BoardsDrawer = ({ onSelect, onCreate, ...props }: BoardsDrawerProps) => {
-  const selectedProjectId = useReadLocalStorage<string | null>(
-    'selectedProjectId'
-  )
-
-  const { getToken } = useAuth()
-
-  const { data: projects, isSuccess: isEachProjectFetchedSuccessfully } =
-    useQuery(['projects'], async () => getAllProjects(await getToken()))
+  const params = useParams<Params>()
 
   const {
     data: boards,
     isLoading: isEachBoardLoading,
     isSuccess: isEachBoardFetchedSuccessfully,
-  } = useQuery(
-    ['projects', selectedProjectId, 'boards'],
-    async () =>
-      getAllBoards({
-        projectId: selectedProjectId!,
-        token: await getToken(),
+    isFetchingNextPage: isFetchingNextBoardsPage,
+    hasNextPage: hasNextBoardsPage,
+    fetchNextPage: fetchNextBoardsPage,
+  } = useInfiniteQuery(
+    ['infinite', 'projects', params.projectId, 'boards'],
+    ({ pageParam = 0 }) =>
+      getBoards({
+        projectId: params.projectId!,
+        page: pageParam,
+        size: BOARDS_PAGE_SIZE,
       }),
     {
-      enabled:
-        !!selectedProjectId &&
-        isEachProjectFetchedSuccessfully &&
-        projects.map((project) => project.id).includes(selectedProjectId),
+      getNextPageParam: (lastPage) =>
+        lastPage.page < Math.ceil(lastPage.total / BOARDS_PAGE_SIZE) - 1
+          ? lastPage.page + 1
+          : undefined,
     }
   )
+
+  const ref = useRef<HTMLDivElement | null>(null)
+
+  const entry = useIntersectionObserver(ref, {
+    freezeOnceVisible: isFetchingNextBoardsPage,
+  })
+
+  /* FIXME:
+   * Fix null ref bug.
+   */
+  useEffect(() => {
+    entry?.isIntersecting && fetchNextBoardsPage()
+  }, [entry?.isIntersecting, fetchNextBoardsPage])
 
   return (
     <SwipeableDrawer
@@ -98,14 +113,17 @@ const BoardsDrawer = ({ onSelect, onCreate, ...props }: BoardsDrawerProps) => {
                 .fill(null)
                 .map((_, index) => <DrawerItemSkeleton key={index} />)}
             {isEachBoardFetchedSuccessfully &&
-              boards.map((board) => (
-                <BoardsDrawerItem
-                  key={board.name}
-                  board={board}
-                  boards={boards}
-                  onSelect={onSelect}
-                />
-              ))}
+              boards.pages.flatMap((page) =>
+                page.content.map((board) => (
+                  <BoardsDrawerItem
+                    key={board.name}
+                    board={board}
+                    boards={boards.pages.flatMap((page) => page.content)}
+                    onSelect={onSelect}
+                  />
+                ))
+              )}
+            {hasNextBoardsPage && <DrawerItemSkeleton ref={ref} />}
           </List>
         </Stack>
         <Box>

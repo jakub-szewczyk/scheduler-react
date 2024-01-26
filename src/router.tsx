@@ -27,6 +27,10 @@ const router = createBrowserRouter([
       },
       {
         path: '/',
+        element: <Navigate to='/projects' replace />,
+      },
+      {
+        path: '/projects',
         element: (
           <>
             <SignedIn>
@@ -39,7 +43,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: '/notes',
+        path: '/projects/:projectId/notes',
         element: (
           <>
             <SignedIn>
@@ -52,7 +56,20 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: '/boards',
+        path: '/projects/:projectId/notes/:noteId',
+        element: (
+          <>
+            <SignedIn>
+              <Notes />
+            </SignedIn>
+            <SignedOut>
+              <RedirectToSignIn />
+            </SignedOut>
+          </>
+        ),
+      },
+      {
+        path: '/projects/:projectId/boards',
         element: (
           <>
             <SignedIn>
@@ -65,7 +82,33 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: '/schedules',
+        path: '/projects/:projectId/boards/:boardId',
+        element: (
+          <>
+            <SignedIn>
+              <Boards />
+            </SignedIn>
+            <SignedOut>
+              <RedirectToSignIn />
+            </SignedOut>
+          </>
+        ),
+      },
+      {
+        path: '/projects/:projectId/schedules',
+        element: (
+          <>
+            <SignedIn>
+              <Schedules />
+            </SignedIn>
+            <SignedOut>
+              <RedirectToSignIn />
+            </SignedOut>
+          </>
+        ),
+      },
+      {
+        path: '/projects/:projectId/schedules/:scheduleId',
         element: (
           <>
             <SignedIn>

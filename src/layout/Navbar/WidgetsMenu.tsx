@@ -1,7 +1,6 @@
+import AppsIcon from '@mui/icons-material/Apps'
+import PendingActionsIcon from '@mui/icons-material/PendingActions'
 import StickyNote2Icon from '@mui/icons-material/StickyNote2'
-import ViewKanbanIcon from '@mui/icons-material/ViewKanban'
-import ViewListIcon from '@mui/icons-material/ViewList'
-import WidgetsIcon from '@mui/icons-material/Widgets'
 import {
   IconButton,
   IconButtonProps,
@@ -11,7 +10,15 @@ import {
   MenuItem,
 } from '@mui/material'
 import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { PostIconWhite } from '../PostIcon/PostIcon.styled'
+
+type Params = {
+  projectId: string
+  scheduleId: string
+  boardId: string
+  noteId: string
+}
 
 interface WidgetsMenuProps {
   iconButtonProps?: IconButtonProps
@@ -20,22 +27,45 @@ interface WidgetsMenuProps {
 const WidgetsMenu = ({ iconButtonProps }: WidgetsMenuProps) => {
   const [menu, setMenu] = useState<HTMLElement | null>(null)
 
+  const [searchParams] = useSearchParams()
+
+  const params = useParams<Params>()
+
   const navigate = useNavigate()
 
-  const { pathname } = useLocation()
-
   const handleNotesMenuItemClick = () => {
-    navigate('/notes')
+    if (params.noteId) return setMenu(null)
+    navigate({
+      pathname: `/projects/${searchParams.get('projectId')}/notes`,
+      search: new URLSearchParams({
+        projectId: searchParams.get('projectId')!,
+        projectName: searchParams.get('projectName')!,
+      }).toString(),
+    })
     setMenu(null)
   }
 
   const handleBoardsMenuItemClick = () => {
-    navigate('/boards')
+    if (params.boardId) return setMenu(null)
+    navigate({
+      pathname: `/projects/${searchParams.get('projectId')}/boards`,
+      search: new URLSearchParams({
+        projectId: searchParams.get('projectId')!,
+        projectName: searchParams.get('projectName')!,
+      }).toString(),
+    })
     setMenu(null)
   }
 
   const handleSchedulesMenuItemClick = () => {
-    navigate('/schedules')
+    if (params.scheduleId) return setMenu(null)
+    navigate({
+      pathname: `/projects/${searchParams.get('projectId')}/schedules`,
+      search: new URLSearchParams({
+        projectId: searchParams.get('projectId')!,
+        projectName: searchParams.get('projectName')!,
+      }).toString(),
+    })
     setMenu(null)
   }
 
@@ -45,7 +75,7 @@ const WidgetsMenu = ({ iconButtonProps }: WidgetsMenuProps) => {
         onClick={(event) => setMenu(event.currentTarget)}
         {...iconButtonProps}
       >
-        <WidgetsIcon />
+        <AppsIcon />
       </IconButton>
       <Menu
         open={!!menu}
@@ -54,30 +84,27 @@ const WidgetsMenu = ({ iconButtonProps }: WidgetsMenuProps) => {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <MenuItem
-          selected={pathname === '/notes'}
-          onClick={handleNotesMenuItemClick}
-        >
+        <MenuItem selected={!!params.noteId} onClick={handleNotesMenuItemClick}>
           <ListItemIcon>
             <StickyNote2Icon fontSize='small' />
           </ListItemIcon>
           <ListItemText>Notes</ListItemText>
         </MenuItem>
         <MenuItem
-          selected={pathname === '/boards'}
+          selected={!!params.boardId}
           onClick={handleBoardsMenuItemClick}
         >
           <ListItemIcon>
-            <ViewKanbanIcon fontSize='small' />
+            <PostIconWhite style={{ marginLeft: 2 }} />
           </ListItemIcon>
           <ListItemText>Boards</ListItemText>
         </MenuItem>
         <MenuItem
-          selected={pathname === '/schedules'}
+          selected={!!params.scheduleId}
           onClick={handleSchedulesMenuItemClick}
         >
           <ListItemIcon>
-            <ViewListIcon fontSize='small' />
+            <PendingActionsIcon fontSize='small' />
           </ListItemIcon>
           <ListItemText>Schedules</ListItemText>
         </MenuItem>

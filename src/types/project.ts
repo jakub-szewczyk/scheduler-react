@@ -1,5 +1,3 @@
-import { initialValues } from '@/modules/project'
-
 export interface Project {
   id: string
   createdAt: string
@@ -7,4 +5,4 @@ export interface Project {
   description?: string | null
 }
 
-export type InitialValues = ReturnType<typeof initialValues>
+export type InitialValues = { name: string; description: string }

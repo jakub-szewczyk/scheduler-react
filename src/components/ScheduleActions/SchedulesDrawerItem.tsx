@@ -1,16 +1,21 @@
+import { deleteSchedule } from '@/services/schedule'
 import CloseIcon from '@mui/icons-material/Close'
-import ViewListIcon from '@mui/icons-material/ViewList'
+import PendingActionsIcon from '@mui/icons-material/PendingActions'
 import { Box, IconButton, ListItemButton, Stack, Tooltip } from '@mui/material'
 import Avatar from '@mui/material/Avatar'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
 import ListItemText from '@mui/material/ListItemText'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { formatDistanceToNow } from 'date-fns'
-import { useBoolean, useReadLocalStorage } from 'usehooks-ts'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useBoolean } from 'usehooks-ts'
 import { Schedule } from '../../types/schedule'
 import DeleteScheduleDialog from './DeleteScheduleDialog'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useAuth } from '@clerk/clerk-react'
-import { deleteSchedule } from '@/services/schedule'
+
+type Params = {
+  projectId: string
+  scheduleId: string
+}
 
 interface SchedulesDrawerItemProps {
   schedule: Pick<Schedule, 'id' | 'createdAt' | 'name'>
@@ -23,40 +28,57 @@ const SchedulesDrawerItem = ({
   schedules,
   onSelect,
 }: SchedulesDrawerItemProps) => {
-  const selectedProjectId = useReadLocalStorage<string | null>(
-    'selectedProjectId'
-  )
-
-  const selectedScheduleId = useReadLocalStorage<string | null>(
-    'selectedScheduleId'
-  )
-
   const {
     value: isDeleteScheduleDialogOpen,
     setFalse: closeDeleteScheduleDialog,
     setTrue: openDeleteScheduleDialog,
   } = useBoolean(false)
 
-  const { getToken } = useAuth()
+  const [searchParams] = useSearchParams()
+
+  const params = useParams<Params>()
+
+  const navigate = useNavigate()
 
   const queryClient = useQueryClient()
 
   const { mutate: deleteScheduleMutation, isLoading: isScheduleDeleting } =
     useMutation(deleteSchedule, {
-      onSuccess: () => {
-        queryClient.invalidateQueries(
-          ['projects', selectedProjectId, 'schedules'],
-          { exact: true }
-        )
+      onSuccess: async (schedule) => {
+        const isScheduleSelected = schedule.id === params.scheduleId
+        const index = schedules.findIndex(({ id }) => id === schedule.id)
+        if (isScheduleSelected && index === 0)
+          return navigate(
+            {
+              pathname: `/projects/${params.projectId}/schedules/${schedules[index + 1].id
+                }`,
+              search: searchParams.toString(),
+            },
+            { replace: true }
+          )
+        if (isScheduleSelected && index > 0)
+          return navigate(
+            {
+              pathname: `/projects/${params.projectId}/schedules/${schedules[index - 1].id
+                }`,
+              search: searchParams.toString(),
+            },
+            { replace: true }
+          )
+        await queryClient.invalidateQueries([
+          'infinite',
+          'projects',
+          params.projectId,
+          'schedules',
+        ])
         closeDeleteScheduleDialog()
       },
     })
 
-  const handleScheduleDelete = async (scheduleId: string) =>
+  const handleScheduleDelete = (scheduleId: string) =>
     deleteScheduleMutation({
-      projectId: selectedProjectId!,
+      projectId: params.projectId!,
       scheduleId,
-      token: await getToken(),
     })
 
   return (
@@ -66,12 +88,12 @@ const SchedulesDrawerItem = ({
           <ListItemAvatar>
             <Avatar
               sx={{
-                ...(schedule.id === selectedScheduleId && {
+                ...(schedule.id === params.scheduleId && {
                   bgcolor: (theme) => theme.palette.primary.main,
                 }),
               }}
             >
-              <ViewListIcon />
+              <PendingActionsIcon />
             </Avatar>
           </ListItemAvatar>
           <ListItemText

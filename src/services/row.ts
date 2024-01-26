@@ -8,17 +8,13 @@ interface UpdateScheduleRowsPayload {
     Row,
     'index' | 'starts' | 'ends' | 'room' | 'subject' | 'notification'
   >[]
-  token: string | null
 }
 
 export const updateScheduleRows = ({
   projectId,
   scheduleId,
   rows,
-  token,
 }: UpdateScheduleRowsPayload) =>
   api
-    .put<Row[]>(`/projects/${projectId}/schedules/${scheduleId}/rows`, rows, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    .put<Row[]>(`/projects/${projectId}/schedules/${scheduleId}/rows`, rows)
     .then(({ data }) => data)

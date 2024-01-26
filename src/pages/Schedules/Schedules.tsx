@@ -1,74 +1,57 @@
 import { ProjectContainer } from '@/components/Project/styles/Project.styles'
-import { getAllProjects } from '@/services/project'
-import { getAllSchedules, getSchedule } from '@/services/schedule'
+import { getSchedule, getSchedules } from '@/services/schedule'
 import { Row } from '@/types/row'
-import { useAuth } from '@clerk/clerk-react'
 import { Box, CircularProgress, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useImmer } from 'use-immer'
-import { useLocalStorage, useReadLocalStorage } from 'usehooks-ts'
 import Schedule from '../../components/Schedule/Schedule'
 import ScheduleActions from '../../components/ScheduleActions/ScheduleActions'
+
+type Params = {
+  projectId: string
+  scheduleId: string
+}
 
 const Schedules = () => {
   const [rows, setRows] = useImmer<Row[]>([])
 
-  const selectedProjectId = useReadLocalStorage<string | null>(
-    'selectedProjectId'
+  const [searchParams] = useSearchParams()
+
+  const params = useParams<Params>()
+
+  const navigate = useNavigate()
+
+  useQuery(
+    ['projects', params.projectId, 'schedules'],
+    () => getSchedules({ projectId: params.projectId! }),
+    {
+      enabled: !params.scheduleId,
+      onSuccess: (schedules) =>
+        !params.scheduleId &&
+        navigate(
+          {
+            pathname: `/projects/${params.projectId}/schedules/${schedules.content[0].id}`,
+            search: searchParams.toString(),
+          },
+          { replace: true }
+        ),
+    }
   )
-
-  const [selectedScheduleId, setSelectedScheduleId] = useLocalStorage<
-    string | null
-  >('selectedScheduleId', null)
-
-  const { getToken } = useAuth()
-
-  const { data: projects, isSuccess: isEachProjectFetchedSuccessfully } =
-    useQuery(['projects'], async () => getAllProjects(await getToken()))
-
-  const { data: schedules, isSuccess: isEachScheduleFetchedSuccessfully } =
-    useQuery(
-      ['projects', selectedProjectId, 'schedules'],
-      async () =>
-        getAllSchedules({
-          projectId: selectedProjectId!,
-          token: await getToken(),
-        }),
-      {
-        enabled:
-          !!selectedProjectId &&
-          isEachProjectFetchedSuccessfully &&
-          projects.map((project) => project.id).includes(selectedProjectId),
-        onSuccess: (schedules) => {
-          if (
-            selectedScheduleId &&
-            schedules
-              .map((schedule) => schedule.id)
-              .includes(selectedScheduleId)
-          )
-            return
-          setSelectedScheduleId(schedules[0].id)
-        },
-      }
-    )
 
   const {
     data: schedule,
     isLoading: isScheduleLoading,
-    isError: isScheduleFetchedWithError,
+    isError: isScheduleFetchedUnsuccessfully,
   } = useQuery(
-    ['projects', selectedProjectId, 'schedules', selectedScheduleId],
-    async () =>
+    ['projects', params.projectId, 'schedules', params.scheduleId],
+    () =>
       getSchedule({
-        projectId: selectedProjectId!,
-        scheduleId: selectedScheduleId!,
-        token: await getToken(),
+        projectId: params.projectId!,
+        scheduleId: params.scheduleId!,
       }),
     {
-      enabled:
-        !!selectedScheduleId &&
-        isEachScheduleFetchedSuccessfully &&
-        schedules.map((schedule) => schedule.id).includes(selectedScheduleId),
+      enabled: !!params.scheduleId,
       select: (schedule) => ({
         ...schedule,
         rows: schedule.rows.map((row) => ({
@@ -85,10 +68,6 @@ const Schedules = () => {
     }
   )
 
-  /**
-   * TODO:
-   * Test loading and error states.
-   */
   if (isScheduleLoading || rows.length === 0)
     return (
       <Box
@@ -103,7 +82,11 @@ const Schedules = () => {
       </Box>
     )
 
-  if (isScheduleFetchedWithError)
+  /**
+   * TODO:
+   * Improve error display.
+   */
+  if (isScheduleFetchedUnsuccessfully)
     return (
       <ProjectContainer>
         <Typography color='error'>

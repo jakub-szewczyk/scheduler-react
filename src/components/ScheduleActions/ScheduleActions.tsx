@@ -1,33 +1,29 @@
 import { exportToXLSX } from '@/modules/schedule'
 import { createSchedule, updateSchedule } from '@/services/schedule'
 import { InitialValues, Schedule } from '@/types/schedule'
-import { useAuth } from '@clerk/clerk-react'
 import DownloadIcon from '@mui/icons-material/Download'
 import EditIcon from '@mui/icons-material/Edit'
+import PendingActionsIcon from '@mui/icons-material/PendingActions'
 import PrintIcon from '@mui/icons-material/Print'
-import ViewListIcon from '@mui/icons-material/ViewList'
 import { SpeedDial, SpeedDialAction } from '@mui/material'
 import SpeedDialIcon from '@mui/material/SpeedDialIcon'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { FormikHelpers } from 'formik'
-import { useBoolean, useLocalStorage, useReadLocalStorage } from 'usehooks-ts'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useBoolean } from 'usehooks-ts'
 import UpsertScheduleDialog from '../Schedule/UpsertScheduleDialog'
 import SchedulesDrawer from './SchedulesDrawer'
+
+type Params = {
+  projectId: string
+  scheduleId: string
+}
 
 interface ScheduleActionsProps {
   schedule: Schedule
 }
 
 const ScheduleActions = ({ schedule }: ScheduleActionsProps) => {
-  const selectedProjectId = useReadLocalStorage<string | null>(
-    'selectedProjectId'
-  )
-
-  const [, setSelectedScheduleId] = useLocalStorage<string | null>(
-    'selectedScheduleId',
-    null
-  )
-
   const {
     value: isSchedulesDrawerOpen,
     setFalse: closeSchedulesDrawer,
@@ -46,59 +42,77 @@ const ScheduleActions = ({ schedule }: ScheduleActionsProps) => {
     setTrue: openEditScheduleDialog,
   } = useBoolean()
 
-  const { getToken } = useAuth()
+  const [searchParams] = useSearchParams()
+
+  const params = useParams<Params>()
+
+  const navigate = useNavigate()
 
   const queryClient = useQueryClient()
 
   const { mutate: createScheduleMutation, isLoading: isScheduleCreating } =
     useMutation(createSchedule, {
-      onSuccess: ({ id }) => {
-        queryClient.invalidateQueries(
-          ['projects', selectedProjectId, 'schedules'],
-          { exact: true }
-        )
-        setSelectedScheduleId(id)
+      onSuccess: (schedule) => {
+        navigate({
+          pathname: `/projects/${params.projectId}/schedules/${schedule.id}`,
+          search: searchParams.toString(),
+        })
         closeCreateScheduleDialog()
       },
     })
 
   const { mutate: updateScheduleMutation, isLoading: isScheduleUpdating } =
     useMutation(updateSchedule, {
-      onSuccess: () => {
-        queryClient.invalidateQueries([
-          'projects',
-          selectedProjectId,
-          'schedules',
+      onSuccess: async () => {
+        await Promise.all([
+          queryClient.invalidateQueries([
+            'projects',
+            params.projectId,
+            'schedules',
+          ]),
+          queryClient.invalidateQueries([
+            'infinite',
+            'projects',
+            params.projectId,
+            'schedules',
+          ]),
         ])
         closeEditScheduleDialog()
       },
     })
 
   const handleScheduleSelect = (scheduleId: string) => {
-    setSelectedScheduleId(scheduleId)
+    navigate({
+      pathname: `/projects/${params.projectId}/schedules/${scheduleId}`,
+      search: searchParams.toString(),
+    })
     closeSchedulesDrawer()
   }
 
-  const handleScheduleCreate = async (
+  const handleScheduleCreate = (
     values: InitialValues,
-    formikHelpers: FormikHelpers<InitialValues>
+    { setSubmitting }: FormikHelpers<InitialValues>
   ) =>
-    createScheduleMutation({
-      projectId: selectedProjectId!,
-      name: values.name,
-      token: await getToken(),
-    })
+    createScheduleMutation(
+      {
+        projectId: params.projectId!,
+        name: values.name,
+      },
+      { onSettled: () => setSubmitting(false) }
+    )
 
-  const handleScheduleEdit = async (
+  const handleScheduleEdit = (
     values: InitialValues,
-    formikHelpers: FormikHelpers<InitialValues>
+    { setSubmitting }: FormikHelpers<InitialValues>
   ) =>
-    updateScheduleMutation({
-      projectId: selectedProjectId!,
-      scheduleId: schedule.id,
-      name: values.name,
-      token: await getToken(),
-    })
+    updateScheduleMutation(
+      {
+        projectId: params.projectId!,
+        scheduleId: schedule.id,
+        name: values.name,
+      },
+      { onSettled: () => setSubmitting(false) }
+    )
 
   return (
     <>
@@ -128,7 +142,7 @@ const ScheduleActions = ({ schedule }: ScheduleActionsProps) => {
         />
         <SpeedDialAction
           tooltipTitle='Schedules'
-          icon={<ViewListIcon />}
+          icon={<PendingActionsIcon />}
           onClick={openSchedulesDrawer}
         />
       </SpeedDial>
@@ -140,7 +154,7 @@ const ScheduleActions = ({ schedule }: ScheduleActionsProps) => {
         onCreate={openCreateScheduleDialog}
       />
       <UpsertScheduleDialog
-        mode='CREATE'
+        mode='insert'
         open={isCreateScheduleDialogOpen}
         onClose={closeCreateScheduleDialog}
         schedule={schedule}
@@ -148,7 +162,7 @@ const ScheduleActions = ({ schedule }: ScheduleActionsProps) => {
         onCreate={handleScheduleCreate}
       />
       <UpsertScheduleDialog
-        mode='EDIT'
+        mode='update'
         open={isEditScheduleDialogOpen}
         onClose={closeEditScheduleDialog}
         schedule={schedule}

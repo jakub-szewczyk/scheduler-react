@@ -2,15 +2,18 @@ import Note from '@/components/Note/Note'
 import NoteActions from '@/components/NoteActions/NoteActions'
 import { ProjectContainer } from '@/components/Project/styles/Project.styles'
 import { deserialize } from '@/modules/note'
-import { getAllNotes, getNote } from '@/services/note'
-import { getAllProjects } from '@/services/project'
-import { useAuth } from '@clerk/clerk-react'
+import { getNote, getNotes } from '@/services/note'
 import { Box, CircularProgress, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { Editor, EditorState, RawDraftContentState } from 'draft-js'
 import { useRef } from 'react'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useImmer } from 'use-immer'
-import { useLocalStorage, useReadLocalStorage } from 'usehooks-ts'
+
+type Params = {
+  projectId: string
+  noteId: string
+}
 
 const Notes = () => {
   const editorRef = useRef<Editor>(null)
@@ -19,60 +22,38 @@ const Notes = () => {
     EditorState.createEmpty()
   )
 
-  const selectedProjectId = useReadLocalStorage<string | null>(
-    'selectedProjectId'
-  )
+  const [searchParams] = useSearchParams()
 
-  const [selectedNoteId, setSelectedNoteId] = useLocalStorage<string | null>(
-    'selectedNoteId',
-    null
-  )
+  const params = useParams<Params>()
 
-  const { getToken } = useAuth()
+  const navigate = useNavigate()
 
-  const { data: projects, isSuccess: isEachProjectFetchedSuccessfully } =
-    useQuery(['projects'], async () => getAllProjects(await getToken()))
-
-  const { data: notes, isSuccess: isEachNoteFetchedSuccessfully } = useQuery(
-    ['projects', selectedProjectId, 'notes'],
-    async () =>
-      getAllNotes({
-        projectId: selectedProjectId!,
-        token: await getToken(),
-      }),
+  useQuery(
+    ['projects', params.projectId, 'notes'],
+    () => getNotes({ projectId: params.projectId! }),
     {
-      enabled:
-        !!selectedProjectId &&
-        isEachProjectFetchedSuccessfully &&
-        projects.map((project) => project.id).includes(selectedProjectId),
-      onSuccess: (notes) => {
-        if (
-          selectedNoteId &&
-          notes.map((note) => note.id).includes(selectedNoteId)
-        )
-          return
-        setSelectedNoteId(notes[0].id)
-      },
+      enabled: !params.noteId,
+      onSuccess: (notes) =>
+        !params.noteId &&
+        navigate(
+          {
+            pathname: `/projects/${params.projectId}/notes/${notes.content[0].id}`,
+            search: searchParams.toString(),
+          },
+          { replace: true }
+        ),
     }
   )
 
   const {
     data: note,
     isLoading: isNoteLoading,
-    isError: isNoteFetchedWithError,
+    isError: isNoteFetchedUnsuccessfully,
   } = useQuery(
-    ['projects', selectedProjectId, 'notes', selectedNoteId],
-    async () =>
-      getNote({
-        projectId: selectedProjectId!,
-        noteId: selectedNoteId!,
-        token: await getToken(),
-      }),
+    ['projects', params.projectId, 'notes', params.noteId],
+    () => getNote({ projectId: params.projectId!, noteId: params.noteId! }),
     {
-      enabled:
-        !!selectedNoteId &&
-        isEachNoteFetchedSuccessfully &&
-        notes.map((note) => note.id).includes(selectedNoteId),
+      enabled: !!params.noteId,
       select: (note) => ({
         ...note,
         editorState: deserialize(note.editorState as RawDraftContentState),
@@ -99,7 +80,7 @@ const Notes = () => {
       </Box>
     )
 
-  if (isNoteFetchedWithError)
+  if (isNoteFetchedUnsuccessfully)
     return (
       <ProjectContainer>
         <Typography color='error'>

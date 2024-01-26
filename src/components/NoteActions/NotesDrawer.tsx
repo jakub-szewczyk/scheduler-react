@@ -1,7 +1,6 @@
 import DrawerItemSkeleton from '@/layout/DrawerItemSkeleton/DrawerItemSkeleton'
-import { getAllNotes } from '@/services/note'
-import { getAllProjects } from '@/services/project'
-import { useAuth } from '@clerk/clerk-react'
+import { NOTES_PAGE_SIZE } from '@/modules/note'
+import { getNotes } from '@/services/note'
 import AddIcon from '@mui/icons-material/Add'
 import {
   Box,
@@ -12,10 +11,16 @@ import {
   Typography,
 } from '@mui/material'
 import List from '@mui/material/List'
-import { useQuery } from '@tanstack/react-query'
-import { MouseEventHandler } from 'react'
-import { useReadLocalStorage } from 'usehooks-ts'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { MouseEventHandler, useEffect, useRef } from 'react'
+import { useParams } from 'react-router-dom'
+import { useIntersectionObserver } from 'usehooks-ts'
 import NotesDrawerItem from './NotesDrawerItem'
+
+type Params = {
+  projectId: string
+  boardId: string
+}
 
 interface NotesDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
   onCreate: MouseEventHandler<HTMLButtonElement> | undefined
@@ -23,33 +28,43 @@ interface NotesDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
 }
 
 const NotesDrawer = ({ onCreate, onSelect, ...props }: NotesDrawerProps) => {
-  const selectedProjectId = useReadLocalStorage<string | null>(
-    'selectedProjectId'
-  )
-
-  const { getToken } = useAuth()
-
-  const { data: projects, isSuccess: isEachProjectFetchedSuccessfully } =
-    useQuery(['projects'], async () => getAllProjects(await getToken()))
+  const params = useParams<Params>()
 
   const {
     data: notes,
     isLoading: isEachNoteLoading,
     isSuccess: isEachNoteFetchedSuccessfully,
-  } = useQuery(
-    ['projects', selectedProjectId, 'notes'],
-    async () =>
-      getAllNotes({
-        projectId: selectedProjectId!,
-        token: await getToken(),
+    isFetchingNextPage: isFetchingNextNotesPage,
+    hasNextPage: hasNextNotesPage,
+    fetchNextPage: fetchNextNotesPage,
+  } = useInfiniteQuery(
+    ['infinite', 'projects', params.projectId, 'notes'],
+    ({ pageParam = 0 }) =>
+      getNotes({
+        projectId: params.projectId!,
+        page: pageParam,
+        size: NOTES_PAGE_SIZE,
       }),
     {
-      enabled:
-        !!selectedProjectId &&
-        isEachProjectFetchedSuccessfully &&
-        projects.map((project) => project.id).includes(selectedProjectId),
+      getNextPageParam: (lastPage) =>
+        lastPage.page < Math.ceil(lastPage.total / NOTES_PAGE_SIZE) - 1
+          ? lastPage.page + 1
+          : undefined,
     }
   )
+
+  const ref = useRef<HTMLDivElement | null>(null)
+
+  const entry = useIntersectionObserver(ref, {
+    freezeOnceVisible: isFetchingNextNotesPage,
+  })
+
+  /* FIXME:
+   * Fix null ref bug.
+   */
+  useEffect(() => {
+    entry?.isIntersecting && fetchNextNotesPage()
+  }, [entry?.isIntersecting, fetchNextNotesPage])
 
   return (
     <SwipeableDrawer
@@ -98,14 +113,17 @@ const NotesDrawer = ({ onCreate, onSelect, ...props }: NotesDrawerProps) => {
                 .fill(null)
                 .map((_, index) => <DrawerItemSkeleton key={index} />)}
             {isEachNoteFetchedSuccessfully &&
-              notes.map((note) => (
-                <NotesDrawerItem
-                  key={note.id}
-                  note={note}
-                  notes={notes}
-                  onSelect={onSelect}
-                />
-              ))}
+              notes.pages.flatMap((page) =>
+                page.content.map((note) => (
+                  <NotesDrawerItem
+                    key={note.id}
+                    note={note}
+                    notes={notes.pages.flatMap((page) => page.content)}
+                    onSelect={onSelect}
+                  />
+                ))
+              )}
+            {hasNextNotesPage && <DrawerItemSkeleton ref={ref} />}
           </List>
         </Stack>
         <Box>

@@ -7,7 +7,7 @@ export interface Issue {
 export type UpsertedIssue = Omit<Issue, 'id'> & { id?: string }
 
 export type UpsertIssueDialogMode =
-  | 'CREATE'
-  | 'EDIT'
-  | 'INSERT_ABOVE'
-  | 'INSERT_BELOW'
+  | 'insert'
+  | 'update'
+  | 'insert_above'
+  | 'insert_below'

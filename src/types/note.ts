@@ -1,4 +1,3 @@
-import { initialValues } from '@/modules/note'
 import { EditorState, RawDraftContentState } from 'draft-js'
 
 export interface Note {
@@ -8,7 +7,7 @@ export interface Note {
   editorState: EditorState | RawDraftContentState
 }
 
-export type InitialValues = ReturnType<typeof initialValues>
+export type InitialValues = { name: string }
 
 export type DraftBlockStyleType =
   | 'unstyled'

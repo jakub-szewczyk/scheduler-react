@@ -1,6 +1,5 @@
 import { createProject, deleteProject, updateProject } from '@/services/project'
 import { InitialValues, Project } from '@/types/project'
-import { useAuth } from '@clerk/clerk-react'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
@@ -18,22 +17,31 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { formatDistanceToNow } from 'date-fns'
 import { FormikHelpers } from 'formik'
 import { MouseEventHandler } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useBoolean, useLocalStorage } from 'usehooks-ts'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useBoolean } from 'usehooks-ts'
 import DeleteProjectDialog from './DeleteProjectDialog'
 import UpsertProjectDialog from './UpsertProjectDialog'
 
 interface ProjectItemProps {
   project: Project
-  projects: Project[]
+  disableDelete?: boolean
+  onAfterCreate?: () => void
+  onAfterUpdate?: () => void
+  onAfterDelete?: (project: Project) => void
 }
 
-const ProjectItem = ({ project, projects }: ProjectItemProps) => {
-  const [selectedProjectId, setSelectedProjectId] = useLocalStorage<
-    string | null
-  >('selectedProjectId', null)
+const ProjectItem = ({
+  project,
+  disableDelete,
+  onAfterCreate,
+  onAfterUpdate,
+  onAfterDelete,
+}: ProjectItemProps) => {
+  const [searchParams, setSearchParams] = useSearchParams()
 
-  const isProjectSelected = project.id === selectedProjectId
+  const navigate = useNavigate()
+
+  const isProjectSelected = project.id === searchParams.get('projectId')
 
   const {
     value: isCreateProjectDialogOpen,
@@ -53,72 +61,97 @@ const ProjectItem = ({ project, projects }: ProjectItemProps) => {
     setTrue: openDeleteProjectDialog,
   } = useBoolean()
 
-  const navigate = useNavigate()
-
-  const { getToken } = useAuth()
-
   const queryClient = useQueryClient()
 
   const { mutate: createProjectMutation, isLoading: isCreatingProject } =
-    useMutation(
-      async (data: Pick<Project, 'name' | 'description'>) =>
-        createProject(await getToken(), data),
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries(['projects'], { exact: true })
-          closeCreateProjectDialog()
-        },
-      }
-    )
+    useMutation(createProject, {
+      onSuccess: async (project) => {
+        await Promise.all([
+          queryClient.invalidateQueries(['infinite']),
+          queryClient.invalidateQueries(['projects']),
+        ])
+        closeCreateProjectDialog()
+        setSearchParams(
+          (searchParams) => ({
+            ...Object.fromEntries(searchParams),
+            projectId: project.id,
+            projectName: project.name,
+            page: '0',
+          }),
+          { replace: +searchParams.get('page')! === 0 }
+        )
+        onAfterCreate?.()
+      },
+    })
 
   const { mutate: updateProjectMutation, isLoading: isUpdatingProject } =
-    useMutation(
-      async (data: Pick<Project, 'id' | 'name' | 'description'>) =>
-        updateProject(await getToken(), data),
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries(['projects'], { exact: true })
-          closeEditProjectDialog()
-        },
-      }
-    )
+    useMutation(updateProject, {
+      onSuccess: async () => {
+        await Promise.all([
+          queryClient.invalidateQueries(['infinite']),
+          queryClient.invalidateQueries(['projects']),
+        ])
+        closeEditProjectDialog()
+        setSearchParams(
+          (searchParams) => ({
+            ...Object.fromEntries(searchParams),
+            projectName: project.name,
+          }),
+          { replace: true }
+        )
+        onAfterUpdate?.()
+      },
+    })
 
   const { mutate: deleteProjectMutation, isLoading: isDeletingProject } =
-    useMutation(
-      async (data: Pick<Project, 'id'>) =>
-        deleteProject(await getToken(), data),
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries(['projects'], { exact: true })
-          closeDeleteProjectDialog()
-        },
-      }
-    )
+    useMutation(deleteProject, {
+      onSuccess: async (project) => {
+        await Promise.all([
+          queryClient.invalidateQueries(['infinite']),
+          queryClient.invalidateQueries(['projects']),
+        ])
+        closeDeleteProjectDialog()
+        onAfterDelete?.(project)
+      },
+    })
 
   const handleCreateIconButtonClick:
     | MouseEventHandler<HTMLButtonElement>
     | undefined = (event) => {
-    event.stopPropagation()
-    openCreateProjectDialog()
-  }
+      event.stopPropagation()
+      openCreateProjectDialog()
+    }
 
   const handleEditIconButtonClick:
     | MouseEventHandler<HTMLButtonElement>
     | undefined = (event) => {
-    event.stopPropagation()
-    openEditProjectDialog()
-  }
+      event.stopPropagation()
+      openEditProjectDialog()
+    }
 
   const handleDeleteIconButtonClick:
     | MouseEventHandler<HTMLButtonElement>
     | undefined = (event) => {
-    event.stopPropagation()
-    openDeleteProjectDialog()
-  }
+      event.stopPropagation()
+      openDeleteProjectDialog()
+    }
 
   const handleProjectSelect = () => {
-    setSelectedProjectId(project.id)
-    navigate('/schedules')
+    setSearchParams(
+      (searchParams) => ({
+        ...Object.fromEntries(searchParams),
+        projectId: project.id,
+        projectName: project.name,
+      }),
+      { replace: true }
+    )
+    navigate(
+      `/projects/${project.id}/schedules?${new URLSearchParams({
+        ...Object.fromEntries(searchParams),
+        projectId: project.id,
+        projectName: project.name,
+      })}`
+    )
   }
 
   const handleProjectCreate = (
@@ -229,21 +262,21 @@ const ProjectItem = ({ project, projects }: ProjectItemProps) => {
           </Box>
           <Tooltip
             placement='left'
-            title={projects.length === 1 && 'At least one project is required'}
+            title={disableDelete && 'At least one project is required'}
           >
             <Box
               onClick={(event) => isCreatingProject && event.stopPropagation()}
             >
               <IconButton
                 size='small'
-                disabled={projects.length === 1}
+                disabled={disableDelete}
                 onClick={handleDeleteIconButtonClick}
                 sx={{
                   '.MuiSvgIcon-root': {
                     ...(isProjectSelected &&
-                      projects.length === 1 && {
-                        fill: 'rgba(0, 0, 0, 0.3)',
-                      }),
+                      disableDelete && {
+                      fill: 'rgba(0, 0, 0, 0.3)',
+                    }),
                   },
                 }}
               >
@@ -254,20 +287,19 @@ const ProjectItem = ({ project, projects }: ProjectItemProps) => {
         </CardActions>
       </Card>
       <UpsertProjectDialog
-        mode='CREATE'
+        mode='insert'
         open={isCreateProjectDialogOpen}
         onClose={closeCreateProjectDialog}
-        project={project}
         loading={isCreatingProject}
-        onCreate={handleProjectCreate}
+        onInsert={handleProjectCreate}
       />
       <UpsertProjectDialog
-        mode='EDIT'
+        mode='update'
         open={isEditProjectDialogOpen}
         onClose={closeEditProjectDialog}
         project={project}
         loading={isUpdatingProject}
-        onEdit={handleProjectEdit}
+        onUpdate={handleProjectEdit}
       />
       <DeleteProjectDialog
         open={isDeleteProjectDialogOpen}

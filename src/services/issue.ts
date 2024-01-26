@@ -8,7 +8,6 @@ interface UpdateBoardIssuePayload {
   issueId: string
   title: Issue['title']
   content: Issue['content']
-  token: string | null
 }
 
 export const updateBoardIssue = ({
@@ -18,14 +17,10 @@ export const updateBoardIssue = ({
   issueId,
   title,
   content,
-  token,
 }: UpdateBoardIssuePayload) =>
   api
     .patch<Issue>(
       `/projects/${projectId}/boards/${boardId}/statuses/${statusId}/issues/${issueId}`,
-      { title, content },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
+      { title, content }
     )
     .then(({ data }) => data)
