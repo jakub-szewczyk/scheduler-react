@@ -4,14 +4,18 @@ import { PaginatedResponse } from '@/types/api'
 
 interface GetNotesParams {
   projectId: string
+  page?: number
+  size?: number
 }
 
 type GetNotesResponse = PaginatedResponse<
   Pick<Note, 'id' | 'createdAt' | 'name'>[]
 >
 
-export const getNotes = ({ projectId }: GetNotesParams) =>
-  api<GetNotesResponse>(`/projects/${projectId}/notes`).then(({ data }) => data)
+export const getNotes = ({ projectId, ...params }: GetNotesParams) =>
+  api<GetNotesResponse>(`/projects/${projectId}/notes`, { params }).then(
+    ({ data }) => data
+  )
 
 interface GetNoteParams {
   projectId: string

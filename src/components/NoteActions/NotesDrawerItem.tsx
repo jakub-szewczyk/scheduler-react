@@ -42,11 +42,6 @@ const NotesDrawerItem = ({ note, notes, onSelect }: NotesDrawerItemProps) => {
     deleteNote,
     {
       onSuccess: async () => {
-        await queryClient.invalidateQueries(
-          ['projects', params.projectId, 'notes'],
-          { exact: true }
-        )
-        closeDeleteNoteDialog()
         const isNoteSelected = note.id === params.noteId
         const index = notes.findIndex(({ id }) => id === note.id)
         if (isNoteSelected && index === 0)
@@ -67,6 +62,13 @@ const NotesDrawerItem = ({ note, notes, onSelect }: NotesDrawerItemProps) => {
             },
             { replace: true }
           )
+        await queryClient.invalidateQueries([
+          'infinite',
+          'projects',
+          params.projectId,
+          'notes',
+        ])
+        closeDeleteNoteDialog()
       },
     }
   )

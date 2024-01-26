@@ -56,11 +56,7 @@ const NoteActions = forwardRef<Editor, NoteActionsProps>(({ note }, ref) => {
   const { mutate: createNoteMutation, isLoading: isNoteCreating } = useMutation(
     createNote,
     {
-      onSuccess: async (note) => {
-        await queryClient.invalidateQueries(
-          ['projects', params.projectId, 'notes'],
-          { exact: true }
-        )
+      onSuccess: (note) => {
         navigate({
           pathname: `/projects/${params.projectId}/notes/${note.id}`,
           search: searchParams.toString(),
@@ -74,10 +70,18 @@ const NoteActions = forwardRef<Editor, NoteActionsProps>(({ note }, ref) => {
     updateNote,
     {
       onSuccess: async () => {
-        await queryClient.invalidateQueries([
-          'projects',
-          params.projectId,
-          'notes',
+        await Promise.all([
+          queryClient.invalidateQueries([
+            'projects',
+            params.projectId,
+            'notes',
+          ]),
+          queryClient.invalidateQueries([
+            'infinite',
+            'projects',
+            params.projectId,
+            'notes',
+          ]),
         ])
         closeEditNoteDialog()
       },
@@ -94,22 +98,28 @@ const NoteActions = forwardRef<Editor, NoteActionsProps>(({ note }, ref) => {
 
   const handleNoteCreate = (
     values: InitialValues,
-    _: FormikHelpers<InitialValues>
+    { setSubmitting }: FormikHelpers<InitialValues>
   ) =>
-    createNoteMutation({
-      projectId: params.projectId!,
-      name: values.name,
-    })
+    createNoteMutation(
+      {
+        projectId: params.projectId!,
+        name: values.name,
+      },
+      { onSettled: () => setSubmitting(false) }
+    )
 
   const handleNoteEdit = (
     values: InitialValues,
-    _: FormikHelpers<InitialValues>
+    { setSubmitting }: FormikHelpers<InitialValues>
   ) =>
-    updateNoteMutation({
-      projectId: params.projectId!,
-      noteId: note.id,
-      name: values.name,
-    })
+    updateNoteMutation(
+      {
+        projectId: params.projectId!,
+        noteId: note.id,
+        name: values.name,
+      },
+      { onSettled: () => setSubmitting(false) }
+    )
 
   return (
     <>
@@ -146,7 +156,7 @@ const NoteActions = forwardRef<Editor, NoteActionsProps>(({ note }, ref) => {
         onCreate={openCreateNoteDialog}
       />
       <UpsertNoteDialog
-        mode='CREATE'
+        mode='insert'
         open={isCreateNoteDialogOpen}
         onClose={closeCreateNoteDialog}
         note={note}
@@ -154,7 +164,7 @@ const NoteActions = forwardRef<Editor, NoteActionsProps>(({ note }, ref) => {
         onCreate={handleNoteCreate}
       />
       <UpsertNoteDialog
-        mode='EDIT'
+        mode='update'
         open={isEditNoteDialogOpen}
         onClose={closeEditNoteDialog}
         note={note}

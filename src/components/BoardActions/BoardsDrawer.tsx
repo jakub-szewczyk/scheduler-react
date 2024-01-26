@@ -1,4 +1,5 @@
 import DrawerItemSkeleton from '@/layout/DrawerItemSkeleton/DrawerItemSkeleton'
+import { BOARDS_PAGE_SIZE } from '@/modules/board'
 import { getBoards } from '@/services/board'
 import AddIcon from '@mui/icons-material/Add'
 import {
@@ -10,12 +11,11 @@ import {
   Typography,
 } from '@mui/material'
 import List from '@mui/material/List'
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import { MouseEventHandler, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
-import BoardsDrawerItem from './BoardsDrawerItem'
-import { BOARDS_PAGE_SIZE } from '@/modules/board'
 import { useIntersectionObserver } from 'usehooks-ts'
+import BoardsDrawerItem from './BoardsDrawerItem'
 
 type Params = {
   projectId: string

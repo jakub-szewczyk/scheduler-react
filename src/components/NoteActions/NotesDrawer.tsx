@@ -1,4 +1,5 @@
 import DrawerItemSkeleton from '@/layout/DrawerItemSkeleton/DrawerItemSkeleton'
+import { NOTES_PAGE_SIZE } from '@/modules/note'
 import { getNotes } from '@/services/note'
 import AddIcon from '@mui/icons-material/Add'
 import {
@@ -10,9 +11,10 @@ import {
   Typography,
 } from '@mui/material'
 import List from '@mui/material/List'
-import { useQuery } from '@tanstack/react-query'
-import { MouseEventHandler } from 'react'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { MouseEventHandler, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
+import { useIntersectionObserver } from 'usehooks-ts'
 import NotesDrawerItem from './NotesDrawerItem'
 
 type Params = {
@@ -28,14 +30,41 @@ interface NotesDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
 const NotesDrawer = ({ onCreate, onSelect, ...props }: NotesDrawerProps) => {
   const params = useParams<Params>()
 
-  // TODO: Implement infinite scrolling
   const {
     data: notes,
     isLoading: isEachNoteLoading,
     isSuccess: isEachNoteFetchedSuccessfully,
-  } = useQuery(['projects', params.projectId, 'notes'], () =>
-    getNotes({ projectId: params.projectId! })
+    isFetchingNextPage: isFetchingNextNotesPage,
+    hasNextPage: hasNextNotesPage,
+    fetchNextPage: fetchNextNotesPage,
+  } = useInfiniteQuery(
+    ['infinite', 'projects', params.projectId, 'notes'],
+    ({ pageParam = 0 }) =>
+      getNotes({
+        projectId: params.projectId!,
+        page: pageParam,
+        size: NOTES_PAGE_SIZE,
+      }),
+    {
+      getNextPageParam: (lastPage) =>
+        lastPage.page < Math.ceil(lastPage.total / NOTES_PAGE_SIZE) - 1
+          ? lastPage.page + 1
+          : undefined,
+    }
   )
+
+  const ref = useRef<HTMLDivElement | null>(null)
+
+  const entry = useIntersectionObserver(ref, {
+    freezeOnceVisible: isFetchingNextNotesPage,
+  })
+
+  /* FIXME:
+   * Fix null ref bug.
+   */
+  useEffect(() => {
+    entry?.isIntersecting && fetchNextNotesPage()
+  }, [entry?.isIntersecting, fetchNextNotesPage])
 
   return (
     <SwipeableDrawer
@@ -84,14 +113,17 @@ const NotesDrawer = ({ onCreate, onSelect, ...props }: NotesDrawerProps) => {
                 .fill(null)
                 .map((_, index) => <DrawerItemSkeleton key={index} />)}
             {isEachNoteFetchedSuccessfully &&
-              notes.content.map((note) => (
-                <NotesDrawerItem
-                  key={note.id}
-                  note={note}
-                  notes={notes.content}
-                  onSelect={onSelect}
-                />
-              ))}
+              notes.pages.flatMap((page) =>
+                page.content.map((note) => (
+                  <NotesDrawerItem
+                    key={note.id}
+                    note={note}
+                    notes={notes.pages.flatMap((page) => page.content)}
+                    onSelect={onSelect}
+                  />
+                ))
+              )}
+            {hasNextNotesPage && <DrawerItemSkeleton ref={ref} />}
           </List>
         </Stack>
         <Box>

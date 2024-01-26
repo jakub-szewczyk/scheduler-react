@@ -32,10 +32,18 @@ const NoteHeader = ({ note }: NoteHeaderProps) => {
     updateNote,
     {
       onSuccess: async () => {
-        await queryClient.invalidateQueries([
-          'projects',
-          params.projectId,
-          'notes',
+        await Promise.all([
+          queryClient.invalidateQueries([
+            'projects',
+            params.projectId,
+            'notes',
+          ]),
+          queryClient.invalidateQueries([
+            'infinite',
+            'projects',
+            params.projectId,
+            'notes',
+          ]),
         ])
         closeEditNoteDialog()
       },
@@ -44,13 +52,16 @@ const NoteHeader = ({ note }: NoteHeaderProps) => {
 
   const handleNoteEdit = (
     values: InitialValues,
-    _: FormikHelpers<InitialValues>
+    { setSubmitting }: FormikHelpers<InitialValues>
   ) =>
-    updateNoteMutation({
-      projectId: params.projectId!,
-      noteId: note.id,
-      name: values.name,
-    })
+    updateNoteMutation(
+      {
+        projectId: params.projectId!,
+        noteId: note.id,
+        name: values.name,
+      },
+      { onSettled: () => setSubmitting(false) }
+    )
 
   return (
     <>
@@ -74,7 +85,7 @@ const NoteHeader = ({ note }: NoteHeaderProps) => {
         </Typography>
       </Stack>
       <UpsertNoteDialog
-        mode='EDIT'
+        mode='update'
         open={isEditNoteDialogOpen}
         onClose={closeEditNoteDialog}
         note={note}

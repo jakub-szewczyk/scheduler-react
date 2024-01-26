@@ -1,4 +1,4 @@
-import { DraftBlockStyleType, Note } from '@/types/note'
+import { DraftBlockStyleType } from '@/types/note'
 import CodeIcon from '@mui/icons-material/Code'
 import DataObjectIcon from '@mui/icons-material/DataObject'
 import FormatBoldIcon from '@mui/icons-material/FormatBold'
@@ -22,9 +22,7 @@ import { ReactNode } from 'react'
 import html2pdf from 'html2pdf.js'
 import { isEmpty, isNil, or } from 'ramda'
 
-export const initialValues = (mode: 'CREATE' | 'EDIT', note: Note) => ({
-  name: mode === 'EDIT' ? note.name || '' : '',
-})
+export const NOTES_PAGE_SIZE = 10
 
 export const serialize = (editorState: EditorState) =>
   convertToRaw(editorState.getCurrentContent())
