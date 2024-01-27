@@ -1,11 +1,7 @@
 import { Grid2Props, styled } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 
-/**
- * TODO:
- * Rename
- */
-export const ProjectContainer = styled((props: Grid2Props) => (
+export const Container = styled((props: Grid2Props) => (
   <Grid {...props} container spacing={2} />
 ))(({ theme }) => ({
   alignContent: 'flex-start',

@@ -1,5 +1,5 @@
 import ProjectItem from '@/components/Project/ProjectItem'
-import { ProjectContainer } from '@/components/Project/styles/Project.styles'
+import { Container } from '@/components/Project/styles/Project.styles'
 import { PROJECTS_PAGE_SIZE } from '@/modules/project'
 import { getProjects } from '@/services/project'
 import { Box, CircularProgress, Pagination, Typography } from '@mui/material'
@@ -55,7 +55,7 @@ const Projects = () => {
         minHeight: { xs: 'calc(100vh - 72px)', sm: 'calc(100vh - 88px)' },
       }}
     >
-      <ProjectContainer>
+      <Container>
         {isEachProjectLoading && (
           <Box
             sx={{
@@ -111,7 +111,7 @@ const Projects = () => {
             Something went wrong: fetching projects failed. Please try again.
           </Typography>
         )}
-      </ProjectContainer>
+      </Container>
       {isEachProjectFetchedSuccessfully && (
         <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
           <Pagination

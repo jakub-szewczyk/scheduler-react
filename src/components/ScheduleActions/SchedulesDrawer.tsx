@@ -65,6 +65,8 @@ const SchedulesDrawer = ({
 
   /* FIXME:
    * Fix null ref bug.
+   * In deployed version this ain't working properly.
+   * Maybe try using the scroll event instead of intersection observer.
    */
   useEffect(() => {
     entry?.isIntersecting && fetchNextSchedulesPage()

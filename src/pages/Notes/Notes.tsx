@@ -1,6 +1,6 @@
 import Note from '@/components/Note/Note'
 import NoteActions from '@/components/NoteActions/NoteActions'
-import { ProjectContainer } from '@/components/Project/styles/Project.styles'
+import { Container } from '@/components/Project/styles/Project.styles'
 import { deserialize } from '@/modules/note'
 import { getNote, getNotes } from '@/services/note'
 import { Box, CircularProgress, Typography } from '@mui/material'
@@ -82,11 +82,11 @@ const Notes = () => {
 
   if (isNoteFetchedUnsuccessfully)
     return (
-      <ProjectContainer>
+      <Container>
         <Typography color='error'>
           Something went wrong. Please try again.
         </Typography>
-      </ProjectContainer>
+      </Container>
     )
 
   return (

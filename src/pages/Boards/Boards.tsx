@@ -1,4 +1,4 @@
-import { ProjectContainer } from '@/components/Project/styles/Project.styles'
+import { Container } from '@/components/Project/styles/Project.styles'
 import { getBoard, getBoards } from '@/services/board'
 import { Status } from '@/types/status'
 import { Box, CircularProgress, Typography } from '@mui/material'
@@ -80,11 +80,11 @@ const Boards = () => {
    */
   if (isBoardFetchedUnsuccessfully)
     return (
-      <ProjectContainer>
+      <Container>
         <Typography color='error'>
           Something went wrong. Please try again.
         </Typography>
-      </ProjectContainer>
+      </Container>
     )
 
   return (

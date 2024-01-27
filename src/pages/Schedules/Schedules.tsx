@@ -1,4 +1,4 @@
-import { ProjectContainer } from '@/components/Project/styles/Project.styles'
+import { Container } from '@/components/Project/styles/Project.styles'
 import { getSchedule, getSchedules } from '@/services/schedule'
 import { Row } from '@/types/row'
 import { Box, CircularProgress, Typography } from '@mui/material'
@@ -88,11 +88,11 @@ const Schedules = () => {
    */
   if (isScheduleFetchedUnsuccessfully)
     return (
-      <ProjectContainer>
+      <Container>
         <Typography color='error'>
           Something went wrong. Please try again.
         </Typography>
-      </ProjectContainer>
+      </Container>
     )
 
   return (

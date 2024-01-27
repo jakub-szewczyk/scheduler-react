@@ -22,7 +22,7 @@ import { ReactNode } from 'react'
 import html2pdf from 'html2pdf.js'
 import { isEmpty, isNil, or } from 'ramda'
 
-export const NOTES_PAGE_SIZE = 10
+export const NOTES_PAGE_SIZE = 20
 
 export const serialize = (editorState: EditorState) =>
   convertToRaw(editorState.getCurrentContent())
