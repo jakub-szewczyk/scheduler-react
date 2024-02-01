@@ -4,7 +4,7 @@ import { utils, writeFileXLSX } from 'xlsx'
 import * as ROW from '../modules/row'
 import { Schedule } from '../types/schedule'
 
-export const SCHEDULES_PAGE_SIZE = 20
+export const SCHEDULES_PAGE_SIZE = 10
 
 export const exportToXLSX = (schedule: Schedule) => () => {
   const ws = utils.json_to_sheet(pipe(schedule.rows, map(ROW.toXLSX)))

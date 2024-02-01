@@ -1,1 +1,1 @@
-export const BOARDS_PAGE_SIZE = 20
+export const BOARDS_PAGE_SIZE = 10

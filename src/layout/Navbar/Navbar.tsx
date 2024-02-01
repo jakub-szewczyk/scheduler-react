@@ -50,6 +50,11 @@ const Navbar = () => {
     },
   })
 
+  /* FIXME:
+   * Switching projects
+   * while items for a given project are still loading
+   * causes an invalid set of items being displayed for that project.
+   */
   const {
     data: projects,
     isLoading: isEachProjectLoading,
@@ -81,6 +86,7 @@ const Navbar = () => {
       }),
       { replace: true }
     )
+    // FIXME: Handle case when these params are undefined.
     if (params.scheduleId)
       return navigate(
         {
@@ -205,6 +211,7 @@ const Navbar = () => {
                     onScroll: (event: any) =>
                       event.target.scrollHeight ===
                       event.target.scrollTop + event.target.clientHeight &&
+                      !isEachProjectFetching &&
                       fetchNextProjectsPage(),
                   },
                 }}
