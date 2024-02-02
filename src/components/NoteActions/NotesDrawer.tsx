@@ -30,6 +30,9 @@ interface NotesDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
 const NotesDrawer = ({ onCreate, onSelect, ...props }: NotesDrawerProps) => {
   const params = useParams<Params>()
 
+  /* FIXME:
+   * Subsequent pages not fetching when opening a drawer while the initial set of items is still loading.
+   */
   const {
     data: notes,
     isLoading: isEachNoteLoading,
@@ -59,9 +62,6 @@ const NotesDrawer = ({ onCreate, onSelect, ...props }: NotesDrawerProps) => {
     freezeOnceVisible: isFetchingNextNotesPage,
   })
 
-  /* FIXME:
-   * Fix null ref bug.
-   */
   useEffect(() => {
     entry?.isIntersecting && fetchNextNotesPage()
   }, [entry?.isIntersecting, fetchNextNotesPage])

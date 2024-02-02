@@ -11,9 +11,9 @@ import {
 } from '@mui/material'
 import List from '@mui/material/List'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { MouseEventHandler } from 'react'
-import InfiniteScroll from 'react-infinite-scroller'
+import { MouseEventHandler, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
+import { useIntersectionObserver } from 'usehooks-ts'
 import DrawerItemSkeleton from '../../layout/DrawerItemSkeleton/DrawerItemSkeleton'
 import SchedulesDrawerItem from './SchedulesDrawerItem'
 
@@ -35,15 +35,13 @@ const SchedulesDrawer = ({
   const params = useParams<Params>()
 
   /* FIXME:
-   * Subsequent pages not fetching
-   * when opening a drawer
-   * while the initial set of items is still loading.
+   * Subsequent pages not fetching when opening a drawer while the initial set of items is still loading.
    */
   const {
     data: schedules,
     isLoading: isEachScheduleLoading,
-    isFetching: isEachScheduleFetching,
     isSuccess: isEachScheduleFetchedSuccessfully,
+    isFetchingNextPage: isFetchingNextSchedulesPage,
     hasNextPage: hasNextSchedulesPage,
     fetchNextPage: fetchNextSchedulesPage,
   } = useInfiniteQuery(
@@ -61,6 +59,16 @@ const SchedulesDrawer = ({
           : undefined,
     }
   )
+
+  const ref = useRef<HTMLDivElement | null>(null)
+
+  const entry = useIntersectionObserver(ref, {
+    freezeOnceVisible: isFetchingNextSchedulesPage,
+  })
+
+  useEffect(() => {
+    entry?.isIntersecting && fetchNextSchedulesPage()
+  }, [entry?.isIntersecting, fetchNextSchedulesPage])
 
   return (
     <SwipeableDrawer
@@ -108,31 +116,18 @@ const SchedulesDrawer = ({
               Array(3)
                 .fill(null)
                 .map((_, index) => <DrawerItemSkeleton key={index} />)}
-            {isEachScheduleFetchedSuccessfully && (
-              <InfiniteScroll
-                useWindow={false}
-                hasMore={!!hasNextSchedulesPage}
-                loader={<DrawerItemSkeleton key={0} />}
-                loadMore={(page) =>
-                  page > 1 &&
-                  !isEachScheduleFetching &&
-                  fetchNextSchedulesPage()
-                }
-              >
-                {schedules.pages.flatMap((page) =>
-                  page.content.map((schedule) => (
-                    <SchedulesDrawerItem
-                      key={schedule.id}
-                      schedule={schedule}
-                      schedules={schedules.pages.flatMap(
-                        (page) => page.content
-                      )}
-                      onSelect={onSelect}
-                    />
-                  ))
-                )}
-              </InfiniteScroll>
-            )}
+            {isEachScheduleFetchedSuccessfully &&
+              schedules.pages.flatMap((page) =>
+                page.content.map((schedule) => (
+                  <SchedulesDrawerItem
+                    key={schedule.id}
+                    schedule={schedule}
+                    schedules={schedules.pages.flatMap((page) => page.content)}
+                    onSelect={onSelect}
+                  />
+                ))
+              )}
+            {hasNextSchedulesPage && <DrawerItemSkeleton ref={ref} />}
           </List>
         </Stack>
         <Box>

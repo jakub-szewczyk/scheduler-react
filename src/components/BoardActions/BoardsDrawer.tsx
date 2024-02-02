@@ -30,6 +30,9 @@ interface BoardsDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
 const BoardsDrawer = ({ onSelect, onCreate, ...props }: BoardsDrawerProps) => {
   const params = useParams<Params>()
 
+  /* FIXME:
+   * Subsequent pages not fetching when opening a drawer while the initial set of items is still loading.
+   */
   const {
     data: boards,
     isLoading: isEachBoardLoading,
@@ -59,9 +62,6 @@ const BoardsDrawer = ({ onSelect, onCreate, ...props }: BoardsDrawerProps) => {
     freezeOnceVisible: isFetchingNextBoardsPage,
   })
 
-  /* FIXME:
-   * Fix null ref bug.
-   */
   useEffect(() => {
     entry?.isIntersecting && fetchNextBoardsPage()
   }, [entry?.isIntersecting, fetchNextBoardsPage])
