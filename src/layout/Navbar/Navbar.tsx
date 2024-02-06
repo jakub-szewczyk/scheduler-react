@@ -16,24 +16,17 @@ import {
 } from '@mui/material'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useEventListener } from 'usehooks-ts'
 import ProfileMenu from './ProfileMenu'
 import WidgetsMenu from './WidgetsMenu'
-
-type Params = {
-  projectId: string
-  scheduleId: string
-  boardId: string
-  noteId: string
-}
 
 const Navbar = () => {
   const [isScrollYOffset, setIsScrollYOffset] = useState(false)
 
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const params = useParams<Params>()
+  const location = useLocation()
 
   const navigate = useNavigate()
 
@@ -50,11 +43,6 @@ const Navbar = () => {
     },
   })
 
-  /* FIXME:
-   * Switching projects
-   * while items for a given project are still loading
-   * causes an invalid set of items being displayed for that project.
-   */
   const {
     data: projects,
     isLoading: isEachProjectLoading,
@@ -86,8 +74,7 @@ const Navbar = () => {
       }),
       { replace: true }
     )
-    // FIXME: Handle case when these params are undefined.
-    if (params.scheduleId)
+    if (location.pathname.includes('schedules'))
       return navigate(
         {
           pathname: `/projects/${project.id}/schedules`,
@@ -99,7 +86,7 @@ const Navbar = () => {
         },
         { replace: true }
       )
-    if (params.boardId)
+    if (location.pathname.includes('boards'))
       return navigate(
         {
           pathname: `/projects/${project.id}/boards`,
@@ -111,7 +98,7 @@ const Navbar = () => {
         },
         { replace: true }
       )
-    if (params.noteId)
+    if (location.pathname.includes('notes'))
       return navigate(
         {
           pathname: `/projects/${project.id}/notes`,
