@@ -2,18 +2,35 @@ import ProjectItem from '@/components/Project/ProjectItem'
 import { Container } from '@/components/Project/styles/Project.styles'
 import { PROJECTS_PAGE_SIZE } from '@/modules/project'
 import { getProjects } from '@/services/project'
-import { Box, CircularProgress, Pagination, Typography } from '@mui/material'
+import ClearIcon from '@mui/icons-material/Clear'
+import SearchIcon from '@mui/icons-material/Search'
+import {
+  Box,
+  CircularProgress,
+  IconButton,
+  InputAdornment,
+  Pagination,
+  TextField,
+  Typography,
+} from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 import { useQuery } from '@tanstack/react-query'
 import { omit } from 'ramda'
+import { ChangeEvent, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { useDebounceCallback } from 'usehooks-ts'
 
 const Projects = () => {
   const [searchParams, setSearchParams] = useSearchParams()
 
+  const search = searchParams.get('search')
+
+  const inputRef = useRef<HTMLInputElement>()
+
   const projectsParams = {
     page: +searchParams.get('page')!,
     size: PROJECTS_PAGE_SIZE,
+    ...(search && { name: search }),
   }
 
   const {
@@ -46,6 +63,34 @@ const Projects = () => {
     }
   )
 
+  const handleProjectSearchChange = useDebounceCallback(
+    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      setSearchParams(
+        (searchParams) => {
+          const newSearchParams = {
+            ...Object.fromEntries(searchParams),
+            page: '0',
+            search: event.target.value,
+          } as { search?: string }
+          if (!event.target.value) delete newSearchParams.search
+          return newSearchParams
+        },
+        { replace: true }
+      ),
+    500
+  )
+
+  const handleProjectSearchClear = () => {
+    setSearchParams(
+      (searchParams) => ({
+        ...omit(['search'], Object.fromEntries(searchParams)),
+        page: '0',
+      }),
+      { replace: true }
+    )
+    inputRef.current!.value = ''
+  }
+
   return (
     <Box
       sx={{
@@ -68,26 +113,70 @@ const Projects = () => {
             <CircularProgress />
           </Box>
         )}
+        <Box sx={{ width: '100%', px: 1, mt: { xs: 1.25, sm: 0.25 }, mb: 1 }}>
+          <TextField
+            size='small'
+            label='Search'
+            fullWidth
+            defaultValue={search || ''}
+            onChange={handleProjectSearchChange}
+            sx={{
+              width: '100%',
+              maxWidth: {
+                xs: '100%',
+                sm: 'calc(50% - 8px)',
+                md: `calc(${(4 / 12) * 100}% - 10px)`,
+                lg: 'calc(25% - 12px)',
+                xl: `calc(${(2.4 / 12) * 100}% - 12px)`,
+              },
+            }}
+            InputProps={{
+              inputRef,
+              startAdornment: (
+                <InputAdornment position='start'>
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position='end'>
+                  <IconButton size='small' onClick={handleProjectSearchClear}>
+                    <ClearIcon fontSize='small' />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
         {isEachProjectFetchedSuccessfully &&
           projects.content.map((project, _, array) => (
             <Grid key={project.name} xs={12} sm={6} md={4} lg={3} xl={12 / 5}>
               <ProjectItem
                 project={project}
-                disableDelete={projects.total === 1}
+                onAfterCreate={() => (inputRef.current!.value = '')}
                 onAfterDelete={(project) => {
                   const isProjectSelected =
                     project.id === searchParams.get('projectId')
                   const isProjectLastOnPage = projects.content.length === 1
-                  if (isProjectSelected && isProjectLastOnPage)
+                  if (isProjectSelected && isProjectLastOnPage) {
+                    inputRef.current!.value = ''
                     return setSearchParams((searchParams) => ({
-                      page: (+searchParams.get('page')! - 1).toString(),
+                      page: Math.max(
+                        0,
+                        +searchParams.get('page')! - 1
+                      ).toString(),
                       transitional: 'true',
                     }))
-                  if (!isProjectSelected && isProjectLastOnPage)
+                  }
+                  if (!isProjectSelected && isProjectLastOnPage) {
+                    inputRef.current!.value = ''
                     return setSearchParams((searchParams) => ({
-                      ...Object.fromEntries(searchParams),
-                      page: (+searchParams.get('page')! - 1).toString(),
+                      ...omit(['search'], Object.fromEntries(searchParams)),
+                      page: Math.max(
+                        0,
+                        +searchParams.get('page')! - 1
+                      ).toString(),
                     }))
+                  }
                   if (isProjectSelected && !isProjectLastOnPage) {
                     const index = array.findIndex(({ id }) => id === project.id)
                     setSearchParams(

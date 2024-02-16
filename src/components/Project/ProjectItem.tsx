@@ -21,6 +21,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useBoolean } from 'usehooks-ts'
 import DeleteProjectDialog from './DeleteProjectDialog'
 import UpsertProjectDialog from './UpsertProjectDialog'
+import { omit } from 'ramda'
 
 interface ProjectItemProps {
   project: Project
@@ -73,7 +74,7 @@ const ProjectItem = ({
         closeCreateProjectDialog()
         setSearchParams(
           (searchParams) => ({
-            ...Object.fromEntries(searchParams),
+            ...omit(['search'], Object.fromEntries(searchParams)),
             projectId: project.id,
             projectName: project.name,
             page: '0',
