@@ -6,6 +6,7 @@ interface GetSchedulesParams {
   projectId: string
   page?: number
   size?: number
+  name?: string
 }
 
 type GetSchedulesResponse = PaginatedResponse<

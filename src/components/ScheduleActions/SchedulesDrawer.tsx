@@ -1,19 +1,30 @@
 import { SCHEDULES_PAGE_SIZE } from '@/modules/schedule'
 import { getSchedules } from '@/services/schedule'
 import AddIcon from '@mui/icons-material/Add'
+import ClearIcon from '@mui/icons-material/Clear'
+import SearchIcon from '@mui/icons-material/Search'
 import {
   Box,
   Button,
+  IconButton,
+  InputAdornment,
   Stack,
   SwipeableDrawer,
   SwipeableDrawerProps,
+  TextField,
   Typography,
 } from '@mui/material'
 import List from '@mui/material/List'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { MouseEventHandler, useEffect, useRef } from 'react'
+import {
+  ChangeEvent,
+  MouseEventHandler,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import { useParams } from 'react-router-dom'
-import { useIntersectionObserver } from 'usehooks-ts'
+import { useDebounceCallback, useIntersectionObserver } from 'usehooks-ts'
 import DrawerItemSkeleton from '../../layout/DrawerItemSkeleton/DrawerItemSkeleton'
 import SchedulesDrawerItem from './SchedulesDrawerItem'
 
@@ -32,7 +43,17 @@ const SchedulesDrawer = ({
   onSelect,
   ...props
 }: SchedulesDrawerProps) => {
+  // TODO:
+  // Improve empty schedules display.
+  // Handle broken scroll after clear.
+  // Handle refetch after each crud op.
+  const [search, setSearch] = useState('')
+
   const params = useParams<Params>()
+
+  const itemRef = useRef<HTMLDivElement | null>(null)
+
+  const inputRef = useRef<HTMLInputElement>()
 
   /* FIXME:
    * Subsequent pages not fetching when opening a drawer while the initial set of items is still loading.
@@ -45,12 +66,21 @@ const SchedulesDrawer = ({
     hasNextPage: hasNextSchedulesPage,
     fetchNextPage: fetchNextSchedulesPage,
   } = useInfiniteQuery(
-    ['infinite', 'projects', params.projectId, 'schedules'],
+    [
+      'infinite',
+      'projects',
+      params.projectId,
+      'schedules',
+      {
+        ...(search && { name: search }),
+      },
+    ],
     ({ pageParam = 0 }) =>
       getSchedules({
         projectId: params.projectId!,
         page: pageParam,
         size: SCHEDULES_PAGE_SIZE,
+        ...(search && { name: search }),
       }),
     {
       getNextPageParam: (lastPage) =>
@@ -60,15 +90,24 @@ const SchedulesDrawer = ({
     }
   )
 
-  const ref = useRef<HTMLDivElement | null>(null)
-
-  const entry = useIntersectionObserver(ref, {
+  const entry = useIntersectionObserver(itemRef, {
     freezeOnceVisible: isFetchingNextSchedulesPage,
   })
 
   useEffect(() => {
     entry?.isIntersecting && fetchNextSchedulesPage()
   }, [entry?.isIntersecting, fetchNextSchedulesPage])
+
+  const handleScheduleSearchChange = useDebounceCallback(
+    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      setSearch(event.target.value),
+    500
+  )
+
+  const handleScheduleSearchClear = () => {
+    setSearch('')
+    inputRef.current!.value = ''
+  }
 
   return (
     <SwipeableDrawer
@@ -88,6 +127,33 @@ const SchedulesDrawer = ({
           <Typography variant='h6' align='center'>
             Select & manage schedules
           </Typography>
+          <Box>
+            <TextField
+              size='small'
+              label='Search'
+              fullWidth
+              defaultValue={search || ''}
+              onChange={handleScheduleSearchChange}
+              InputProps={{
+                inputRef,
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+                endAdornment: search ? (
+                  <InputAdornment position='end'>
+                    <IconButton
+                      size='small'
+                      onClick={handleScheduleSearchClear}
+                    >
+                      <ClearIcon fontSize='small' />
+                    </IconButton>
+                  </InputAdornment>
+                ) : null,
+              }}
+            />
+          </Box>
           <List
             sx={{
               overflow: 'auto',
@@ -127,7 +193,7 @@ const SchedulesDrawer = ({
                   />
                 ))
               )}
-            {hasNextSchedulesPage && <DrawerItemSkeleton ref={ref} />}
+            {hasNextSchedulesPage && <DrawerItemSkeleton ref={itemRef} />}
           </List>
         </Stack>
         <Box>

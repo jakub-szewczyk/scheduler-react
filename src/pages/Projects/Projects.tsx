@@ -137,13 +137,13 @@ const Projects = () => {
                   <SearchIcon />
                 </InputAdornment>
               ),
-              endAdornment: (
+              endAdornment: search ? (
                 <InputAdornment position='end'>
                   <IconButton size='small' onClick={handleProjectSearchClear}>
                     <ClearIcon fontSize='small' />
                   </IconButton>
                 </InputAdornment>
-              ),
+              ) : null,
             }}
           />
         </Box>
