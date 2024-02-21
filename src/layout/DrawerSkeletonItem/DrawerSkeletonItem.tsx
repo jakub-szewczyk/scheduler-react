@@ -10,7 +10,7 @@ import {
 } from '@mui/material'
 import { forwardRef } from 'react'
 
-const DrawerItemSkeleton = forwardRef<HTMLDivElement>((_, ref) => (
+const DrawerSkeletonItem = forwardRef<HTMLDivElement>((_, ref) => (
   <Stack ref={ref} direction='row' alignItems='start'>
     <ListItemButton>
       <ListItemAvatar>
@@ -29,4 +29,4 @@ const DrawerItemSkeleton = forwardRef<HTMLDivElement>((_, ref) => (
   </Stack>
 ))
 
-export default DrawerItemSkeleton
+export default DrawerSkeletonItem

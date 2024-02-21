@@ -1,4 +1,4 @@
-import DrawerItemSkeleton from '@/layout/DrawerItemSkeleton/DrawerItemSkeleton'
+import DrawerSkeletonItem from '@/layout/DrawerSkeletonItem/DrawerSkeletonItem'
 import { NOTES_PAGE_SIZE } from '@/modules/note'
 import { getNotes } from '@/services/note'
 import AddIcon from '@mui/icons-material/Add'
@@ -111,7 +111,7 @@ const NotesDrawer = ({ onCreate, onSelect, ...props }: NotesDrawerProps) => {
             {isEachNoteLoading &&
               Array(3)
                 .fill(null)
-                .map((_, index) => <DrawerItemSkeleton key={index} />)}
+                .map((_, index) => <DrawerSkeletonItem key={index} />)}
             {isEachNoteFetchedSuccessfully &&
               notes.pages.flatMap((page) =>
                 page.content.map((note) => (
@@ -123,7 +123,7 @@ const NotesDrawer = ({ onCreate, onSelect, ...props }: NotesDrawerProps) => {
                   />
                 ))
               )}
-            {hasNextNotesPage && <DrawerItemSkeleton ref={ref} />}
+            {hasNextNotesPage && <DrawerSkeletonItem ref={ref} />}
           </List>
         </Stack>
         <Box>
