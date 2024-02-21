@@ -1,20 +1,26 @@
+import DrawerEmptyItem from '@/layout/DrawerEmptyItem/DrawerEmptyItem'
 import DrawerSkeletonItem from '@/layout/DrawerSkeletonItem/DrawerSkeletonItem'
 import { BOARDS_PAGE_SIZE } from '@/modules/board'
 import { getBoards } from '@/services/board'
 import AddIcon from '@mui/icons-material/Add'
+import ClearIcon from '@mui/icons-material/Clear'
+import SearchIcon from '@mui/icons-material/Search'
 import {
   Box,
   Button,
+  IconButton,
+  InputAdornment,
   Stack,
   SwipeableDrawer,
   SwipeableDrawerProps,
+  TextField,
   Typography,
 } from '@mui/material'
 import List from '@mui/material/List'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { MouseEventHandler, useEffect, useRef } from 'react'
+import { ChangeEvent, MouseEventHandler, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { useIntersectionObserver } from 'usehooks-ts'
+import { useDebounceCallback, useIntersectionObserver } from 'usehooks-ts'
 import BoardsDrawerItem from './BoardsDrawerItem'
 
 type Params = {
@@ -28,11 +34,12 @@ interface BoardsDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
 }
 
 const BoardsDrawer = ({ onSelect, onCreate, ...props }: BoardsDrawerProps) => {
+  const [search, setSearch] = useState('')
+
   const params = useParams<Params>()
 
-  /* FIXME:
-   * Subsequent pages not fetching when opening a drawer while the initial set of items is still loading.
-   */
+  const inputRef = useRef<HTMLInputElement>()
+
   const {
     data: boards,
     isLoading: isEachBoardLoading,
@@ -41,12 +48,21 @@ const BoardsDrawer = ({ onSelect, onCreate, ...props }: BoardsDrawerProps) => {
     hasNextPage: hasNextBoardsPage,
     fetchNextPage: fetchNextBoardsPage,
   } = useInfiniteQuery(
-    ['infinite', 'projects', params.projectId, 'boards'],
+    [
+      'infinite',
+      'projects',
+      params.projectId,
+      'boards',
+      {
+        ...(search && { name: search }),
+      },
+    ],
     ({ pageParam = 0 }) =>
       getBoards({
         projectId: params.projectId!,
         page: pageParam,
         size: BOARDS_PAGE_SIZE,
+        ...(search && { name: search }),
       }),
     {
       getNextPageParam: (lastPage) =>
@@ -56,15 +72,21 @@ const BoardsDrawer = ({ onSelect, onCreate, ...props }: BoardsDrawerProps) => {
     }
   )
 
-  const ref = useRef<HTMLDivElement | null>(null)
-
-  const entry = useIntersectionObserver(ref, {
+  const { ref: itemRef } = useIntersectionObserver({
     freezeOnceVisible: isFetchingNextBoardsPage,
+    onChange: (isIntersecting) => isIntersecting && fetchNextBoardsPage(),
   })
 
-  useEffect(() => {
-    entry?.isIntersecting && fetchNextBoardsPage()
-  }, [entry?.isIntersecting, fetchNextBoardsPage])
+  const handleBoardSearchChange = useDebounceCallback(
+    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      setSearch(event.target.value),
+    500
+  )
+
+  const handleBoardSearchClear = () => {
+    setSearch('')
+    inputRef.current!.value = ''
+  }
 
   return (
     <SwipeableDrawer
@@ -84,6 +106,30 @@ const BoardsDrawer = ({ onSelect, onCreate, ...props }: BoardsDrawerProps) => {
           <Typography variant='h6' align='center'>
             Select & manage boards
           </Typography>
+          <Box>
+            <TextField
+              size='small'
+              label='Search'
+              fullWidth
+              defaultValue={search || ''}
+              onChange={handleBoardSearchChange}
+              InputProps={{
+                inputRef,
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+                endAdornment: search ? (
+                  <InputAdornment position='end'>
+                    <IconButton size='small' onClick={handleBoardSearchClear}>
+                      <ClearIcon fontSize='small' />
+                    </IconButton>
+                  </InputAdornment>
+                ) : null,
+              }}
+            />
+          </Box>
           <List
             sx={{
               overflow: 'auto',
@@ -123,7 +169,11 @@ const BoardsDrawer = ({ onSelect, onCreate, ...props }: BoardsDrawerProps) => {
                   />
                 ))
               )}
-            {hasNextBoardsPage && <DrawerSkeletonItem ref={ref} />}
+            {isEachBoardFetchedSuccessfully &&
+              boards.pages.flatMap((page) => page.content).length === 0 && (
+                <DrawerEmptyItem />
+              )}
+            {hasNextBoardsPage && <DrawerSkeletonItem ref={itemRef} />}
           </List>
         </Stack>
         <Box>

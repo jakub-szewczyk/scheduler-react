@@ -20,12 +20,15 @@ type Params = {
 interface BoardsDrawerItemProps {
   board: Pick<Board, 'id' | 'createdAt' | 'name'>
   boards: Pick<Board, 'id' | 'createdAt' | 'name'>[]
+  disableDelete?: boolean
+
   onSelect: (boardId: string) => void
 }
 
 const BoardsDrawerItem = ({
   board,
   boards,
+  disableDelete,
   onSelect,
 }: BoardsDrawerItemProps) => {
   const {
@@ -112,12 +115,12 @@ const BoardsDrawerItem = ({
         </ListItemButton>
         <Tooltip
           placement='left'
-          title={boards.length === 1 && 'At least one board is required'}
+          title={disableDelete && 'At least one board is required'}
         >
           <Box>
             <IconButton
               size='small'
-              disabled={boards.length === 1}
+              disabled={disableDelete}
               onClick={openDeleteBoardDialog}
             >
               <CloseIcon fontSize='small' />
