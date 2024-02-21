@@ -5,6 +5,7 @@ import api from './api'
 type GetProjectsParams = Partial<{
   page: number
   size: number
+  name: string
 }>
 
 type GetProjectsResponse = PaginatedResponse<Project[]>

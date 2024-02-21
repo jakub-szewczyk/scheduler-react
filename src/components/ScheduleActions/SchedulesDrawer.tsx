@@ -1,20 +1,26 @@
+import DrawerEmptyItem from '@/layout/DrawerEmptyItem/DrawerEmptyItem'
 import { SCHEDULES_PAGE_SIZE } from '@/modules/schedule'
 import { getSchedules } from '@/services/schedule'
 import AddIcon from '@mui/icons-material/Add'
+import ClearIcon from '@mui/icons-material/Clear'
+import SearchIcon from '@mui/icons-material/Search'
 import {
   Box,
   Button,
+  IconButton,
+  InputAdornment,
   Stack,
   SwipeableDrawer,
   SwipeableDrawerProps,
+  TextField,
   Typography,
 } from '@mui/material'
 import List from '@mui/material/List'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { MouseEventHandler, useEffect, useRef } from 'react'
+import { ChangeEvent, MouseEventHandler, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { useIntersectionObserver } from 'usehooks-ts'
-import DrawerItemSkeleton from '../../layout/DrawerItemSkeleton/DrawerItemSkeleton'
+import { useDebounceCallback, useIntersectionObserver } from 'usehooks-ts'
+import DrawerSkeletonItem from '../../layout/DrawerSkeletonItem/DrawerSkeletonItem'
 import SchedulesDrawerItem from './SchedulesDrawerItem'
 
 type Params = {
@@ -32,11 +38,12 @@ const SchedulesDrawer = ({
   onSelect,
   ...props
 }: SchedulesDrawerProps) => {
+  const [search, setSearch] = useState('')
+
   const params = useParams<Params>()
 
-  /* FIXME:
-   * Subsequent pages not fetching when opening a drawer while the initial set of items is still loading.
-   */
+  const inputRef = useRef<HTMLInputElement>()
+
   const {
     data: schedules,
     isLoading: isEachScheduleLoading,
@@ -45,12 +52,21 @@ const SchedulesDrawer = ({
     hasNextPage: hasNextSchedulesPage,
     fetchNextPage: fetchNextSchedulesPage,
   } = useInfiniteQuery(
-    ['infinite', 'projects', params.projectId, 'schedules'],
+    [
+      'infinite',
+      'projects',
+      params.projectId,
+      'schedules',
+      {
+        ...(search && { name: search }),
+      },
+    ],
     ({ pageParam = 0 }) =>
       getSchedules({
         projectId: params.projectId!,
         page: pageParam,
         size: SCHEDULES_PAGE_SIZE,
+        ...(search && { name: search }),
       }),
     {
       getNextPageParam: (lastPage) =>
@@ -60,15 +76,21 @@ const SchedulesDrawer = ({
     }
   )
 
-  const ref = useRef<HTMLDivElement | null>(null)
-
-  const entry = useIntersectionObserver(ref, {
+  const { ref: itemRef } = useIntersectionObserver({
     freezeOnceVisible: isFetchingNextSchedulesPage,
+    onChange: (isIntersecting) => isIntersecting && fetchNextSchedulesPage(),
   })
 
-  useEffect(() => {
-    entry?.isIntersecting && fetchNextSchedulesPage()
-  }, [entry?.isIntersecting, fetchNextSchedulesPage])
+  const handleScheduleSearchChange = useDebounceCallback(
+    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      setSearch(event.target.value),
+    500
+  )
+
+  const handleScheduleSearchClear = () => {
+    setSearch('')
+    inputRef.current!.value = ''
+  }
 
   return (
     <SwipeableDrawer
@@ -88,6 +110,33 @@ const SchedulesDrawer = ({
           <Typography variant='h6' align='center'>
             Select & manage schedules
           </Typography>
+          <Box>
+            <TextField
+              size='small'
+              label='Search'
+              fullWidth
+              defaultValue={search || ''}
+              onChange={handleScheduleSearchChange}
+              InputProps={{
+                inputRef,
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+                endAdornment: search ? (
+                  <InputAdornment position='end'>
+                    <IconButton
+                      size='small'
+                      onClick={handleScheduleSearchClear}
+                    >
+                      <ClearIcon fontSize='small' />
+                    </IconButton>
+                  </InputAdornment>
+                ) : null,
+              }}
+            />
+          </Box>
           <List
             sx={{
               overflow: 'auto',
@@ -115,7 +164,7 @@ const SchedulesDrawer = ({
             {isEachScheduleLoading &&
               Array(3)
                 .fill(null)
-                .map((_, index) => <DrawerItemSkeleton key={index} />)}
+                .map((_, index) => <DrawerSkeletonItem key={index} />)}
             {isEachScheduleFetchedSuccessfully &&
               schedules.pages.flatMap((page) =>
                 page.content.map((schedule) => (
@@ -127,7 +176,11 @@ const SchedulesDrawer = ({
                   />
                 ))
               )}
-            {hasNextSchedulesPage && <DrawerItemSkeleton ref={ref} />}
+            {isEachScheduleFetchedSuccessfully &&
+              schedules.pages.flatMap((page) => page.content).length === 0 && (
+                <DrawerEmptyItem />
+              )}
+            {hasNextSchedulesPage && <DrawerSkeletonItem ref={itemRef} />}
           </List>
         </Stack>
         <Box>

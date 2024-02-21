@@ -1,4 +1,4 @@
-import DrawerItemSkeleton from '@/layout/DrawerItemSkeleton/DrawerItemSkeleton'
+import DrawerSkeletonItem from '@/layout/DrawerSkeletonItem/DrawerSkeletonItem'
 import { BOARDS_PAGE_SIZE } from '@/modules/board'
 import { getBoards } from '@/services/board'
 import AddIcon from '@mui/icons-material/Add'
@@ -111,7 +111,7 @@ const BoardsDrawer = ({ onSelect, onCreate, ...props }: BoardsDrawerProps) => {
             {isEachBoardLoading &&
               Array(3)
                 .fill(null)
-                .map((_, index) => <DrawerItemSkeleton key={index} />)}
+                .map((_, index) => <DrawerSkeletonItem key={index} />)}
             {isEachBoardFetchedSuccessfully &&
               boards.pages.flatMap((page) =>
                 page.content.map((board) => (
@@ -123,7 +123,7 @@ const BoardsDrawer = ({ onSelect, onCreate, ...props }: BoardsDrawerProps) => {
                   />
                 ))
               )}
-            {hasNextBoardsPage && <DrawerItemSkeleton ref={ref} />}
+            {hasNextBoardsPage && <DrawerSkeletonItem ref={ref} />}
           </List>
         </Stack>
         <Box>

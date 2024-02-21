@@ -20,12 +20,14 @@ type Params = {
 interface SchedulesDrawerItemProps {
   schedule: Pick<Schedule, 'id' | 'createdAt' | 'name'>
   schedules: Pick<Schedule, 'id' | 'createdAt' | 'name'>[]
+  disableDelete?: boolean
   onSelect: (scheduleId: string) => void
 }
 
 const SchedulesDrawerItem = ({
   schedule,
   schedules,
+  disableDelete,
   onSelect,
 }: SchedulesDrawerItemProps) => {
   const {
@@ -112,12 +114,12 @@ const SchedulesDrawerItem = ({
         </ListItemButton>
         <Tooltip
           placement='left'
-          title={schedules.length === 1 && 'At least one schedule is required'}
+          title={disableDelete && 'At least one schedule is required'}
         >
           <Box>
             <IconButton
               size='small'
-              disabled={schedules.length === 1}
+              disabled={disableDelete}
               onClick={openDeleteScheduleDialog}
             >
               <CloseIcon fontSize='small' />
