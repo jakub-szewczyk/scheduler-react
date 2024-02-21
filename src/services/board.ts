@@ -6,6 +6,7 @@ interface GetBoardsParams {
   projectId: string
   page?: number
   size?: number
+  name?: string
 }
 
 type GetBoardsResponse = PaginatedResponse<
