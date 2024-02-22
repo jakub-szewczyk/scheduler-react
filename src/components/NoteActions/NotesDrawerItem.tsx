@@ -20,10 +20,16 @@ type Params = {
 interface NotesDrawerItemProps {
   note: Pick<Note, 'id' | 'createdAt' | 'name'>
   notes: Pick<Note, 'id' | 'createdAt' | 'name'>[]
+  disableDelete?: boolean
   onSelect: (noteId: string) => void
 }
 
-const NotesDrawerItem = ({ note, notes, onSelect }: NotesDrawerItemProps) => {
+const NotesDrawerItem = ({
+  note,
+  notes,
+  disableDelete,
+  onSelect,
+}: NotesDrawerItemProps) => {
   const {
     value: isDeleteNoteDialogOpen,
     setFalse: closeDeleteNoteDialog,
@@ -110,12 +116,12 @@ const NotesDrawerItem = ({ note, notes, onSelect }: NotesDrawerItemProps) => {
         </ListItemButton>
         <Tooltip
           placement='left'
-          title={notes.length === 1 && 'At least one note is required'}
+          title={disableDelete && 'At least one note is required'}
         >
           <Box>
             <IconButton
               size='small'
-              disabled={notes.length === 1}
+              disabled={disableDelete}
               onClick={openDeleteNoteDialog}
             >
               <CloseIcon fontSize='small' />
