@@ -1,20 +1,26 @@
+import DrawerEmptyItem from '@/layout/DrawerEmptyItem/DrawerEmptyItem'
 import DrawerSkeletonItem from '@/layout/DrawerSkeletonItem/DrawerSkeletonItem'
 import { NOTES_PAGE_SIZE } from '@/modules/note'
 import { getNotes } from '@/services/note'
 import AddIcon from '@mui/icons-material/Add'
+import ClearIcon from '@mui/icons-material/Clear'
+import SearchIcon from '@mui/icons-material/Search'
 import {
   Box,
   Button,
+  IconButton,
+  InputAdornment,
   Stack,
   SwipeableDrawer,
   SwipeableDrawerProps,
+  TextField,
   Typography,
 } from '@mui/material'
 import List from '@mui/material/List'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { MouseEventHandler, useEffect, useRef } from 'react'
+import { ChangeEvent, MouseEventHandler, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { useIntersectionObserver } from 'usehooks-ts'
+import { useDebounceCallback, useIntersectionObserver } from 'usehooks-ts'
 import NotesDrawerItem from './NotesDrawerItem'
 
 type Params = {
@@ -28,11 +34,12 @@ interface NotesDrawerProps extends Omit<SwipeableDrawerProps, 'onSelect'> {
 }
 
 const NotesDrawer = ({ onCreate, onSelect, ...props }: NotesDrawerProps) => {
+  const [search, setSearch] = useState('')
+
   const params = useParams<Params>()
 
-  /* FIXME:
-   * Subsequent pages not fetching when opening a drawer while the initial set of items is still loading.
-   */
+  const inputRef = useRef<HTMLInputElement>()
+
   const {
     data: notes,
     isLoading: isEachNoteLoading,
@@ -41,12 +48,21 @@ const NotesDrawer = ({ onCreate, onSelect, ...props }: NotesDrawerProps) => {
     hasNextPage: hasNextNotesPage,
     fetchNextPage: fetchNextNotesPage,
   } = useInfiniteQuery(
-    ['infinite', 'projects', params.projectId, 'notes'],
+    [
+      'infinite',
+      'projects',
+      params.projectId,
+      'notes',
+      {
+        ...(search && { name: search }),
+      },
+    ],
     ({ pageParam = 0 }) =>
       getNotes({
         projectId: params.projectId!,
         page: pageParam,
         size: NOTES_PAGE_SIZE,
+        ...(search && { name: search }),
       }),
     {
       getNextPageParam: (lastPage) =>
@@ -56,15 +72,21 @@ const NotesDrawer = ({ onCreate, onSelect, ...props }: NotesDrawerProps) => {
     }
   )
 
-  const ref = useRef<HTMLDivElement | null>(null)
-
-  const entry = useIntersectionObserver(ref, {
+  const { ref: itemRef } = useIntersectionObserver({
     freezeOnceVisible: isFetchingNextNotesPage,
+    onChange: (isIntersecting) => isIntersecting && fetchNextNotesPage(),
   })
 
-  useEffect(() => {
-    entry?.isIntersecting && fetchNextNotesPage()
-  }, [entry?.isIntersecting, fetchNextNotesPage])
+  const handleNoteSearchChange = useDebounceCallback(
+    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      setSearch(event.target.value),
+    500
+  )
+
+  const handleNoteSearchClear = () => {
+    setSearch('')
+    inputRef.current!.value = ''
+  }
 
   return (
     <SwipeableDrawer
@@ -84,6 +106,30 @@ const NotesDrawer = ({ onCreate, onSelect, ...props }: NotesDrawerProps) => {
           <Typography variant='h6' align='center'>
             Create or load notes
           </Typography>
+          <Box>
+            <TextField
+              size='small'
+              label='Search'
+              fullWidth
+              defaultValue={search || ''}
+              onChange={handleNoteSearchChange}
+              InputProps={{
+                inputRef,
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+                endAdornment: search ? (
+                  <InputAdornment position='end'>
+                    <IconButton size='small' onClick={handleNoteSearchClear}>
+                      <ClearIcon fontSize='small' />
+                    </IconButton>
+                  </InputAdornment>
+                ) : null,
+              }}
+            />
+          </Box>
           <List
             sx={{
               overflow: 'auto',
@@ -123,7 +169,11 @@ const NotesDrawer = ({ onCreate, onSelect, ...props }: NotesDrawerProps) => {
                   />
                 ))
               )}
-            {hasNextNotesPage && <DrawerSkeletonItem ref={ref} />}
+            {isEachNoteFetchedSuccessfully &&
+              notes.pages.flatMap((page) => page.content).length === 0 && (
+                <DrawerEmptyItem />
+              )}
+            {hasNextNotesPage && <DrawerSkeletonItem ref={itemRef} />}
           </List>
         </Stack>
         <Box>

@@ -21,7 +21,6 @@ interface BoardsDrawerItemProps {
   board: Pick<Board, 'id' | 'createdAt' | 'name'>
   boards: Pick<Board, 'id' | 'createdAt' | 'name'>[]
   disableDelete?: boolean
-
   onSelect: (boardId: string) => void
 }
 

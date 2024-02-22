@@ -6,6 +6,7 @@ interface GetNotesParams {
   projectId: string
   page?: number
   size?: number
+  name?: string
 }
 
 type GetNotesResponse = PaginatedResponse<
