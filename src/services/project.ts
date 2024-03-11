@@ -6,6 +6,7 @@ type GetProjectsParams = Partial<{
   page: number
   size: number
   name: string
+  createdAt: 'ASC' | 'DESC'
 }>
 
 type GetProjectsResponse = PaginatedResponse<Project[]>

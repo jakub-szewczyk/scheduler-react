@@ -113,7 +113,7 @@ const SchedulesDrawer = ({
           <Box>
             <TextField
               size='small'
-              label='Search'
+              label='Search by name'
               fullWidth
               defaultValue={search || ''}
               onChange={handleScheduleSearchChange}

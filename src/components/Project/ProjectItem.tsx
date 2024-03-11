@@ -6,6 +6,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import {
   Box,
   Card,
+  CardActionArea,
   CardActions,
   CardContent,
   CardHeader,
@@ -198,94 +199,98 @@ const ProjectItem = ({
           },
         }}
       >
-        <CardHeader
-          title={project.name}
-          subheader={formatDistanceToNow(new Date(project.createdAt), {
-            addSuffix: true,
-          })}
-          titleTypographyProps={{
-            variant: 'body1',
-            noWrap: true,
-          }}
-          subheaderTypographyProps={{
-            variant: 'body2',
-            noWrap: true,
-          }}
-          sx={{
-            pb: 0,
-            ...(isProjectSelected && {
-              '.MuiCardHeader-subheader': {
-                color: (theme) => theme.palette.grey['900'],
-              },
-            }),
-            '.MuiCardHeader-content': {
-              width: 'calc(100% - 60px)',
-            },
-          }}
-        />
-        <CardContent sx={{ pb: '0.5rem !important' }}>
-          <Typography
-            variant='body2'
-            sx={{
-              overflow: 'hidden',
-              display: '-webkit-box',
-              WebkitLineClamp: '1',
-              WebkitBoxOrient: 'vertical',
+        <CardActionArea>
+          <CardHeader
+            title={project.name}
+            subheader={formatDistanceToNow(new Date(project.createdAt), {
+              addSuffix: true,
+            })}
+            titleTypographyProps={{
+              variant: 'body1',
+              noWrap: true,
             }}
-          >
-            {project.description}
-          </Typography>
-        </CardContent>
-        <CardActions
-          disableSpacing
-          sx={{
-            mt: 'auto',
-            '.MuiSvgIcon-root': {
+            subheaderTypographyProps={{
+              variant: 'body2',
+              noWrap: true,
+            }}
+            sx={{
+              pb: 0,
               ...(isProjectSelected && {
-                fill: (theme) => theme.palette.common.black,
+                '.MuiCardHeader-subheader': {
+                  color: (theme) => theme.palette.grey['900'],
+                },
               }),
-            },
-          }}
-        >
-          <Box
-            onClick={(event) => isCreatingProject && event.stopPropagation()}
-          >
-            <IconButton size='small' onClick={handleCreateIconButtonClick}>
-              <AddIcon fontSize='small' />
-            </IconButton>
-          </Box>
-          <Box
-            onClick={(event) => isCreatingProject && event.stopPropagation()}
-          >
-            <IconButton size='small' onClick={handleEditIconButtonClick}>
-              <EditIcon fontSize='small' />
-            </IconButton>
-          </Box>
-          <Tooltip
-            placement='left'
-            title={disableDelete && 'At least one project is required'}
+              '.MuiCardHeader-content': {
+                width: 'calc(100% - 60px)',
+              },
+            }}
+          />
+          <CardContent sx={{ pb: '0.5rem !important' }}>
+            <Typography
+              variant='body2'
+              sx={{
+                overflow: 'hidden',
+                display: '-webkit-box',
+                WebkitLineClamp: '1',
+                WebkitBoxOrient: 'vertical',
+              }}
+            >
+              {project.description}
+            </Typography>
+          </CardContent>
+          <CardActions
+            disableSpacing
+            sx={{
+              mt: 'auto',
+              '.MuiSvgIcon-root': {
+                ...(isProjectSelected && {
+                  fill: (theme) => theme.palette.common.black,
+                }),
+              },
+            }}
           >
             <Box
               onClick={(event) => isCreatingProject && event.stopPropagation()}
             >
-              <IconButton
-                size='small'
-                disabled={disableDelete}
-                onClick={handleDeleteIconButtonClick}
-                sx={{
-                  '.MuiSvgIcon-root': {
-                    ...(isProjectSelected &&
-                      disableDelete && {
-                      fill: 'rgba(0, 0, 0, 0.3)',
-                    }),
-                  },
-                }}
-              >
-                <DeleteIcon fontSize='small' />
+              <IconButton size='small' onClick={handleCreateIconButtonClick}>
+                <AddIcon fontSize='small' />
               </IconButton>
             </Box>
-          </Tooltip>
-        </CardActions>
+            <Box
+              onClick={(event) => isCreatingProject && event.stopPropagation()}
+            >
+              <IconButton size='small' onClick={handleEditIconButtonClick}>
+                <EditIcon fontSize='small' />
+              </IconButton>
+            </Box>
+            <Tooltip
+              placement='left'
+              title={disableDelete && 'At least one project is required'}
+            >
+              <Box
+                onClick={(event) =>
+                  isCreatingProject && event.stopPropagation()
+                }
+              >
+                <IconButton
+                  size='small'
+                  disabled={disableDelete}
+                  onClick={handleDeleteIconButtonClick}
+                  sx={{
+                    '.MuiSvgIcon-root': {
+                      ...(isProjectSelected &&
+                        disableDelete && {
+                        fill: 'rgba(0, 0, 0, 0.3)',
+                      }),
+                    },
+                  }}
+                >
+                  <DeleteIcon fontSize='small' />
+                </IconButton>
+              </Box>
+            </Tooltip>
+          </CardActions>
+        </CardActionArea>
       </Card>
       <UpsertProjectDialog
         mode='insert'

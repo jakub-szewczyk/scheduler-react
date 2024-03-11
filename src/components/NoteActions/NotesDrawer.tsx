@@ -109,7 +109,7 @@ const NotesDrawer = ({ onCreate, onSelect, ...props }: NotesDrawerProps) => {
           <Box>
             <TextField
               size='small'
-              label='Search'
+              label='Search by name'
               fullWidth
               defaultValue={search || ''}
               onChange={handleNoteSearchChange}

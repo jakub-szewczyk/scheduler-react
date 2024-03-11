@@ -11,7 +11,11 @@ import {
   InputAdornment,
   Pagination,
   TextField,
+  Select,
   Typography,
+  FormControl,
+  InputLabel,
+  MenuItem,
 } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2/Grid2'
 import { useQuery } from '@tanstack/react-query'
@@ -25,12 +29,15 @@ const Projects = () => {
 
   const search = searchParams.get('search')
 
+  const createdAt = searchParams.get('createdAt')
+
   const inputRef = useRef<HTMLInputElement>()
 
   const projectsParams = {
     page: +searchParams.get('page')!,
     size: PROJECTS_PAGE_SIZE,
     ...(search && { name: search }),
+    ...(createdAt && { createdAt }),
   }
 
   const {
@@ -113,10 +120,20 @@ const Projects = () => {
             <CircularProgress />
           </Box>
         )}
-        <Box sx={{ width: '100%', px: 1, mt: { xs: 1.25, sm: 0.25 }, mb: 1 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            columnGap: 1,
+            width: '100%',
+            px: 1,
+            mt: { xs: 1.25, sm: 0.25 },
+            mb: 1,
+          }}
+        >
           <TextField
             size='small'
-            label='Search'
+            label='Search by name'
             fullWidth
             defaultValue={search || ''}
             onChange={handleProjectSearchChange}
@@ -125,9 +142,9 @@ const Projects = () => {
               maxWidth: {
                 xs: '100%',
                 sm: 'calc(50% - 8px)',
-                md: `calc(${(4 / 12) * 100}% - 10px)`,
+                md: `calc(${(4 / 12) * 100}% - 10.7px)`,
                 lg: 'calc(25% - 12px)',
-                xl: `calc(${(2.4 / 12) * 100}% - 12px)`,
+                xl: `calc(${(2.4 / 12) * 100}% - 12.8px)`,
               },
             }}
             InputProps={{
@@ -146,6 +163,29 @@ const Projects = () => {
               ) : null,
             }}
           />
+          <FormControl
+            size='small'
+            sx={{ width: '100%', maxWidth: { xs: 100, sm: 140 } }}
+          >
+            <InputLabel id='createdAt' size='small'>
+              Sort by date
+            </InputLabel>
+            <Select
+              size='small'
+              labelId='createdAt'
+              label='Sort by date'
+              defaultValue={createdAt || 'DESC'}
+              onChange={(event) =>
+                setSearchParams((searchParams) => ({
+                  ...Object.fromEntries(searchParams),
+                  createdAt: event.target.value,
+                }))
+              }
+            >
+              <MenuItem value='DESC'>Latest first</MenuItem>
+              <MenuItem value='ASC'>Oldest first</MenuItem>
+            </Select>
+          </FormControl>
         </Box>
         {isEachProjectFetchedSuccessfully &&
           projects.content.map((project, _, array) => (
