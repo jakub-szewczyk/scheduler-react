@@ -1,7 +1,7 @@
 import ProjectItem from '@/components/Project/ProjectItem'
 import { Container } from '@/components/Project/styles/Project.styles'
 import { PROJECTS_PAGE_SIZE } from '@/modules/project'
-import { getProjects } from '@/services/project'
+import { GetProjectsParams, getProjects } from '@/services/project'
 import ClearIcon from '@mui/icons-material/Clear'
 import SearchIcon from '@mui/icons-material/Search'
 import {
@@ -29,7 +29,9 @@ const Projects = () => {
 
   const search = searchParams.get('search')
 
-  const createdAt = searchParams.get('createdAt')
+  const createdAt = searchParams.get('createdAt') as
+    | (GetProjectsParams['createdAt'] & string)
+    | null
 
   const inputRef = useRef<HTMLInputElement>()
 

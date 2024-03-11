@@ -2,7 +2,7 @@ import { PaginatedResponse } from '@/types/api'
 import { Project } from '@/types/project'
 import api from './api'
 
-type GetProjectsParams = Partial<{
+export type GetProjectsParams = Partial<{
   page: number
   size: number
   name: string
