@@ -9,7 +9,7 @@ export type GetProjectsParams = Partial<{
   createdAt: 'ASC' | 'DESC'
 }>
 
-type GetProjectsResponse = PaginatedResponse<Project[]>
+export type GetProjectsResponse = PaginatedResponse<Project[]>
 
 export const getProjects = (params?: GetProjectsParams) =>
   api<GetProjectsResponse>('/projects', { params }).then(({ data }) => data)

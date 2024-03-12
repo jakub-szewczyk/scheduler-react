@@ -1,4 +1,4 @@
-import ProjectItem from '@/components/Project/ProjectItem'
+import ProjectList from '@/components/Project/ProjectList'
 import { Container } from '@/components/Project/styles/Project.styles'
 import { PROJECTS_PAGE_SIZE } from '@/modules/project'
 import { GetProjectsParams, getProjects } from '@/services/project'
@@ -7,17 +7,16 @@ import SearchIcon from '@mui/icons-material/Search'
 import {
   Box,
   CircularProgress,
+  FormControl,
   IconButton,
   InputAdornment,
-  Pagination,
-  TextField,
-  Select,
-  Typography,
-  FormControl,
   InputLabel,
   MenuItem,
+  Pagination,
+  Select,
+  TextField,
+  Typography,
 } from '@mui/material'
-import Grid from '@mui/material/Unstable_Grid2/Grid2'
 import { useQuery } from '@tanstack/react-query'
 import { omit } from 'ramda'
 import { ChangeEvent, useRef } from 'react'
@@ -34,6 +33,8 @@ const Projects = () => {
     | null
 
   const inputRef = useRef<HTMLInputElement>()
+
+  const isEachProjectInitializedRef = useRef(false)
 
   const projectsParams = {
     page: +searchParams.get('page')!,
@@ -52,6 +53,7 @@ const Projects = () => {
     () => getProjects(projectsParams),
     {
       onSuccess: (projects) => {
+        isEachProjectInitializedRef.current = true
         if (
           !searchParams.get('projectId') ||
           !searchParams.get('projectName')
@@ -137,6 +139,7 @@ const Projects = () => {
             size='small'
             label='Search by name'
             fullWidth
+            disabled={!isEachProjectInitializedRef.current}
             defaultValue={search || ''}
             onChange={handleProjectSearchChange}
             sx={{
@@ -153,7 +156,13 @@ const Projects = () => {
               inputRef,
               startAdornment: (
                 <InputAdornment position='start'>
-                  <SearchIcon />
+                  <SearchIcon
+                    style={{
+                      ...(!isEachProjectInitializedRef.current && {
+                        opacity: 0.5,
+                      }),
+                    }}
+                  />
                 </InputAdornment>
               ),
               endAdornment: search ? (
@@ -176,6 +185,7 @@ const Projects = () => {
               size='small'
               labelId='createdAt'
               label='Sort by date'
+              disabled={!isEachProjectInitializedRef.current}
               defaultValue={createdAt || 'DESC'}
               onChange={(event) =>
                 setSearchParams((searchParams) => ({
@@ -189,51 +199,9 @@ const Projects = () => {
             </Select>
           </FormControl>
         </Box>
-        {isEachProjectFetchedSuccessfully &&
-          projects.content.map((project, _, array) => (
-            <Grid key={project.name} xs={12} sm={6} md={4} lg={3} xl={12 / 5}>
-              <ProjectItem
-                project={project}
-                onAfterCreate={() => (inputRef.current!.value = '')}
-                onAfterDelete={(project) => {
-                  const isProjectSelected =
-                    project.id === searchParams.get('projectId')
-                  const isProjectLastOnPage = projects.content.length === 1
-                  if (isProjectSelected && isProjectLastOnPage) {
-                    inputRef.current!.value = ''
-                    return setSearchParams((searchParams) => ({
-                      page: Math.max(
-                        0,
-                        +searchParams.get('page')! - 1
-                      ).toString(),
-                      transitional: 'true',
-                    }))
-                  }
-                  if (!isProjectSelected && isProjectLastOnPage) {
-                    inputRef.current!.value = ''
-                    return setSearchParams((searchParams) => ({
-                      ...omit(['search'], Object.fromEntries(searchParams)),
-                      page: Math.max(
-                        0,
-                        +searchParams.get('page')! - 1
-                      ).toString(),
-                    }))
-                  }
-                  if (isProjectSelected && !isProjectLastOnPage) {
-                    const index = array.findIndex(({ id }) => id === project.id)
-                    setSearchParams(
-                      (searchParams) => ({
-                        ...Object.fromEntries(searchParams),
-                        projectId: array[Math.abs(index - 1)].id,
-                        projectName: array[Math.abs(index - 1)].name,
-                      }),
-                      { replace: true }
-                    )
-                  }
-                }}
-              />
-            </Grid>
-          ))}
+        {isEachProjectFetchedSuccessfully && (
+          <ProjectList projects={projects} />
+        )}
         {/* TODO:
          * Improve error display.
          */}
