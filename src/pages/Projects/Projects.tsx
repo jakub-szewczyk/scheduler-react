@@ -74,6 +74,13 @@ const Projects = () => {
     }
   )
 
+  /* TODO:
+   * `defaultValue` causes search value to be visible when it shouldn't.
+   * Steps to reproduce:
+   * 1. Search for a project.
+   * 2. Add a new project.
+   * 3. Search value isn't applied any more but it's visible inside the textfield.
+   * */
   const handleProjectSearchChange = useDebounceCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       setSearchParams(
