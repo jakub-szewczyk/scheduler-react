@@ -182,8 +182,6 @@ const ProjectItem = ({
         elevation={0}
         onClick={handleProjectSelect}
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
           height: '100%',
           cursor: 'pointer',
           bgcolor: 'rgba(0, 0, 0, 0.35)',
@@ -199,7 +197,15 @@ const ProjectItem = ({
           },
         }}
       >
-        <CardActionArea>
+        <CardActionArea
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            justifyContent: 'flex-start',
+            height: '100%',
+          }}
+        >
           <CardHeader
             title={project.name}
             subheader={formatDistanceToNow(new Date(project.createdAt), {
