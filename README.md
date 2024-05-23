@@ -1,45 +1,30 @@
-# Scheduler
+# React + TypeScript + Vite
 
-Schedule your tasks with ease!
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Features
+Currently, two official plugins are available:
 
-### Multiple project management
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-![](/public/screenshots/1.png)
+## Expanding the ESLint configuration
 
-### Take notes with the built-in editor
+If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
 
-![](/public/screenshots/2.png)
+- Configure the top-level `parserOptions` property like this:
 
-### Drag and drop your tasks on a kanban board
+```js
+export default {
+  // other rules...
+  parserOptions: {
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+    project: ['./tsconfig.json', './tsconfig.node.json'],
+    tsconfigRootDir: __dirname,
+  },
+}
+```
 
-![](/public/screenshots/3.png)
-
-### Schedule your tasks and meetings
-
-![](/public/screenshots/4.png)
-
-## Todo
-
-- Increase test coverage.
-
-- Server side persistance layer.
-
-- Flickering save/rename text inside upsert dialogs.
-
-## Known issues
-
-### Kanban board - invalid menu position
-
-Kanban scrollbar somehow collides with the MUI `<Menu />` component, resulting in an invalid menu position and unnecessary scroll restoration. Unknown steps to reproduce. The bug appears when opening the status or issue context menu.
-
-### Kanban board - shaky drag animation
-
-Steps to reproduce:
-
-1. Make sure the kanban board is vertically scrollable.
-
-2. Grab any issue item and drag it to the bottom.
-
-3. Observe dragged element shaking.
+- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
+- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
+- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
