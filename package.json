@@ -1,13 +1,16 @@
 {
   "name": "scheduler-react",
   "private": true,
-  "version": "0.0.0",
+  "version": "2.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "check": "tsc --noEmit",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "prettify": "prettier ./src/**/*.{ts,tsx} --write",
+    "preview": "vite preview",
+    "prepare": "husky"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.2.0",
@@ -20,6 +23,8 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.3.0",
+    "@commitlint/config-conventional": "^19.2.2",
     "@tanstack/router-devtools": "^1.33.7",
     "@tanstack/router-vite-plugin": "^1.32.17",
     "@types/node": "^20.12.12",
@@ -32,6 +37,8 @@
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.4",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",
     "typescript": "^5.2.2",
