@@ -1,9 +1,7 @@
 import { RedirectToSignIn, SignedIn, SignedOut } from '@clerk/clerk-react'
-import { createLazyFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 
-const Dashboard = () => <p>Dashboard</p>
-
-export const Route = createLazyFileRoute('/')({
+export const Route = createFileRoute('/')({
   component: () => (
     <>
       <SignedIn>
@@ -15,3 +13,7 @@ export const Route = createLazyFileRoute('/')({
     </>
   ),
 })
+
+function Dashboard() {
+  return <p>Dashboard</p>
+}

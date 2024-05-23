@@ -1,16 +1,8 @@
-import {
-  ClerkProvider,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from '@clerk/clerk-react'
-import {
-  Link,
-  Outlet,
-  createRootRoute,
-  useNavigate,
-} from '@tanstack/react-router'
-import { lazy } from 'react'
+import Navbar from '@/components/layout/Navbar/Navbar'
+import Sidebar from '@/components/layout/Sidebar/Sidebar'
+import { ClerkProvider } from '@clerk/clerk-react'
+import { Outlet, createRootRoute } from '@tanstack/react-router'
+import { Suspense, lazy } from 'react'
 
 const TanStackRouterDevtools =
   process.env.NODE_ENV === 'production'
@@ -21,40 +13,31 @@ const TanStackRouterDevtools =
         }))
       )
 
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+export const Route = createRootRoute({
+  component: Root,
+})
 
-if (!PUBLISHABLE_KEY) throw new Error('missing publishable key')
-
-const RootLayout = () => {
-  const navigate = useNavigate()
+function Root() {
+  const navigate = Route.useNavigate()
 
   return (
     <>
       <ClerkProvider
         routerPush={(to) => navigate({ to })}
         routerReplace={(to) => navigate({ to, replace: true })}
-        publishableKey={PUBLISHABLE_KEY}
+        publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
       >
-        <header className='flex justify-end gap-x-2 px-6 py-4 bg-blue-50'>
-          <SignedIn>
-            <UserButton />
-          </SignedIn>
-          <SignedOut>
-            <Link to='/sign-in'>Sign in</Link>
-          </SignedOut>
-          <SignedOut>
-            <Link to='/sign-up'>Sign up</Link>
-          </SignedOut>
-        </header>
-        <main className='p-6'>
-          <Outlet />
-        </main>
+        <Navbar />
+        <div className='flex'>
+          <Sidebar />
+          <main className='p-4'>
+            <Outlet />
+          </main>
+        </div>
       </ClerkProvider>
-      <TanStackRouterDevtools />
+      <Suspense>
+        <TanStackRouterDevtools position='bottom-right' />
+      </Suspense>
     </>
   )
 }
-
-export const Route = createRootRoute({
-  component: RootLayout,
-})
