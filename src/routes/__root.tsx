@@ -5,12 +5,21 @@ import {
   UserButton,
 } from '@clerk/clerk-react'
 import {
-  createRootRoute,
   Link,
   Outlet,
+  createRootRoute,
   useNavigate,
 } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/router-devtools'
+import { lazy } from 'react'
+
+const TanStackRouterDevtools =
+  process.env.NODE_ENV === 'production'
+    ? () => null
+    : lazy(() =>
+        import('@tanstack/router-devtools').then((res) => ({
+          default: res.TanStackRouterDevtools,
+        }))
+      )
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
