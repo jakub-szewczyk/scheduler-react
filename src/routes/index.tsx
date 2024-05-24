@@ -1,3 +1,4 @@
+import Heading3 from '@/components/layout/Heading3/Heading3'
 import { RedirectToSignIn, SignedIn, SignedOut } from '@clerk/clerk-react'
 import { createFileRoute } from '@tanstack/react-router'
 
@@ -15,5 +16,5 @@ export const Route = createFileRoute('/')({
 })
 
 function Dashboard() {
-  return <p>Dashboard</p>
+  return <Heading3>Dashboard</Heading3>
 }

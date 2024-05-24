@@ -28,9 +28,9 @@ function Root() {
         publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
       >
         <Navbar />
-        <div className='flex'>
+        <div className='flex w-full'>
           <Sidebar />
-          <main className='p-4'>
+          <main className='w-full p-4 bg-muted/40 sm:p-6'>
             <Outlet />
           </main>
         </div>
