@@ -1,6 +1,6 @@
 import Navbar from '@/components/layout/Navbar/Navbar'
 import Sidebar from '@/components/layout/Sidebar/Sidebar'
-import { ClerkProvider } from '@clerk/clerk-react'
+import { ClerkProvider, SignedIn, SignedOut } from '@clerk/clerk-react'
 import { Outlet, createRootRoute } from '@tanstack/react-router'
 import { Suspense, lazy } from 'react'
 
@@ -27,13 +27,20 @@ function Root() {
         routerReplace={(to) => navigate({ to, replace: true })}
         publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
       >
-        <Navbar />
-        <div className='flex w-full'>
-          <Sidebar />
-          <main className='w-full p-4 bg-muted/40 sm:p-6'>
+        <SignedIn>
+          <Navbar />
+          <div className='flex w-full'>
+            <Sidebar />
+            <main className='w-full p-4 bg-muted/40 sm:p-6'>
+              <Outlet />
+            </main>
+          </div>
+        </SignedIn>
+        <SignedOut>
+          <main className='flex items-center justify-center h-[calc(100vh-3rem)] p-4 bg-muted/40 sm:p-6'>
             <Outlet />
           </main>
-        </div>
+        </SignedOut>
       </ClerkProvider>
       <Suspense>
         <TanStackRouterDevtools position='bottom-right' />

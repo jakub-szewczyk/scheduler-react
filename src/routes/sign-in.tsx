@@ -8,5 +8,5 @@ export const Route = createFileRoute('/sign-in')({
 function SignIn() {
   const { loaded } = useClerk()
 
-  return loaded ? <ClerkSignIn /> : <p>Loading...</p>
+  return loaded && <ClerkSignIn />
 }

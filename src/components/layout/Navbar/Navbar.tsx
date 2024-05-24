@@ -1,17 +1,8 @@
-import { SignedIn, SignedOut, UserButton } from '@clerk/clerk-react'
-import { Link } from '@tanstack/react-router'
+import { UserButton } from '@clerk/clerk-react'
 
 const Navbar = () => (
-  <header className='flex items-center justify-end gap-x-2 h-12 px-3 border-b'>
-    <SignedIn>
-      <UserButton />
-    </SignedIn>
-    <SignedOut>
-      <Link to='/sign-in'>Sign in</Link>
-    </SignedOut>
-    <SignedOut>
-      <Link to='/sign-up'>Sign up</Link>
-    </SignedOut>
+  <header className='flex items-center justify-end gap-x-2 h-12 px-3 border-b sm:px-6'>
+    <UserButton />
   </header>
 )
 

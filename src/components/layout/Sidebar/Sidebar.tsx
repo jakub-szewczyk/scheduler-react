@@ -3,7 +3,7 @@ import SidebarLink from '../SidebarLink/SidebarLink'
 
 const Sidebar = () => (
   <aside className='w-14 border-r h-[calc(100vh-3rem)]'>
-    <nav className='flex flex-col items-center gap-y-2 h-full py-2 sm:pt-4'>
+    <nav className='flex flex-col items-center gap-y-2 h-full py-2 sm:py-4'>
       <SidebarLink to='/' tooltip='Dashboard'>
         <Home />
       </SidebarLink>
