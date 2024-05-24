@@ -43,7 +43,7 @@ function Root() {
         </SignedOut>
       </ClerkProvider>
       <Suspense>
-        <TanStackRouterDevtools position='bottom-right' />
+        <TanStackRouterDevtools position='top-left' />
       </Suspense>
     </>
   )
