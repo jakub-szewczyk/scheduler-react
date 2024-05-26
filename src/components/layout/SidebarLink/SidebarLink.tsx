@@ -18,25 +18,30 @@ const SidebarLink = ({
   className,
   tooltip,
   ...props
-}: SidebarLink) => (
-  <TooltipProvider delayDuration={100}>
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button className={className} asChild variant='ghost' size='icon'>
-          <Link
-            inactiveProps={{
-              className:
-                'text-muted-foreground transition-colors hover:text-foreground',
-            }}
-            {...props}
-          >
-            {children}
-          </Link>
-        </Button>
-      </TooltipTrigger>
-      {tooltip && <TooltipContent side='right'>{tooltip}</TooltipContent>}
-    </Tooltip>
-  </TooltipProvider>
-)
+}: SidebarLink) => {
+  const button = (
+    <Button className={className} asChild size='icon' variant='ghost'>
+      <Link
+        inactiveProps={{
+          className:
+            'text-muted-foreground transition-colors hover:text-foreground',
+        }}
+        {...props}
+      >
+        {children}
+      </Link>
+    </Button>
+  )
 
+  return tooltip ? (
+    <TooltipProvider delayDuration={100}>
+      <Tooltip>
+        <TooltipTrigger asChild>{button}</TooltipTrigger>
+        <TooltipContent side='right'>{tooltip}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  ) : (
+    button
+  )
+}
 export default SidebarLink

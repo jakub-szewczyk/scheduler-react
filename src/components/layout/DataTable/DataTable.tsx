@@ -113,7 +113,7 @@ const columns: ColumnDef<Data>[] = [
     cell: () => (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant='ghost' className='w-8 h-8 p-0'>
+          <Button variant='ghost' className='w-8 h-8 p-0 float-right'>
             <MoreHorizontal className=' w-4 h-4' />
           </Button>
         </DropdownMenuTrigger>
@@ -160,9 +160,9 @@ const DataTable = ({ className }: DataTableProps) => {
 
   return (
     <div className={className}>
-      <div className='flex items-center justify-between gap-x-2 mb-4'>
+      <div className='flex flex-wrap items-center justify-between gap-x-2 gap-y-4 mb-4'>
         <Input
-          className='max-w-sm'
+          className='w-full sm:max-w-sm'
           placeholder='Search by title'
           value={(table.getColumn('title')?.getFilterValue() as string) || ''}
           onChange={(event) =>
@@ -171,7 +171,10 @@ const DataTable = ({ className }: DataTableProps) => {
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant='outline'>
+            <Button
+              className='w-full justify-between sm:max-w-fit'
+              variant='outline'
+            >
               Columns <ChevronDown className='w-4 h-4 ml-2' />
             </Button>
           </DropdownMenuTrigger>
