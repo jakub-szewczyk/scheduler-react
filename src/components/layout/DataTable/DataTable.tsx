@@ -246,7 +246,7 @@ const DataTable = ({ className }: DataTableProps) => {
           {table.getFilteredSelectedRowModel().rows.length} of{' '}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <div className='space-x-2'>
+        <div className='flex gap-x-2'>
           <Button
             size='sm'
             variant='outline'

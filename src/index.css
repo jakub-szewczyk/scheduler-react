@@ -76,8 +76,13 @@
   }
 }
 
+html,
 body {
   overflow-x: hidden;
+}
+
+html > body[data-scroll-locked] {
+  margin-right: 0 !important;
 }
 
 @keyframes fade-in {
