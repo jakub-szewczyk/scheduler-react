@@ -1,5 +1,3 @@
-/* eslint-disable @tanstack/query/exhaustive-deps */
-import { GetToken } from '@clerk/types'
 import { queryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
 import { api } from './api'
@@ -15,20 +13,13 @@ export type GetProjectsSearchParams = z.infer<
   typeof getProjectsSearchParamsSchema
 >
 
-export const getProjects = async (
-  getToken: GetToken,
-  params?: Partial<GetProjectsSearchParams>
-) =>
-  api('/projects', {
-    params,
-    headers: { Authorization: `Bearer ${await getToken()}` },
-  }).then(({ data }) => data)
+export const getProjects = async (params?: Partial<GetProjectsSearchParams>) =>
+  api('/projects', { params }).then(({ data }) => data)
 
 export const getProjectsQueryOptions = (
-  getToken: GetToken,
   params?: Partial<GetProjectsSearchParams>
 ) =>
   queryOptions({
     queryKey: ['projects', params],
-    queryFn: () => getProjects(getToken, params),
+    queryFn: () => getProjects(params),
   })

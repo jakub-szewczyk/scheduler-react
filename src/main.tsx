@@ -1,10 +1,10 @@
-import { ClerkProvider, useAuth } from '@clerk/clerk-react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { RouterProvider, createRouter } from '@tanstack/react-router'
-import { identity } from 'lodash/fp'
+import { ClerkProvider } from '@clerk/clerk-react'
+import { QueryClient } from '@tanstack/react-query'
+import { createRouter } from '@tanstack/react-router'
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
+import TanstackProvider from './providers/TanstackProvider'
 import { routeTree } from './routeTree.gen'
 
 declare module '@tanstack/react-router' {
@@ -13,23 +13,14 @@ declare module '@tanstack/react-router' {
   }
 }
 
+export type Router = typeof router
+
 const queryClient = new QueryClient()
 
 const router = createRouter({
   routeTree,
-  context: { getToken: identity, queryClient },
+  context: { queryClient, isSignedIn: false },
 })
-
-// eslint-disable-next-line react-refresh/only-export-components
-const TanstackProvider = () => {
-  const { getToken } = useAuth()
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} context={{ getToken }} />
-    </QueryClientProvider>
-  )
-}
 
 const rootElement = document.getElementById('root')!
 
@@ -43,7 +34,7 @@ if (!rootElement.innerHTML) {
         routerReplace={(to) => router.navigate({ to, replace: true })}
         publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
       >
-        <TanstackProvider />
+        <TanstackProvider router={router} queryClient={queryClient} />
       </ClerkProvider>
     </StrictMode>
   )
