@@ -32,7 +32,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => (
       {!isCollapsed ? (
         <Link
           to='/'
-          className='flex items-center justify-center gap-x-2 transition-transform duration-100 animate-[fade-in_300ms] hover:scale-105'
+          className='flex items-center justify-center gap-x-2 transition-transform duration-100 animate-[fade-in_300ms] hover:scale-[1.025]'
         >
           <div className='w-fit p-1.5 rounded-full bg-foreground text-background animate-[fade-in_300ms]'>
             <CalendarCheck size='20' />
