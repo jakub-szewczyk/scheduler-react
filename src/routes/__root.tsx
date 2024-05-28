@@ -2,9 +2,8 @@ import Navbar from '@/components/layout/Navbar/Navbar'
 import Sidebar from '@/components/layout/Sidebar/Sidebar'
 import { cn } from '@/modules/common'
 import { SignedIn, SignedOut } from '@clerk/clerk-react'
-import { QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
+import { Outlet, createRootRoute } from '@tanstack/react-router'
 import { Suspense, lazy } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
@@ -17,12 +16,7 @@ const TanStackRouterDevtools =
         }))
       )
 
-type Context = {
-  queryClient: QueryClient
-  isSignedIn: boolean
-}
-
-export const Route = createRootRouteWithContext<Context>()({
+export const Route = createRootRoute({
   component: Root,
 })
 

@@ -1,11 +1,15 @@
-import { RedirectToSignIn } from '@clerk/clerk-react'
+import Heading3 from '@/components/layout/Heading3/Heading3'
+import Protected from '@/components/layout/Protected/Protected'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/settings')({
-  component: () => <div>Hello /settings!</div>,
-  beforeLoad: ({ context }) => {
-    if (!context.isSignedIn) throw new Error('unauthorized')
-  },
-  errorComponent: (props) =>
-    props.error.message === 'unauthorized' ? <RedirectToSignIn /> : null,
+  component: () => (
+    <Protected>
+      <Settings />
+    </Protected>
+  ),
 })
+
+function Settings() {
+  return <Heading3>Settings</Heading3>
+}

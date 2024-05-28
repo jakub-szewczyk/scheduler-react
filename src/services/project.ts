@@ -1,4 +1,5 @@
-import { queryOptions } from '@tanstack/react-query'
+import { PaginableResponse } from '@/types/common'
+import { Project } from '@/types/project'
 import { z } from 'zod'
 import { api } from './api'
 
@@ -13,13 +14,7 @@ export type GetProjectsSearchParams = z.infer<
   typeof getProjectsSearchParamsSchema
 >
 
-export const getProjects = async (params?: Partial<GetProjectsSearchParams>) =>
-  api('/projects', { params }).then(({ data }) => data)
+type GetProjectsResponse = PaginableResponse<Project>
 
-export const getProjectsQueryOptions = (
-  params?: Partial<GetProjectsSearchParams>
-) =>
-  queryOptions({
-    queryKey: ['projects', params],
-    queryFn: () => getProjects(params),
-  })
+export const getProjects = async (params?: Partial<GetProjectsSearchParams>) =>
+  api<GetProjectsResponse>('/projects', { params }).then(({ data }) => data)

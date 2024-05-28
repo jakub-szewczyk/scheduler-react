@@ -1,4 +1,3 @@
-import Preloader from '@/components/layout/Preloader/Preloader'
 import { Router } from '@/main'
 import { api } from '@/services/api'
 import { useAuth } from '@clerk/clerk-react'
@@ -7,13 +6,14 @@ import { RouterProvider } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import ThemeProvider from './ThemeProvider'
 
+const queryClient = new QueryClient()
+
 interface TanstackProviderProps {
   router: Router
-  queryClient: QueryClient
 }
 
-const TanstackProvider = ({ router, queryClient }: TanstackProviderProps) => {
-  const { isLoaded, isSignedIn, getToken } = useAuth()
+const TanstackProvider = ({ router }: TanstackProviderProps) => {
+  const { getToken } = useAuth()
 
   useEffect(() => {
     const interceptor = api.interceptors.request.use(async (config) => {
@@ -26,11 +26,7 @@ const TanstackProvider = ({ router, queryClient }: TanstackProviderProps) => {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider storageKey='theme' defaultTheme='dark'>
-        {isLoaded ? (
-          <RouterProvider router={router} context={{ isSignedIn }} />
-        ) : (
-          <Preloader />
-        )}
+        <RouterProvider router={router} />
       </ThemeProvider>
     </QueryClientProvider>
   )

@@ -1,14 +1,13 @@
 import Heading3 from '@/components/layout/Heading3/Heading3'
-import { RedirectToSignIn } from '@clerk/clerk-react'
+import Protected from '@/components/layout/Protected/Protected'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/')({
-  component: Dashboard,
-  beforeLoad: ({ context }) => {
-    if (!context.isSignedIn) throw new Error('unauthorized')
-  },
-  errorComponent: (props) =>
-    props.error.message === 'unauthorized' ? <RedirectToSignIn /> : null,
+  component: () => (
+    <Protected>
+      <Dashboard />
+    </Protected>
+  ),
 })
 
 function Dashboard() {

@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
   TableBody,
@@ -18,16 +19,17 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { faker } from '@faker-js/faker'
+import { cn } from '@/modules/common'
 import {
   ColumnDef,
   ColumnFiltersState,
+  OnChangeFn,
+  PaginationState,
   SortingState,
   VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
@@ -42,102 +44,112 @@ interface Data {
   description: string
 }
 
-const data: Data[] = Array(30)
-  .fill(null)
-  .map(() => ({
-    id: faker.string.uuid(),
-    createdAt: faker.date.past().toISOString(),
-    title: faker.commerce.productName(),
-    description: faker.commerce.productDescription(),
-  }))
-
-const columns: ColumnDef<Data>[] = [
-  {
-    id: 'check',
-    enableHiding: false,
-    enableSorting: false,
-    header: ({ table }) => (
-      <Checkbox
-        className='translate-y-0.5'
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && 'indeterminate')
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        className='translate-y-0.5'
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-      />
-    ),
-  },
-  {
-    accessorKey: 'title',
-    enableSorting: false,
-    header: 'Title',
-    cell: ({ row }) => <div>{row.getValue('title')}</div>,
-  },
-  {
-    accessorKey: 'description',
-    enableSorting: false,
-    header: 'Description',
-    cell: ({ row }) => <div>{row.getValue('description')}</div>,
-  },
-  {
-    accessorKey: 'createdAt',
-    header: ({ column }) => (
-      <Button
-        className='-ml-4'
-        variant='ghost'
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        Created at
-        <ArrowUpDown className='w-4 h-4 ml-2' />
-      </Button>
-    ),
-    cell: ({ row }) => (
-      <div>
-        {new Intl.DateTimeFormat('en-US').format(
-          new Date(row.getValue('createdAt'))
-        )}
-      </div>
-    ),
-  },
-  {
-    id: 'actions',
-    enableHiding: false,
-    enableSorting: false,
-    cell: () => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant='ghost' className='w-8 h-8 p-0 float-right'>
-            <MoreHorizontal className=' w-4 h-4' />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align='end'>
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>Details</DropdownMenuItem>
-          <DropdownMenuItem>Edit</DropdownMenuItem>
-          <DropdownMenuItem>Delete</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
-  },
-]
-
 interface DataTableProps {
   className?: HTMLAttributes<HTMLDivElement>['className']
+  isFetching?: boolean
+  isPlaceholderData?: boolean
+  data: Data[] | undefined
+  pagination: PaginationState & {
+    rowCount: number | undefined
+    onPaginationChange: OnChangeFn<PaginationState>
+  }
 }
 
-const DataTable = ({ className }: DataTableProps) => {
+const DataTable = ({
+  data = [],
+  isFetching,
+  isPlaceholderData,
+  pagination,
+  className,
+}: DataTableProps) => {
   const [sorting, setSorting] = useState<SortingState>([])
   const [rowSelection, setRowSelection] = useState({})
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+
+  const columns: ColumnDef<Data>[] = [
+    {
+      id: 'check',
+      enableHiding: false,
+      enableSorting: false,
+      header: ({ table }) => (
+        <Checkbox
+          className='translate-y-0.5'
+          disabled={isFetching}
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && 'indeterminate')
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          className='translate-y-0.5'
+          disabled={isFetching}
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+        />
+      ),
+    },
+    {
+      accessorKey: 'title',
+      enableSorting: false,
+      header: 'Title',
+      cell: ({ row }) => <div>{row.getValue('title')}</div>,
+    },
+    {
+      accessorKey: 'description',
+      enableSorting: false,
+      header: 'Description',
+      cell: ({ row }) => <div>{row.getValue('description')}</div>,
+    },
+    {
+      accessorKey: 'createdAt',
+      header: ({ column }) => (
+        <Button
+          className='-ml-4'
+          variant='ghost'
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Created at
+          <ArrowUpDown className='w-4 h-4 ml-2' />
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <div>
+          {new Intl.DateTimeFormat('en-US').format(
+            new Date(row.getValue('createdAt'))
+          )}
+        </div>
+      ),
+    },
+    {
+      id: 'actions',
+      enableHiding: false,
+      enableSorting: false,
+      cell: () => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              className='w-8 h-8 p-0 float-right'
+              variant='ghost'
+              disabled={isFetching}
+            >
+              <MoreHorizontal className=' w-4 h-4' />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='end'>
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>Details</DropdownMenuItem>
+            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <DropdownMenuItem>Delete</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
+  ]
 
   const table = useReactTable({
     data,
@@ -147,6 +159,7 @@ const DataTable = ({ className }: DataTableProps) => {
       rowSelection,
       columnFilters,
       columnVisibility,
+      pagination,
     },
     onSortingChange: setSorting,
     onRowSelectionChange: setRowSelection,
@@ -155,7 +168,9 @@ const DataTable = ({ className }: DataTableProps) => {
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    manualPagination: true,
+    rowCount: pagination.rowCount,
+    onPaginationChange: pagination.onPaginationChange,
   })
 
   return (
@@ -212,22 +227,58 @@ const DataTable = ({ className }: DataTableProps) => {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows?.length > 0 ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
+                    <TableCell
+                      key={cell.id}
+                      className={cn(
+                        isFetching && !isPlaceholderData && 'opacity-50'
+                      )}
+                    >
+                      {isFetching &&
+                      isPlaceholderData &&
+                      !cell.id.includes('check') &&
+                      !cell.id.includes('actions') ? (
+                        <Skeleton className='h-4 w-full' />
+                      ) : (
+                        flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )
                       )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
+            ) : isFetching ? (
+              Array(pagination.pageSize)
+                .fill(null)
+                .map((_, index) => (
+                  <TableRow key={index} data-state={false}>
+                    {columns.map((column, index) => (
+                      <TableCell key={`${index}_${column.id}`}>
+                        {column.id?.includes('check') ? (
+                          <Checkbox className='translate-y-0.5' disabled />
+                        ) : column.id?.includes('actions') ? (
+                          <Button
+                            className='w-8 h-8 p-0 float-right'
+                            variant='ghost'
+                            disabled
+                          >
+                            <MoreHorizontal className=' w-4 h-4' />
+                          </Button>
+                        ) : (
+                          <Skeleton className='h-4 w-full' />
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
             ) : (
               <TableRow>
                 <TableCell

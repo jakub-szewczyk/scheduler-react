@@ -1,5 +1,4 @@
 import { ClerkProvider } from '@clerk/clerk-react'
-import { QueryClient } from '@tanstack/react-query'
 import { createRouter } from '@tanstack/react-router'
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
@@ -15,11 +14,8 @@ declare module '@tanstack/react-router' {
 
 export type Router = typeof router
 
-const queryClient = new QueryClient()
-
 const router = createRouter({
   routeTree,
-  context: { queryClient, isSignedIn: false },
 })
 
 const rootElement = document.getElementById('root')!
@@ -34,7 +30,7 @@ if (!rootElement.innerHTML) {
         routerReplace={(to) => router.navigate({ to, replace: true })}
         publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
       >
-        <TanstackProvider router={router} queryClient={queryClient} />
+        <TanstackProvider router={router} />
       </ClerkProvider>
     </StrictMode>
   )
