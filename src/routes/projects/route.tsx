@@ -1,4 +1,4 @@
-import DataTable from '@/components/layout/DataTable/DataTable'
+import DataTable from '@/components/domain/DataTable/DataTable'
 import Heading3 from '@/components/layout/Heading3/Heading3'
 import Protected from '@/components/layout/Protected/Protected'
 import { getProjects, getProjectsSearchParamsSchema } from '@/services/project'

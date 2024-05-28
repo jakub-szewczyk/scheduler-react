@@ -34,7 +34,14 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { lowerCase, upperFirst } from 'lodash/fp'
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from 'lucide-react'
+import {
+  ArrowUpDown,
+  ChevronDown,
+  FileText,
+  MoreHorizontal,
+  Pencil,
+  Trash,
+} from 'lucide-react'
 import { HTMLAttributes, useState } from 'react'
 
 interface Data {
@@ -142,9 +149,24 @@ const DataTable = ({
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Details</DropdownMenuItem>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
-            <DropdownMenuItem>Delete</DropdownMenuItem>
+            <DropdownMenuItem>
+              <div className='flex items-center justify-center gap-x-2'>
+                <FileText className='w-4 h-4' />
+                Details
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <div className='flex items-center justify-center gap-x-2'>
+                <Pencil className='w-4 h-4' />
+                Edit
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <div className='flex items-center justify-center gap-x-2 text-destructive'>
+                <Trash className='w-4 h-4' />
+                Delete
+              </div>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       ),
