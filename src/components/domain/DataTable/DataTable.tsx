@@ -10,6 +10,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+} from '@/components/ui/pagination'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
@@ -37,6 +43,10 @@ import { lowerCase, upperFirst } from 'lodash/fp'
 import {
   ArrowUpDown,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
   FileText,
   MoreHorizontal,
   Pencil,
@@ -320,22 +330,91 @@ const DataTable = ({
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
         <div className='flex gap-x-2'>
-          <Button
-            size='sm'
-            variant='outline'
-            disabled={!table.getCanPreviousPage()}
-            onClick={() => table.previousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            size='sm'
-            variant='outline'
-            disabled={!table.getCanNextPage()}
-            onClick={() => table.nextPage()}
-          >
-            Next
-          </Button>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <Button
+                  className='gap-x-2 w-8 h-8'
+                  size='icon'
+                  variant='ghost'
+                  disabled={!table.getCanPreviousPage()}
+                  onClick={() => table.firstPage()}
+                >
+                  <ChevronsLeft className='w-4 h-4' />
+                </Button>
+              </PaginationItem>
+              <PaginationItem>
+                <Button
+                  className='gap-x-2 w-8 h-8'
+                  size='icon'
+                  variant='ghost'
+                  disabled={!table.getCanPreviousPage()}
+                  onClick={() => table.previousPage()}
+                >
+                  <ChevronLeft className='w-4 h-4' />
+                </Button>
+              </PaginationItem>
+              {table.getPageOptions().map((pageIndex, _, array) => {
+                // TODO: Rename
+                const threshold = 3
+                const isLeftEllipsisVisible =
+                  pageIndex === 0 && pagination.pageIndex - threshold > 0
+                const isRightEllipsisVisible =
+                  pageIndex === array.length - 1 &&
+                  pagination.pageIndex + threshold < array.length - 1
+                return (
+                  <>
+                    {isRightEllipsisVisible && (
+                      <PaginationItem>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    )}
+                    <PaginationItem>
+                      <Button
+                        className='gap-x-2 w-8 h-8'
+                        size='icon'
+                        variant={
+                          pageIndex === pagination.pageIndex
+                            ? 'default'
+                            : 'ghost'
+                        }
+                        onClick={() => table.setPageIndex(pageIndex)}
+                      >
+                        {pageIndex + 1}
+                      </Button>
+                    </PaginationItem>
+                    {isLeftEllipsisVisible && (
+                      <PaginationItem>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    )}
+                  </>
+                )
+              })}
+              <PaginationItem>
+                <Button
+                  className='gap-x-2 w-8 h-8'
+                  size='icon'
+                  variant='ghost'
+                  disabled={!table.getCanNextPage()}
+                  onClick={() => table.nextPage()}
+                >
+                  <ChevronRight className='w-4 h-4' />
+                </Button>
+              </PaginationItem>
+              <PaginationItem>
+                <Button
+                  className='gap-x-2 w-8 h-8'
+                  size='icon'
+                  variant='ghost'
+                  disabled={!table.getCanNextPage()}
+                  onClick={() => table.lastPage()}
+                >
+                  <ChevronsRight className='w-4 h-4' />
+                </Button>
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
       </div>
     </div>
