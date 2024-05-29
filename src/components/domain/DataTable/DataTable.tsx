@@ -19,17 +19,14 @@ import { cn } from '@/modules/common'
 import {
   ColumnDef,
   ColumnFiltersState,
-  OnChangeFn,
-  PaginationState,
   SortingState,
   VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { ArrowUpDown } from 'lucide-react'
+import { ArrowDown, ArrowUp } from 'lucide-react'
 import { HTMLAttributes, useState } from 'react'
 import DataTablePagination from '../DataTablePagination/DataTablePagination'
 
@@ -45,11 +42,15 @@ interface DataTableProps {
   data: Data[] | undefined
   isFetching?: boolean
   isPlaceholderData?: boolean
+  sorting: {
+    state: SortingState
+    onChange: (state: SortingState) => void
+  }
   pagination: {
     page: number
     size: number
     total: number | undefined
-    onChange: OnChangeFn<PaginationState>
+    onChange: (state: { page: number; size: number }) => void
   }
 }
 
@@ -58,12 +59,12 @@ const DataTable = ({
   data = [],
   isFetching,
   isPlaceholderData,
+  sorting,
   pagination,
 }: DataTableProps) => {
-  const [sorting, setSorting] = useState<SortingState>([])
   const [rowSelection, setRowSelection] = useState({})
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
   const columns: ColumnDef<Data>[] = [
     {
@@ -111,7 +112,11 @@ const DataTable = ({
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
           Created at
-          <ArrowUpDown className='w-4 h-4 ml-2' />
+          {column.getIsSorted() === 'asc' ? (
+            <ArrowUp className='w-4 h-4 ml-2' />
+          ) : (
+            <ArrowDown className='w-4 h-4 ml-2' />
+          )}
         </Button>
       ),
       cell: ({ row }) => (
@@ -134,22 +139,33 @@ const DataTable = ({
     data,
     columns,
     state: {
-      sorting,
+      sorting: sorting.state,
       rowSelection,
       columnFilters,
       columnVisibility,
       pagination: { pageIndex: pagination.page, pageSize: pagination.size },
     },
-    onSortingChange: setSorting,
-    onRowSelectionChange: setRowSelection,
-    onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
+    onRowSelectionChange: setRowSelection,
+    onColumnVisibilityChange: setColumnVisibility,
+    // TODO: Handle filter by title
     getFilteredRowModel: getFilteredRowModel(),
+    onColumnFiltersChange: setColumnFilters,
+    manualSorting: true,
+    onSortingChange: (updater) => {
+      if (typeof updater !== 'function') return
+      sorting.onChange(updater(sorting.state))
+    },
     manualPagination: true,
     rowCount: pagination.total,
-    onPaginationChange: pagination.onChange,
+    onPaginationChange: (updater) => {
+      if (typeof updater !== 'function') return
+      const { pageIndex, pageSize } = updater({
+        pageIndex: pagination.page,
+        pageSize: pagination.size,
+      })
+      pagination.onChange({ page: pageIndex, size: pageSize })
+    },
   })
 
   return (

@@ -1,7 +1,7 @@
-import DataTable from '@/components/domain/DataTable/DataTable'
 import Heading3 from '@/components/common/Heading3/Heading3'
 import Paragraph from '@/components/common/Paragraph/Paragraph'
 import Protected from '@/components/common/Protected/Protected'
+import DataTable from '@/components/domain/DataTable/DataTable'
 import { Button } from '@/components/ui/button'
 import { getProjects, getProjectsSearchParamsSchema } from '@/services/project'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
@@ -47,24 +47,22 @@ function Projects() {
         data={projectsQuery.data?.content}
         isFetching={projectsQuery.isFetching}
         isPlaceholderData={projectsQuery.isPlaceholderData}
+        sorting={{
+          state: [{ id: 'createdAt', desc: search.createdAt === 'DESC' }],
+          onChange: ([{ desc }]) =>
+            navigate({
+              search: (search) => ({
+                ...search,
+                createdAt: !desc ? 'ASC' : 'DESC',
+              }),
+            }),
+        }}
         pagination={{
           page: search.page,
           size: search.size,
           total: projectsQuery.data?.total,
-          onChange: (updater) => {
-            if (typeof updater !== 'function') return
-            const { pageIndex, pageSize } = updater({
-              pageIndex: search.page,
-              pageSize: search.size,
-            })
-            navigate({
-              search: (search) => ({
-                ...search,
-                page: pageIndex,
-                size: pageSize,
-              }),
-            })
-          },
+          onChange: ({ page, size }) =>
+            navigate({ search: (search) => ({ ...search, page, size }) }),
         }}
       />
     </div>
