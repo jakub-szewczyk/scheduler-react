@@ -1,5 +1,5 @@
-import PaginationCapacity from '@/components/layout/PaginationCapacity/PaginationCapacity'
-import PaginationControls from '@/components/layout/PaginationControls/PaginationControls'
+import PaginationCapacity from '@/components/common/PaginationCapacity/PaginationCapacity'
+import PaginationControls from '@/components/common/PaginationControls/PaginationControls'
 import { cn } from '@/modules/common'
 import { Table } from '@tanstack/react-table'
 import { HTMLAttributes } from 'react'

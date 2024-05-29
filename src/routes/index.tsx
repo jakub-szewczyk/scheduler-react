@@ -1,5 +1,5 @@
-import Heading3 from '@/components/layout/Heading3/Heading3'
-import Protected from '@/components/layout/Protected/Protected'
+import Heading3 from '@/components/common/Heading3/Heading3'
+import Protected from '@/components/common/Protected/Protected'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/')({

@@ -1,5 +1,5 @@
-import Navbar from '@/components/layout/Navbar/Navbar'
-import Sidebar from '@/components/layout/Sidebar/Sidebar'
+import Navbar from '@/components/common/Navbar/Navbar'
+import Sidebar from '@/components/common/Sidebar/Sidebar'
 import { cn } from '@/modules/common'
 import { SignedIn, SignedOut } from '@clerk/clerk-react'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
