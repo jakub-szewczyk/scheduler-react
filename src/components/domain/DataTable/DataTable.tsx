@@ -180,10 +180,9 @@ const DataTable = ({
           className='w-full sm:max-w-sm'
           placeholder='Search by title'
           value={(table.getColumn('title')?.getFilterValue() as string) || ''}
-          onChange={(event) => {
-            table.firstPage()
+          onChange={(event) =>
             table.getColumn('title')?.setFilterValue(event.target.value)
-          }}
+          }
         />
         <ColumnVisibilityDropdown table={table} />
       </div>

@@ -7,6 +7,7 @@ import { getProjects, getProjectsSearchParamsSchema } from '@/services/project'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { CirclePlus } from 'lucide-react'
+import { useDebounceValue } from 'usehooks-ts'
 
 export const Route = createFileRoute('/projects')({
   component: () => (
@@ -22,9 +23,20 @@ function Projects() {
 
   const navigate = Route.useNavigate()
 
+  const [debouncedSearch] = useDebounceValue(search, 500)
+
+  const query = {
+    ...search,
+    page:
+      search.title === debouncedSearch.title
+        ? search.page
+        : debouncedSearch.page,
+    title: debouncedSearch.title,
+  }
+
   const projectsQuery = useQuery({
-    queryKey: ['projects', search],
-    queryFn: () => getProjects(search),
+    queryKey: ['projects', query],
+    queryFn: () => getProjects(query),
     placeholderData: keepPreviousData,
   })
 
@@ -55,6 +67,7 @@ function Projects() {
                 ...search,
                 createdAt: !desc ? 'ASC' : 'DESC',
               }),
+              replace: true,
             }),
         }}
         filtering={{
@@ -63,8 +76,10 @@ function Projects() {
             navigate({
               search: (search) => ({
                 ...search,
+                page: 0,
                 title: state.at(0)?.value || '',
               }),
+              replace: true,
             }),
         }}
         pagination={{
@@ -72,7 +87,10 @@ function Projects() {
           size: search.size,
           total: projectsQuery.data?.total,
           onChange: ({ page, size }) =>
-            navigate({ search: (search) => ({ ...search, page, size }) }),
+            navigate({
+              search: (search) => ({ ...search, page, size }),
+              replace: true,
+            }),
         }}
       />
     </div>
