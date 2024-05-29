@@ -5,7 +5,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { Link, LinkProps } from '@tanstack/react-router'
+import { Link, LinkProps, useLocation } from '@tanstack/react-router'
 import { ReactNode } from 'react'
 
 interface SidebarLink extends LinkProps {
@@ -19,9 +19,12 @@ const SidebarLink = ({
   tooltip,
   ...props
 }: SidebarLink) => {
+  const location = useLocation()
+
   const button = (
     <Button className={className} asChild size='icon' variant='ghost'>
       <Link
+        disabled={props.to === location.pathname}
         inactiveProps={{
           className:
             'text-muted-foreground transition-colors hover:text-foreground',
@@ -44,4 +47,5 @@ const SidebarLink = ({
     button
   )
 }
+
 export default SidebarLink
