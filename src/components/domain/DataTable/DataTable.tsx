@@ -1,21 +1,11 @@
+import ActionsDropdown from '@/components/layout/ActionsDropdown/ActionsDropdown'
+import ColumnVisibilityDropdown from '@/components/layout/ColumnVisibilityDropdown/ColumnVisibilityDropdown'
+import EmptyTableRow from '@/components/layout/EmptyTableRow/EmptyTableRow'
+import LoadingTableRows from '@/components/layout/LoadingTableRows/LoadingTableRows'
+import SelectedRowsIndicator from '@/components/layout/SelectedRowsIndicator/SelectedRowsIndicator'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-} from '@/components/ui/pagination'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
@@ -39,20 +29,9 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { lowerCase, upperFirst } from 'lodash/fp'
-import {
-  ArrowUpDown,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-  FileText,
-  MoreHorizontal,
-  Pencil,
-  Trash,
-} from 'lucide-react'
+import { ArrowUpDown } from 'lucide-react'
 import { HTMLAttributes, useState } from 'react'
+import DataTablePagination from '../DataTablePagination/DataTablePagination'
 
 interface Data {
   id: string
@@ -63,21 +42,23 @@ interface Data {
 
 interface DataTableProps {
   className?: HTMLAttributes<HTMLDivElement>['className']
+  data: Data[] | undefined
   isFetching?: boolean
   isPlaceholderData?: boolean
-  data: Data[] | undefined
-  pagination: PaginationState & {
-    rowCount: number | undefined
-    onPaginationChange: OnChangeFn<PaginationState>
+  pagination: {
+    page: number
+    size: number
+    total: number | undefined
+    onChange: OnChangeFn<PaginationState>
   }
 }
 
 const DataTable = ({
+  className,
   data = [],
   isFetching,
   isPlaceholderData,
   pagination,
-  className,
 }: DataTableProps) => {
   const [sorting, setSorting] = useState<SortingState>([])
   const [rowSelection, setRowSelection] = useState({})
@@ -145,41 +126,7 @@ const DataTable = ({
       id: 'actions',
       enableHiding: false,
       enableSorting: false,
-      cell: () => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              className='w-8 h-8 p-0 float-right'
-              variant='ghost'
-              disabled={isFetching}
-            >
-              <MoreHorizontal className=' w-4 h-4' />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <div className='flex items-center justify-center gap-x-2'>
-                <FileText className='w-4 h-4' />
-                Details
-              </div>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <div className='flex items-center justify-center gap-x-2'>
-                <Pencil className='w-4 h-4' />
-                Edit
-              </div>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <div className='flex items-center justify-center gap-x-2 text-destructive'>
-                <Trash className='w-4 h-4' />
-                Delete
-              </div>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
+      cell: () => <ActionsDropdown disabled={isFetching} />,
     },
   ]
 
@@ -191,7 +138,7 @@ const DataTable = ({
       rowSelection,
       columnFilters,
       columnVisibility,
-      pagination,
+      pagination: { pageIndex: pagination.page, pageSize: pagination.size },
     },
     onSortingChange: setSorting,
     onRowSelectionChange: setRowSelection,
@@ -201,8 +148,8 @@ const DataTable = ({
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     manualPagination: true,
-    rowCount: pagination.rowCount,
-    onPaginationChange: pagination.onPaginationChange,
+    rowCount: pagination.total,
+    onPaginationChange: pagination.onChange,
   })
 
   return (
@@ -216,30 +163,7 @@ const DataTable = ({
             table.getColumn('title')?.setFilterValue(event.target.value)
           }
         />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              className='w-full justify-between sm:max-w-fit'
-              variant='outline'
-            >
-              Columns <ChevronDown className='w-4 h-4 ml-2' />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='end'>
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => (
-                <DropdownMenuCheckboxItem
-                  key={column.id}
-                  checked={column.getIsVisible()}
-                  onCheckedChange={(value) => column.toggleVisibility(value)}
-                >
-                  {upperFirst(lowerCase(column.id))}
-                </DropdownMenuCheckboxItem>
-              ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ColumnVisibilityDropdown table={table} />
       </div>
       <div className='border rounded-md bg-background'>
         <Table>
@@ -288,134 +212,16 @@ const DataTable = ({
                 </TableRow>
               ))
             ) : isFetching ? (
-              Array(pagination.pageSize)
-                .fill(null)
-                .map((_, index) => (
-                  <TableRow key={index} data-state={false}>
-                    {columns.map((column, index) => (
-                      <TableCell key={`${index}_${column.id}`}>
-                        {column.id?.includes('check') ? (
-                          <Checkbox className='translate-y-0.5' disabled />
-                        ) : column.id?.includes('actions') ? (
-                          <Button
-                            className='w-8 h-8 p-0 float-right'
-                            variant='ghost'
-                            disabled
-                          >
-                            <MoreHorizontal className=' w-4 h-4' />
-                          </Button>
-                        ) : (
-                          <Skeleton className='h-4 w-full' />
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
+              <LoadingTableRows table={table} columns={columns} />
             ) : (
-              <TableRow>
-                <TableCell
-                  className='h-24 text-center'
-                  colSpan={columns.length}
-                >
-                  No results
-                </TableCell>
-              </TableRow>
+              <EmptyTableRow columns={columns} />
             )}
           </TableBody>
         </Table>
       </div>
-      <div className='flex items-center gap-x-2 mt-4'>
-        <div className='flex-1 text-sm text-muted-foreground'>
-          {table.getFilteredSelectedRowModel().rows.length} of{' '}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-        <div className='flex gap-x-2'>
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <Button
-                  className='gap-x-2 w-8 h-8'
-                  size='icon'
-                  variant='ghost'
-                  disabled={!table.getCanPreviousPage()}
-                  onClick={() => table.firstPage()}
-                >
-                  <ChevronsLeft className='w-4 h-4' />
-                </Button>
-              </PaginationItem>
-              <PaginationItem>
-                <Button
-                  className='gap-x-2 w-8 h-8'
-                  size='icon'
-                  variant='ghost'
-                  disabled={!table.getCanPreviousPage()}
-                  onClick={() => table.previousPage()}
-                >
-                  <ChevronLeft className='w-4 h-4' />
-                </Button>
-              </PaginationItem>
-              {table.getPageOptions().map((pageIndex, _, array) => {
-                // TODO: Rename
-                const threshold = 3
-                const isLeftEllipsisVisible =
-                  pageIndex === 0 && pagination.pageIndex - threshold > 0
-                const isRightEllipsisVisible =
-                  pageIndex === array.length - 1 &&
-                  pagination.pageIndex + threshold < array.length - 1
-                return (
-                  <>
-                    {isRightEllipsisVisible && (
-                      <PaginationItem>
-                        <PaginationEllipsis />
-                      </PaginationItem>
-                    )}
-                    <PaginationItem>
-                      <Button
-                        className='gap-x-2 w-8 h-8'
-                        size='icon'
-                        variant={
-                          pageIndex === pagination.pageIndex
-                            ? 'default'
-                            : 'ghost'
-                        }
-                        onClick={() => table.setPageIndex(pageIndex)}
-                      >
-                        {pageIndex + 1}
-                      </Button>
-                    </PaginationItem>
-                    {isLeftEllipsisVisible && (
-                      <PaginationItem>
-                        <PaginationEllipsis />
-                      </PaginationItem>
-                    )}
-                  </>
-                )
-              })}
-              <PaginationItem>
-                <Button
-                  className='gap-x-2 w-8 h-8'
-                  size='icon'
-                  variant='ghost'
-                  disabled={!table.getCanNextPage()}
-                  onClick={() => table.nextPage()}
-                >
-                  <ChevronRight className='w-4 h-4' />
-                </Button>
-              </PaginationItem>
-              <PaginationItem>
-                <Button
-                  className='gap-x-2 w-8 h-8'
-                  size='icon'
-                  variant='ghost'
-                  disabled={!table.getCanNextPage()}
-                  onClick={() => table.lastPage()}
-                >
-                  <ChevronsRight className='w-4 h-4' />
-                </Button>
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
+      <div className='flex items-center justify-between gap-x-2 mt-4'>
+        <SelectedRowsIndicator table={table} />
+        <DataTablePagination className='ml-auto' table={table} />
       </div>
     </div>
   )

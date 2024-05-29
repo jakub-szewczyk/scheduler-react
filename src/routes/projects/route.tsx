@@ -29,14 +29,14 @@ function Projects() {
     <div className='flex flex-col gap-y-4 sm:gap-y-6'>
       <Heading3>Projects</Heading3>
       <DataTable
+        data={projectsQuery.data?.content}
         isFetching={projectsQuery.isFetching}
         isPlaceholderData={projectsQuery.isPlaceholderData}
-        data={projectsQuery.data?.content}
         pagination={{
-          rowCount: projectsQuery.data?.total,
-          pageIndex: search.page,
-          pageSize: search.size,
-          onPaginationChange: (updater) => {
+          page: search.page,
+          size: search.size,
+          total: projectsQuery.data?.total,
+          onChange: (updater) => {
             if (typeof updater !== 'function') return
             const { pageIndex, pageSize } = updater({
               pageIndex: search.page,
