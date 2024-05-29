@@ -23,7 +23,6 @@ import {
   VisibilityState,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   useReactTable,
 } from '@tanstack/react-table'
 import { ArrowDown, ArrowUp } from 'lucide-react'
@@ -39,12 +38,16 @@ interface Data {
 
 interface DataTableProps {
   className?: HTMLAttributes<HTMLDivElement>['className']
-  data: Data[] | undefined
   isFetching?: boolean
   isPlaceholderData?: boolean
+  data: Data[] | undefined
   sorting: {
     state: SortingState
     onChange: (state: SortingState) => void
+  }
+  filtering: {
+    state: ColumnFiltersState
+    onChange: (state: ColumnFiltersState) => void
   }
   pagination: {
     page: number
@@ -56,15 +59,15 @@ interface DataTableProps {
 
 const DataTable = ({
   className,
-  data = [],
   isFetching,
   isPlaceholderData,
+  data = [],
   sorting,
+  filtering,
   pagination,
 }: DataTableProps) => {
   const [rowSelection, setRowSelection] = useState({})
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
   const columns: ColumnDef<Data>[] = [
     {
@@ -139,25 +142,27 @@ const DataTable = ({
     data,
     columns,
     state: {
-      sorting: sorting.state,
       rowSelection,
-      columnFilters,
       columnVisibility,
+      sorting: sorting.state,
+      columnFilters: filtering.state,
       pagination: { pageIndex: pagination.page, pageSize: pagination.size },
     },
+    rowCount: pagination.total,
     getCoreRowModel: getCoreRowModel(),
     onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
-    // TODO: Handle filter by title
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnFiltersChange: setColumnFilters,
     manualSorting: true,
+    manualFiltering: true,
+    manualPagination: true,
     onSortingChange: (updater) => {
       if (typeof updater !== 'function') return
       sorting.onChange(updater(sorting.state))
     },
-    manualPagination: true,
-    rowCount: pagination.total,
+    onColumnFiltersChange: (updater) => {
+      if (typeof updater !== 'function') return
+      filtering.onChange(updater(filtering.state))
+    },
     onPaginationChange: (updater) => {
       if (typeof updater !== 'function') return
       const { pageIndex, pageSize } = updater({
@@ -175,9 +180,10 @@ const DataTable = ({
           className='w-full sm:max-w-sm'
           placeholder='Search by title'
           value={(table.getColumn('title')?.getFilterValue() as string) || ''}
-          onChange={(event) =>
+          onChange={(event) => {
+            table.firstPage()
             table.getColumn('title')?.setFilterValue(event.target.value)
-          }
+          }}
         />
         <ColumnVisibilityDropdown table={table} />
       </div>

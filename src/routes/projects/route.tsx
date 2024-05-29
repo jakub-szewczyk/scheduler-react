@@ -44,9 +44,9 @@ function Projects() {
         </Button>
       </div>
       <DataTable
-        data={projectsQuery.data?.content}
         isFetching={projectsQuery.isFetching}
         isPlaceholderData={projectsQuery.isPlaceholderData}
+        data={projectsQuery.data?.content}
         sorting={{
           state: [{ id: 'createdAt', desc: search.createdAt === 'DESC' }],
           onChange: ([{ desc }]) =>
@@ -54,6 +54,16 @@ function Projects() {
               search: (search) => ({
                 ...search,
                 createdAt: !desc ? 'ASC' : 'DESC',
+              }),
+            }),
+        }}
+        filtering={{
+          state: [{ id: 'title', value: search.title }],
+          onChange: (state) =>
+            navigate({
+              search: (search) => ({
+                ...search,
+                title: state.at(0)?.value || '',
               }),
             }),
         }}
