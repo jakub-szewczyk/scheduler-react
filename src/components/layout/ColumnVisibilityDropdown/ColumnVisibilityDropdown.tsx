@@ -18,8 +18,11 @@ const ColumnVisibilityDropdown = <Data,>({
 }: ColumnVisibilityDropdownProps<Data>) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
-      <Button className='w-full justify-between sm:max-w-fit' variant='outline'>
-        Columns <ChevronDown className='w-4 h-4 ml-2' />
+      <Button
+        className='w-full justify-between gap-x-2 sm:max-w-fit'
+        variant='outline'
+      >
+        Columns <ChevronDown className='w-4 h-4' />
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent align='end'>
