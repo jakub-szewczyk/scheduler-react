@@ -5,7 +5,6 @@ import LoadingTableRows from '@/components/common/LoadingTableRows/LoadingTableR
 import SelectedRowsIndicator from '@/components/common/SelectedRowsIndicator/SelectedRowsIndicator'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
@@ -28,6 +27,7 @@ import {
 import { ArrowDown, ArrowUp } from 'lucide-react'
 import { HTMLAttributes, useState } from 'react'
 import DataTablePagination from '../DataTablePagination/DataTablePagination'
+import DataTableSearch from '../DataTableSearch/DataTableSearch'
 
 interface Data {
   id: string
@@ -176,14 +176,7 @@ const DataTable = ({
   return (
     <div className={className}>
       <div className='flex flex-wrap items-center justify-between gap-x-2 gap-y-4 mb-4'>
-        <Input
-          className='w-full sm:max-w-sm'
-          placeholder='Search by title'
-          value={(table.getColumn('title')?.getFilterValue() as string) || ''}
-          onChange={(event) =>
-            table.getColumn('title')?.setFilterValue(event.target.value)
-          }
-        />
+        <DataTableSearch table={table} />
         <ColumnVisibilityDropdown table={table} />
       </div>
       <div className='border rounded-md bg-background'>
