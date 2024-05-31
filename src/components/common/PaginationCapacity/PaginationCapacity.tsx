@@ -16,7 +16,7 @@ const PaginationCapacity = <Data,>({
   table,
   sizes = [10, 20, 50, 100],
 }: PaginationCapacityProps<Data>) => (
-  <div className='flex items-center gap-x-2'>
+  <div className='inline-flex items-center gap-x-2'>
     <p className='hidden text-sm text-muted-foreground whitespace-nowrap md:block'>
       Rows per page
     </p>
