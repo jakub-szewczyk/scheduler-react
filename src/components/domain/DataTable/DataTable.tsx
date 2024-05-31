@@ -138,7 +138,11 @@ const DataTable = ({
       meta: { style: { width: '4rem' } },
       enableHiding: false,
       enableSorting: false,
-      cell: () => <ActionsDropdown disabled={isFetching} />,
+      cell: () => (
+        <ActionsDropdown
+          buttonProps={{ className: 'float-right', disabled: isFetching }}
+        />
+      ),
     },
   ]
 

@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { Button, ButtonProps } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,21 +7,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { cn } from '@/modules/common'
 import { FileText, MoreHorizontal, Pencil, Trash } from 'lucide-react'
 
 interface ActionsDropdownProps {
-  disabled?: boolean
+  buttonProps?: ButtonProps
 }
 
-const ActionsDropdown = ({ disabled }: ActionsDropdownProps) => (
+const ActionsDropdown = ({ buttonProps }: ActionsDropdownProps) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
       <Button
-        className='w-8 h-8 p-0 float-right'
+        className={cn('w-8 h-8 p-0', buttonProps?.className)}
         variant='ghost'
-        disabled={disabled}
+        {...buttonProps}
       >
-        <MoreHorizontal className=' w-4 h-4' />
+        <MoreHorizontal className='w-4 h-4' />
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent align='end'>
