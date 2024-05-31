@@ -211,6 +211,7 @@ const DataTable = ({
                     <TableCell
                       key={cell.id}
                       className={cn(
+                        'max-w-0 [&>div]:truncate',
                         isFetching && !isPlaceholderData && 'opacity-50'
                       )}
                     >
