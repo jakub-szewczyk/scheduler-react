@@ -72,6 +72,7 @@ const DataTable = ({
   const columns: ColumnDef<Data>[] = [
     {
       id: 'check',
+      meta: { style: { width: '4rem' } },
       enableHiding: false,
       enableSorting: false,
       header: ({ table }) => (
@@ -95,6 +96,7 @@ const DataTable = ({
       ),
     },
     {
+      meta: { style: { width: '25%' } },
       accessorKey: 'title',
       enableSorting: false,
       header: 'Title',
@@ -107,6 +109,7 @@ const DataTable = ({
       cell: ({ row }) => <div>{row.getValue('description')}</div>,
     },
     {
+      meta: { style: { width: '15%' } },
       accessorKey: 'createdAt',
       header: ({ column }) => (
         <Button
@@ -132,6 +135,7 @@ const DataTable = ({
     },
     {
       id: 'actions',
+      meta: { style: { width: '4rem' } },
       enableHiding: false,
       enableSorting: false,
       cell: () => <ActionsDropdown disabled={isFetching} />,
@@ -185,7 +189,7 @@ const DataTable = ({
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} {...header.column.columnDef.meta}>
                     {!header.isPlaceholder &&
                       flexRender(
                         header.column.columnDef.header,
