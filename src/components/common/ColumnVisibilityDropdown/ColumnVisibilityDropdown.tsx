@@ -5,16 +5,19 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { DropdownMenuContentProps } from '@radix-ui/react-dropdown-menu'
 import { Table } from '@tanstack/react-table'
 import { lowerCase, upperFirst } from 'lodash/fp'
 import { ChevronDown } from 'lucide-react'
 
 interface ColumnVisibilityDropdownProps<Data> {
   table: Table<Data>
+  dropdownMenuContentProps?: DropdownMenuContentProps
 }
 
 const ColumnVisibilityDropdown = <Data,>({
   table,
+  dropdownMenuContentProps,
 }: ColumnVisibilityDropdownProps<Data>) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
@@ -25,7 +28,7 @@ const ColumnVisibilityDropdown = <Data,>({
         Columns <ChevronDown className='w-4 h-4' />
       </Button>
     </DropdownMenuTrigger>
-    <DropdownMenuContent align='end'>
+    <DropdownMenuContent {...dropdownMenuContentProps}>
       {table
         .getAllColumns()
         .filter((column) => column.getCanHide())

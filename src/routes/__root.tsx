@@ -1,7 +1,8 @@
 import Navbar from '@/components/common/Navbar/Navbar'
 import Sidebar from '@/components/common/Sidebar/Sidebar'
+import ThemeSelect from '@/components/common/ThemeSelect/ThemeSelect'
 import { cn } from '@/modules/common'
-import { SignedIn, SignedOut } from '@clerk/clerk-react'
+import { SignedIn, SignedOut, UserButton } from '@clerk/clerk-react'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { Outlet, createRootRoute } from '@tanstack/react-router'
 import { Suspense, lazy } from 'react'
@@ -29,7 +30,10 @@ function Root() {
   return (
     <>
       <SignedIn>
-        <Navbar />
+        <Navbar>
+          <ThemeSelect />
+          <UserButton afterSignOutUrl='/sign-in' />
+        </Navbar>
         <div className='flex w-full'>
           <Sidebar
             isCollapsed={isSidebarCollapsed}

@@ -141,6 +141,7 @@ const DataTable = ({
       cell: () => (
         <ActionsDropdown
           buttonProps={{ className: 'float-right', disabled: isFetching }}
+          dropdownMenuContentProps={{ align: 'end' }}
         />
       ),
     },
@@ -185,7 +186,10 @@ const DataTable = ({
     <div className={className}>
       <div className='flex flex-wrap items-center justify-between gap-x-2 gap-y-4 mb-4'>
         <DataTableSearch table={table} />
-        <ColumnVisibilityDropdown table={table} />
+        <ColumnVisibilityDropdown
+          table={table}
+          dropdownMenuContentProps={{ align: 'end' }}
+        />
       </div>
       <div className='border rounded-md bg-background'>
         <Table>
@@ -235,9 +239,9 @@ const DataTable = ({
                 </TableRow>
               ))
             ) : isFetching ? (
-              <LoadingTableRows table={table} columns={columns} />
+              <LoadingTableRows table={table} />
             ) : (
-              <EmptyTableRow columns={columns} />
+              <EmptyTableRow columnsLength={columns.length} />
             )}
           </TableBody>
         </Table>

@@ -8,13 +8,18 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/modules/common'
+import { DropdownMenuContentProps } from '@radix-ui/react-dropdown-menu'
 import { FileText, MoreHorizontal, Pencil, Trash } from 'lucide-react'
 
 interface ActionsDropdownProps {
   buttonProps?: ButtonProps
+  dropdownMenuContentProps?: DropdownMenuContentProps
 }
 
-const ActionsDropdown = ({ buttonProps }: ActionsDropdownProps) => (
+const ActionsDropdown = ({
+  buttonProps,
+  dropdownMenuContentProps,
+}: ActionsDropdownProps) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
       <Button
@@ -25,7 +30,7 @@ const ActionsDropdown = ({ buttonProps }: ActionsDropdownProps) => (
         <MoreHorizontal className='w-4 h-4' />
       </Button>
     </DropdownMenuTrigger>
-    <DropdownMenuContent align='end'>
+    <DropdownMenuContent {...dropdownMenuContentProps}>
       <DropdownMenuLabel>Actions</DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuItem>

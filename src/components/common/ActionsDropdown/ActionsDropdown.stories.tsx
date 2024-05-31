@@ -12,5 +12,8 @@ export default meta
 type Story = StoryObj<typeof ActionsDropdown>
 
 export const Primary: Story = {
-  args: { buttonProps: { disabled: false } },
+  args: {
+    buttonProps: { disabled: false },
+    dropdownMenuContentProps: { align: 'start' },
+  },
 }

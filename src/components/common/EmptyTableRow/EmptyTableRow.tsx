@@ -1,13 +1,12 @@
 import { TableCell, TableRow } from '@/components/ui/table'
-import { ColumnDef } from '@tanstack/react-table'
 
-interface EmptyTableRowProps<Data> {
-  columns: ColumnDef<Data>[]
+interface EmptyTableRowProps {
+  columnsLength: number
 }
 
-const EmptyTableRow = <Data,>({ columns }: EmptyTableRowProps<Data>) => (
+const EmptyTableRow = ({ columnsLength }: EmptyTableRowProps) => (
   <TableRow>
-    <TableCell className='h-24 text-center' colSpan={columns.length}>
+    <TableCell className='h-24 text-center' colSpan={columnsLength}>
       No results
     </TableCell>
   </TableRow>
