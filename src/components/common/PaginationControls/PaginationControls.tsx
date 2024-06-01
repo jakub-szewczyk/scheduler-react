@@ -1,8 +1,11 @@
+import { Button } from '@/components/ui/button'
 import { Table } from '@tanstack/react-table'
-import PaginationFirstPageButton from '../PaginationFirstPageButton/PaginationFirstPageButton'
-import PaginationLastPageButton from '../PaginationLastPageButton/PaginationLastPageButton'
-import PaginationNextPageButton from '../PaginationNextPageButton/PaginationNextPageButton'
-import PaginationPreviousPageButton from '../PaginationPreviousPageButton/PaginationPreviousPageButton'
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronsLeftIcon,
+  ChevronsRightIcon,
+} from 'lucide-react'
 
 interface PaginationControlsProps<Data> {
   table: Table<Data>
@@ -19,10 +22,42 @@ const PaginationControls = <Data,>({
       Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
     </div>
     <div className='flex items-center gap-x-2'>
-      <PaginationFirstPageButton table={table} />
-      <PaginationPreviousPageButton table={table} />
-      <PaginationNextPageButton table={table} />
-      <PaginationLastPageButton table={table} />
+      <Button
+        className='w-8 h-8'
+        size='icon'
+        variant='outline'
+        disabled={!table.getCanPreviousPage()}
+        onClick={() => table.firstPage()}
+      >
+        <ChevronsLeftIcon className='h-4 w-4' />
+      </Button>
+      <Button
+        className='w-8 h-8'
+        size='icon'
+        variant='outline'
+        disabled={!table.getCanPreviousPage()}
+        onClick={() => table.previousPage()}
+      >
+        <ChevronLeftIcon className='w-4 h-4' />
+      </Button>
+      <Button
+        className='w-8 h-8'
+        size='icon'
+        variant='outline'
+        disabled={!table.getCanNextPage()}
+        onClick={() => table.nextPage()}
+      >
+        <ChevronRightIcon className='w-4 h-4' />
+      </Button>
+      <Button
+        className='w-8 h-8'
+        size='icon'
+        variant='outline'
+        disabled={!table.getCanNextPage()}
+        onClick={() => table.lastPage()}
+      >
+        <ChevronsRightIcon className='w-4 h-4' />
+      </Button>
     </div>
   </div>
 )
