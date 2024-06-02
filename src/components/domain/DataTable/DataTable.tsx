@@ -2,6 +2,7 @@ import ActionsDropdown from '@/components/common/ActionsDropdown/ActionsDropdown
 import ColumnVisibilityDropdown from '@/components/common/Table/ColumnVisibilityDropdown/ColumnVisibilityDropdown'
 import EmptyRow from '@/components/common/Table/EmptyRow/EmptyRow'
 import LoadingRows from '@/components/common/Table/LoadingRows/LoadingRows'
+import Pagination from '@/components/common/Table/Pagination/Pagination'
 import SelectedRowsIndicator from '@/components/common/Table/SelectedRowsIndicator/SelectedRowsIndicator'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -26,7 +27,6 @@ import {
 } from '@tanstack/react-table'
 import { ArrowDown, ArrowUp } from 'lucide-react'
 import { HTMLAttributes, useState } from 'react'
-import DataTablePagination from '../../common/Pagination/Pagination'
 import DataTableSearch from '../DataTableSearch/DataTableSearch'
 
 interface Data {
@@ -248,7 +248,7 @@ const DataTable = ({
       </div>
       <div className='flex items-center justify-between gap-x-2 mt-4'>
         <SelectedRowsIndicator table={table} />
-        <DataTablePagination className='ml-auto' table={table} />
+        <Pagination className='ml-auto' table={table} />
       </div>
     </div>
   )

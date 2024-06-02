@@ -1,8 +1,8 @@
-import PaginationCapacity from '@/components/common/Pagination/PaginationCapacity/PaginationCapacity'
-import PaginationControls from '@/components/common/Pagination/PaginationControls/PaginationControls'
 import { cn } from '@/modules/common'
 import { Table } from '@tanstack/react-table'
 import { HTMLAttributes } from 'react'
+import PaginationCapacity from './PaginationCapacity/PaginationCapacity'
+import PaginationControls from './PaginationControls/PaginationControls'
 
 interface DataTablePaginationProps<Data> {
   className?: HTMLAttributes<HTMLDivElement>['className']

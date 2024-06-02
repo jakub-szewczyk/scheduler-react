@@ -1,7 +1,7 @@
-import Pagination from '@/components/common/Pagination/Pagination'
 import type { Meta, StoryObj } from '@storybook/react'
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
-import '../../../index.css'
+import '../../../../index.css'
+import Pagination from './Pagination'
 
 const PaginationWithHooks = (props: object) => {
   const table = useReactTable({
@@ -14,7 +14,7 @@ const PaginationWithHooks = (props: object) => {
 }
 
 const meta: Meta<typeof Pagination> = {
-  title: 'Common/Pagination/Pagination',
+  title: 'Common/Table/Pagination/Pagination',
   component: PaginationWithHooks,
 }
 
