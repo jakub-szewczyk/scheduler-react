@@ -1,26 +1,26 @@
-import LoadingRows from '@/components/common/Table/LoadingRows/LoadingRows'
+import SkeletonRows from '@/components/common/Table/SkeletonRows/SkeletonRows'
 import type { Meta, StoryObj } from '@storybook/react'
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
 import '../../../../index.css'
 
-const LoadingRowsWithHooks = (props: object) => {
+const SkeletonRowsWithHooks = (props: object) => {
   const table = useReactTable({
     data: [],
     columns: [],
     getCoreRowModel: getCoreRowModel(),
   })
 
-  return <LoadingRows table={table} {...props} />
+  return <SkeletonRows table={table} {...props} />
 }
 
-const meta: Meta<typeof LoadingRows> = {
-  title: 'Common/Table/LoadingRows',
-  component: LoadingRowsWithHooks,
+const meta: Meta<typeof SkeletonRows> = {
+  title: 'Common/Table/SkeletonRows',
+  component: SkeletonRowsWithHooks,
 }
 
 export default meta
 
-type Story = StoryObj<typeof LoadingRows>
+type Story = StoryObj<typeof SkeletonRows>
 
 export const Primary: Story = {
   args: {},

@@ -1,7 +1,7 @@
 import ActionsDropdown from '@/components/common/ActionsDropdown/ActionsDropdown'
-import ColumnVisibilityDropdown from '@/components/common/Table/ColumnVisibilityDropdown/ColumnVisibilityDropdown'
-import EmptyRow from '@/components/common/Table/EmptyRow/EmptyRow'
-import LoadingRows from '@/components/common/Table/LoadingRows/LoadingRows'
+import ColumnSelector from '@/components/common/Table/ColumnSelector/ColumnSelector'
+import NoResultsRow from '@/components/common/Table/NoResultsRow/NoResultsRow'
+import SkeletonRows from '@/components/common/Table/SkeletonRows/SkeletonRows'
 import Pagination from '@/components/common/Table/Pagination/Pagination'
 import SelectedRowsIndicator from '@/components/common/Table/SelectedRowsIndicator/SelectedRowsIndicator'
 import { Button } from '@/components/ui/button'
@@ -186,7 +186,7 @@ const DataTable = ({
     <div className={className}>
       <div className='flex flex-wrap items-center justify-between gap-x-2 gap-y-4 mb-4'>
         <DataTableSearch table={table} />
-        <ColumnVisibilityDropdown
+        <ColumnSelector
           table={table}
           dropdownMenuContentProps={{ align: 'end' }}
         />
@@ -239,9 +239,9 @@ const DataTable = ({
                 </TableRow>
               ))
             ) : isFetching ? (
-              <LoadingRows table={table} />
+              <SkeletonRows table={table} />
             ) : (
-              <EmptyRow columnsLength={columns.length} />
+              <NoResultsRow columnsLength={columns.length} />
             )}
           </TableBody>
         </Table>

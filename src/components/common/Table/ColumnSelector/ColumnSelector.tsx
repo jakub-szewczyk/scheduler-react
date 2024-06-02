@@ -10,15 +10,15 @@ import { Table } from '@tanstack/react-table'
 import { lowerCase, upperFirst } from 'lodash/fp'
 import { ChevronDown } from 'lucide-react'
 
-interface ColumnVisibilityDropdownProps<Data> {
+interface ColumnSelectorProps<Data> {
   table: Table<Data>
   dropdownMenuContentProps?: DropdownMenuContentProps
 }
 
-const ColumnVisibilityDropdown = <Data,>({
+const ColumnSelector = <Data,>({
   table,
   dropdownMenuContentProps,
-}: ColumnVisibilityDropdownProps<Data>) => (
+}: ColumnSelectorProps<Data>) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
       <Button
@@ -45,4 +45,4 @@ const ColumnVisibilityDropdown = <Data,>({
   </DropdownMenu>
 )
 
-export default ColumnVisibilityDropdown
+export default ColumnSelector

@@ -1,10 +1,10 @@
 import { TableCell, TableRow } from '@/components/ui/table'
 
-interface EmptyRowProps {
+interface NoResultsRowProps {
   columnsLength: number
 }
 
-const EmptyRow = ({ columnsLength }: EmptyRowProps) => (
+const NoResultsRow = ({ columnsLength }: NoResultsRowProps) => (
   <TableRow>
     <TableCell className='h-24 text-center' colSpan={columnsLength}>
       No results
@@ -12,4 +12,4 @@ const EmptyRow = ({ columnsLength }: EmptyRowProps) => (
   </TableRow>
 )
 
-export default EmptyRow
+export default NoResultsRow

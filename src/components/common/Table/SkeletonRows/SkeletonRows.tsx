@@ -5,11 +5,11 @@ import { TableCell, TableRow } from '@/components/ui/table'
 import { Table } from '@tanstack/react-table'
 import { MoreHorizontal } from 'lucide-react'
 
-interface LoadingRowsProps<Data> {
+interface SkeletonRowsProps<Data> {
   table: Table<Data>
 }
 
-const LoadingRows = <Data,>({ table }: LoadingRowsProps<Data>) =>
+const SkeletonRows = <Data,>({ table }: SkeletonRowsProps<Data>) =>
   Array(table.getState().pagination.pageSize)
     .fill(null)
     .map((_, index) => (
@@ -34,4 +34,4 @@ const LoadingRows = <Data,>({ table }: LoadingRowsProps<Data>) =>
       </TableRow>
     ))
 
-export default LoadingRows
+export default SkeletonRows
