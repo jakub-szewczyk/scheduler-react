@@ -8,8 +8,8 @@ import {
   Settings,
 } from 'lucide-react'
 import { Dispatch, SetStateAction } from 'react'
-import SidebarButton from '../SidebarButton/SidebarButton'
-import SidebarLink from '../SidebarLink/SidebarLink'
+import SidebarButton from './SidebarButton/SidebarButton'
+import SidebarLink from './SidebarLink/SidebarLink'
 
 interface SidebarProps {
   isCollapsed: boolean

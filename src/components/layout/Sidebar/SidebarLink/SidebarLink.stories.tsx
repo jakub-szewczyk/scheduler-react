@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import '../../../index.css'
-import SidebarLink from './SidebarLink'
 import { Home } from 'lucide-react'
+import '../../../../index.css'
+import SidebarLink from './SidebarLink'
 
 const meta: Meta<typeof SidebarLink> = {
-  title: 'Common/SidebarLink',
+  title: 'Layout/Sidebar/SidebarLink',
   component: SidebarLink,
 }
 

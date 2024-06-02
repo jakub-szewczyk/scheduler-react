@@ -1,8 +1,8 @@
 import ActionsDropdown from '@/components/common/ActionsDropdown/ActionsDropdown'
-import ColumnVisibilityDropdown from '@/components/common/ColumnVisibilityDropdown/ColumnVisibilityDropdown'
-import EmptyTableRow from '@/components/common/EmptyTableRow/EmptyTableRow'
-import LoadingTableRows from '@/components/common/LoadingTableRows/LoadingTableRows'
-import SelectedRowsIndicator from '@/components/common/SelectedRowsIndicator/SelectedRowsIndicator'
+import ColumnVisibilityDropdown from '@/components/common/Table/ColumnVisibilityDropdown/ColumnVisibilityDropdown'
+import EmptyRow from '@/components/common/Table/EmptyRow/EmptyRow'
+import LoadingRows from '@/components/common/Table/LoadingRows/LoadingRows'
+import SelectedRowsIndicator from '@/components/common/Table/SelectedRowsIndicator/SelectedRowsIndicator'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -26,7 +26,7 @@ import {
 } from '@tanstack/react-table'
 import { ArrowDown, ArrowUp } from 'lucide-react'
 import { HTMLAttributes, useState } from 'react'
-import DataTablePagination from '../DataTablePagination/DataTablePagination'
+import DataTablePagination from '../../common/Pagination/Pagination'
 import DataTableSearch from '../DataTableSearch/DataTableSearch'
 
 interface Data {
@@ -239,9 +239,9 @@ const DataTable = ({
                 </TableRow>
               ))
             ) : isFetching ? (
-              <LoadingTableRows table={table} />
+              <LoadingRows table={table} />
             ) : (
-              <EmptyTableRow columnsLength={columns.length} />
+              <EmptyRow columnsLength={columns.length} />
             )}
           </TableBody>
         </Table>

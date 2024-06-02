@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import '../../../index.css'
-import Paragraph from './Paragraph'
+import Heading3 from './Heading3'
 
-const meta: Meta<typeof Paragraph> = {
-  title: 'Common/Paragraph',
-  component: Paragraph,
+const meta: Meta<typeof Heading3> = {
+  title: 'Typography/Heading3',
+  component: Heading3,
 }
 
 export default meta
 
-type Story = StoryObj<typeof Paragraph>
+type Story = StoryObj<typeof Heading3>
 
 export const Primary: Story = {
   args: {

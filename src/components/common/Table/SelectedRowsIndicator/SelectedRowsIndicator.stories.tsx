@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
-import '../../../index.css'
+import '../../../../index.css'
 import SelectedRowsIndicator from './SelectedRowsIndicator'
 
 const SelectedRowsIndicatorWithHooks = (props: object) => {
@@ -14,7 +14,7 @@ const SelectedRowsIndicatorWithHooks = (props: object) => {
 }
 
 const meta: Meta<typeof SelectedRowsIndicator> = {
-  title: 'Common/SelectedRowsIndicator',
+  title: 'Common/Table/SelectedRowsIndicator',
   component: SelectedRowsIndicatorWithHooks,
 }
 

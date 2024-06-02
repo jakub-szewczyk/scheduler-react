@@ -14,7 +14,7 @@ const SidebarWithHooks = ({ isCollapsed }: { isCollapsed: boolean }) => {
 }
 
 const meta: Meta<typeof Sidebar> = {
-  title: 'Common/Sidebar',
+  title: 'Layout/Sidebar/Sidebar',
   component: SidebarWithHooks,
 }
 

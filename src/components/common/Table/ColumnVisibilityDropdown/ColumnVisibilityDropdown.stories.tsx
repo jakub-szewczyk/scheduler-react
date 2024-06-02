@@ -1,7 +1,7 @@
-import ColumnVisibilityDropdown from '@/components/common/ColumnVisibilityDropdown/ColumnVisibilityDropdown'
+import ColumnVisibilityDropdown from '@/components/common/Table/ColumnVisibilityDropdown/ColumnVisibilityDropdown'
 import type { Meta, StoryObj } from '@storybook/react'
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
-import '../../../index.css'
+import '../../../../index.css'
 
 const ColumnVisibilityDropdownWithHooks = (props: object) => {
   const table = useReactTable({
@@ -14,7 +14,7 @@ const ColumnVisibilityDropdownWithHooks = (props: object) => {
 }
 
 const meta: Meta<typeof ColumnVisibilityDropdown> = {
-  title: 'Common/ColumnVisibilityDropdown',
+  title: 'Common/Table/ColumnVisibilityDropdown',
   component: ColumnVisibilityDropdownWithHooks,
 }
 

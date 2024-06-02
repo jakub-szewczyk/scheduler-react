@@ -1,10 +1,10 @@
 import { TableCell, TableRow } from '@/components/ui/table'
 
-interface EmptyTableRowProps {
+interface EmptyRowProps {
   columnsLength: number
 }
 
-const EmptyTableRow = ({ columnsLength }: EmptyTableRowProps) => (
+const EmptyRow = ({ columnsLength }: EmptyRowProps) => (
   <TableRow>
     <TableCell className='h-24 text-center' colSpan={columnsLength}>
       No results
@@ -12,4 +12,4 @@ const EmptyTableRow = ({ columnsLength }: EmptyTableRowProps) => (
   </TableRow>
 )
 
-export default EmptyTableRow
+export default EmptyRow

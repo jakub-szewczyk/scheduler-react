@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import '../../../index.css'
-import SidebarButton from './SidebarButton'
 import { Home } from 'lucide-react'
+import '../../../../index.css'
+import SidebarButton from './SidebarButton'
 
 const meta: Meta<typeof SidebarButton> = {
-  title: 'Common/SidebarButton',
+  title: 'Layout/Sidebar/SidebarButton',
   component: SidebarButton,
 }
 
