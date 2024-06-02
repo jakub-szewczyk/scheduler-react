@@ -31,7 +31,7 @@ function Root() {
     <>
       <SignedIn>
         <Navbar>
-          <ThemeSelect />
+          <ThemeSelect dropdownMenuContentProps={{ align: 'end' }} />
           <UserButton afterSignOutUrl='/sign-in' />
         </Navbar>
         <div className='flex w-full'>

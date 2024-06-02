@@ -6,9 +6,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import useTheme from '@/hooks/useTheme'
+import { DropdownMenuContentProps } from '@radix-ui/react-dropdown-menu'
 import { Moon, Sun } from 'lucide-react'
 
-const ThemeSelect = () => {
+interface ThemeSelectProps {
+  dropdownMenuContentProps?: DropdownMenuContentProps
+}
+
+const ThemeSelect = ({ dropdownMenuContentProps }: ThemeSelectProps) => {
   const { setTheme } = useTheme()
 
   return (
@@ -19,7 +24,7 @@ const ThemeSelect = () => {
           <Moon className='absolute w-4 h-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100' />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align='end'>
+      <DropdownMenuContent {...dropdownMenuContentProps}>
         <DropdownMenuItem onClick={() => setTheme('light')}>
           Light
         </DropdownMenuItem>
