@@ -1,9 +1,8 @@
 import ActionsDropdown from '@/components/common/ActionsDropdown/ActionsDropdown'
-import ColumnSelector from '@/components/common/Table/ColumnSelector/ColumnSelector'
 import NoResultsRow from '@/components/common/Table/NoResultsRow/NoResultsRow'
-import SkeletonRows from '@/components/common/Table/SkeletonRows/SkeletonRows'
 import Pagination from '@/components/common/Table/Pagination/Pagination'
 import SelectedRowsIndicator from '@/components/common/Table/SelectedRowsIndicator/SelectedRowsIndicator'
+import SkeletonRows from '@/components/common/Table/SkeletonRows/SkeletonRows'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -20,7 +19,6 @@ import {
   ColumnDef,
   ColumnFiltersState,
   SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   useReactTable,
@@ -67,7 +65,6 @@ const DataTable = ({
   pagination,
 }: DataTableProps) => {
   const [rowSelection, setRowSelection] = useState({})
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
   const columns: ColumnDef<Data>[] = [
     {
@@ -152,7 +149,6 @@ const DataTable = ({
     columns,
     state: {
       rowSelection,
-      columnVisibility,
       sorting: sorting.state,
       columnFilters: filtering.state,
       pagination: { pageIndex: pagination.page, pageSize: pagination.size },
@@ -160,7 +156,6 @@ const DataTable = ({
     rowCount: pagination.total,
     getCoreRowModel: getCoreRowModel(),
     onRowSelectionChange: setRowSelection,
-    onColumnVisibilityChange: setColumnVisibility,
     manualSorting: true,
     manualFiltering: true,
     manualPagination: true,
@@ -186,13 +181,9 @@ const DataTable = ({
     <div className={className}>
       <div className='flex flex-wrap items-center justify-between gap-x-2 gap-y-4 mb-4'>
         <DataTableSearch table={table} />
-        <ColumnSelector
-          table={table}
-          dropdownMenuContentProps={{ align: 'end' }}
-        />
       </div>
       <div className='border rounded-md bg-background'>
-        <Table>
+        <Table className='min-w-[36rem]'>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
