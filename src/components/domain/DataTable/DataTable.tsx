@@ -1,4 +1,5 @@
 import ActionsDropdown from '@/components/common/ActionsDropdown/ActionsDropdown'
+import DeleteConfirmationDialog from '@/components/common/Table/DeleteConfirmationDialog/DeleteConfirmationDialog'
 import NoResultsRow from '@/components/common/Table/NoResultsRow/NoResultsRow'
 import Pagination from '@/components/common/Table/Pagination/Pagination'
 import SelectedRowsIndicator from '@/components/common/Table/SelectedRowsIndicator/SelectedRowsIndicator'
@@ -23,7 +24,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { ArrowDown, ArrowUp, Trash } from 'lucide-react'
+import { ArrowDown, ArrowUp } from 'lucide-react'
 import { HTMLAttributes, useState } from 'react'
 import DataTableSearch from '../DataTableSearch/DataTableSearch'
 
@@ -178,22 +179,18 @@ const DataTable = ({
     },
   })
 
-  const selectedRowIds = table.getSelectedRowModel().rows.map(({ id }) => id)
+  const selectedRows = table.getSelectedRowModel().rows
 
   return (
     <div className={className}>
       <div className='flex items-center justify-between gap-x-2 gap-y-4 mb-4'>
         <DataTableSearch table={table} />
-        {selectedRowIds.length > 0 && (
-          <Button
-            className='gap-x-2 text-destructive'
-            variant='ghost'
-            // TODO: Open confirm dialog
-            onClick={() => console.log(selectedRowIds)}
-          >
-            <span className='hidden sm:inline'>Delete selected</span>
-            <Trash className='size-4' />
-          </Button>
+        {selectedRows.length > 0 && (
+          <DeleteConfirmationDialog
+            table={table}
+            subject='project'
+            onConfirm={console.log}
+          />
         )}
       </div>
       <div className='border rounded-md bg-background'>
