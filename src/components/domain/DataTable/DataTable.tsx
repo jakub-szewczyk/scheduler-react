@@ -19,13 +19,15 @@ import { cn } from '@/modules/common'
 import {
   ColumnDef,
   ColumnFiltersState,
+  Row,
   SortingState,
   flexRender,
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { ArrowDown, ArrowUp } from 'lucide-react'
+import { ArrowDown, ArrowUp, FileText, Pencil, Trash } from 'lucide-react'
 import { HTMLAttributes, useState } from 'react'
+import { useBoolean } from 'usehooks-ts'
 import DataTableSearch from '../DataTableSearch/DataTableSearch'
 
 interface Data {
@@ -66,6 +68,13 @@ const DataTable = ({
   pagination,
 }: DataTableProps) => {
   const [rowSelection, setRowSelection] = useState({})
+  const [targetRow, setTargetRow] = useState<Row<Data> | null>(null)
+
+  const {
+    value: isDialogOpen,
+    setValue: setIsDialogOpen,
+    setTrue: openDialog,
+  } = useBoolean()
 
   const columns: ColumnDef<Data>[] = [
     {
@@ -136,8 +145,38 @@ const DataTable = ({
       meta: { style: { width: '4rem' } },
       enableHiding: false,
       enableSorting: false,
-      cell: () => (
+      cell: ({ row }) => (
         <ActionsDropdown
+          items={[
+            {
+              children: (
+                <div className='flex items-center justify-center gap-x-2'>
+                  <FileText className='w-4 h-4' />
+                  Details
+                </div>
+              ),
+            },
+            {
+              children: (
+                <div className='flex items-center justify-center gap-x-2'>
+                  <Pencil className='w-4 h-4' />
+                  Edit
+                </div>
+              ),
+            },
+            {
+              children: (
+                <div className='flex items-center justify-center gap-x-2 text-destructive'>
+                  <Trash className='w-4 h-4' />
+                  Delete
+                </div>
+              ),
+              onSelect: () => {
+                openDialog()
+                setTargetRow(row)
+              },
+            },
+          ]}
           buttonProps={{ className: 'float-right', disabled: isFetching }}
           dropdownMenuContentProps={{ align: 'end' }}
         />
@@ -182,77 +221,94 @@ const DataTable = ({
   const selectedRows = table.getSelectedRowModel().rows
 
   return (
-    <div className={className}>
-      <div className='flex items-center justify-between gap-x-2 gap-y-4 mb-4'>
-        <DataTableSearch table={table} />
-        {selectedRows.length > 0 && (
-          <DeleteConfirmationDialog
-            table={table}
-            subject='project'
-            onConfirm={console.log}
-          />
-        )}
-      </div>
-      <div className='border rounded-md bg-background'>
-        <Table className='min-w-[36rem]'>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} {...header.column.columnDef.meta}>
-                    {!header.isPlaceholder &&
-                      flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length > 0 ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className={cn(
-                        'max-w-0 [&>div]:truncate',
-                        isFetching && !isPlaceholderData && 'opacity-50'
-                      )}
+    <>
+      <div className={className}>
+        <div className='flex items-center justify-between gap-x-2 gap-y-4 mb-4'>
+          <DataTableSearch table={table} />
+          {selectedRows.length > 0 && (
+            <Button
+              className='gap-x-2 text-destructive'
+              variant='ghost'
+              onClick={openDialog}
+            >
+              <span className='hidden sm:inline'>Delete selected</span>
+              <Trash className='size-4' />
+            </Button>
+          )}
+        </div>
+        <div className='border rounded-md bg-background'>
+          <Table className='min-w-[36rem]'>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead
+                      key={header.id}
+                      {...header.column.columnDef.meta}
                     >
-                      {isFetching &&
-                      isPlaceholderData &&
-                      !cell.id.includes('check') &&
-                      !cell.id.includes('actions') ? (
-                        <Skeleton className='h-4 w-full' />
-                      ) : (
+                      {!header.isPlaceholder &&
                         flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )
-                      )}
-                    </TableCell>
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                    </TableHead>
                   ))}
                 </TableRow>
-              ))
-            ) : isFetching ? (
-              <SkeletonRows table={table} />
-            ) : (
-              <NoResultsRow columnsLength={columns.length} />
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length > 0 ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && 'selected'}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        className={cn(
+                          'max-w-0 [&>div]:truncate',
+                          isFetching && !isPlaceholderData && 'opacity-50'
+                        )}
+                      >
+                        {isFetching &&
+                        isPlaceholderData &&
+                        !cell.id.includes('check') &&
+                        !cell.id.includes('actions') ? (
+                          <Skeleton className='h-4 w-full' />
+                        ) : (
+                          flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : isFetching ? (
+                <SkeletonRows table={table} />
+              ) : (
+                <NoResultsRow columnsLength={columns.length} />
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        <div className='flex items-center justify-between gap-x-2 mt-4'>
+          <SelectedRowsIndicator table={table} />
+          <Pagination className='ml-auto' table={table} />
+        </div>
       </div>
-      <div className='flex items-center justify-between gap-x-2 mt-4'>
-        <SelectedRowsIndicator table={table} />
-        <Pagination className='ml-auto' table={table} />
-      </div>
-    </div>
+      <DeleteConfirmationDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        rows={
+          selectedRows.length > 0 ? selectedRows : targetRow ? [targetRow] : []
+        }
+        subject='project'
+        onConfirm={console.log}
+      />
+    </>
   )
 }
 
