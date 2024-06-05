@@ -23,7 +23,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { ArrowDown, ArrowUp } from 'lucide-react'
+import { ArrowDown, ArrowUp, Trash } from 'lucide-react'
 import { HTMLAttributes, useState } from 'react'
 import DataTableSearch from '../DataTableSearch/DataTableSearch'
 
@@ -159,6 +159,7 @@ const DataTable = ({
     manualSorting: true,
     manualFiltering: true,
     manualPagination: true,
+    getRowId: (row) => row.id,
     onSortingChange: (updater) => {
       if (typeof updater !== 'function') return
       sorting.onChange(updater(sorting.state))
@@ -177,10 +178,23 @@ const DataTable = ({
     },
   })
 
+  const selectedRowIds = table.getSelectedRowModel().rows.map(({ id }) => id)
+
   return (
     <div className={className}>
-      <div className='flex flex-wrap items-center justify-between gap-x-2 gap-y-4 mb-4'>
+      <div className='flex items-center justify-between gap-x-2 gap-y-4 mb-4'>
         <DataTableSearch table={table} />
+        {selectedRowIds.length > 0 && (
+          <Button
+            className='gap-x-2 text-destructive'
+            variant='ghost'
+            // TODO: Open confirm dialog
+            onClick={() => console.log(selectedRowIds)}
+          >
+            <span className='hidden sm:inline'>Delete selected</span>
+            <Trash className='size-4' />
+          </Button>
+        )}
       </div>
       <div className='border rounded-md bg-background'>
         <Table className='min-w-[36rem]'>

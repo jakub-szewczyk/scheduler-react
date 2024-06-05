@@ -25,7 +25,7 @@ const ColumnSelector = <Data,>({
         className='w-full justify-between gap-x-2 sm:max-w-fit'
         variant='outline'
       >
-        Columns <ChevronDown className='w-4 h-4' />
+        Columns <ChevronDown className='size-4' />
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent {...dropdownMenuContentProps}>
