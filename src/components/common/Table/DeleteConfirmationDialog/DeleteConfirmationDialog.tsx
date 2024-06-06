@@ -12,19 +12,22 @@ import {
 import { Button, buttonVariants } from '@/components/ui/button'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { cn } from '@/modules/common'
+import { Subject } from '@/types/common'
 import { AlertDialogProps } from '@radix-ui/react-alert-dialog'
 import { Row } from '@tanstack/react-table'
-import { Trash } from 'lucide-react'
+import { LoaderCircle, Trash } from 'lucide-react'
 
 interface DeleteConfirmationDialogProps<Data> extends AlertDialogProps {
+  isPending?: boolean
+  subject: Subject
   rows: Row<Data>[]
-  subject: string
   onConfirm: (rows: Row<Data>[]) => void
 }
 
 const DeleteConfirmationDialog = <Data,>({
-  rows,
+  isPending,
   subject,
+  rows,
   onConfirm,
   ...props
 }: DeleteConfirmationDialogProps<Data>) => (
@@ -57,13 +60,18 @@ const DeleteConfirmationDialog = <Data,>({
               buttonVariants({ variant: 'destructive' }),
               'gap-x-2'
             )}
+            disabled={isPending}
             onClick={(event) => {
               event.preventDefault()
               onConfirm(rows)
             }}
           >
             Yes, delete
-            <Trash className='size-4' />
+            {isPending ? (
+              <LoaderCircle className='size-4 animate-spin' />
+            ) : (
+              <Trash className='size-4' />
+            )}
           </Button>
         </AlertDialogAction>
       </AlertDialogFooter>

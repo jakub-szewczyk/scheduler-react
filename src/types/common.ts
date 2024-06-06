@@ -4,3 +4,5 @@ export interface PaginableResponse<Content> {
   size: number
   total: number
 }
+
+export type Subject = 'project' | 'schedule' | 'board' | 'note'

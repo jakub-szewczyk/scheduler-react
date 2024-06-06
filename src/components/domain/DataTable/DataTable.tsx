@@ -16,6 +16,9 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { cn } from '@/modules/common'
+import { deleteProjects } from '@/services/project'
+import { Subject } from '@/types/common'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -41,6 +44,7 @@ interface DataTableProps {
   className?: HTMLAttributes<HTMLDivElement>['className']
   isFetching?: boolean
   isPlaceholderData?: boolean
+  subject: Subject
   data: Data[] | undefined
   sorting: {
     state: SortingState
@@ -62,6 +66,7 @@ const DataTable = ({
   className,
   isFetching,
   isPlaceholderData,
+  subject,
   data = [],
   sorting,
   filtering,
@@ -74,7 +79,24 @@ const DataTable = ({
     value: isDialogOpen,
     setValue: setIsDialogOpen,
     setTrue: openDialog,
+    setFalse: closeDialog,
   } = useBoolean()
+
+  const queryClient = useQueryClient()
+
+  /**
+   * TODO:
+   * If no search is applied and the deleted element was the last one on the page, go to the previous page.
+   * If search is applied and the deleted element was the last one on the page, go to the first page.
+   * Test all possible edge cases.
+   */
+  const { mutate, isPending } = useMutation({
+    mutationFn: deleteProjects,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] })
+      closeDialog()
+    },
+  })
 
   const columns: ColumnDef<Data>[] = [
     {
@@ -229,6 +251,7 @@ const DataTable = ({
             <Button
               className='gap-x-2 text-destructive'
               variant='ghost'
+              disabled={!!queryClient.isFetching({ queryKey: ['projects'] })}
               onClick={openDialog}
             >
               <span className='hidden sm:inline'>Delete selected</span>
@@ -302,11 +325,12 @@ const DataTable = ({
       <DeleteConfirmationDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
+        isPending={isPending}
+        subject={subject}
         rows={
           selectedRows.length > 0 ? selectedRows : targetRow ? [targetRow] : []
         }
-        subject='project'
-        onConfirm={console.log}
+        onConfirm={(rows) => mutate(rows.map((row) => row.id))}
       />
     </>
   )

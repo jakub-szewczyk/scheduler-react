@@ -16,5 +16,11 @@ export type GetProjectsSearchParams = z.infer<
 
 type GetProjectsResponse = PaginableResponse<Project>
 
-export const getProjects = async (params?: Partial<GetProjectsSearchParams>) =>
+export const getProjects = (params?: Partial<GetProjectsSearchParams>) =>
   api<GetProjectsResponse>('/projects', { params }).then(({ data }) => data)
+
+export const deleteProject = (projectId: string) =>
+  api.delete<Project>(`/projects/${projectId}`).then(({ data }) => data)
+
+export const deleteProjects = (projectIds: string[]) =>
+  Promise.all(projectIds.map(deleteProject))

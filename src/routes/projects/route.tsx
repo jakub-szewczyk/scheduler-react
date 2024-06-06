@@ -58,6 +58,7 @@ function Projects() {
       <DataTable
         isFetching={projectsQuery.isFetching}
         isPlaceholderData={projectsQuery.isPlaceholderData}
+        subject='project'
         data={projectsQuery.data?.content}
         sorting={{
           state: [{ id: 'createdAt', desc: search.createdAt === 'DESC' }],
