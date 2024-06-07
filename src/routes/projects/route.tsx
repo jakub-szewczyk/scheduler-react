@@ -78,7 +78,7 @@ function Projects() {
               search: (search) => ({
                 ...search,
                 page: 0,
-                title: state.at(0)?.value || '',
+                title: (state.at(0)?.value as string) || '',
               }),
               replace: true,
             }),

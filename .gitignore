@@ -25,3 +25,8 @@ dist-ssr
 cspell.json
 
 *storybook.log
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+playwright/.auth
