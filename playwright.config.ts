@@ -31,11 +31,9 @@ export default defineConfig({
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: BASE_APP_URL,
-
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
   },
-
   /* Configure projects for major browsers */
   projects: [
     { name: 'global setup', testMatch: /global\.setup\.ts/ },
@@ -96,7 +94,6 @@ export default defineConfig({
       },
     },
   ],
-
   /* Run your local dev server before starting the tests */
   webServer: {
     command: 'npm run dev',

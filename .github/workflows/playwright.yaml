@@ -5,8 +5,13 @@ on:
     branches: [main, master]
 jobs:
   test:
-    timeout-minutes: 60
     runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      BASE_APP_URL: ${{vars.BASE_APP_URL}}
+      CLERK_SECRET_KEY: ${{secrets.CLERK_SECRET_KEY}}
+      TEST_ACCOUNT_EMAIL: ${{secrets.TEST_ACCOUNT_EMAIL}}
+      TEST_ACCOUNT_PASSWORD: ${{secrets.TEST_ACCOUNT_PASSWORD}}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
