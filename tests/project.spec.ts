@@ -4,6 +4,7 @@ import {
   EMPTY_PAGINABLE_RESPONSE,
   PAGINABLE_RESPONSE,
 } from '../src/mocks/common'
+import { searchParam } from '../src/utils/common'
 
 const BASE_APP_URL = process.env.BASE_APP_URL
 
@@ -46,17 +47,30 @@ test('navigating through pages', async ({ page }) => {
     page,
     options: { frontendApiUrl: BASE_APP_URL },
   })
+  const total = 100
   await page.route(`${VITE_BASE_API_URL}/projects*`, (route) => {
-    const urlSearchParams = new URLSearchParams(
-      new URL(route.request().url()).search
-    )
-    const page = +(urlSearchParams.get('page') || 0)
-    const size = +(urlSearchParams.get('size') || 10)
-    return route.fulfill({
-      json: PAGINABLE_RESPONSE({ page, size, total: 100 }),
-    })
+    const page = +(searchParam('page', route.request().url()) || 0)
+    const size = +(searchParam('size', route.request().url()) || 10)
+    return route.fulfill({ json: PAGINABLE_RESPONSE({ page, size, total }) })
   })
   await page.goto(`${BASE_APP_URL}/projects`)
-  await expect(page.getByRole('cell', { name: 'Project #100' })).toBeVisible()
-  // TODO: Navigate
+  const iterations = Array(total / +(searchParam('size', page.url()) || 10))
+    .fill(null)
+    .map((_, index) => index)
+  for (const iteration of iterations) {
+    await Promise.all(
+      Array(+(searchParam('size', page.url()) || 10))
+        .fill(null)
+        .map((_, index) =>
+          expect(
+            page.getByRole('cell', {
+              name: `Project #${total - +(searchParam('page', page.url()) || 0) * +(searchParam('size', page.url()) || 10) - index}`,
+              exact: true,
+            })
+          ).toBeVisible()
+        )
+    )
+    if (iteration < iterations.length - 1)
+      await page.getByTestId('next-page').click()
+  }
 })

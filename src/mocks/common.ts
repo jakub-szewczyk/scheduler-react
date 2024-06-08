@@ -21,7 +21,7 @@ export const PAGINABLE_RESPONSE = ({
     .slice(page * size, page * size + size)
     .map((_, index) => ({
       id: faker.string.uuid(),
-      title: `Project #${total - index}`,
+      title: `Project #${total - index - page * size}`,
       description: faker.lorem.sentences(),
       createdAt: faker.date.recent().toISOString(),
     })),

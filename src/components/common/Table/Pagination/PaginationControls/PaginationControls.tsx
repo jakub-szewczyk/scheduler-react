@@ -32,6 +32,7 @@ const PaginationControls = <Data,>({
         <ChevronsLeftIcon className='h-4 w-4' />
       </Button>
       <Button
+        data-testid='previous-page'
         className='w-8 h-8'
         size='icon'
         variant='outline'
@@ -41,6 +42,7 @@ const PaginationControls = <Data,>({
         <ChevronLeftIcon className='w-4 h-4' />
       </Button>
       <Button
+        data-testid='next-page'
         className='w-8 h-8'
         size='icon'
         variant='outline'
