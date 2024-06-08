@@ -3,19 +3,19 @@ import Navbar from '@/components/layout/Navbar/Navbar'
 import Sidebar from '@/components/layout/Sidebar/Sidebar'
 import { cn } from '@/modules/common'
 import { SignedIn, SignedOut, UserButton } from '@clerk/clerk-react'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { Outlet, createRootRoute } from '@tanstack/react-router'
-import { Suspense, lazy } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
+// import { Suspense, lazy } from 'react'
+// import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
-const TanStackRouterDevtools =
-  process.env.NODE_ENV === 'production'
-    ? () => null
-    : lazy(() =>
-        import('@tanstack/router-devtools').then((res) => ({
-          default: res.TanStackRouterDevtools,
-        }))
-      )
+// const TanStackRouterDevtools =
+//   process.env.NODE_ENV === 'production'
+//     ? () => null
+//     : lazy(() =>
+//         import('@tanstack/router-devtools').then((res) => ({
+//           default: res.TanStackRouterDevtools,
+//         }))
+//       )
 
 export const Route = createRootRoute({
   component: Root,
@@ -54,10 +54,10 @@ function Root() {
           <Outlet />
         </main>
       </SignedOut>
-      <ReactQueryDevtools />
-      <Suspense>
-        <TanStackRouterDevtools />
-      </Suspense>
+      {/* <ReactQueryDevtools />
+           <Suspense>
+           <TanStackRouterDevtools />
+           </Suspense> */}
     </>
   )
 }

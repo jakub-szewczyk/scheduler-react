@@ -74,3 +74,81 @@ test('navigating through pages', async ({ page }) => {
       await page.getByTestId('next-page').click()
   }
 })
+
+test('changing page size', async ({ page }) => {
+  await setupClerkTestingToken({
+    page,
+    options: { frontendApiUrl: BASE_APP_URL },
+  })
+  const total = 100
+  await page.route(`${VITE_BASE_API_URL}/projects*`, (route) => {
+    const page = +(searchParam('page', route.request().url()) || 0)
+    const size = +(searchParam('size', route.request().url()) || 10)
+    return route.fulfill({ json: PAGINABLE_RESPONSE({ page, size, total }) })
+  })
+  await page.goto(`${BASE_APP_URL}/projects`)
+  let size = 10
+  await Promise.all(
+    Array(size)
+      .fill(null)
+      .map((_, index) =>
+        expect(
+          page.getByRole('cell', {
+            name: `Project #${total - index}`,
+            exact: true,
+          })
+        ).toBeVisible()
+      )
+  )
+  size = 20
+  await page.getByRole('combobox').click()
+  await page.getByLabel(size.toString()).click()
+  await Promise.all(
+    await Promise.all(
+      Array(size)
+        .fill(null)
+        .map((_, index) =>
+          expect(
+            page.getByRole('cell', {
+              name: `Project #${total - index}`,
+              exact: true,
+            })
+          ).toBeVisible()
+        )
+    )
+  )
+  size = 50
+  await page.getByRole('combobox').click()
+  await page.getByLabel(size.toString()).click()
+  await Promise.all(
+    await Promise.all(
+      Array(size)
+        .fill(null)
+        .map((_, index) =>
+          expect(
+            page.getByRole('cell', {
+              name: `Project #${total - index}`,
+              exact: true,
+            })
+          ).toBeVisible()
+        )
+    )
+  )
+  size = 100
+  await page.getByRole('combobox').click()
+  await page.getByLabel(size.toString()).click()
+  await Promise.all(
+    await Promise.all(
+      Array(size)
+        .fill(null)
+        .map((_, index) =>
+          expect(
+            page.getByRole('cell', {
+              name: `Project #${total - index}`,
+              exact: true,
+            })
+          ).toBeVisible()
+        )
+    )
+  )
+})
