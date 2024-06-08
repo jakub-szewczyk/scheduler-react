@@ -6,7 +6,7 @@ setup('global setup', async ({ page }) => {
   const PASSWORD = process.env.TEST_ACCOUNT_PASSWORD
   if (!EMAIL || !PASSWORD)
     throw new Error(
-      'missing environment variables: [TEST_ACCOUNT_EMAIL, TEST_ACCOUNT_PASSWORD]'
+      'missing one of environment variables: [TEST_ACCOUNT_EMAIL, TEST_ACCOUNT_PASSWORD]'
     )
   await clerkSetup()
   await page.goto('/sign-in')

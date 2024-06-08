@@ -9,8 +9,7 @@ dotenv.config({ path: '.env.local' })
 
 const BASE_APP_URL = process.env.BASE_APP_URL
 
-if (!BASE_APP_URL)
-  throw new Error('missing environment variables: BASE_APP_URL')
+if (!BASE_APP_URL) throw new Error('missing environment variable: BASE_APP_URL')
 
 /**
  * See https://playwright.dev/docs/test-configuration.
