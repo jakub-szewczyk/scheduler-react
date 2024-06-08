@@ -9,6 +9,7 @@ jobs:
     timeout-minutes: 60
     env:
       BASE_APP_URL: ${{vars.BASE_APP_URL}}
+      VITE_BASE_API_URL: ${{vars.VITE_BASE_API_URL}}
       CLERK_SECRET_KEY: ${{secrets.CLERK_SECRET_KEY}}
       TEST_ACCOUNT_EMAIL: ${{secrets.TEST_ACCOUNT_EMAIL}}
       TEST_ACCOUNT_PASSWORD: ${{secrets.TEST_ACCOUNT_PASSWORD}}
