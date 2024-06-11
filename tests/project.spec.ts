@@ -42,7 +42,7 @@ test('rendering empty table', async ({ page }) => {
   await expect(page.getByRole('cell', { name: 'No results' })).toBeVisible()
 })
 
-test('navigating through pages', async ({ page }) => {
+test('going to the next page', async ({ page }) => {
   await setupClerkTestingToken({
     page,
     options: { frontendApiUrl: BASE_APP_URL },
@@ -73,6 +73,117 @@ test('navigating through pages', async ({ page }) => {
     if (iteration < iterations.length - 1)
       await page.getByTestId('next-page').click()
   }
+})
+
+test('going to the previous page', async ({ page }) => {
+  await setupClerkTestingToken({
+    page,
+    options: { frontendApiUrl: BASE_APP_URL },
+  })
+  const total = 100
+  await page.route(`${VITE_BASE_API_URL}/projects*`, (route) => {
+    const page = +(searchParam('page', route.request().url()) || 0)
+    const size = +(searchParam('size', route.request().url()) || 10)
+    return route.fulfill({ json: PAGINABLE_RESPONSE({ page, size, total }) })
+  })
+  await page.goto(`${BASE_APP_URL}/projects?page=${total / 10 - 1}`)
+  const iterations = Array(total / +(searchParam('size', page.url()) || 10))
+    .fill(null)
+    .map((_, index) => index)
+  for (const iteration of iterations) {
+    await Promise.all(
+      Array(+(searchParam('size', page.url()) || 10))
+        .fill(null)
+        .map((_, index) =>
+          expect(
+            page.getByRole('cell', {
+              name: `Project #${total - +(searchParam('page', page.url()) || 0) * +(searchParam('size', page.url()) || 10) - index}`,
+              exact: true,
+            })
+          ).toBeVisible()
+        )
+    )
+    if (iteration < iterations.length - 1)
+      await page.getByTestId('previous-page').click()
+  }
+})
+
+test('going to the last page', async ({ page }) => {
+  await setupClerkTestingToken({
+    page,
+    options: { frontendApiUrl: BASE_APP_URL },
+  })
+  const total = 100
+  await page.route(`${VITE_BASE_API_URL}/projects*`, (route) => {
+    const page = +(searchParam('page', route.request().url()) || 0)
+    const size = +(searchParam('size', route.request().url()) || 10)
+    return route.fulfill({ json: PAGINABLE_RESPONSE({ page, size, total }) })
+  })
+  await page.goto(`${BASE_APP_URL}/projects`)
+  await Promise.all(
+    Array(+(searchParam('size', page.url()) || 10))
+      .fill(null)
+      .map((_, index) =>
+        expect(
+          page.getByRole('cell', {
+            name: `Project #${total - +(searchParam('page', page.url()) || 0) * +(searchParam('size', page.url()) || 10) - index}`,
+            exact: true,
+          })
+        ).toBeVisible()
+      )
+  )
+  await page.getByTestId('last-page').click()
+  await Promise.all(
+    Array(+(searchParam('size', page.url()) || 10))
+      .fill(null)
+      .map((_, index) =>
+        expect(
+          page.getByRole('cell', {
+            name: `Project #${total - +(searchParam('page', page.url()) || 0) * +(searchParam('size', page.url()) || 10) - index}`,
+            exact: true,
+          })
+        ).toBeVisible()
+      )
+  )
+})
+
+test('going to the first page', async ({ page }) => {
+  await setupClerkTestingToken({
+    page,
+    options: { frontendApiUrl: BASE_APP_URL },
+  })
+  const total = 100
+  await page.route(`${VITE_BASE_API_URL}/projects*`, (route) => {
+    const page = +(searchParam('page', route.request().url()) || 0)
+    const size = +(searchParam('size', route.request().url()) || 10)
+    return route.fulfill({ json: PAGINABLE_RESPONSE({ page, size, total }) })
+  })
+  await page.goto(`${BASE_APP_URL}/projects?page=${total / 10 - 1}`)
+  await Promise.all(
+    Array(+(searchParam('size', page.url()) || 10))
+      .fill(null)
+      .map((_, index) =>
+        expect(
+          page.getByRole('cell', {
+            name: `Project #${total - +(searchParam('page', page.url()) || 0) * +(searchParam('size', page.url()) || 10) - index}`,
+            exact: true,
+          })
+        ).toBeVisible()
+      )
+  )
+  await page.getByTestId('first-page').click()
+  await Promise.all(
+    Array(+(searchParam('size', page.url()) || 10))
+      .fill(null)
+      .map((_, index) =>
+        expect(
+          page.getByRole('cell', {
+            name: `Project #${total - +(searchParam('page', page.url()) || 0) * +(searchParam('size', page.url()) || 10) - index}`,
+            exact: true,
+          })
+        ).toBeVisible()
+      )
+  )
 })
 
 test('changing page size', async ({ page }) => {

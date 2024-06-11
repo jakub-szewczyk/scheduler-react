@@ -23,6 +23,7 @@ const PaginationControls = <Data,>({
     </div>
     <div className='flex items-center gap-x-2'>
       <Button
+        data-testid='first-page'
         className='w-8 h-8'
         size='icon'
         variant='outline'
@@ -52,6 +53,7 @@ const PaginationControls = <Data,>({
         <ChevronRightIcon className='w-4 h-4' />
       </Button>
       <Button
+        data-testid='last-page'
         className='w-8 h-8'
         size='icon'
         variant='outline'
