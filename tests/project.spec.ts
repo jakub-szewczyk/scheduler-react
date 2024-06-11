@@ -104,51 +104,47 @@ test('changing page size', async ({ page }) => {
   await page.getByRole('combobox').click()
   await page.getByLabel(size.toString()).click()
   await Promise.all(
-    await Promise.all(
-      Array(size)
-        .fill(null)
-        .map((_, index) =>
-          expect(
-            page.getByRole('cell', {
-              name: `Project #${total - index}`,
-              exact: true,
-            })
-          ).toBeVisible()
-        )
-    )
+    Array(size)
+      .fill(null)
+      .map((_, index) =>
+        expect(
+          page.getByRole('cell', {
+            name: `Project #${total - index}`,
+            exact: true,
+          })
+        ).toBeVisible()
+      )
   )
   size = 50
   await page.getByRole('combobox').click()
   await page.getByLabel(size.toString()).click()
   await Promise.all(
-    await Promise.all(
-      Array(size)
-        .fill(null)
-        .map((_, index) =>
-          expect(
-            page.getByRole('cell', {
-              name: `Project #${total - index}`,
-              exact: true,
-            })
-          ).toBeVisible()
-        )
-    )
+    Array(size)
+      .fill(null)
+      .map((_, index) =>
+        expect(
+          page.getByRole('cell', {
+            name: `Project #${total - index}`,
+            exact: true,
+          })
+        ).toBeVisible()
+      )
   )
   size = 100
   await page.getByRole('combobox').click()
   await page.getByLabel(size.toString()).click()
   await Promise.all(
-    await Promise.all(
-      Array(size)
-        .fill(null)
-        .map((_, index) =>
-          expect(
-            page.getByRole('cell', {
-              name: `Project #${total - index}`,
-              exact: true,
-            })
-          ).toBeVisible()
-        )
-    )
+    Array(size)
+      .fill(null)
+      .map((_, index) =>
+        expect(
+          page.getByRole('cell', {
+            name: `Project #${total - index}`,
+            exact: true,
+          })
+        ).toBeVisible()
+      )
   )
 })
+
+// TODO: Test searching, sorting & deleting

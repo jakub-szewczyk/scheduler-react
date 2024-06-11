@@ -4,7 +4,6 @@ import { useAuth } from '@clerk/clerk-react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RouterProvider } from '@tanstack/react-router'
 import { useEffect } from 'react'
-import ThemeProvider from './ThemeProvider'
 
 const queryClient = new QueryClient()
 
@@ -25,9 +24,7 @@ const TanstackProvider = ({ router }: TanstackProviderProps) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider storageKey='theme' defaultTheme='dark'>
-        <RouterProvider router={router} />
-      </ThemeProvider>
+      <RouterProvider router={router} />
     </QueryClientProvider>
   )
 }
