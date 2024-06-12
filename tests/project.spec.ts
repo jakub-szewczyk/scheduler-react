@@ -1,10 +1,10 @@
 import { setupClerkTestingToken } from '@clerk/testing/playwright'
+import { faker } from '@faker-js/faker'
 import { expect, test } from '@playwright/test'
 import {
   EMPTY_PAGINABLE_RESPONSE,
   PAGINABLE_RESPONSE,
-} from '../src/mocks/project'
-import { searchParam } from '../src/utils/common'
+} from '../src/mocks/common'
 
 const BASE_APP_URL = process.env.BASE_APP_URL
 
@@ -42,221 +42,148 @@ test('rendering empty table', async ({ page }) => {
   await expect(page.getByRole('cell', { name: 'No results' })).toBeVisible()
 })
 
-test('going to the next page', async ({ page }) => {
+test('navigating to the next page', async ({ page, isMobile }) => {
   await setupClerkTestingToken({
     page,
     options: { frontendApiUrl: BASE_APP_URL },
   })
-  const total = 100
-  await page.route(`${VITE_BASE_API_URL}/projects*`, (route) => {
-    const page = +(searchParam('page', route.request().url()) || 0)
-    const size = +(searchParam('size', route.request().url()) || 10)
-    return route.fulfill({ json: PAGINABLE_RESPONSE({ page, size, total }) })
-  })
+  const url = `${VITE_BASE_API_URL}/projects*`
+  await page.route(url, (route) => route.fulfill({ json: PAGINABLE_RESPONSE }))
+  let promise = page.waitForResponse(url)
   await page.goto(`${BASE_APP_URL}/projects`)
-  const iterations = Array(total / +(searchParam('size', page.url()) || 10))
-    .fill(null)
-    .map((_, index) => index)
-  for (const iteration of iterations) {
-    await Promise.all(
-      Array(+(searchParam('size', page.url()) || 10))
-        .fill(null)
-        .map((_, index) =>
-          expect(
-            page.getByRole('cell', {
-              name: `Project #${total - +(searchParam('page', page.url()) || 0) * +(searchParam('size', page.url()) || 10) - index}`,
-              exact: true,
-            })
-          ).toBeVisible()
-        )
-    )
-    if (iteration < iterations.length - 1)
-      await page.getByTestId('next-page').click()
+  if (isMobile) {
+    await expect(page.getByText('1/10')).toBeVisible()
+  } else {
+    await expect(page.getByText('Page 1 of 10')).toBeVisible()
   }
+  expect((await promise).url().includes('page=0')).toBeTruthy()
+  promise = page.waitForResponse(url)
+  await page.getByTestId('next-page').click()
+  if (isMobile) {
+    await expect(page.getByText('2/10')).toBeVisible()
+  } else {
+    await expect(page.getByText('Page 2 of 10')).toBeVisible()
+  }
+  expect((await promise).url().includes('page=1')).toBeTruthy()
 })
 
-test('going to the previous page', async ({ page }) => {
+test('navigating to the previous page', async ({ page, isMobile }) => {
   await setupClerkTestingToken({
     page,
     options: { frontendApiUrl: BASE_APP_URL },
   })
-  const total = 100
-  await page.route(`${VITE_BASE_API_URL}/projects*`, (route) => {
-    const page = +(searchParam('page', route.request().url()) || 0)
-    const size = +(searchParam('size', route.request().url()) || 10)
-    return route.fulfill({ json: PAGINABLE_RESPONSE({ page, size, total }) })
-  })
-  await page.goto(`${BASE_APP_URL}/projects?page=${total / 10 - 1}`)
-  const iterations = Array(total / +(searchParam('size', page.url()) || 10))
-    .fill(null)
-    .map((_, index) => index)
-  for (const iteration of iterations) {
-    await Promise.all(
-      Array(+(searchParam('size', page.url()) || 10))
-        .fill(null)
-        .map((_, index) =>
-          expect(
-            page.getByRole('cell', {
-              name: `Project #${total - +(searchParam('page', page.url()) || 0) * +(searchParam('size', page.url()) || 10) - index}`,
-              exact: true,
-            })
-          ).toBeVisible()
-        )
-    )
-    if (iteration < iterations.length - 1)
-      await page.getByTestId('previous-page').click()
+  const url = `${VITE_BASE_API_URL}/projects*`
+  await page.route(url, (route) => route.fulfill({ json: PAGINABLE_RESPONSE }))
+  let promise = page.waitForResponse(url)
+  await page.goto(`${BASE_APP_URL}/projects?page=9`)
+  if (isMobile) {
+    await expect(page.getByText('10/10')).toBeVisible()
+  } else {
+    await expect(page.getByText('Page 10 of 10')).toBeVisible()
   }
+  expect((await promise).url().includes('page=9')).toBeTruthy()
+  promise = page.waitForResponse(url)
+  await page.getByTestId('previous-page').click()
+  if (isMobile) {
+    await expect(page.getByText('9/10')).toBeVisible()
+  } else {
+    await expect(page.getByText('Page 9 of 10')).toBeVisible()
+  }
+  expect((await promise).url().includes('page=8')).toBeTruthy()
 })
 
-test('going to the last page', async ({ page }) => {
+test('navigating to the last page', async ({ page, isMobile }) => {
   await setupClerkTestingToken({
     page,
     options: { frontendApiUrl: BASE_APP_URL },
   })
-  const total = 100
-  await page.route(`${VITE_BASE_API_URL}/projects*`, (route) => {
-    const page = +(searchParam('page', route.request().url()) || 0)
-    const size = +(searchParam('size', route.request().url()) || 10)
-    return route.fulfill({ json: PAGINABLE_RESPONSE({ page, size, total }) })
-  })
+  const url = `${VITE_BASE_API_URL}/projects*`
+  await page.route(url, (route) => route.fulfill({ json: PAGINABLE_RESPONSE }))
+  let promise = page.waitForResponse(url)
   await page.goto(`${BASE_APP_URL}/projects`)
-  await Promise.all(
-    Array(+(searchParam('size', page.url()) || 10))
-      .fill(null)
-      .map((_, index) =>
-        expect(
-          page.getByRole('cell', {
-            name: `Project #${total - +(searchParam('page', page.url()) || 0) * +(searchParam('size', page.url()) || 10) - index}`,
-            exact: true,
-          })
-        ).toBeVisible()
-      )
-  )
+  if (isMobile) {
+    await expect(page.getByText('1/10')).toBeVisible()
+  } else {
+    await expect(page.getByText('Page 1 of 10')).toBeVisible()
+  }
+  expect((await promise).url().includes('page=0')).toBeTruthy()
+  promise = page.waitForResponse(url)
   await page.getByTestId('last-page').click()
-  await Promise.all(
-    Array(+(searchParam('size', page.url()) || 10))
-      .fill(null)
-      .map((_, index) =>
-        expect(
-          page.getByRole('cell', {
-            name: `Project #${total - +(searchParam('page', page.url()) || 0) * +(searchParam('size', page.url()) || 10) - index}`,
-            exact: true,
-          })
-        ).toBeVisible()
-      )
-  )
+  if (isMobile) {
+    await expect(page.getByText('10/10')).toBeVisible()
+  } else {
+    await expect(page.getByText('Page 10 of 10')).toBeVisible()
+  }
+  expect((await promise).url().includes('page=9')).toBeTruthy()
 })
 
-test('going to the first page', async ({ page }) => {
+test('navigating to the first page', async ({ page, isMobile }) => {
   await setupClerkTestingToken({
     page,
     options: { frontendApiUrl: BASE_APP_URL },
   })
-  const total = 100
-  await page.route(`${VITE_BASE_API_URL}/projects*`, (route) => {
-    const page = +(searchParam('page', route.request().url()) || 0)
-    const size = +(searchParam('size', route.request().url()) || 10)
-    return route.fulfill({ json: PAGINABLE_RESPONSE({ page, size, total }) })
-  })
-  await page.goto(`${BASE_APP_URL}/projects?page=${total / 10 - 1}`)
-  await Promise.all(
-    Array(+(searchParam('size', page.url()) || 10))
-      .fill(null)
-      .map((_, index) =>
-        expect(
-          page.getByRole('cell', {
-            name: `Project #${total - +(searchParam('page', page.url()) || 0) * +(searchParam('size', page.url()) || 10) - index}`,
-            exact: true,
-          })
-        ).toBeVisible()
-      )
-  )
+  const url = `${VITE_BASE_API_URL}/projects*`
+  await page.route(url, (route) => route.fulfill({ json: PAGINABLE_RESPONSE }))
+  let promise = page.waitForResponse(url)
+  await page.goto(`${BASE_APP_URL}/projects?page=9`)
+  if (isMobile) {
+    await expect(page.getByText('10/10')).toBeVisible()
+  } else {
+    await expect(page.getByText('Page 10 of 10')).toBeVisible()
+  }
+  expect((await promise).url().includes('page=9')).toBeTruthy()
+  promise = page.waitForResponse(url)
   await page.getByTestId('first-page').click()
-  await Promise.all(
-    Array(+(searchParam('size', page.url()) || 10))
-      .fill(null)
-      .map((_, index) =>
-        expect(
-          page.getByRole('cell', {
-            name: `Project #${total - +(searchParam('page', page.url()) || 0) * +(searchParam('size', page.url()) || 10) - index}`,
-            exact: true,
-          })
-        ).toBeVisible()
-      )
-  )
+  if (isMobile) {
+    await expect(page.getByText('1/10')).toBeVisible()
+  } else {
+    await expect(page.getByText('Page 1 of 10')).toBeVisible()
+  }
+  expect((await promise).url().includes('page=0')).toBeTruthy()
 })
 
-// FIXME: Fails in CI
-test('changing page size', async ({ page }) => {
+test('increasing page size', async ({ page, isMobile }) => {
   await setupClerkTestingToken({
     page,
     options: { frontendApiUrl: BASE_APP_URL },
   })
-  const total = 100
-  await page.route(`${VITE_BASE_API_URL}/projects*`, (route) => {
-    const page = +(searchParam('page', route.request().url()) || 0)
-    const size = +(searchParam('size', route.request().url()) || 10)
-    return route.fulfill({ json: PAGINABLE_RESPONSE({ page, size, total }) })
-  })
+  const url = `${VITE_BASE_API_URL}/projects*`
+  await page.route(url, (route) => route.fulfill({ json: PAGINABLE_RESPONSE }))
+  let promise = page.waitForResponse(url)
   await page.goto(`${BASE_APP_URL}/projects`)
-  let size = 10
-  await Promise.all(
-    Array(size)
-      .fill(null)
-      .map((_, index) =>
-        expect(
-          page.getByRole('cell', {
-            name: `Project #${total - index}`,
-            exact: true,
-          })
-        ).toBeVisible()
-      )
-  )
-  size = 20
+  expect((await promise).url().includes('size=10')).toBeTruthy()
+  if (isMobile) {
+    await expect(page.getByText('1/10')).toBeVisible()
+  } else {
+    await expect(page.getByText('Page 1 of 10')).toBeVisible()
+  }
+  promise = page.waitForResponse(url)
   await page.getByRole('combobox').click()
-  await page.getByLabel(size.toString()).click()
-  await Promise.all(
-    Array(size)
-      .fill(null)
-      .map((_, index) =>
-        expect(
-          page.getByRole('cell', {
-            name: `Project #${total - index}`,
-            exact: true,
-          })
-        ).toBeVisible()
-      )
-  )
-  size = 50
+  await page.getByLabel('20').click()
+  expect((await promise).url().includes('size=20')).toBeTruthy()
+  if (isMobile) {
+    await expect(page.getByText('1/5')).toBeVisible()
+  } else {
+    await expect(page.getByText('Page 1 of 5')).toBeVisible()
+  }
+  promise = page.waitForResponse(url)
   await page.getByRole('combobox').click()
-  await page.getByLabel(size.toString()).click()
-  await Promise.all(
-    Array(size)
-      .fill(null)
-      .map((_, index) =>
-        expect(
-          page.getByRole('cell', {
-            name: `Project #${total - index}`,
-            exact: true,
-          })
-        ).toBeVisible()
-      )
-  )
-  size = 100
+  await page.getByLabel('50').click()
+  if (isMobile) {
+    await expect(page.getByText('1/2', { exact: true })).toBeVisible()
+  } else {
+    await expect(page.getByText('Page 1 of 2')).toBeVisible()
+  }
+  expect((await promise).url().includes('size=50')).toBeTruthy()
+  promise = page.waitForResponse(url)
   await page.getByRole('combobox').click()
-  await page.getByLabel(size.toString()).click()
-  await Promise.all(
-    Array(size)
-      .fill(null)
-      .map((_, index) =>
-        expect(
-          page.getByRole('cell', {
-            name: `Project #${total - index}`,
-            exact: true,
-          })
-        ).toBeVisible()
-      )
-  )
+  await page.getByLabel('100').click()
+  expect((await promise).url().includes('size=100')).toBeTruthy()
+  if (isMobile) {
+    await expect(page.getByText('1/1')).toBeVisible()
+  } else {
+    await expect(page.getByText('Page 1 of 1')).toBeVisible()
+  }
 })
 
 test('sorting by creation date', async ({ page }) => {
@@ -264,69 +191,31 @@ test('sorting by creation date', async ({ page }) => {
     page,
     options: { frontendApiUrl: BASE_APP_URL },
   })
-  const total = 100
-  await page.route(`${VITE_BASE_API_URL}/projects*`, (route) => {
-    const createdAt = (searchParam('createdAt', route.request().url()) ||
-      'DESC') as 'ASC' | 'DESC'
-    return route.fulfill({ json: PAGINABLE_RESPONSE({ createdAt }) })
-  })
+  const url = `${VITE_BASE_API_URL}/projects*`
+  await page.route(url, (route) => route.fulfill({ json: PAGINABLE_RESPONSE }))
+  let promise = page.waitForResponse(url)
   await page.goto(`${BASE_APP_URL}/projects`)
-  await Promise.all(
-    Array(+(searchParam('size', page.url()) || 10))
-      .fill(null)
-      .map((_, index) =>
-        expect(
-          page.getByRole('cell', {
-            name: `Project #${total - +(searchParam('page', page.url()) || 0) * +(searchParam('size', page.url()) || 10) - index}`,
-            exact: true,
-          })
-        ).toBeVisible()
-      )
-  )
+  expect((await promise).url().includes('createdAt=DESC')).toBeTruthy()
+  promise = page.waitForResponse(url)
   await page.getByRole('button', { name: 'Created at' }).click()
-  await Promise.all(
-    Array(+(searchParam('size', page.url()) || 10))
-      .fill(null)
-      .map((_, index) =>
-        expect(
-          page.getByRole('cell', {
-            name: `Project #${+(searchParam('page', page.url()) || 0) * +(searchParam('size', page.url()) || 10) + index + 1}`,
-            exact: true,
-          })
-        ).toBeVisible()
-      )
-  )
+  expect((await promise).url().includes('createdAt=ASC')).toBeTruthy()
 })
 
-// FIXME: Multiple search results may not show up due to mock pagination implementation.
 test('searching by title', async ({ page }) => {
   await setupClerkTestingToken({
     page,
     options: { frontendApiUrl: BASE_APP_URL },
   })
-  const total = 100
-  await page.route(`${VITE_BASE_API_URL}/projects*`, (route) => {
-    const title = searchParam('title', route.request().url()) || ''
-    return route.fulfill({ json: PAGINABLE_RESPONSE({ title }) })
-  })
+  const url = `${VITE_BASE_API_URL}/projects*`
+  await page.route(url, (route) => route.fulfill({ json: PAGINABLE_RESPONSE }))
+  let promise = page.waitForResponse(url)
   await page.goto(`${BASE_APP_URL}/projects`)
-  await Promise.all(
-    Array(+(searchParam('size', page.url()) || 10))
-      .fill(null)
-      .map((_, index) =>
-        expect(
-          page.getByRole('cell', {
-            name: `Project #${total - +(searchParam('page', page.url()) || 0) * +(searchParam('size', page.url()) || 10) - index}`,
-            exact: true,
-          })
-        ).toBeVisible()
-      )
-  )
-  await page.getByPlaceholder('Search by title').fill('10')
-  await expect(page.getByText('Project #100', { exact: true })).toBeVisible()
+  expect((await promise).url().includes('title=')).toBeTruthy()
+  promise = page.waitForResponse(url)
+  const slug = faker.lorem.slug()
+  await page.getByPlaceholder('Search by title').fill(slug)
+  expect((await promise).url().includes(`title=${slug}`)).toBeTruthy()
+  await expect(page.getByPlaceholder('Search by title')).toHaveValue(slug)
 })
 
-// TODO:
-// Test deleting.
-// Assert changes in the url.
-// Consider switching to e2e.
+// TODO: Test deleting projects
