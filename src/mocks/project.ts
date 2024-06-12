@@ -15,17 +15,27 @@ export const PAGINABLE_RESPONSE = ({
   page = 0,
   size = 10,
   total = 100,
-}): PaginableResponse<Project> => ({
-  content: Array(total)
+  createdAt = 'DESC',
+}: Partial<{
+  page: number
+  size: number
+  total: number
+  createdAt: 'ASC' | 'DESC'
+}>): PaginableResponse<Project> => {
+  const content = Array(total)
     .fill(null)
-    .slice(page * size, page * size + size)
     .map((_, index) => ({
       id: faker.string.uuid(),
-      title: `Project #${total - index - page * size}`,
+      title: `Project #${total - index}`,
       description: faker.lorem.sentences(),
-      createdAt: faker.date.recent().toISOString(),
-    })),
-  page,
-  size,
-  total,
-})
+      createdAt: new Date(Date.now() - index * 1_000_000).toISOString(),
+    }))
+  if (createdAt === 'ASC') content.reverse()
+  content.slice(page * size, page * size + size)
+  return {
+    content,
+    page,
+    size,
+    total,
+  }
+}

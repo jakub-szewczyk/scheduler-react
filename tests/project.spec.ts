@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 import {
   EMPTY_PAGINABLE_RESPONSE,
   PAGINABLE_RESPONSE,
-} from '../src/mocks/common'
+} from '../src/mocks/project'
 import { searchParam } from '../src/utils/common'
 
 const BASE_APP_URL = process.env.BASE_APP_URL
@@ -186,6 +186,7 @@ test('going to the first page', async ({ page }) => {
   )
 })
 
+// FIXME: Fails in CI
 test('changing page size', async ({ page }) => {
   await setupClerkTestingToken({
     page,
@@ -258,4 +259,47 @@ test('changing page size', async ({ page }) => {
   )
 })
 
-// TODO: Test searching, sorting & deleting
+test('sorting by creation date', async ({ page }) => {
+  await setupClerkTestingToken({
+    page,
+    options: { frontendApiUrl: BASE_APP_URL },
+  })
+  const total = 100
+  await page.route(`${VITE_BASE_API_URL}/projects*`, (route) => {
+    const page = +(searchParam('page', route.request().url()) || 0)
+    const size = +(searchParam('size', route.request().url()) || 10)
+    const createdAt = (searchParam('createdAt', route.request().url()) ||
+      'DESC') as 'ASC' | 'DESC'
+    return route.fulfill({
+      json: PAGINABLE_RESPONSE({ page, size, total, createdAt }),
+    })
+  })
+  await page.goto(`${BASE_APP_URL}/projects`)
+  await Promise.all(
+    Array(+(searchParam('size', page.url()) || 10))
+      .fill(null)
+      .map((_, index) =>
+        expect(
+          page.getByRole('cell', {
+            name: `Project #${total - +(searchParam('page', page.url()) || 0) * +(searchParam('size', page.url()) || 10) - index}`,
+            exact: true,
+          })
+        ).toBeVisible()
+      )
+  )
+  await page.getByRole('button', { name: 'Created at' }).click()
+  await Promise.all(
+    Array(+(searchParam('size', page.url()) || 10))
+      .fill(null)
+      .map((_, index) =>
+        expect(
+          page.getByRole('cell', {
+            name: `Project #${+(searchParam('page', page.url()) || 0) * +(searchParam('size', page.url()) || 10) + index + 1}`,
+            exact: true,
+          })
+        ).toBeVisible()
+      )
+  )
+})
+
+// TODO: Test searching & deleting
