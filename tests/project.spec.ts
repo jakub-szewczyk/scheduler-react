@@ -266,13 +266,9 @@ test('sorting by creation date', async ({ page }) => {
   })
   const total = 100
   await page.route(`${VITE_BASE_API_URL}/projects*`, (route) => {
-    const page = +(searchParam('page', route.request().url()) || 0)
-    const size = +(searchParam('size', route.request().url()) || 10)
     const createdAt = (searchParam('createdAt', route.request().url()) ||
       'DESC') as 'ASC' | 'DESC'
-    return route.fulfill({
-      json: PAGINABLE_RESPONSE({ page, size, total, createdAt }),
-    })
+    return route.fulfill({ json: PAGINABLE_RESPONSE({ createdAt }) })
   })
   await page.goto(`${BASE_APP_URL}/projects`)
   await Promise.all(
@@ -302,4 +298,35 @@ test('sorting by creation date', async ({ page }) => {
   )
 })
 
-// TODO: Test searching & deleting
+// FIXME: Multiple search results may not show up due to mock pagination implementation.
+test('searching by title', async ({ page }) => {
+  await setupClerkTestingToken({
+    page,
+    options: { frontendApiUrl: BASE_APP_URL },
+  })
+  const total = 100
+  await page.route(`${VITE_BASE_API_URL}/projects*`, (route) => {
+    const title = searchParam('title', route.request().url()) || ''
+    return route.fulfill({ json: PAGINABLE_RESPONSE({ title }) })
+  })
+  await page.goto(`${BASE_APP_URL}/projects`)
+  await Promise.all(
+    Array(+(searchParam('size', page.url()) || 10))
+      .fill(null)
+      .map((_, index) =>
+        expect(
+          page.getByRole('cell', {
+            name: `Project #${total - +(searchParam('page', page.url()) || 0) * +(searchParam('size', page.url()) || 10) - index}`,
+            exact: true,
+          })
+        ).toBeVisible()
+      )
+  )
+  await page.getByPlaceholder('Search by title').fill('10')
+  await expect(page.getByText('Project #100', { exact: true })).toBeVisible()
+})
+
+// TODO:
+// Test deleting.
+// Assert changes in the url.
+// Consider switching to e2e.
