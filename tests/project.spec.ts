@@ -218,4 +218,78 @@ test('searching by title', async ({ page }) => {
   await expect(page.getByPlaceholder('Search by title')).toHaveValue(slug)
 })
 
-// TODO: Test deleting projects
+test('deleting one project', async ({ page }) => {
+  await setupClerkTestingToken({
+    page,
+    options: { frontendApiUrl: BASE_APP_URL },
+  })
+  await page.route(`${VITE_BASE_API_URL}/projects*`, (route) =>
+    route.fulfill({ json: PAGINABLE_RESPONSE })
+  )
+  await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    route.fulfill({
+      json: {
+        id: faker.string.uuid(),
+        title: faker.lorem.slug(),
+        description: faker.lorem.sentences(),
+        createdAt: faker.date.past().toISOString(),
+      },
+    })
+  )
+  await page.goto(`${BASE_APP_URL}/projects`)
+  await page
+    .getByRole('row', { name: 'socius-accusator-corona Tergo' })
+    .getByRole('button')
+    .click()
+  await page.getByRole('menuitem', { name: 'Delete' }).click()
+  await expect(
+    page
+      .getByLabel('Warning: Permanent Deletion')
+      .getByText('socius-accusator-corona')
+  ).toBeVisible()
+  const promise = page.waitForResponse(
+    (response) => response.request().method() === 'DELETE'
+  )
+  await page.getByRole('button', { name: 'Yes, delete' }).click()
+  expect((await promise).request().method()).toBe('DELETE')
+})
+
+test('deleting many projects', async ({ page }) => {
+  await setupClerkTestingToken({
+    page,
+    options: { frontendApiUrl: BASE_APP_URL },
+  })
+  await page.route(`${VITE_BASE_API_URL}/projects*`, (route) =>
+    route.fulfill({ json: PAGINABLE_RESPONSE })
+  )
+  await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    route.fulfill({
+      json: {
+        id: faker.string.uuid(),
+        title: faker.lorem.slug(),
+        description: faker.lorem.sentences(),
+        createdAt: faker.date.past().toISOString(),
+      },
+    })
+  )
+  await page.goto(`${BASE_APP_URL}/projects`)
+  await page
+    .getByRole('row', { name: 'socius-accusator-corona Tergo' })
+    .getByRole('checkbox')
+    .check()
+  await page
+    .getByRole('row', { name: 'qui-articulus-confero' })
+    .getByRole('checkbox')
+    .check()
+  await page.getByRole('button', { name: 'Delete selected' }).click()
+  await expect(
+    page
+      .getByLabel('Warning: Permanent Deletion')
+      .getByText('socius-accusator-corona, qui-articulus-confero')
+  ).toBeVisible()
+  const promise = page.waitForResponse(
+    (response) => response.request().method() === 'DELETE'
+  )
+  await page.getByRole('button', { name: 'Yes, delete' }).click()
+  expect((await promise).request().method()).toBe('DELETE')
+})

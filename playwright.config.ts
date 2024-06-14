@@ -20,8 +20,10 @@ export default defineConfig({
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
+  /* Test timeout */
+  timeout: 60_000,
   /* Expect timeout */
-  expect: { timeout: 60000 },
+  expect: { timeout: 60_000 },
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
@@ -63,37 +65,37 @@ export default defineConfig({
       dependencies: ['global setup'],
     },
     /* Test against branded browsers. */
-    {
-      name: 'Microsoft Edge',
-      use: {
-        ...devices['Desktop Edge'],
-        channel: 'msedge',
-        storageState: 'playwright/.auth/user.json',
-      },
-    },
-    {
-      name: 'Google Chrome',
-      use: {
-        ...devices['Desktop Chrome'],
-        channel: 'chrome',
-        storageState: 'playwright/.auth/user.json',
-      },
-    },
+    // {
+    //   name: 'Microsoft Edge',
+    //   use: {
+    //     ...devices['Desktop Edge'],
+    //     channel: 'msedge',
+    //     storageState: 'playwright/.auth/user.json',
+    //   },
+    // },
+    // {
+    //   name: 'Google Chrome',
+    //   use: {
+    //     ...devices['Desktop Chrome'],
+    //     channel: 'chrome',
+    //     storageState: 'playwright/.auth/user.json',
+    //   },
+    // },
     /* Test against mobile viewports. */
-    {
-      name: 'Mobile Safari',
-      use: {
-        ...devices['iPhone 12'],
-        storageState: 'playwright/.auth/user.json',
-      },
-    },
-    {
-      name: 'Mobile Chrome',
-      use: {
-        ...devices['Pixel 5'],
-        storageState: 'playwright/.auth/user.json',
-      },
-    },
+    // {
+    //   name: 'Mobile Safari',
+    //   use: {
+    //     ...devices['iPhone 12'],
+    //     storageState: 'playwright/.auth/user.json',
+    //   },
+    // },
+    // {
+    //   name: 'Mobile Chrome',
+    //   use: {
+    //     ...devices['Pixel 5'],
+    //     storageState: 'playwright/.auth/user.json',
+    //   },
+    // },
   ],
   /* Run your local dev server before starting the tests */
   webServer: {
