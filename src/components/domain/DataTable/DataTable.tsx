@@ -15,10 +15,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { cn } from '@/modules/common'
-import { deleteProjects } from '@/services/project'
+import { cn, getDeleteMutationFn } from '@/modules/common'
 import { Subject } from '@/types/common'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { Link, useNavigate } from '@tanstack/react-router'
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -82,6 +82,8 @@ const DataTable = ({
     setFalse: closeDialog,
   } = useBoolean()
 
+  const navigate = useNavigate()
+
   const columns: ColumnDef<Data>[] = [
     {
       id: 'check',
@@ -113,7 +115,11 @@ const DataTable = ({
       accessorKey: 'title',
       enableSorting: false,
       header: 'Title',
-      cell: ({ row }) => <div>{row.getValue('title')}</div>,
+      cell: ({ row }) => (
+        <Link className='hover:underline' to={`/${subject}s/${row.id}`}>
+          {row.getValue('title')}
+        </Link>
+      ),
     },
     {
       accessorKey: 'description',
@@ -161,6 +167,7 @@ const DataTable = ({
                   Details
                 </div>
               ),
+              onClick: () => navigate({ to: `/${subject}s/${row.id}` }),
             },
             {
               children: (
@@ -227,7 +234,7 @@ const DataTable = ({
   const queryClient = useQueryClient()
 
   const { mutate, isPending } = useMutation({
-    mutationFn: deleteProjects,
+    mutationFn: getDeleteMutationFn(subject),
     onSuccess: (_, variables) => {
       const allRemoved =
         variables.length === table.getFilteredRowModel().rows.length
@@ -237,7 +244,7 @@ const DataTable = ({
         table.firstPage()
       }
       if (allRemoved && !searchApplied) table.previousPage()
-      queryClient.invalidateQueries({ queryKey: ['projects'] })
+      queryClient.invalidateQueries({ queryKey: [`${subject}s`] })
       closeDialog()
     },
   })
@@ -253,7 +260,7 @@ const DataTable = ({
             <Button
               className='gap-x-2 text-destructive'
               variant='ghost'
-              disabled={!!queryClient.isFetching({ queryKey: ['projects'] })}
+              disabled={!!queryClient.isFetching({ queryKey: [`${subject}s`] })}
               onClick={openDialog}
             >
               <span className='hidden sm:inline'>Delete selected</span>
