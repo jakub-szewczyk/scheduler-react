@@ -53,7 +53,7 @@ const DeleteConfirmationDialog = <Data,>({
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
-        <AlertDialogCancel>Cancel</AlertDialogCancel>
+        <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
         <AlertDialogAction asChild>
           <Button
             className={cn(

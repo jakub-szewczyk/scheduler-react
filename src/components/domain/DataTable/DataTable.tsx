@@ -82,22 +82,6 @@ const DataTable = ({
     setFalse: closeDialog,
   } = useBoolean()
 
-  const queryClient = useQueryClient()
-
-  /**
-   * TODO:
-   * If no search is applied and the deleted element was the last one on the page, go to the previous page.
-   * If search is applied and the deleted element was the last one on the page, go to the first page.
-   * Test all possible edge cases.
-   */
-  const { mutate, isPending } = useMutation({
-    mutationFn: deleteProjects,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects'] })
-      closeDialog()
-    },
-  })
-
   const columns: ColumnDef<Data>[] = [
     {
       id: 'check',
@@ -237,6 +221,24 @@ const DataTable = ({
         pageSize: pagination.size,
       })
       pagination.onChange({ page: pageIndex, size: pageSize })
+    },
+  })
+
+  const queryClient = useQueryClient()
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: deleteProjects,
+    onSuccess: (_, variables) => {
+      const allRemoved =
+        variables.length === table.getFilteredRowModel().rows.length
+      const searchApplied = table.getColumn('title')?.getFilterValue() as string
+      if (allRemoved && searchApplied) {
+        table.getColumn('title')?.setFilterValue('')
+        table.firstPage()
+      }
+      if (allRemoved && !searchApplied) table.previousPage()
+      queryClient.invalidateQueries({ queryKey: ['projects'] })
+      closeDialog()
     },
   })
 
