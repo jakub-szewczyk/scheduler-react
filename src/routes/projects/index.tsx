@@ -5,11 +5,11 @@ import Paragraph from '@/components/typography/Paragraph/Paragraph'
 import { Button } from '@/components/ui/button'
 import { getProjects, getProjectsSearchParamsSchema } from '@/services/project'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { CirclePlus } from 'lucide-react'
 import { useDebounceValue } from 'usehooks-ts'
 
-export const Route = createFileRoute('/projects')({
+export const Route = createFileRoute('/projects/')({
   component: () => (
     <Protected>
       <Projects />
@@ -51,8 +51,15 @@ function Projects() {
           creation date to keep everything organized. Click on any project to
           see its full details.
         </Paragraph>
-        <Button className='gap-x-2 sm:w-fit' size='sm' variant='outline'>
-          New Project <CirclePlus className='w-4 h-4' />
+        <Button
+          className='gap-x-2 sm:w-fit'
+          size='sm'
+          variant='outline'
+          asChild
+        >
+          <Link to='/projects/new'>
+            New Project <CirclePlus className='w-4 h-4' />
+          </Link>
         </Button>
       </div>
       <DataTable

@@ -14,8 +14,10 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as SignUpImport } from './routes/sign-up'
 import { Route as SignInImport } from './routes/sign-in'
 import { Route as SettingsRouteImport } from './routes/settings/route'
-import { Route as ProjectsRouteImport } from './routes/projects/route'
 import { Route as IndexImport } from './routes/index'
+import { Route as ProjectsIndexImport } from './routes/projects/index'
+import { Route as ProjectsNewImport } from './routes/projects/new'
+import { Route as ProjectsProjectIdImport } from './routes/projects/$projectId'
 
 // Create/Update Routes
 
@@ -34,13 +36,23 @@ const SettingsRouteRoute = SettingsRouteImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const ProjectsRouteRoute = ProjectsRouteImport.update({
-  path: '/projects',
+const IndexRoute = IndexImport.update({
+  path: '/',
   getParentRoute: () => rootRoute,
 } as any)
 
-const IndexRoute = IndexImport.update({
-  path: '/',
+const ProjectsIndexRoute = ProjectsIndexImport.update({
+  path: '/projects/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ProjectsNewRoute = ProjectsNewImport.update({
+  path: '/projects/new',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ProjectsProjectIdRoute = ProjectsProjectIdImport.update({
+  path: '/projects/$projectId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -53,13 +65,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/projects': {
-      id: '/projects'
-      path: '/projects'
-      fullPath: '/projects'
-      preLoaderRoute: typeof ProjectsRouteImport
       parentRoute: typeof rootRoute
     }
     '/settings': {
@@ -83,6 +88,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignUpImport
       parentRoute: typeof rootRoute
     }
+    '/projects/$projectId': {
+      id: '/projects/$projectId'
+      path: '/projects/$projectId'
+      fullPath: '/projects/$projectId'
+      preLoaderRoute: typeof ProjectsProjectIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/projects/new': {
+      id: '/projects/new'
+      path: '/projects/new'
+      fullPath: '/projects/new'
+      preLoaderRoute: typeof ProjectsNewImport
+      parentRoute: typeof rootRoute
+    }
+    '/projects/': {
+      id: '/projects/'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof ProjectsIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -90,10 +116,12 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren({
   IndexRoute,
-  ProjectsRouteRoute,
   SettingsRouteRoute,
   SignInRoute,
   SignUpRoute,
+  ProjectsProjectIdRoute,
+  ProjectsNewRoute,
+  ProjectsIndexRoute,
 })
 
 /* prettier-ignore-end */
@@ -105,17 +133,16 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/projects",
         "/settings",
         "/sign-in",
-        "/sign-up"
+        "/sign-up",
+        "/projects/$projectId",
+        "/projects/new",
+        "/projects/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
-    },
-    "/projects": {
-      "filePath": "projects/route.tsx"
     },
     "/settings": {
       "filePath": "settings/route.tsx"
@@ -125,6 +152,15 @@ export const routeTree = rootRoute.addChildren({
     },
     "/sign-up": {
       "filePath": "sign-up.tsx"
+    },
+    "/projects/$projectId": {
+      "filePath": "projects/$projectId.tsx"
+    },
+    "/projects/new": {
+      "filePath": "projects/new.tsx"
+    },
+    "/projects/": {
+      "filePath": "projects/index.tsx"
     }
   }
 }
