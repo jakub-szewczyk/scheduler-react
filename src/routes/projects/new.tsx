@@ -38,7 +38,7 @@ function NewProject() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>New</BreadcrumbPage>
+              <BreadcrumbPage>New Project</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>

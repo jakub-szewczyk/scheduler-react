@@ -16,13 +16,12 @@ import { Send } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-const formSchema = (subject: Subject) =>
-  z.object({
-    title: z.string().min(1, `Please enter ${subject}'s title`),
-    description: z.string(),
-  })
+const formSchema = z.object({
+  title: z.string().min(1, 'This field is required'),
+  description: z.string(),
+})
 
-type Inputs = z.infer<ReturnType<typeof formSchema>>
+type Inputs = z.infer<typeof formSchema>
 
 interface DataFormProps {
   subject: Subject
@@ -35,7 +34,7 @@ const DataForm = ({ subject, onSubmit }: DataFormProps) => {
       title: '',
       description: '',
     },
-    resolver: zodResolver(formSchema(subject)),
+    resolver: zodResolver(formSchema),
   })
 
   return (
@@ -82,7 +81,7 @@ const DataForm = ({ subject, onSubmit }: DataFormProps) => {
             )}
           />
         </div>
-        <Button className='flex gap-x-2 sm:w-fit' type='submit'>
+        <Button className='flex gap-x-2 sm:w-fit' type='submit' size='sm'>
           Submit
           <Send className='size-4' />
         </Button>
