@@ -10,6 +10,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
+import { useToast } from '@/components/ui/use-toast'
 import { createProject } from '@/services/project'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
@@ -25,17 +26,29 @@ export const Route = createFileRoute('/projects/new')({
 function NewProject() {
   const navigate = Route.useNavigate()
 
+  const { toast } = useToast()
+
   const queryClient = useQueryClient()
 
   const { mutate, isPending } = useMutation({
     mutationFn: createProject,
-    onSuccess: () => {
+    onSuccess: (project) => {
       navigate({
         to: '/projects',
         search: { page: 0, size: 10, title: '', createdAt: 'DESC' },
       })
       queryClient.invalidateQueries({ queryKey: ['projects'] })
+      toast({
+        title: 'Project created',
+        description: `${project.title} has been added to your project list`,
+      })
     },
+    onError: (error) =>
+      toast({
+        variant: 'destructive',
+        title: 'Form submission failed',
+        ...(error.response && { description: error.response.data[0].msg }),
+      }),
   })
 
   return (

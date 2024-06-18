@@ -1,4 +1,4 @@
-import { PaginableResponse } from '@/types/common'
+import { PaginableResponse } from '@/types/api'
 import { Project } from '@/types/project'
 import { z } from 'zod'
 import { api } from './api'

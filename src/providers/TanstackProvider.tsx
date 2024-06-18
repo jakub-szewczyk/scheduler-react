@@ -1,9 +1,17 @@
 import { Router } from '@/main'
 import { api } from '@/services/api'
+import { ApiError } from '@/types/api'
 import { useAuth } from '@clerk/clerk-react'
+import '@tanstack/react-query'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RouterProvider } from '@tanstack/react-router'
 import { useEffect } from 'react'
+
+declare module '@tanstack/react-query' {
+  interface Register {
+    defaultError: ApiError
+  }
+}
 
 const queryClient = new QueryClient()
 

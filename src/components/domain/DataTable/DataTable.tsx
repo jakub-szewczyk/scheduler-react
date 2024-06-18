@@ -236,6 +236,7 @@ const DataTable = ({
   const { mutate, isPending } = useMutation({
     mutationFn: getDeleteMutationFn(subject),
     onSuccess: (_, variables) => {
+      // TODO: Validate that it's working correctly
       const allRemoved =
         variables.length === table.getFilteredRowModel().rows.length
       const searchApplied = table.getColumn('title')?.getFilterValue() as string
@@ -251,6 +252,7 @@ const DataTable = ({
 
   const selectedRows = table.getSelectedRowModel().rows
 
+  // FIXME: Handle long titles & descriptions
   return (
     <>
       <div className={className}>

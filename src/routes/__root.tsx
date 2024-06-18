@@ -1,6 +1,7 @@
 import ThemeSelect from '@/components/common/ThemeSelect/ThemeSelect'
 import Navbar from '@/components/layout/Navbar/Navbar'
 import Sidebar from '@/components/layout/Sidebar/Sidebar'
+import { Toaster } from '@/components/ui/toaster'
 import { cn } from '@/modules/common'
 import { SignedIn, SignedOut, UserButton } from '@clerk/clerk-react'
 import { Outlet, createRootRoute } from '@tanstack/react-router'
@@ -54,6 +55,7 @@ function Root() {
           <Outlet />
         </main>
       </SignedOut>
+      <Toaster />
       {/* <ReactQueryDevtools />
            <Suspense>
            <TanStackRouterDevtools />

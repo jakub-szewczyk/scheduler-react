@@ -1,4 +1,4 @@
-import { PaginableResponse } from '@/types/common'
+import { PaginableResponse } from '@/types/api'
 import { Project } from '@/types/project'
 import { faker } from '@faker-js/faker'
 
