@@ -14,3 +14,7 @@ type Story = StoryObj<typeof DataForm>
 export const Primary: Story = {
   args: { subject: 'project' },
 }
+
+export const Pending: Story = {
+  args: { subject: 'project', isPending: true },
+}

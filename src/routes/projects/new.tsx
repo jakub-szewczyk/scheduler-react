@@ -10,6 +10,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
+import { createProject } from '@/services/project'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/projects/new')({
@@ -21,6 +23,21 @@ export const Route = createFileRoute('/projects/new')({
 })
 
 function NewProject() {
+  const navigate = Route.useNavigate()
+
+  const queryClient = useQueryClient()
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: createProject,
+    onSuccess: () => {
+      navigate({
+        to: '/projects',
+        search: { page: 0, size: 10, title: '', createdAt: 'DESC' },
+      })
+      queryClient.invalidateQueries({ queryKey: ['projects'] })
+    },
+  })
+
   return (
     <div className='flex flex-col gap-y-12'>
       <div className='flex flex-col gap-y-4'>
@@ -50,7 +67,7 @@ function NewProject() {
           Once you're done, submit the form to get your project started.
         </Paragraph>
       </div>
-      <DataForm subject='project' onSubmit={console.log} />
+      <DataForm isPending={isPending} subject='project' onSubmit={mutate} />
     </div>
   )
 }

@@ -13,7 +13,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Subject } from '@/types/common'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from '@tanstack/react-router'
-import { Send } from 'lucide-react'
+import { LoaderCircle, Send } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -25,11 +25,12 @@ const formSchema = z.object({
 type Inputs = z.infer<typeof formSchema>
 
 interface DataFormProps {
+  isPending?: boolean
   subject: Subject
   onSubmit: (inputs: Inputs) => void
 }
 
-const DataForm = ({ subject, onSubmit }: DataFormProps) => {
+const DataForm = ({ isPending, subject, onSubmit }: DataFormProps) => {
   const form = useForm<Inputs>({
     defaultValues: {
       title: '',
@@ -88,6 +89,7 @@ const DataForm = ({ subject, onSubmit }: DataFormProps) => {
             type='button'
             size='sm'
             variant='ghost'
+            disabled={isPending}
             asChild
           >
             <Link
@@ -98,9 +100,18 @@ const DataForm = ({ subject, onSubmit }: DataFormProps) => {
               Cancel
             </Link>
           </Button>
-          <Button className='flex gap-x-2 sm:w-fit' type='submit' size='sm'>
+          <Button
+            className='flex gap-x-2 sm:w-fit'
+            type='submit'
+            size='sm'
+            disabled={isPending}
+          >
             Submit
-            <Send className='size-4' />
+            {isPending ? (
+              <LoaderCircle className='size-4 animate-spin' />
+            ) : (
+              <Send className='size-4' />
+            )}
           </Button>
         </div>
       </form>
