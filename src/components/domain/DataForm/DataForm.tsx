@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Subject } from '@/types/common'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Link } from '@tanstack/react-router'
 import { Send } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -81,10 +82,27 @@ const DataForm = ({ subject, onSubmit }: DataFormProps) => {
             )}
           />
         </div>
-        <Button className='flex gap-x-2 sm:w-fit' type='submit' size='sm'>
-          Submit
-          <Send className='size-4' />
-        </Button>
+        <div className='flex gap-x-2'>
+          <Button
+            className='flex gap-x-2 sm:w-fit'
+            type='button'
+            size='sm'
+            variant='ghost'
+            asChild
+          >
+            <Link
+              from='/projects/new'
+              to='/projects'
+              search={{ page: 0, size: 10, title: '', createdAt: 'DESC' }}
+            >
+              Cancel
+            </Link>
+          </Button>
+          <Button className='flex gap-x-2 sm:w-fit' type='submit' size='sm'>
+            Submit
+            <Send className='size-4' />
+          </Button>
+        </div>
       </form>
     </Form>
   )

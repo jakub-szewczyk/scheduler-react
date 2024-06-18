@@ -51,7 +51,12 @@ function Projects() {
           creation date to keep everything organized. Click on any project to
           see its full details.
         </Paragraph>
-        <Button className='gap-x-2 sm:w-fit' size='sm' asChild>
+        <Button
+          className='gap-x-2 sm:w-fit'
+          size='sm'
+          variant='secondary'
+          asChild
+        >
           <Link to='/projects/new'>
             New Project <CirclePlus className='size-4' />
           </Link>
