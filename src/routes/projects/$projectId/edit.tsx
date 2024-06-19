@@ -11,23 +11,25 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
 import { useToast } from '@/components/ui/use-toast'
-import { createProject } from '@/services/project'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { getProject, updateProject } from '@/services/project'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { useDocumentTitle } from 'usehooks-ts'
 
-const pageTitle = 'New Project'
+const pageTitle = 'Edit Project'
 
-export const Route = createFileRoute('/projects/new')({
+export const Route = createFileRoute('/projects/$projectId/edit')({
   component: () => (
     <Protected>
-      <NewProject />
+      <EditProject />
     </Protected>
   ),
 })
 
-function NewProject() {
+function EditProject() {
   useDocumentTitle(`Scheduler - ${pageTitle}`)
+
+  const params = Route.useParams()
 
   const navigate = Route.useNavigate()
 
@@ -35,17 +37,26 @@ function NewProject() {
 
   const queryClient = useQueryClient()
 
+  const { data, isLoading, isFetching, isPlaceholderData } = useQuery({
+    queryKey: ['projects', params.projectId],
+    queryFn: () => getProject(params.projectId),
+  })
+
   const { mutate, isPending } = useMutation({
-    mutationFn: createProject,
+    mutationFn: updateProject,
     onSuccess: (project) => {
+      /**
+       * TODO:
+       * Navigate to the previous page if it was the "Projects" page.
+       */
       navigate({
         to: '/projects',
         search: { page: 0, size: 10, title: '', createdAt: 'DESC' },
       })
       queryClient.invalidateQueries({ queryKey: ['projects'] })
       toast({
-        title: 'Project created',
-        description: `${project.title} has been added to your project list`,
+        title: 'Project updated',
+        description: `${project.title} has been successfully updated`,
       })
     },
   })
@@ -67,19 +78,46 @@ function NewProject() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link
+                  to='/projects/$projectId'
+                  params={{ projectId: params.projectId }}
+                >
+                  Project Details
+                </Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
               <BreadcrumbPage>{pageTitle}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
         <Heading3>{pageTitle}</Heading3>
         <Paragraph className='text-sm text-muted-foreground'>
-          Kick off your new project by entering a title and description. Choose
-          a title that captures the essence of your project and use the
-          description to provide an overview of its objectives and key details.
-          Once you're done, submit the form to get your project started.
+          Update your project details by modifying the title and description.
+          Ensure the title accurately represents your project's current
+          direction and use the description to highlight new goals, progress,
+          and essential information. Once you've made your edits, submit the
+          form to keep your project information up-to-date.
         </Paragraph>
       </div>
-      <DataForm isPending={isPending} subject='project' onSubmit={mutate} />
+      <DataForm
+        isLoading={isLoading}
+        isFetching={isFetching}
+        isPlaceholderData={isPlaceholderData}
+        isPending={isPending}
+        subject='project'
+        values={
+          data
+            ? {
+                title: data.title,
+                description: data.description || '',
+              }
+            : undefined
+        }
+        onSubmit={(inputs) => mutate({ id: params.projectId, ...inputs })}
+      />
     </div>
   )
 }

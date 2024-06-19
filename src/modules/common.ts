@@ -6,7 +6,11 @@ import { match } from 'ts-pattern'
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs))
 
+/**
+ * TODO:
+ * Use `.exhaustive()` instead of `.run()`.
+ */
 export const getDeleteMutationFn = (subject: Subject) =>
   match(subject)
     .with('project', () => deleteProjects)
-    .run() // TODO: Use exhaustive
+    .run()

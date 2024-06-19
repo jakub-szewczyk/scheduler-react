@@ -7,7 +7,9 @@ import { getProjects, getProjectsSearchParamsSchema } from '@/services/project'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { CirclePlus } from 'lucide-react'
-import { useDebounceValue } from 'usehooks-ts'
+import { useDebounceValue, useDocumentTitle } from 'usehooks-ts'
+
+const pageTitle = 'Projects'
 
 export const Route = createFileRoute('/projects/')({
   component: () => (
@@ -19,6 +21,8 @@ export const Route = createFileRoute('/projects/')({
 })
 
 function Projects() {
+  useDocumentTitle(`Scheduler - ${pageTitle}`)
+
   const search = Route.useSearch()
 
   const navigate = Route.useNavigate()
@@ -43,7 +47,7 @@ function Projects() {
   return (
     <div className='flex flex-col gap-y-12'>
       <div className='flex flex-col gap-y-4'>
-        <Heading3>Projects</Heading3>
+        <Heading3>{pageTitle}</Heading3>
         <Paragraph className='text-sm text-muted-foreground'>
           Welcome to your project management page. View and manage all your
           projects effortlessly. Create new projects, edit existing ones, and

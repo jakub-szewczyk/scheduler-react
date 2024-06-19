@@ -1,6 +1,9 @@
-import Heading3 from '@/components/typography/Heading3/Heading3'
 import Protected from '@/components/common/Protected/Protected'
+import Heading3 from '@/components/typography/Heading3/Heading3'
 import { createFileRoute } from '@tanstack/react-router'
+import { useDocumentTitle } from 'usehooks-ts'
+
+const pageTitle = 'Settings'
 
 export const Route = createFileRoute('/settings')({
   component: () => (
@@ -11,5 +14,7 @@ export const Route = createFileRoute('/settings')({
 })
 
 function Settings() {
-  return <Heading3>Settings</Heading3>
+  useDocumentTitle(`Scheduler - ${pageTitle}`)
+
+  return <Heading3>{pageTitle}</Heading3>
 }

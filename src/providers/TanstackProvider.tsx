@@ -1,11 +1,17 @@
+import { useToast } from '@/components/ui/use-toast'
 import { Router } from '@/main'
 import { api } from '@/services/api'
 import { ApiError } from '@/types/api'
 import { useAuth } from '@clerk/clerk-react'
 import '@tanstack/react-query'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import {
+  MutationCache,
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query'
 import { RouterProvider } from '@tanstack/react-router'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 declare module '@tanstack/react-query' {
   interface Register {
@@ -13,14 +19,33 @@ declare module '@tanstack/react-query' {
   }
 }
 
-const queryClient = new QueryClient()
-
 interface TanstackProviderProps {
   router: Router
 }
 
 const TanstackProvider = ({ router }: TanstackProviderProps) => {
   const { getToken } = useAuth()
+
+  const { toast } = useToast()
+
+  const handleError = (error: ApiError) =>
+    toast({
+      variant: 'destructive',
+      title: 'Form submission failed',
+      ...(error.response && { description: error.response.data[0].msg }),
+    })
+
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        queryCache: new QueryCache({
+          onError: handleError,
+        }),
+        mutationCache: new MutationCache({
+          onError: handleError,
+        }),
+      })
+  )
 
   useEffect(() => {
     const interceptor = api.interceptors.request.use(async (config) => {

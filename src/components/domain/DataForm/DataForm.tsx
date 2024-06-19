@@ -9,6 +9,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { Subject } from '@/types/common'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -25,17 +26,26 @@ const formSchema = z.object({
 type Inputs = z.infer<typeof formSchema>
 
 interface DataFormProps {
+  isLoading?: boolean
+  isFetching?: boolean
+  isPlaceholderData?: boolean
   isPending?: boolean
   subject: Subject
+  values?: Inputs
   onSubmit: (inputs: Inputs) => void
 }
 
-const DataForm = ({ isPending, subject, onSubmit }: DataFormProps) => {
+const DataForm = ({
+  isLoading,
+  isFetching,
+  isPlaceholderData,
+  isPending,
+  subject,
+  values = { title: '', description: '' },
+  onSubmit,
+}: DataFormProps) => {
   const form = useForm<Inputs>({
-    defaultValues: {
-      title: '',
-      description: '',
-    },
+    values,
     resolver: zodResolver(formSchema),
   })
 
@@ -54,9 +64,17 @@ const DataForm = ({ isPending, subject, onSubmit }: DataFormProps) => {
                 <FormLabel>
                   Title<span className='text-destructive'>*</span>
                 </FormLabel>
-                <FormControl>
-                  <Input placeholder='Enter title' {...field} />
-                </FormControl>
+                {isLoading ? (
+                  <Skeleton className='w-full h-10 sm:max-w-sm' />
+                ) : (
+                  <FormControl>
+                    <Input
+                      placeholder='Enter title'
+                      disabled={isFetching && !isPlaceholderData}
+                      {...field}
+                    />
+                  </FormControl>
+                )}
                 <FormDescription>
                   This value has to be unique. There can only be one {subject}{' '}
                   associated with this title.
@@ -72,11 +90,16 @@ const DataForm = ({ isPending, subject, onSubmit }: DataFormProps) => {
               <FormItem className='sm:max-w-3xl'>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea
-                    className='resize-none'
-                    placeholder='Enter description'
-                    {...field}
-                  />
+                  {isLoading ? (
+                    <Skeleton className='w-full h-20 sm:max-w-3xl' />
+                  ) : (
+                    <Textarea
+                      className='resize-none'
+                      placeholder='Enter description'
+                      disabled={isFetching && !isPlaceholderData}
+                      {...field}
+                    />
+                  )}
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -104,7 +127,9 @@ const DataForm = ({ isPending, subject, onSubmit }: DataFormProps) => {
             className='flex gap-x-2 sm:w-fit'
             type='submit'
             size='sm'
-            disabled={isPending}
+            disabled={
+              isLoading || (isFetching && !isPlaceholderData) || isPending
+            }
           >
             Submit
             {isPending ? (

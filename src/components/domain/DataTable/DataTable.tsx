@@ -33,11 +33,15 @@ import { HTMLAttributes, useState } from 'react'
 import { useBoolean } from 'usehooks-ts'
 import DataTableSearch from '../DataTableSearch/DataTableSearch'
 
+/**
+ * TODO:
+ * Reuse exisitng types.
+ */
 interface Data {
   id: string
   createdAt: string
   title: string
-  description: string
+  description: string | null
 }
 
 interface DataTableProps {
@@ -176,6 +180,7 @@ const DataTable = ({
                   Edit
                 </div>
               ),
+              onClick: () => navigate({ to: `/${subject}s/${row.id}/edit` }),
             },
             {
               children: (
@@ -236,7 +241,10 @@ const DataTable = ({
   const { mutate, isPending } = useMutation({
     mutationFn: getDeleteMutationFn(subject),
     onSuccess: (_, variables) => {
-      // TODO: Validate that it's working correctly
+      /**
+       * TODO:
+       * Validate that it's working correctly.
+       */
       const allRemoved =
         variables.length === table.getFilteredRowModel().rows.length
       const searchApplied = table.getColumn('title')?.getFilterValue() as string
@@ -252,7 +260,10 @@ const DataTable = ({
 
   const selectedRows = table.getSelectedRowModel().rows
 
-  // FIXME: Handle long titles & descriptions
+  /**
+   * FIXME:
+   * Trim long titles and descriptions.
+   */
   return (
     <>
       <div className={className}>

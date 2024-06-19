@@ -19,10 +19,18 @@ type GetProjectsResponseBody = PaginableResponse<Project>
 export const getProjects = (params?: Partial<GetProjectsSearchParams>) =>
   api<GetProjectsResponseBody>('/projects', { params }).then(({ data }) => data)
 
+export const getProject = (id: Project['id']) =>
+  api<Project>(`/projects/${id}`).then(({ data }) => data)
+
 type CreateProjectRequestBody = Pick<Project, 'title' | 'description'>
 
 export const createProject = (data: CreateProjectRequestBody) =>
   api.post<Project>('/projects', data).then(({ data }) => data)
+
+type UpdateProjectRequestBody = Pick<Project, 'id' | 'title' | 'description'>
+
+export const updateProject = ({ id, ...data }: UpdateProjectRequestBody) =>
+  api.put<Project>(`/projects/${id}`, data).then(({ data }) => data)
 
 export const deleteProject = (projectId: string) =>
   api.delete<Project>(`/projects/${projectId}`).then(({ data }) => data)
