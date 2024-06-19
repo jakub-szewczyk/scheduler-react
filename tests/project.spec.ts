@@ -365,6 +365,29 @@ test.describe('new project page', () => {
     )
   })
 
+  test('title being required', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(
+      `${VITE_BASE_API_URL}/projects`,
+      (route) =>
+        route.request().method() === 'POST' &&
+        route.fulfill({
+          json: {
+            id: faker.string.uuid(),
+            title: faker.lorem.slug(),
+            description: faker.lorem.sentences(),
+            createdAt: faker.date.past().toISOString(),
+          },
+        })
+    )
+    await page.goto(`${BASE_APP_URL}/projects/new`)
+    await page.getByRole('button', { name: 'Submit' }).click()
+    await expect(page.getByText('This field is required')).toBeVisible()
+  })
+
   test('creating project', async ({ page }) => {
     await setupClerkTestingToken({
       page,
@@ -416,8 +439,63 @@ test.describe('new project page', () => {
       })
     ).toBeVisible()
   })
+})
+
+test.describe('edit project page', () => {
+  test('rendering title and description', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    const id = faker.string.uuid()
+    await page.route(
+      `${VITE_BASE_API_URL}/projects/*`,
+      (route) =>
+        route.request().method() === 'GET' &&
+        route.fulfill({
+          json: {
+            id,
+            title: faker.lorem.slug(),
+            description: faker.lorem.sentences(),
+            createdAt: faker.date.past().toISOString(),
+          },
+        })
+    )
+    await page.goto(`${BASE_APP_URL}/projects/${id}/edit`)
+    await expect(
+      page.getByRole('heading', { name: 'Edit Project' })
+    ).toBeVisible()
+    await expect(page.getByRole('main')).toContainText(
+      "Update your project details by modifying the title and description. Ensure the title accurately represents your project's current direction and use the description to highlight new goals, progress, and essential information. Once you've made your edits, submit the form to keep your project information up-to-date."
+    )
+  })
 
   test('title being required', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    const id = faker.string.uuid()
+    await page.route(
+      `${VITE_BASE_API_URL}/projects/*`,
+      (route) =>
+        route.request().method() === 'GET' &&
+        route.fulfill({
+          json: {
+            id,
+            title: faker.lorem.slug(),
+            description: faker.lorem.sentences(),
+            createdAt: faker.date.past().toISOString(),
+          },
+        })
+    )
+    await page.goto(`${BASE_APP_URL}/projects/${id}/edit`)
+    await page.getByPlaceholder('Enter title').clear()
+    await page.getByRole('button', { name: 'Submit' }).click()
+    await expect(page.getByText('This field is required')).toBeVisible()
+  })
+
+  test('updating project', async ({ page }) => {
     await setupClerkTestingToken({
       page,
       options: { frontendApiUrl: BASE_APP_URL },
@@ -429,9 +507,9 @@ test.describe('new project page', () => {
         route.fulfill({ json: PAGINABLE_RESPONSE })
     )
     await page.route(
-      `${VITE_BASE_API_URL}/projects`,
+      `${VITE_BASE_API_URL}/projects/*`,
       (route) =>
-        route.request().method() === 'POST' &&
+        route.request().method() === 'GET' &&
         route.fulfill({
           json: {
             id: faker.string.uuid(),
@@ -441,8 +519,42 @@ test.describe('new project page', () => {
           },
         })
     )
-    await page.goto(`${BASE_APP_URL}/projects/new`)
+    const id = faker.string.uuid()
+    const title = faker.lorem.slug()
+    const description = faker.lorem.sentences()
+    await page.route(`${VITE_BASE_API_URL}/projects/${id}`, (route) =>
+      route.fulfill({
+        json: {
+          id,
+          title,
+          description,
+          createdAt: faker.date.past().toISOString(),
+        },
+      })
+    )
+    await page.goto(`${BASE_APP_URL}/projects/${id}/edit`)
+    await page.getByPlaceholder('Enter title').fill(title)
+    await page.getByPlaceholder('Enter description').fill(description)
+    const promise1 = page.waitForResponse(
+      (response) => response.request().method() === 'PUT'
+    )
+    const promise2 = page.waitForResponse(
+      (response) => response.request().method() === 'GET'
+    )
     await page.getByRole('button', { name: 'Submit' }).click()
-    await expect(page.getByText('This field is required')).toBeVisible()
+    expect((await promise1).request().method()).toBe('PUT')
+    expect((await promise2).request().method()).toBe('GET')
+    await expect(page.getByRole('heading', { name: 'Projects' })).toBeVisible()
+    await expect(page.getByRole('main')).toContainText(
+      'Welcome to your project management page. View and manage all your projects effortlessly. Create new projects, edit existing ones, and delete those you no longer need. Easily search by title and sort by creation date to keep everything organized. Click on any project to see its full details.'
+    )
+    await expect(
+      page.getByText('Project updated', { exact: true })
+    ).toBeVisible()
+    await expect(
+      page.getByText(`${title} has been successfully updated`, {
+        exact: true,
+      })
+    ).toBeVisible()
   })
 })
