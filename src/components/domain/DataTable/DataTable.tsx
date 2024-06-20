@@ -249,10 +249,6 @@ const DataTable = <Data extends Project /*TODO: `, Schedule, Board, Note` */>({
 
   const selectedRows = table.getSelectedRowModel().rows
 
-  /**
-   * TODO:
-   * Trim long titles and descriptions.
-   */
   return (
     <>
       <div className={className}>
@@ -301,7 +297,7 @@ const DataTable = <Data extends Project /*TODO: `, Schedule, Board, Note` */>({
                       <TableCell
                         key={cell.id}
                         className={cn(
-                          'max-w-0 [&>div]:truncate',
+                          'max-w-0 truncate',
                           isFetching && !isPlaceholderData && 'opacity-50'
                         )}
                       >
