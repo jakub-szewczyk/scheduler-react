@@ -45,11 +45,11 @@ function EditProject() {
   const { mutate, isPending } = useMutation({
     mutationFn: updateProject,
     onSuccess: (project) => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] })
       navigate({
         to: '/projects/$projectId',
         params: { projectId: project.id },
       })
-      queryClient.invalidateQueries({ queryKey: ['projects'] })
       toast({
         title: 'Project updated',
         description: `${project.title} has been successfully updated`,

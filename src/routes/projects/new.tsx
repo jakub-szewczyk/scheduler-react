@@ -38,11 +38,11 @@ function NewProject() {
   const { mutate, isPending } = useMutation({
     mutationFn: createProject,
     onSuccess: (project) => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] })
       navigate({
         to: '/projects/$projectId',
         params: { projectId: project.id },
       })
-      queryClient.invalidateQueries({ queryKey: ['projects'] })
       toast({
         title: 'Project created',
         description: `${project.title} has been successfully created`,

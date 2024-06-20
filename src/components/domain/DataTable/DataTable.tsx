@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/table'
 import { cn, getDeleteMutationFn } from '@/modules/common'
 import { Subject } from '@/types/common'
+import { Project } from '@/types/project'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import {
@@ -33,18 +34,7 @@ import { HTMLAttributes, useState } from 'react'
 import { useBoolean } from 'usehooks-ts'
 import DataTableSearch from '../DataTableSearch/DataTableSearch'
 
-/**
- * TODO:
- * Reuse exisitng types.
- */
-interface Data {
-  id: string
-  createdAt: string
-  title: string
-  description: string | null
-}
-
-interface DataTableProps {
+interface DataTableProps<Data> {
   className?: HTMLAttributes<HTMLDivElement>['className']
   isFetching?: boolean
   isPlaceholderData?: boolean
@@ -66,7 +56,7 @@ interface DataTableProps {
   }
 }
 
-const DataTable = ({
+const DataTable = <Data extends Project /*TODO: `, Schedule, Board, Note` */>({
   className,
   isFetching,
   isPlaceholderData,
@@ -75,7 +65,7 @@ const DataTable = ({
   sorting,
   filtering,
   pagination,
-}: DataTableProps) => {
+}: DataTableProps<Data>) => {
   const [rowSelection, setRowSelection] = useState({})
   const [targetRow, setTargetRow] = useState<Row<Data> | null>(null)
 
@@ -238,30 +228,29 @@ const DataTable = ({
 
   const queryClient = useQueryClient()
 
-  const { mutate, isPending } = useMutation({
+  /**
+   * FIXME:
+   * When deleting all elements of the last page, the following things happen:
+   * - Unnecessary request gets fired when auto-navigating to the previous page.
+   * - An invalid pending state indicator gets displayed when elements are deleted via "Delete selected" button.
+   */
+  const deleteMutation = useMutation({
     mutationFn: getDeleteMutationFn(subject),
     onSuccess: (_, variables) => {
-      /**
-       * TODO:
-       * Validate that it's working correctly.
-       */
-      const allRemoved =
-        variables.length === table.getFilteredRowModel().rows.length
-      const searchApplied = table.getColumn('title')?.getFilterValue() as string
-      if (allRemoved && searchApplied) {
-        table.getColumn('title')?.setFilterValue('')
-        table.firstPage()
-      }
-      if (allRemoved && !searchApplied) table.previousPage()
       queryClient.invalidateQueries({ queryKey: [`${subject}s`] })
       closeDialog()
+      if (
+        variables.length === table.getFilteredRowModel().rows.length &&
+        table.getPageCount() === table.getState().pagination.pageIndex + 1
+      )
+        table.previousPage()
     },
   })
 
   const selectedRows = table.getSelectedRowModel().rows
 
   /**
-   * FIXME:
+   * TODO:
    * Trim long titles and descriptions.
    */
   return (
@@ -347,12 +336,12 @@ const DataTable = ({
       <DeleteConfirmationDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        isPending={isPending}
+        isPending={deleteMutation.isPending}
         subject={subject}
         rows={
           selectedRows.length > 0 ? selectedRows : targetRow ? [targetRow] : []
         }
-        onConfirm={(rows) => mutate(rows.map((row) => row.id))}
+        onConfirm={(rows) => deleteMutation.mutate(rows.map((row) => row.id))}
       />
     </>
   )
