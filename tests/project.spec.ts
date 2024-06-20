@@ -378,10 +378,63 @@ test.describe('projects page', () => {
     )
   })
 
-  /**
-   * TODO:
-   * Test navigating to the project details page (two ways).
-   */
+  test('navigating to "Project Details" page using a link', async ({
+    page,
+  }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(`${VITE_BASE_API_URL}/projects*`, (route) =>
+      route.fulfill({ json: PAGINABLE_RESPONSE })
+    )
+    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+      route.fulfill({
+        json: {
+          id: faker.string.uuid(),
+          title: faker.lorem.slug(),
+          description: faker.lorem.sentences(),
+          createdAt: faker.date.past().toISOString(),
+        },
+      })
+    )
+    await page.goto(`${BASE_APP_URL}/projects`)
+    await page.getByRole('link', { name: 'socius-accusator-corona' }).click()
+    expect(page.url()).toBe(
+      `${BASE_APP_URL}/projects/89bd9d8d-69a6-474e-80f4-67cc8796ed15`
+    )
+  })
+
+  test('navigating to "Project Details" page using the dropdown menu', async ({
+    page,
+  }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(`${VITE_BASE_API_URL}/projects*`, (route) =>
+      route.fulfill({ json: PAGINABLE_RESPONSE })
+    )
+    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+      route.fulfill({
+        json: {
+          id: faker.string.uuid(),
+          title: faker.lorem.slug(),
+          description: faker.lorem.sentences(),
+          createdAt: faker.date.past().toISOString(),
+        },
+      })
+    )
+    await page.goto(`${BASE_APP_URL}/projects`)
+    await page
+      .getByRole('row', { name: 'socius-accusator-corona Tergo' })
+      .getByRole('button')
+      .click()
+    await page.getByRole('menuitem', { name: 'Details' }).click()
+    expect(page.url()).toBe(
+      `${BASE_APP_URL}/projects/89bd9d8d-69a6-474e-80f4-67cc8796ed15`
+    )
+  })
 })
 
 test.describe('new project page', () => {
