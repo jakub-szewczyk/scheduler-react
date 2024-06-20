@@ -119,7 +119,7 @@ const DataTable = <Data extends Project /*TODO: `, Schedule, Board, Note` */>({
       accessorKey: 'description',
       enableSorting: false,
       header: 'Description',
-      cell: ({ row }) => <div>{row.getValue('description')}</div>,
+      cell: ({ row }) => row.getValue('description'),
     },
     {
       meta: { style: { width: '15%' } },
@@ -230,9 +230,9 @@ const DataTable = <Data extends Project /*TODO: `, Schedule, Board, Note` */>({
 
   /**
    * FIXME:
-   * When deleting all elements of the last page, the following things happen:
-   * - Unnecessary request gets fired when auto-navigating to the previous page.
-   * - An invalid pending state indicator gets displayed when elements are deleted via "Delete selected" button.
+   * Issues when deleting all elements on the last page:
+   * - Unnecessary request when auto-navigating to the previous page.
+   * - Invalid pending state indicator when using the "Delete selected" button.
    */
   const deleteMutation = useMutation({
     mutationFn: getDeleteMutationFn(subject),

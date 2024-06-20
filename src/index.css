@@ -81,7 +81,12 @@ body {
   overflow-x: hidden;
 }
 
-html>body[data-scroll-locked] {
+html.light > body > #root,
+html.dark > body > #root {
+  background-color: hsl(var(--muted) / 0.4);
+}
+
+html > body[data-scroll-locked] {
   margin-right: 0 !important;
 }
 

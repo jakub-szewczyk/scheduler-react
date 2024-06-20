@@ -42,7 +42,7 @@ function Root() {
           />
           <main
             className={cn(
-              'w-[calc(100vw-3.5rem)] min-h-[calc(100vh-3rem)] mt-12 ml-14 p-4 bg-muted/40 transition-all duration-200 sm:p-6',
+              'w-[calc(100vw-3.5rem)] min-h-[calc(100vh-3rem)] mt-12 ml-14 p-4 transition-all duration-200 sm:p-6',
               !isSidebarCollapsed && 'w-[calc(100vw-13rem)] ml-52'
             )}
           >

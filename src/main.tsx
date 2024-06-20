@@ -1,8 +1,8 @@
-import { ClerkProvider } from '@clerk/clerk-react'
 import { createRouter } from '@tanstack/react-router'
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
+import AuthProvider from './providers/AuthProvider'
 import TanstackProvider from './providers/TanstackProvider'
 import ThemeProvider from './providers/ThemeProvider'
 import { routeTree } from './routeTree.gen'
@@ -27,13 +27,9 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <ThemeProvider storageKey='theme' defaultTheme='dark'>
-        <ClerkProvider
-          routerPush={(to) => router.navigate({ to })}
-          routerReplace={(to) => router.navigate({ to, replace: true })}
-          publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
-        >
+        <AuthProvider router={router}>
           <TanstackProvider router={router} />
-        </ClerkProvider>
+        </AuthProvider>
       </ThemeProvider>
     </StrictMode>
   )

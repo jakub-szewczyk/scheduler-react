@@ -57,7 +57,7 @@ function ProjectDetails() {
         </Breadcrumb>
         <Heading3>{pageTitle}</Heading3>
         <Paragraph className='text-sm text-muted-foreground'>
-          {JSON.stringify(data, null, 2)}
+          <pre>{JSON.stringify(data, null, 2)}</pre>
         </Paragraph>
       </div>
     </div>
