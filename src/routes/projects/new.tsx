@@ -39,15 +39,21 @@ function NewProject() {
     mutationFn: createProject,
     onSuccess: (project) => {
       navigate({
-        to: '/projects',
-        search: { page: 0, size: 10, title: '', createdAt: 'DESC' },
+        to: '/projects/$projectId',
+        params: { projectId: project.id },
       })
       queryClient.invalidateQueries({ queryKey: ['projects'] })
       toast({
         title: 'Project created',
-        description: `${project.title} has been added to your project list`,
+        description: `${project.title} has been successfully created`,
       })
     },
+    onError: (error) =>
+      toast({
+        variant: 'destructive',
+        title: 'Form submission failed',
+        description: error.response?.data?.[0]?.msg,
+      }),
   })
 
   return (

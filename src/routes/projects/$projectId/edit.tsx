@@ -45,13 +45,9 @@ function EditProject() {
   const { mutate, isPending } = useMutation({
     mutationFn: updateProject,
     onSuccess: (project) => {
-      /**
-       * TODO:
-       * Navigate to the previous page if it was the "Projects" page.
-       */
       navigate({
-        to: '/projects',
-        search: { page: 0, size: 10, title: '', createdAt: 'DESC' },
+        to: '/projects/$projectId',
+        params: { projectId: project.id },
       })
       queryClient.invalidateQueries({ queryKey: ['projects'] })
       toast({
@@ -59,6 +55,12 @@ function EditProject() {
         description: `${project.title} has been successfully updated`,
       })
     },
+    onError: (error) =>
+      toast({
+        variant: 'destructive',
+        title: 'Form submission failed',
+        description: error.response?.data?.[0]?.msg,
+      }),
   })
 
   return (

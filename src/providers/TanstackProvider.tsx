@@ -31,8 +31,9 @@ const TanstackProvider = ({ router }: TanstackProviderProps) => {
   const handleError = (error: ApiError) =>
     toast({
       variant: 'destructive',
-      title: 'Form submission failed',
-      ...(error.response && { description: error.response.data[0].msg }),
+      title: 'Something went wrong',
+      description:
+        error.response?.data?.[0]?.msg || 'An unknown error was encountered',
     })
 
   const [queryClient] = useState(

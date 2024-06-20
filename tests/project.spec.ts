@@ -317,10 +317,6 @@ test.describe('projects page', () => {
     expect((await promise2).request().method()).toBe('GET')
   })
 
-  /**
-   * TODO:
-   * Test navigating to "Edit Project" page.
-   */
   test('navigating to "New Project" page', async ({ page }) => {
     await setupClerkTestingToken({
       page,
@@ -348,6 +344,44 @@ test.describe('projects page', () => {
       "Kick off your new project by entering a title and description. Choose a title that captures the essence of your project and use the description to provide an overview of its objectives and key details. Once you're done, submit the form to get your project started."
     )
   })
+
+  test('navigating to "Edit Project" page', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(`${VITE_BASE_API_URL}/projects*`, (route) =>
+      route.fulfill({ json: PAGINABLE_RESPONSE })
+    )
+    const id = faker.string.uuid()
+    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+      route.fulfill({
+        json: {
+          id,
+          title: faker.lorem.slug(),
+          description: faker.lorem.sentences(),
+          createdAt: faker.date.past().toISOString(),
+        },
+      })
+    )
+    await page.goto(`${BASE_APP_URL}/projects`)
+    await page
+      .getByRole('row', { name: 'socius-accusator-corona Tergo' })
+      .getByRole('button')
+      .click()
+    await page.getByRole('menuitem', { name: 'Edit' }).click()
+    await expect(
+      page.getByRole('heading', { name: 'Edit Project' })
+    ).toBeVisible()
+    await expect(page.getByRole('main')).toContainText(
+      "Update your project details by modifying the title and description. Ensure the title accurately represents your project's current direction and use the description to highlight new goals, progress, and essential information. Once you've made your edits, submit the form to keep your project information up-to-date."
+    )
+  })
+
+  /**
+   * TODO:
+   * Test navigating to the project details page (two ways).
+   */
 })
 
 test.describe('new project page', () => {
@@ -399,19 +433,29 @@ test.describe('new project page', () => {
         route.request().method() === 'GET' &&
         route.fulfill({ json: PAGINABLE_RESPONSE })
     )
+    const id = faker.string.uuid()
     const title = faker.lorem.slug()
     const description = faker.lorem.sentences()
+    const json = {
+      id,
+      title,
+      description,
+      createdAt: faker.date.past().toISOString(),
+    }
+    await page.route(
+      `${VITE_BASE_API_URL}/projects/*`,
+      (route) =>
+        route.request().method() === 'GET' &&
+        route.fulfill({
+          json,
+        })
+    )
     await page.route(
       `${VITE_BASE_API_URL}/projects`,
       (route) =>
         route.request().method() === 'POST' &&
         route.fulfill({
-          json: {
-            id: faker.string.uuid(),
-            title,
-            description,
-            createdAt: faker.date.past().toISOString(),
-          },
+          json,
         })
     )
     await page.goto(`${BASE_APP_URL}/projects/new`)
@@ -426,15 +470,12 @@ test.describe('new project page', () => {
     await page.getByRole('button', { name: 'Submit' }).click()
     expect((await promise1).request().method()).toBe('POST')
     expect((await promise2).request().method()).toBe('GET')
-    await expect(page.getByRole('heading', { name: 'Projects' })).toBeVisible()
-    await expect(page.getByRole('main')).toContainText(
-      'Welcome to your project management page. View and manage all your projects effortlessly. Create new projects, edit existing ones, and delete those you no longer need. Easily search by title and sort by creation date to keep everything organized. Click on any project to see its full details.'
-    )
+    expect(page.url()).toBe(`${BASE_APP_URL}/projects/${id}`)
     await expect(
       page.getByText('Project created', { exact: true })
     ).toBeVisible()
     await expect(
-      page.getByText(`${title} has been added to your project list`, {
+      page.getByText(`${title} has been successfully created`, {
         exact: true,
       })
     ).toBeVisible()
@@ -506,20 +547,20 @@ test.describe('edit project page', () => {
         route.request().method() === 'GET' &&
         route.fulfill({ json: PAGINABLE_RESPONSE })
     )
+    const id = faker.string.uuid()
     await page.route(
       `${VITE_BASE_API_URL}/projects/*`,
       (route) =>
         route.request().method() === 'GET' &&
         route.fulfill({
           json: {
-            id: faker.string.uuid(),
+            id,
             title: faker.lorem.slug(),
             description: faker.lorem.sentences(),
             createdAt: faker.date.past().toISOString(),
           },
         })
     )
-    const id = faker.string.uuid()
     const title = faker.lorem.slug()
     const description = faker.lorem.sentences()
     await page.route(`${VITE_BASE_API_URL}/projects/${id}`, (route) =>
@@ -544,10 +585,7 @@ test.describe('edit project page', () => {
     await page.getByRole('button', { name: 'Submit' }).click()
     expect((await promise1).request().method()).toBe('PUT')
     expect((await promise2).request().method()).toBe('GET')
-    await expect(page.getByRole('heading', { name: 'Projects' })).toBeVisible()
-    await expect(page.getByRole('main')).toContainText(
-      'Welcome to your project management page. View and manage all your projects effortlessly. Create new projects, edit existing ones, and delete those you no longer need. Easily search by title and sort by creation date to keep everything organized. Click on any project to see its full details.'
-    )
+    expect(page.url()).toBe(`${BASE_APP_URL}/projects/${id}`)
     await expect(
       page.getByText('Project updated', { exact: true })
     ).toBeVisible()
