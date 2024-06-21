@@ -1,7 +1,5 @@
 import Protected from '@/components/common/Protected/Protected'
 import DataForm from '@/components/domain/DataForm/DataForm'
-import Heading3 from '@/components/typography/Heading3/Heading3'
-import Paragraph from '@/components/typography/Paragraph/Paragraph'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -10,6 +8,13 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { useToast } from '@/components/ui/use-toast'
 import { getProject, updateProject } from '@/services/project'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -95,31 +100,37 @@ function EditProject() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <Heading3>{pageTitle}</Heading3>
-        <Paragraph className='text-sm text-muted-foreground'>
-          Update your project details by modifying the title and description.
-          Ensure the title accurately represents your project's current
-          direction and use the description to highlight new goals, progress,
-          and essential information. Once you've made your edits, submit the
-          form to keep your project information up-to-date.
-        </Paragraph>
-      </div>
-      <DataForm
-        isLoading={isLoading}
-        isFetching={isFetching}
-        isPlaceholderData={isPlaceholderData}
-        isPending={isPending}
-        subject='project'
-        values={
-          data
-            ? {
-                title: data.title,
-                description: data.description || '',
+        <Card>
+          <CardHeader>
+            <CardTitle>{pageTitle}</CardTitle>
+            <CardDescription>
+              Update your project details by modifying the title and
+              description. Ensure the title accurately represents your project's
+              current direction and use the description to highlight new goals,
+              progress, and essential information. Once you've made your edits,
+              submit the form to keep your project information up-to-date.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DataForm
+              isLoading={isLoading}
+              isFetching={isFetching}
+              isPlaceholderData={isPlaceholderData}
+              isPending={isPending}
+              subject='project'
+              values={
+                data
+                  ? {
+                      title: data.title,
+                      description: data.description || '',
+                    }
+                  : undefined
               }
-            : undefined
-        }
-        onSubmit={(inputs) => mutate({ id: params.projectId, ...inputs })}
-      />
+              onSubmit={(inputs) => mutate({ id: params.projectId, ...inputs })}
+            />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

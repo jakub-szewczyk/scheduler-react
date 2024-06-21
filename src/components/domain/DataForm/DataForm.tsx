@@ -52,60 +52,58 @@ const DataForm = ({
   return (
     <Form {...form}>
       <form
-        className='flex flex-col gap-y-12'
+        className='flex flex-col gap-y-6'
         onSubmit={form.handleSubmit(onSubmit)}
       >
-        <div className='flex flex-col gap-y-4'>
-          <FormField
-            control={form.control}
-            name='title'
-            render={({ field }) => (
-              <FormItem className='sm:max-w-sm'>
-                <FormLabel>
-                  Title<span className='text-destructive'>*</span>
-                </FormLabel>
-                {isLoading ? (
-                  <Skeleton className='w-full h-10 sm:max-w-sm' />
-                ) : (
-                  <FormControl>
-                    <Input
-                      placeholder='Enter title'
-                      disabled={isFetching && !isPlaceholderData}
-                      {...field}
-                    />
-                  </FormControl>
-                )}
-                <FormDescription>
-                  This value has to be unique. There can only be one {subject}{' '}
-                  associated with this title.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name='description'
-            render={({ field }) => (
-              <FormItem className='sm:max-w-3xl'>
-                <FormLabel>Description</FormLabel>
+        <FormField
+          control={form.control}
+          name='title'
+          render={({ field }) => (
+            <FormItem className='sm:max-w-[50%]'>
+              <FormLabel>
+                Title<span className='text-destructive'>*</span>
+              </FormLabel>
+              {isLoading ? (
+                <Skeleton className='w-full h-10' />
+              ) : (
                 <FormControl>
-                  {isLoading ? (
-                    <Skeleton className='w-full h-20 sm:max-w-3xl' />
-                  ) : (
-                    <Textarea
-                      className='resize-none'
-                      placeholder='Enter description'
-                      disabled={isFetching && !isPlaceholderData}
-                      {...field}
-                    />
-                  )}
+                  <Input
+                    placeholder='Enter title'
+                    disabled={isFetching && !isPlaceholderData}
+                    {...field}
+                  />
                 </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+              )}
+              <FormDescription>
+                This value has to be unique. There can only be one {subject}{' '}
+                associated with this title.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name='description'
+          render={({ field }) => (
+            <FormItem className='sm:max-w-[50%]'>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                {isLoading ? (
+                  <Skeleton className='w-full h-20' />
+                ) : (
+                  <Textarea
+                    className='resize-none'
+                    placeholder='Enter description'
+                    disabled={isFetching && !isPlaceholderData}
+                    {...field}
+                  />
+                )}
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <div className='flex gap-x-2'>
           <Button
             className='flex gap-x-2 sm:w-fit'

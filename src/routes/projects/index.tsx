@@ -1,8 +1,13 @@
 import Protected from '@/components/common/Protected/Protected'
 import DataTable from '@/components/domain/DataTable/DataTable'
-import Heading3 from '@/components/typography/Heading3/Heading3'
-import Paragraph from '@/components/typography/Paragraph/Paragraph'
 import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { getProjects, getProjectsSearchParamsSchema } from '@/services/project'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
@@ -46,26 +51,30 @@ function Projects() {
 
   return (
     <div className='flex flex-col gap-y-12'>
-      <div className='flex flex-col gap-y-4'>
-        <Heading3>{pageTitle}</Heading3>
-        <Paragraph className='text-sm text-muted-foreground'>
-          Welcome to your project management page. View and manage all your
-          projects effortlessly. Create new projects, edit existing ones, and
-          delete those you no longer need. Easily search by title and sort by
-          creation date to keep everything organized. Click on any project to
-          see its full details.
-        </Paragraph>
-        <Button
-          className='gap-x-2 sm:w-fit'
-          size='sm'
-          variant='secondary'
-          asChild
-        >
-          <Link to='/projects/new'>
-            New Project <CirclePlus className='size-4' />
-          </Link>
-        </Button>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>{pageTitle}</CardTitle>
+          <CardDescription>
+            Welcome to your project management page. View and manage all your
+            projects effortlessly. Create new projects, edit existing ones, and
+            delete those you no longer need. Easily search by title and sort by
+            creation date to keep everything organized. Click on any project to
+            see its full details.
+          </CardDescription>
+        </CardHeader>
+        <CardFooter>
+          <Button
+            className='w-full gap-x-2 sm:w-fit'
+            size='sm'
+            variant='secondary'
+            asChild
+          >
+            <Link to='/projects/new'>
+              New Project <CirclePlus className='size-4' />
+            </Link>
+          </Button>
+        </CardFooter>
+      </Card>
       <DataTable
         isFetching={projectsQuery.isFetching}
         isPlaceholderData={projectsQuery.isPlaceholderData}

@@ -1,7 +1,5 @@
 import Protected from '@/components/common/Protected/Protected'
 import DataForm from '@/components/domain/DataForm/DataForm'
-import Heading3 from '@/components/typography/Heading3/Heading3'
-import Paragraph from '@/components/typography/Paragraph/Paragraph'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -10,6 +8,13 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { useToast } from '@/components/ui/use-toast'
 import { createProject } from '@/services/project'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -77,15 +82,26 @@ function NewProject() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <Heading3>{pageTitle}</Heading3>
-        <Paragraph className='text-sm text-muted-foreground'>
-          Kick off your new project by entering a title and description. Choose
-          a title that captures the essence of your project and use the
-          description to provide an overview of its objectives and key details.
-          Once you're done, submit the form to get your project started.
-        </Paragraph>
+        <Card>
+          <CardHeader>
+            <CardTitle>{pageTitle}</CardTitle>
+            <CardDescription>
+              Kick off your new project by entering a title and description.
+              Choose a title that captures the essence of your project and use
+              the description to provide an overview of its objectives and key
+              details. Once you're done, submit the form to get your project
+              started.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DataForm
+              isPending={isPending}
+              subject='project'
+              onSubmit={mutate}
+            />
+          </CardContent>
+        </Card>
       </div>
-      <DataForm isPending={isPending} subject='project' onSubmit={mutate} />
     </div>
   )
 }
