@@ -24,10 +24,10 @@ const SkeletonRows = <Data,>({ table }: SkeletonRowsProps<Data>) =>
                 variant='ghost'
                 disabled
               >
-                <MoreHorizontal className=' w-4 h-4' />
+                <MoreHorizontal className='size-4' />
               </Button>
             ) : (
-              <Skeleton className='h-4 w-full' />
+              <Skeleton className='w-full h-4' />
             )}
           </TableCell>
         ))}

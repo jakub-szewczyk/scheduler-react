@@ -17,6 +17,8 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import { Skeleton } from '@/components/ui/skeleton'
+import { cn, toDateFormat } from '@/modules/common'
 import { getProject } from '@/services/project'
 import { useQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
@@ -92,24 +94,48 @@ function ProjectDetails() {
           </CardFooter>
           <Separator />
           <CardContent className='pt-6 text-sm'>
-            <dl className='flex justify-between gap-x-4'>
-              <div className='space-y-4'>
-                <dt className='font-bold'>Title</dt>
-                <dd>{projectQuery.data?.title}</dd>
-              </div>
-              <div className='space-y-4'>
-                <dt className='font-bold'>Description</dt>
-                <dd>{projectQuery.data?.description}</dd>
-              </div>
-              <div className='space-y-4'>
-                <dt className='font-bold whitespace-nowrap'>Created at</dt>
+            <dl
+              className={cn(
+                'space-y-4',
+                projectQuery.isFetching &&
+                  !projectQuery.isPlaceholderData &&
+                  'opacity-50'
+              )}
+            >
+              <div className='text-muted-foreground'>
+                <dt className='font-bold'>Created at</dt>
                 <dd>
-                  {projectQuery.data?.createdAt &&
-                    new Intl.DateTimeFormat('en-US').format(
-                      new Date(projectQuery.data.createdAt)
-                    )}
+                  {projectQuery.isLoading ? (
+                    <Skeleton className='max-w-xs h-5' />
+                  ) : (
+                    projectQuery.data?.createdAt &&
+                    toDateFormat(projectQuery.data.createdAt)
+                  )}
                 </dd>
               </div>
+              <div>
+                <dt className='font-bold'>Title</dt>
+                <dd>
+                  {projectQuery.isLoading ? (
+                    <Skeleton className='max-w-screen-sm h-5' />
+                  ) : (
+                    projectQuery.data?.title
+                  )}
+                </dd>
+              </div>
+              {projectQuery.isLoading ? (
+                <div>
+                  <dt className='font-bold'>Description</dt>
+                  <Skeleton className='h-10' />
+                </div>
+              ) : (
+                projectQuery.data?.description && (
+                  <div>
+                    <dt className='font-bold'>Description</dt>
+                    <dd>{projectQuery.data.description}</dd>
+                  </div>
+                )
+              )}
             </dl>
           </CardContent>
         </Card>

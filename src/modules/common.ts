@@ -6,6 +6,13 @@ import { match } from 'ts-pattern'
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs))
 
+export const toDateFormat = (date: string) =>
+  new Intl.DateTimeFormat('en-US', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date(date))
+
 /**
  * TODO:
  * Use `.exhaustive()` instead of `.run()`.

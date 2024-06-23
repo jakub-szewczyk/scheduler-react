@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { cn, getDeleteMutationFn } from '@/modules/common'
+import { cn, toDateFormat, getDeleteMutationFn } from '@/modules/common'
 import { Subject } from '@/types/common'
 import { Project } from '@/types/project'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -138,13 +138,7 @@ const DataTable = <Data extends Project /*TODO: `, Schedule, Board, Note` */>({
           )}
         </Button>
       ),
-      cell: ({ row }) => (
-        <div>
-          {new Intl.DateTimeFormat('en-US').format(
-            new Date(row.getValue('createdAt'))
-          )}
-        </div>
-      ),
+      cell: ({ row }) => <div>{toDateFormat(row.getValue('createdAt'))}</div>,
     },
     {
       id: 'actions',
