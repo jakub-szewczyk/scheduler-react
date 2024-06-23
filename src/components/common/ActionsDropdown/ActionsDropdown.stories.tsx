@@ -18,7 +18,7 @@ export const Primary: Story = {
       {
         children: (
           <div className='flex items-center justify-center gap-x-2'>
-            <FileText className='w-4 h-4' />
+            <FileText className='size-4' />
             Details
           </div>
         ),
@@ -26,7 +26,7 @@ export const Primary: Story = {
       {
         children: (
           <div className='flex items-center justify-center gap-x-2'>
-            <Pencil className='w-4 h-4' />
+            <Pencil className='size-4' />
             Edit
           </div>
         ),
@@ -34,7 +34,7 @@ export const Primary: Story = {
       {
         children: (
           <div className='flex items-center justify-center gap-x-2 text-destructive'>
-            <Trash className='w-4 h-4' />
+            <Trash className='size-4' />
             Delete
           </div>
         ),

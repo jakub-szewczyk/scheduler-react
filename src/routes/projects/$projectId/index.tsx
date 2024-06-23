@@ -16,13 +16,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn, toDateFormat } from '@/modules/common'
 import { getProject } from '@/services/project'
 import { useQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { Pencil } from 'lucide-react'
+import { Calendar, Columns3, FileText, Pencil, StickyNote } from 'lucide-react'
 import { useDocumentTitle } from 'usehooks-ts'
 
 const pageTitle = 'Project Details'
@@ -92,54 +92,88 @@ function ProjectDetails() {
               </Link>
             </Button>
           </CardFooter>
-          <Separator />
-          <CardContent className='pt-6 text-sm'>
-            <dl
-              className={cn(
-                'space-y-4',
-                projectQuery.isFetching &&
-                  !projectQuery.isPlaceholderData &&
-                  'opacity-50'
-              )}
-            >
-              <div className='text-muted-foreground'>
-                <dt className='font-bold'>Created at</dt>
-                <dd>
-                  {projectQuery.isLoading ? (
-                    <Skeleton className='max-w-xs h-5' />
-                  ) : (
-                    projectQuery.data?.createdAt &&
-                    toDateFormat(projectQuery.data.createdAt)
-                  )}
-                </dd>
-              </div>
-              <div>
-                <dt className='font-bold'>Title</dt>
-                <dd>
-                  {projectQuery.isLoading ? (
-                    <Skeleton className='max-w-screen-sm h-5' />
-                  ) : (
-                    projectQuery.data?.title
-                  )}
-                </dd>
-              </div>
-              {projectQuery.isLoading ? (
-                <div>
-                  <dt className='font-bold'>Description</dt>
-                  <Skeleton className='h-10' />
-                </div>
-              ) : (
-                projectQuery.data?.description && (
-                  <div>
-                    <dt className='font-bold'>Description</dt>
-                    <dd>{projectQuery.data.description}</dd>
-                  </div>
-                )
-              )}
-            </dl>
-          </CardContent>
         </Card>
       </div>
+      <Tabs defaultValue='details'>
+        <TabsList>
+          <TabsTrigger className='gap-x-2' value='details'>
+            Details <FileText className='size-4' />
+          </TabsTrigger>
+          <TabsTrigger className='gap-x-2' value='schedules'>
+            Schedules <Calendar className='size-4' />
+          </TabsTrigger>
+          <TabsTrigger className='gap-x-2' value='boards'>
+            Boards <Columns3 className='size-4' />
+          </TabsTrigger>
+          <TabsTrigger className='gap-x-2' value='notes'>
+            Notes <StickyNote className='size-4' />
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value='details'>
+          <Card>
+            <CardContent className='pt-6 text-sm'>
+              <dl
+                className={cn(
+                  'space-y-4',
+                  projectQuery.isFetching &&
+                    !projectQuery.isPlaceholderData &&
+                    'opacity-50'
+                )}
+              >
+                <div className='text-muted-foreground'>
+                  <dt className='font-bold'>Created at</dt>
+                  <dd>
+                    {projectQuery.isLoading ? (
+                      <Skeleton className='max-w-xs h-5' />
+                    ) : (
+                      projectQuery.data?.createdAt &&
+                      toDateFormat(projectQuery.data.createdAt)
+                    )}
+                  </dd>
+                </div>
+                <div>
+                  <dt className='font-bold'>Title</dt>
+                  <dd>
+                    {projectQuery.isLoading ? (
+                      <Skeleton className='max-w-screen-sm h-5' />
+                    ) : (
+                      projectQuery.data?.title
+                    )}
+                  </dd>
+                </div>
+                {projectQuery.isLoading ? (
+                  <div>
+                    <dt className='font-bold'>Description</dt>
+                    <Skeleton className='h-10' />
+                  </div>
+                ) : (
+                  projectQuery.data?.description && (
+                    <div>
+                      <dt className='font-bold'>Description</dt>
+                      <dd>{projectQuery.data.description}</dd>
+                    </div>
+                  )
+                )}
+              </dl>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value='schedules'>
+          <Card>
+            <CardContent className='pt-6 text-sm'>SCHEDULES</CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value='boards'>
+          <Card>
+            <CardContent className='pt-6 text-sm'>BOARDS</CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value='notes'>
+          <Card>
+            <CardContent className='pt-6 text-sm'>NOTES</CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }
