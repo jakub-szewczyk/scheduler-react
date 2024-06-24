@@ -13,7 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { Subject } from '@/types/common'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link } from '@tanstack/react-router'
+import { useRouter } from '@tanstack/react-router'
 import { LoaderCircle, Send } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -48,6 +48,8 @@ const DataForm = ({
     values,
     resolver: zodResolver(formSchema),
   })
+
+  const router = useRouter()
 
   return (
     <Form {...form}>
@@ -108,23 +110,19 @@ const DataForm = ({
           <Button
             className='flex gap-x-2 sm:w-fit'
             type='button'
-            size='sm'
             variant='ghost'
             disabled={isPending}
-            asChild
+            /**
+             * NOTE:
+             * If `document.referrer` is an external domain, then users will navigate to that domain.
+             */
+            onClick={router.history.back}
           >
-            <Link
-              from='/projects/new'
-              to='/projects'
-              search={{ page: 0, size: 10, title: '', createdAt: 'DESC' }}
-            >
-              Cancel
-            </Link>
+            Cancel
           </Button>
           <Button
             className='flex gap-x-2 sm:w-fit'
             type='submit'
-            size='sm'
             disabled={
               isLoading || (isFetching && !isPlaceholderData) || isPending
             }

@@ -65,7 +65,6 @@ function Projects() {
         <CardFooter>
           <Button
             className='w-full gap-x-2 sm:w-fit'
-            size='sm'
             variant='secondary'
             asChild
           >

@@ -20,7 +20,7 @@ const SidebarLink = ({
   ...props
 }: SidebarLink) => {
   const button = (
-    <Button className={className} asChild size='icon' variant='ghost'>
+    <Button className={className} size='icon' variant='ghost' asChild>
       <Link
         inactiveProps={{
           className:
