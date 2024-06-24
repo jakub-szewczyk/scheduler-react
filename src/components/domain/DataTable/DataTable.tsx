@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { cn, toDateFormat, getDeleteMutationFn } from '@/modules/common'
+import { cn, toDateFormat, subjectToDeleteMutationFn } from '@/modules/common'
 import { Subject } from '@/types/common'
 import { Project } from '@/types/project'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -132,9 +132,9 @@ const DataTable = <Data extends Project /*TODO: `, Schedule, Board, Note` */>({
         >
           Created at
           {column.getIsSorted() === 'asc' ? (
-            <ArrowUp className='w-4 h-4 ml-2' />
+            <ArrowUp className='size-4 ml-2' />
           ) : (
-            <ArrowDown className='w-4 h-4 ml-2' />
+            <ArrowDown className='size-4 ml-2' />
           )}
         </Button>
       ),
@@ -229,7 +229,7 @@ const DataTable = <Data extends Project /*TODO: `, Schedule, Board, Note` */>({
    * - Invalid pending state indicator when using the "Delete selected" button.
    */
   const deleteMutation = useMutation({
-    mutationFn: getDeleteMutationFn(subject),
+    mutationFn: subjectToDeleteMutationFn(subject),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: [`${subject}s`] })
       closeDialog()
@@ -299,7 +299,7 @@ const DataTable = <Data extends Project /*TODO: `, Schedule, Board, Note` */>({
                         isPlaceholderData &&
                         !cell.id.includes('check') &&
                         !cell.id.includes('actions') ? (
-                          <Skeleton className='h-4 w-full' />
+                          <Skeleton className='w-full h-4' />
                         ) : (
                           flexRender(
                             cell.column.columnDef.cell,

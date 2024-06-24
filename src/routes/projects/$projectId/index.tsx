@@ -1,4 +1,5 @@
 import Protected from '@/components/common/Protected/Protected'
+import DataTabContent from '@/components/domain/DataTabContent/DataTabContent'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -160,17 +161,23 @@ function ProjectDetails() {
         </TabsContent>
         <TabsContent value='schedules'>
           <Card>
-            <CardContent className='pt-6 text-sm'>SCHEDULES</CardContent>
+            <CardContent className='pt-6 text-sm'>
+              <DataTabContent subject='schedule' />
+            </CardContent>
           </Card>
         </TabsContent>
         <TabsContent value='boards'>
           <Card>
-            <CardContent className='pt-6 text-sm'>BOARDS</CardContent>
+            <CardContent className='pt-6 text-sm'>
+              <DataTabContent subject='board' />
+            </CardContent>
           </Card>
         </TabsContent>
         <TabsContent value='notes'>
           <Card>
-            <CardContent className='pt-6 text-sm'>NOTES</CardContent>
+            <CardContent className='pt-6 text-sm'>
+              <DataTabContent subject='note' />
+            </CardContent>
           </Card>
         </TabsContent>
       </Tabs>

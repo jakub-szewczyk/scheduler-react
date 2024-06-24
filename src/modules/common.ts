@@ -1,8 +1,11 @@
-import { deleteProjects } from '@/services/project'
+import { deleteProjects, getProjects } from '@/services/project'
+import { getSchedules } from '@/services/schedule'
 import { Subject } from '@/types/common'
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { match } from 'ts-pattern'
+
+export const DATA_TABLE_PREVIEW_SIZE = 5
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs))
 
@@ -17,7 +20,17 @@ export const toDateFormat = (date: string) =>
  * TODO:
  * Use `.exhaustive()` instead of `.run()`.
  */
-export const getDeleteMutationFn = (subject: Subject) =>
+export const subjectToQueryFn = (subject: Subject) =>
+  match(subject)
+    .with('project', () => getProjects)
+    .with('schedule', () => getSchedules)
+    .run()
+
+/**
+ * TODO:
+ * Use `.exhaustive()` instead of `.run()`.
+ */
+export const subjectToDeleteMutationFn = (subject: Subject) =>
   match(subject)
     .with('project', () => deleteProjects)
     .run()

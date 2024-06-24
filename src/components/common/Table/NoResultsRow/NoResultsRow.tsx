@@ -1,13 +1,18 @@
 import { TableCell, TableRow } from '@/components/ui/table'
+import { ReactNode } from 'react'
 
 interface NoResultsRowProps {
   columnsLength: number
+  children?: ReactNode
 }
 
-const NoResultsRow = ({ columnsLength }: NoResultsRowProps) => (
+const NoResultsRow = ({
+  children = 'No results',
+  columnsLength,
+}: NoResultsRowProps) => (
   <TableRow>
     <TableCell className='h-24 text-center' colSpan={columnsLength}>
-      No results
+      {children}
     </TableCell>
   </TableRow>
 )
