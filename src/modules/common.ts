@@ -1,3 +1,5 @@
+import { getBoards } from '@/services/board'
+import { getNotes } from '@/services/note'
 import { deleteProjects, getProjects } from '@/services/project'
 import { getSchedules } from '@/services/schedule'
 import { Subject } from '@/types/common'
@@ -16,15 +18,13 @@ export const toDateFormat = (date: string) =>
     year: 'numeric',
   }).format(new Date(date))
 
-/**
- * TODO:
- * Use `.exhaustive()` instead of `.run()`.
- */
 export const subjectToQueryFn = (subject: Subject) =>
   match(subject)
     .with('project', () => getProjects)
     .with('schedule', () => getSchedules)
-    .run()
+    .with('board', () => getBoards)
+    .with('note', () => getNotes)
+    .exhaustive()
 
 /**
  * TODO:

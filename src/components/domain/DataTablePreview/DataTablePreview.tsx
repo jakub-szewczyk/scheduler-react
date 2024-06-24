@@ -88,7 +88,7 @@ const DataTablePreview = <
               </TableCell>
               <TableCell
                 className={cn(
-                  'max-w-0 truncate',
+                  'max-w-0 whitespace-nowrap',
                   isFetching && !isPlaceholderData && 'opacity-50'
                 )}
               >
