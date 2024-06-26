@@ -29,3 +29,10 @@ export const PAGINABLE_RESPONSE = {
   size,
   total,
 }
+
+export const SUBJECT = {
+  id: faker.string.uuid(),
+  title: faker.lorem.slug(),
+  description: faker.lorem.sentences(),
+  createdAt: faker.date.past().toISOString(),
+}

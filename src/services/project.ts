@@ -32,7 +32,7 @@ type UpdateProjectRequestBody = Pick<Project, 'id' | 'title' | 'description'>
 export const updateProject = ({ id, ...data }: UpdateProjectRequestBody) =>
   api.put<Project>(`/projects/${id}`, data).then(({ data }) => data)
 
-export const deleteProject = (projectId: string) =>
+const deleteProject = (projectId: string) =>
   api.delete<Project>(`/projects/${projectId}`).then(({ data }) => data)
 
 export const deleteProjects = (projectIds: string[]) =>

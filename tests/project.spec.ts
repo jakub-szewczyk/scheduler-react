@@ -4,6 +4,7 @@ import { expect, test } from '@playwright/test'
 import {
   EMPTY_PAGINABLE_RESPONSE,
   PAGINABLE_RESPONSE,
+  SUBJECT,
 } from '../src/mocks/common'
 
 const BASE_APP_URL = process.env.BASE_APP_URL
@@ -648,4 +649,148 @@ test.describe('edit project page', () => {
       })
     ).toBeVisible()
   })
+})
+
+test.describe('project details page', () => {
+  test('rendering title and description', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+      route.fulfill({ json: SUBJECT })
+    )
+    await page.goto(`/projects/${SUBJECT.id}`)
+    await expect(
+      page.getByRole('heading', { name: 'Project Details' })
+    ).toBeVisible()
+    await expect(page.getByRole('main')).toContainText(
+      "View your project's title, description, and creation date. Easily navigate to the edit page for updates. Additionally, this screen should serve you as a gateway to manage schedules, boards and notes, keeping your project organized and efficient from a single, streamlined hub."
+    )
+  })
+
+  test('navigating to "Edit Project" page', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+      route.fulfill({ json: SUBJECT })
+    )
+    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.getByRole('link', { name: 'Edit Project' }).click()
+    await expect(
+      page.getByRole('heading', { name: 'Edit Project' })
+    ).toBeVisible()
+    await expect(page.getByRole('main')).toContainText(
+      "Update your project details by modifying the title and description. Ensure the title accurately represents your project's current direction and use the description to highlight new goals, progress, and essential information. Once you've made your edits, submit the form to keep your project information up-to-date."
+    )
+  })
+
+  test('rendering project details', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+      route.fulfill({ json: SUBJECT })
+    )
+    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await expect(page.getByText('Created at')).toBeVisible()
+    await expect(page.getByText('August 6,')).toBeVisible()
+    await expect(page.getByText('Title', { exact: true })).toBeVisible()
+    await expect(page.getByText('alii-spiculum-spectaculum')).toBeVisible()
+    await expect(page.getByText('Description', { exact: true })).toBeVisible()
+    await expect(
+      page.getByText(
+        'Custodia curiositas tantum iusto. Undique cras suscipio alo cerno cattus apostolus omnis adsidue. Cogito depopulo cedo degenero defleo esse. Decimus sub ulterius ciminatio damno crastinus tres attollo. Tertius aiunt adstringo solutio subiungo beatae tergo. Tergiversatio stabilis caveo atrox corrumpo aegrus odio absque certe.'
+      )
+    ).toBeVisible()
+  })
+
+  test('previewing five latest schedules', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(
+      `${VITE_BASE_API_URL}/projects/*/schedules?size=5`,
+      (route) => route.fulfill({ json: PAGINABLE_RESPONSE })
+    )
+    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+      route.fulfill({ json: SUBJECT })
+    )
+    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.getByRole('tab', { name: 'Schedules' }).click()
+    await Promise.all(
+      PAGINABLE_RESPONSE.content.flatMap(({ title, description }) => [
+        expect(page.getByText(title)).toBeVisible(),
+        expect(page.getByText(description)).toBeVisible(),
+      ])
+    )
+  })
+
+  test('previewing five latest boards', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(`${VITE_BASE_API_URL}/projects/*/boards?size=5`, (route) =>
+      route.fulfill({ json: PAGINABLE_RESPONSE })
+    )
+    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+      route.fulfill({ json: SUBJECT })
+    )
+    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.getByRole('tab', { name: 'Boards' }).click()
+    await Promise.all(
+      PAGINABLE_RESPONSE.content.flatMap(({ title, description }) => [
+        expect(page.getByText(title)).toBeVisible(),
+        expect(page.getByText(description)).toBeVisible(),
+      ])
+    )
+  })
+
+  test('previewing five latest notes', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(`${VITE_BASE_API_URL}/projects/*/notes?size=5`, (route) =>
+      route.fulfill({ json: PAGINABLE_RESPONSE })
+    )
+    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+      route.fulfill({ json: SUBJECT })
+    )
+    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.getByRole('tab', { name: 'Notes' }).click()
+    await Promise.all(
+      PAGINABLE_RESPONSE.content.flatMap(({ title, description }) => [
+        expect(page.getByText(title)).toBeVisible(),
+        expect(page.getByText(description)).toBeVisible(),
+      ])
+    )
+  })
+
+  /**
+   * TODO:
+   * Test navigation.
+   */
+  // test('navigating to "Schedules" page', async ({ page }) => {})
+
+  // test('navigating to "Schedule Details" page', async ({ page }) => {})
+
+  // test('navigating to "New Schedule" page', async ({ page }) => {})
+
+  // test('navigating to "Boards" page', async ({ page }) => {})
+
+  // test('navigating to "Board Details" page', async ({ page }) => {})
+
+  // test('navigating to "New Board" page', async ({ page }) => {})
+
+  // test('navigating to "Notes" page', async ({ page }) => {})
+
+  // test('navigating to "Note Details" page', async ({ page }) => {})
+
+  // test('navigating to "New Note" page', async ({ page }) => {})
 })
