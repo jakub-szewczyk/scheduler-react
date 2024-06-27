@@ -20,10 +20,11 @@ const DataTabContent = ({ subject }: DataTabContentProps) => {
 
   return (
     <DataTablePreview
-      subject={subject}
-      data={data?.content}
       isFetching={isFetching}
       isPlaceholderData={isPlaceholderData}
+      subject={subject}
+      data={data?.content}
+      projectId={params.projectId}
     />
   )
 }
