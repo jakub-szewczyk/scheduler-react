@@ -772,25 +772,237 @@ test.describe('project details page', () => {
     )
   })
 
-  /**
-   * TODO:
-   * Test navigation.
-   */
-  // test('navigating to "Schedules" page', async ({ page }) => {})
+  test('navigating to "Schedules" page by "See full details" link', async ({
+    page,
+  }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(
+      `${VITE_BASE_API_URL}/projects/*/schedules?size=5`,
+      (route) => route.fulfill({ json: PAGINABLE_RESPONSE })
+    )
+    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+      route.fulfill({ json: SUBJECT })
+    )
+    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.getByRole('tab', { name: 'Schedules' }).click()
+    await page.getByRole('link', { name: 'See full details' }).click()
+    expect(page.url()).toBe(`${BASE_APP_URL}/projects/${SUBJECT.id}/schedules`)
+  })
 
-  // test('navigating to "Schedule Details" page', async ({ page }) => {})
+  test('navigating to "Schedules" page by "Navigate to the full page" link', async ({
+    page,
+  }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(
+      `${VITE_BASE_API_URL}/projects/*/schedules?size=5`,
+      (route) => route.fulfill({ json: EMPTY_PAGINABLE_RESPONSE })
+    )
+    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+      route.fulfill({ json: SUBJECT })
+    )
+    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.getByRole('tab', { name: 'Schedules' }).click()
+    await page.getByRole('link', { name: 'Navigate to the full page' }).click()
+    expect(page.url()).toBe(`${BASE_APP_URL}/projects/${SUBJECT.id}/schedules`)
+  })
 
-  // test('navigating to "New Schedule" page', async ({ page }) => {})
+  test('navigating to "Schedule Details" page', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(
+      `${VITE_BASE_API_URL}/projects/*/schedules?size=5`,
+      (route) => route.fulfill({ json: PAGINABLE_RESPONSE })
+    )
+    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+      route.fulfill({ json: SUBJECT })
+    )
+    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.getByRole('tab', { name: 'Schedules' }).click()
+    await page
+      .getByRole('link', { name: PAGINABLE_RESPONSE.content[0].title })
+      .click()
+    expect(page.url()).toBe(
+      `${BASE_APP_URL}/projects/${SUBJECT.id}/schedules/${PAGINABLE_RESPONSE.content[0].id}`
+    )
+  })
 
-  // test('navigating to "Boards" page', async ({ page }) => {})
+  test('navigating to "New Schedule" page', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(
+      `${VITE_BASE_API_URL}/projects/*/schedules?size=5`,
+      (route) => route.fulfill({ json: EMPTY_PAGINABLE_RESPONSE })
+    )
+    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+      route.fulfill({ json: SUBJECT })
+    )
+    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.getByRole('tab', { name: 'Schedules' }).click()
+    await page.getByRole('link', { name: 'Create your first entry' }).click()
+    expect(page.url()).toBe(
+      `${BASE_APP_URL}/projects/${SUBJECT.id}/schedules/new`
+    )
+  })
 
-  // test('navigating to "Board Details" page', async ({ page }) => {})
+  test('navigating to "Boards" page by "See full details" link', async ({
+    page,
+  }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(`${VITE_BASE_API_URL}/projects/*/boards?size=5`, (route) =>
+      route.fulfill({ json: PAGINABLE_RESPONSE })
+    )
+    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+      route.fulfill({ json: SUBJECT })
+    )
+    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.getByRole('tab', { name: 'Boards' }).click()
+    await page.getByRole('link', { name: 'See full details' }).click()
+    expect(page.url()).toBe(`${BASE_APP_URL}/projects/${SUBJECT.id}/boards`)
+  })
 
-  // test('navigating to "New Board" page', async ({ page }) => {})
+  test('navigating to "Boards" page by "Navigate to the full page" link', async ({
+    page,
+  }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(`${VITE_BASE_API_URL}/projects/*/boards?size=5`, (route) =>
+      route.fulfill({ json: EMPTY_PAGINABLE_RESPONSE })
+    )
+    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+      route.fulfill({ json: SUBJECT })
+    )
+    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.getByRole('tab', { name: 'Boards' }).click()
+    await page.getByRole('link', { name: 'Navigate to the full page' }).click()
+    expect(page.url()).toBe(`${BASE_APP_URL}/projects/${SUBJECT.id}/boards`)
+  })
 
-  // test('navigating to "Notes" page', async ({ page }) => {})
+  test('navigating to "Board Details" page', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(`${VITE_BASE_API_URL}/projects/*/boards?size=5`, (route) =>
+      route.fulfill({ json: PAGINABLE_RESPONSE })
+    )
+    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+      route.fulfill({ json: SUBJECT })
+    )
+    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.getByRole('tab', { name: 'Boards' }).click()
+    await page
+      .getByRole('link', { name: PAGINABLE_RESPONSE.content[0].title })
+      .click()
+    expect(page.url()).toBe(
+      `${BASE_APP_URL}/projects/${SUBJECT.id}/boards/${PAGINABLE_RESPONSE.content[0].id}`
+    )
+  })
 
-  // test('navigating to "Note Details" page', async ({ page }) => {})
+  test('navigating to "New Board" page', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(`${VITE_BASE_API_URL}/projects/*/boards?size=5`, (route) =>
+      route.fulfill({ json: EMPTY_PAGINABLE_RESPONSE })
+    )
+    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+      route.fulfill({ json: SUBJECT })
+    )
+    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.getByRole('tab', { name: 'Boards' }).click()
+    await page.getByRole('link', { name: 'Create your first entry' }).click()
+    expect(page.url()).toBe(`${BASE_APP_URL}/projects/${SUBJECT.id}/boards/new`)
+  })
 
-  // test('navigating to "New Note" page', async ({ page }) => {})
+  test('navigating to "Notes" page by "See full details" link', async ({
+    page,
+  }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(`${VITE_BASE_API_URL}/projects/*/notes?size=5`, (route) =>
+      route.fulfill({ json: PAGINABLE_RESPONSE })
+    )
+    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+      route.fulfill({ json: SUBJECT })
+    )
+    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.getByRole('tab', { name: 'Notes' }).click()
+    await page.getByRole('link', { name: 'See full details' }).click()
+    expect(page.url()).toBe(`${BASE_APP_URL}/projects/${SUBJECT.id}/notes`)
+  })
+
+  test('navigating to "Notes" page by "Navigate to the full page" link', async ({
+    page,
+  }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(`${VITE_BASE_API_URL}/projects/*/notes?size=5`, (route) =>
+      route.fulfill({ json: EMPTY_PAGINABLE_RESPONSE })
+    )
+    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+      route.fulfill({ json: SUBJECT })
+    )
+    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.getByRole('tab', { name: 'Notes' }).click()
+    await page.getByRole('link', { name: 'Navigate to the full page' }).click()
+    expect(page.url()).toBe(`${BASE_APP_URL}/projects/${SUBJECT.id}/notes`)
+  })
+
+  test('navigating to "Note Details" page', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(`${VITE_BASE_API_URL}/projects/*/notes?size=5`, (route) =>
+      route.fulfill({ json: PAGINABLE_RESPONSE })
+    )
+    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+      route.fulfill({ json: SUBJECT })
+    )
+    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.getByRole('tab', { name: 'Notes' }).click()
+    await page
+      .getByRole('link', { name: PAGINABLE_RESPONSE.content[0].title })
+      .click()
+    expect(page.url()).toBe(
+      `${BASE_APP_URL}/projects/${SUBJECT.id}/notes/${PAGINABLE_RESPONSE.content[0].id}`
+    )
+  })
+
+  test('navigating to "New Note" page', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(`${VITE_BASE_API_URL}/projects/*/notes?size=5`, (route) =>
+      route.fulfill({ json: EMPTY_PAGINABLE_RESPONSE })
+    )
+    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+      route.fulfill({ json: SUBJECT })
+    )
+    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.getByRole('tab', { name: 'Notes' }).click()
+    await page.getByRole('link', { name: 'Create your first entry' }).click()
+    expect(page.url()).toBe(`${BASE_APP_URL}/projects/${SUBJECT.id}/notes/new`)
+  })
 })
