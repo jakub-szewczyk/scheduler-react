@@ -17,8 +17,11 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { cn, subjectToDeleteMutationFn, toDateFormat } from '@/modules/common'
+import { Board } from '@/types/board'
 import { Subject } from '@/types/common'
+import { Note } from '@/types/note'
 import { Project } from '@/types/project'
+import { Schedule } from '@/types/schedule'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import {
@@ -56,7 +59,7 @@ interface DataTableProps<Data> {
   }
 }
 
-const DataTable = <Data extends Project /*TODO: `, Schedule, Board, Note` */>({
+const DataTable = <Data extends Project & Schedule & Board & Note>({
   className,
   isFetching,
   isPlaceholderData,

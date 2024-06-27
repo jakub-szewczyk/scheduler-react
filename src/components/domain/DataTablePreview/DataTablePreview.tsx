@@ -12,8 +12,11 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { DATA_TABLE_PREVIEW_SIZE, cn, toDateFormat } from '@/modules/common'
+import { Board } from '@/types/board'
 import { Subject } from '@/types/common'
+import { Note } from '@/types/note'
 import { Project } from '@/types/project'
+import { Schedule } from '@/types/schedule'
 import { Link } from '@tanstack/react-router'
 import { ArrowRight, CirclePlus, Frown } from 'lucide-react'
 
@@ -25,9 +28,7 @@ interface DataTablePreviewProps<Data> {
   projectId: string
 }
 
-const DataTablePreview = <
-  Data extends Project /*TODO: `, Schedule, Board, Note` */,
->({
+const DataTablePreview = <Data extends Project & Schedule & Board & Note>({
   isFetching,
   isPlaceholderData,
   subject,
