@@ -4,11 +4,11 @@ import { cn } from '@/modules/common'
 import { Table } from '@tanstack/react-table'
 import { X } from 'lucide-react'
 
-interface DataTableSearchProps<Data> {
+interface TableSearchProps<Data> {
   table: Table<Data>
 }
 
-const DataTableSearch = <Data,>({ table }: DataTableSearchProps<Data>) => {
+const TableSearch = <Data,>({ table }: TableSearchProps<Data>) => {
   const title = (table.getColumn('title')?.getFilterValue() as string) || ''
 
   return (
@@ -36,4 +36,4 @@ const DataTableSearch = <Data,>({ table }: DataTableSearchProps<Data>) => {
   )
 }
 
-export default DataTableSearch
+export default TableSearch

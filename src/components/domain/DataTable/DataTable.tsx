@@ -4,6 +4,7 @@ import NoResultsRow from '@/components/common/Table/NoResultsRow/NoResultsRow'
 import Pagination from '@/components/common/Table/Pagination/Pagination'
 import SelectedRowsIndicator from '@/components/common/Table/SelectedRowsIndicator/SelectedRowsIndicator'
 import SkeletonRows from '@/components/common/Table/SkeletonRows/SkeletonRows'
+import TableSearch from '@/components/common/Table/TableSearch/TableSearch'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -15,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { cn, toDateFormat, subjectToDeleteMutationFn } from '@/modules/common'
+import { cn, subjectToDeleteMutationFn, toDateFormat } from '@/modules/common'
 import { Subject } from '@/types/common'
 import { Project } from '@/types/project'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -32,7 +33,6 @@ import {
 import { ArrowDown, ArrowUp, FileText, Pencil, Trash } from 'lucide-react'
 import { HTMLAttributes, useState } from 'react'
 import { useBoolean } from 'usehooks-ts'
-import DataTableSearch from '../DataTableSearch/DataTableSearch'
 
 interface DataTableProps<Data> {
   className?: HTMLAttributes<HTMLDivElement>['className']
@@ -247,7 +247,7 @@ const DataTable = <Data extends Project /*TODO: `, Schedule, Board, Note` */>({
     <>
       <div className={className}>
         <div className='flex items-center justify-between gap-x-2 gap-y-4 mb-4'>
-          <DataTableSearch table={table} />
+          <TableSearch table={table} />
           {selectedRows.length > 0 && (
             <Button
               className='gap-x-2 text-destructive'
