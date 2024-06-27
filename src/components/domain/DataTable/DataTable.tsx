@@ -23,7 +23,7 @@ import { Note } from '@/types/note'
 import { Project } from '@/types/project'
 import { Schedule } from '@/types/schedule'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -78,6 +78,8 @@ const DataTable = <Data extends Project & Schedule & Board & Note>({
     setTrue: openDialog,
     setFalse: closeDialog,
   } = useBoolean()
+
+  const params = useParams({ strict: false })
 
   const navigate = useNavigate()
 
@@ -232,9 +234,14 @@ const DataTable = <Data extends Project & Schedule & Board & Note>({
    * - Invalid pending state indicator when using the "Delete selected" button.
    */
   const deleteMutation = useMutation({
-    mutationFn: subjectToDeleteMutationFn(subject),
+    mutationFn: subjectToDeleteMutationFn(subject)(params?.projectId || ''),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: [`${subject}s`] })
+      queryClient.invalidateQueries({
+        queryKey:
+          subject === 'project'
+            ? [`${subject}s`]
+            : ['projects', params?.projectId, `${subject}s`],
+      })
       closeDialog()
       if (
         variables.length === table.getFilteredRowModel().rows.length &&

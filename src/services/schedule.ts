@@ -1,4 +1,5 @@
 import { PaginableResponse } from '@/types/api'
+import { Project } from '@/types/project'
 import { Schedule } from '@/types/schedule'
 import { z } from 'zod'
 import { api } from './api'
@@ -15,7 +16,7 @@ export type GetSchedulesSearchParams = z.infer<
   typeof getSchedulesSearchParamsSchema
 >
 
-type GetSchedulesPathParams = { projectId: string }
+type GetSchedulesPathParams = { projectId: Project['id'] }
 
 type GetSchedulesResponseBody = PaginableResponse<Schedule>
 
@@ -28,7 +29,10 @@ export const getSchedules = ({
   }).then(({ data }) => data)
 
 // GET /projects/:projectId/schedules/:scheduleId
-type GetSchedulePathParams = { projectId: string; scheduleId: string }
+type GetSchedulePathParams = {
+  projectId: Project['id']
+  scheduleId: Schedule['id']
+}
 
 export const getSchedule = ({ projectId, scheduleId }: GetSchedulePathParams) =>
   api<Schedule>(`/projects/${projectId}/schedules/${scheduleId}`).then(
@@ -36,7 +40,7 @@ export const getSchedule = ({ projectId, scheduleId }: GetSchedulePathParams) =>
   )
 
 // POST /projects/:projectId/schedules
-type CreateSchedulePathParams = { projectId: string }
+type CreateSchedulePathParams = { projectId: Project['id'] }
 
 type CreateScheduleRequestBody = Pick<Schedule, 'title' | 'description'>
 
@@ -49,7 +53,10 @@ export const createSchedule = ({
     .then(({ data }) => data)
 
 // PUT /projects/:projectId/schedules/:scheduleId
-type UpdateSchedulePathParams = { projectId: string; scheduleId: string }
+type UpdateSchedulePathParams = {
+  projectId: Project['id']
+  scheduleId: Schedule['id']
+}
 
 type UpdateScheduleRequestBody = Pick<Schedule, 'id' | 'title' | 'description'>
 
@@ -63,12 +70,18 @@ export const updateSchedule = ({
     .then(({ data }) => data)
 
 // DELETE /projects/:projectId/schedules/:scheduleId
-type DeleteSchedulePathParams = { projectId: string; scheduleId: string }
+type DeleteSchedulePathParams = {
+  projectId: Project['id']
+  scheduleId: Schedule['id']
+}
 
 const deleteSchedule = ({ projectId, scheduleId }: DeleteSchedulePathParams) =>
   api
     .delete<Schedule>(`/projects/${projectId}/schedules/${scheduleId}`)
     .then(({ data }) => data)
 
-export const deleteSchedules = (params: DeleteSchedulePathParams[]) =>
-  Promise.all(params.map(deleteSchedule))
+export const deleteSchedules =
+  (projectId: Project['id']) => (scheduleIds: Schedule['id'][]) =>
+    Promise.all(
+      scheduleIds.map((scheduleId) => deleteSchedule({ projectId, scheduleId }))
+    )

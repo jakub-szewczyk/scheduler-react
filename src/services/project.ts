@@ -37,8 +37,8 @@ export const updateProject = ({ id, ...data }: UpdateProjectRequestBody) =>
   api.put<Project>(`/projects/${id}`, data).then(({ data }) => data)
 
 // DELETE /projects/:projectId
-const deleteProject = (projectId: string) =>
+const deleteProject = (projectId: Project['id']) =>
   api.delete<Project>(`/projects/${projectId}`).then(({ data }) => data)
 
-export const deleteProjects = (projectIds: string[]) =>
+export const deleteProjects = () => (projectIds: Project['id'][]) =>
   Promise.all(projectIds.map(deleteProject))

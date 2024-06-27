@@ -1,5 +1,6 @@
 import { PaginableResponse } from '@/types/api'
 import { Board } from '@/types/board'
+import { Project } from '@/types/project'
 import { z } from 'zod'
 import { api } from './api'
 
@@ -13,7 +14,7 @@ export const getBoardsSearchParamsSchema = z.object({
 
 export type GetBoardsSearchParams = z.infer<typeof getBoardsSearchParamsSchema>
 
-type GetBoardsPathParams = { projectId: string }
+type GetBoardsPathParams = { projectId: Board['id'] }
 
 type GetBoardsResponseBody = PaginableResponse<Board>
 
@@ -26,7 +27,7 @@ export const getBoards = ({
   }).then(({ data }) => data)
 
 // GET /projects/:projectId/boards/:boardId
-type GetBoardPathParams = { projectId: string; boardId: string }
+type GetBoardPathParams = { projectId: Project['id']; boardId: Board['id'] }
 
 export const getBoard = ({ projectId, boardId }: GetBoardPathParams) =>
   api<Board>(`/projects/${projectId}/boards/${boardId}`).then(
@@ -34,7 +35,7 @@ export const getBoard = ({ projectId, boardId }: GetBoardPathParams) =>
   )
 
 // POST /projects/:projectId/boards
-type CreateBoardPathParams = { projectId: string }
+type CreateBoardPathParams = { projectId: Project['id'] }
 
 type CreateBoardRequestBody = Pick<Board, 'title' | 'description'>
 
@@ -45,7 +46,7 @@ export const createBoard = ({
   api.post<Board>(`projects/${projectId}/boards`, data).then(({ data }) => data)
 
 // PUT /projects/:projectId/boards/:boardId
-type UpdateBoardPathParams = { projectId: string; boardId: string }
+type UpdateBoardPathParams = { projectId: Project['id']; boardId: Board['id'] }
 
 type UpdateBoardRequestBody = Pick<Board, 'id' | 'title' | 'description'>
 
@@ -59,12 +60,13 @@ export const updateBoard = ({
     .then(({ data }) => data)
 
 // DELETE /projects/:projectId/boards/:boardId
-type DeleteBoardPathParams = { projectId: string; boardId: string }
+type DeleteBoardPathParams = { projectId: Project['id']; boardId: Board['id'] }
 
 const deleteBoard = ({ projectId, boardId }: DeleteBoardPathParams) =>
   api
     .delete<Board>(`/projects/${projectId}/boards/${boardId}`)
     .then(({ data }) => data)
 
-export const deleteBoards = (params: DeleteBoardPathParams[]) =>
-  Promise.all(params.map(deleteBoard))
+export const deleteBoards =
+  (projectId: Project['id']) => (boardIds: Board['id'][]) =>
+    Promise.all(boardIds.map((boardId) => deleteBoard({ projectId, boardId })))

@@ -1,5 +1,6 @@
 import { PaginableResponse } from '@/types/api'
 import { Note } from '@/types/note'
+import { Project } from '@/types/project'
 import { z } from 'zod'
 import { api } from './api'
 
@@ -13,7 +14,7 @@ export const getNotesSearchParamsSchema = z.object({
 
 export type GetNotesSearchParams = z.infer<typeof getNotesSearchParamsSchema>
 
-type GetNotesPathParams = { projectId: string }
+type GetNotesPathParams = { projectId: Project['id'] }
 
 type GetNotesResponseBody = PaginableResponse<Note>
 
@@ -26,13 +27,13 @@ export const getNotes = ({
   }).then(({ data }) => data)
 
 // GET /projects/:projectId/notes/:noteId
-type GetNotePathParams = { projectId: string; noteId: string }
+type GetNotePathParams = { projectId: Project['id']; noteId: Note['id'] }
 
 export const getNote = ({ projectId, noteId }: GetNotePathParams) =>
   api<Note>(`/projects/${projectId}/notes/${noteId}`).then(({ data }) => data)
 
 // POST /projects/:projectId/notes
-type CreateNotePathParams = { projectId: string }
+type CreateNotePathParams = { projectId: Project['id'] }
 
 type CreateNoteRequestBody = Pick<Note, 'title' | 'description'>
 
@@ -43,7 +44,7 @@ export const createNote = ({
   api.post<Note>(`projects/${projectId}/notes`, data).then(({ data }) => data)
 
 // PUT /projects/:projectId/notes/:noteId
-type UpdateNotePathParams = { projectId: string; noteId: string }
+type UpdateNotePathParams = { projectId: Project['id']; noteId: Note['id'] }
 
 type UpdateNoteRequestBody = Pick<Note, 'id' | 'title' | 'description'>
 
@@ -57,12 +58,13 @@ export const updateNote = ({
     .then(({ data }) => data)
 
 // DELETE /projects/:projectId/notes/:noteId
-type DeleteNotePathParams = { projectId: string; noteId: string }
+type DeleteNotePathParams = { projectId: Project['id']; noteId: Note['id'] }
 
 const deleteNote = ({ projectId, noteId }: DeleteNotePathParams) =>
   api
     .delete<Note>(`/projects/${projectId}/notes/${noteId}`)
     .then(({ data }) => data)
 
-export const deleteNotes = (params: DeleteNotePathParams[]) =>
-  Promise.all(params.map(deleteNote))
+export const deleteNotes =
+  (projectId: Project['id']) => (noteIds: Note['id'][]) =>
+    Promise.all(noteIds.map((noteId) => deleteNote({ projectId, noteId })))

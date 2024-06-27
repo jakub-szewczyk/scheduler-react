@@ -1,7 +1,7 @@
-import { getBoards } from '@/services/board'
-import { getNotes } from '@/services/note'
+import { deleteBoards, getBoards } from '@/services/board'
+import { deleteNotes, getNotes } from '@/services/note'
 import { deleteProjects, getProjects } from '@/services/project'
-import { getSchedules } from '@/services/schedule'
+import { deleteSchedules, getSchedules } from '@/services/schedule'
 import { Subject } from '@/types/common'
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
@@ -26,11 +26,10 @@ export const subjectToQueryFn = (subject: Subject) =>
     .with('note', () => getNotes)
     .exhaustive()
 
-/**
- * TODO:
- * Use `.exhaustive()` instead of `.run()`.
- */
 export const subjectToDeleteMutationFn = (subject: Subject) =>
   match(subject)
     .with('project', () => deleteProjects)
-    .run()
+    .with('schedule', () => deleteSchedules)
+    .with('board', () => deleteBoards)
+    .with('note', () => deleteNotes)
+    .exhaustive()
