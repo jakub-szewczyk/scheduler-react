@@ -58,7 +58,7 @@ type UpdateSchedulePathParams = {
   scheduleId: Schedule['id']
 }
 
-type UpdateScheduleRequestBody = Pick<Schedule, 'id' | 'title' | 'description'>
+type UpdateScheduleRequestBody = Pick<Schedule, 'title' | 'description'>
 
 export const updateSchedule = ({
   projectId,

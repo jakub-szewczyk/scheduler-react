@@ -116,8 +116,7 @@ function NewSchedule() {
               Set up your new schedule by entering a title and description.
               Choose a title that encapsulates the focus of your schedule and
               use the description to outline its key events and timelines. Once
-              you're done, submit the form to start organizing your events. If
-              configured, push notifications can be sent for upcoming events.
+              you're done, submit the form to start organizing your events.
             </CardDescription>
           </CardHeader>
           <CardContent>
