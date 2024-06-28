@@ -41,7 +41,7 @@ function ProjectDetails() {
 
   const params = Route.useParams()
 
-  const projectQuery = useQuery({
+  const getProjectQuery = useQuery({
     queryKey: ['projects', params.projectId],
     queryFn: () => getProject(params.projectId),
   })
@@ -115,42 +115,42 @@ function ProjectDetails() {
               <dl
                 className={cn(
                   'space-y-4',
-                  projectQuery.isFetching &&
-                    !projectQuery.isPlaceholderData &&
+                  getProjectQuery.isFetching &&
+                    !getProjectQuery.isPlaceholderData &&
                     'opacity-50'
                 )}
               >
                 <div className='text-muted-foreground'>
                   <dt className='font-bold'>Created at</dt>
                   <dd>
-                    {projectQuery.isLoading ? (
+                    {getProjectQuery.isLoading ? (
                       <Skeleton className='max-w-xs h-5' />
                     ) : (
-                      projectQuery.data?.createdAt &&
-                      toDateFormat(projectQuery.data.createdAt)
+                      getProjectQuery.data?.createdAt &&
+                      toDateFormat(getProjectQuery.data.createdAt)
                     )}
                   </dd>
                 </div>
                 <div>
                   <dt className='font-bold'>Title</dt>
                   <dd>
-                    {projectQuery.isLoading ? (
+                    {getProjectQuery.isLoading ? (
                       <Skeleton className='max-w-screen-sm h-5' />
                     ) : (
-                      projectQuery.data?.title
+                      getProjectQuery.data?.title
                     )}
                   </dd>
                 </div>
-                {projectQuery.isLoading ? (
+                {getProjectQuery.isLoading ? (
                   <div>
                     <dt className='font-bold'>Description</dt>
                     <Skeleton className='h-10' />
                   </div>
                 ) : (
-                  projectQuery.data?.description && (
+                  getProjectQuery.data?.description && (
                     <div>
                       <dt className='font-bold'>Description</dt>
-                      <dd>{projectQuery.data.description}</dd>
+                      <dd>{getProjectQuery.data.description}</dd>
                     </div>
                   )
                 )}

@@ -34,5 +34,7 @@ export const SUBJECT = {
   id: faker.string.uuid(),
   title: faker.lorem.slug(),
   description: faker.lorem.sentences(),
-  createdAt: faker.date.past().toISOString(),
+  createdAt: faker.date
+    .past({ refDate: new Date(1719550869571) })
+    .toISOString(),
 }

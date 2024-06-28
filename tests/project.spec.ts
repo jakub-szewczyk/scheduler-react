@@ -697,7 +697,7 @@ test.describe('project details page', () => {
     )
     await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
     await expect(page.getByText('Created at')).toBeVisible()
-    await expect(page.getByText('August 6,')).toBeVisible()
+    await expect(page.getByText('August 7,')).toBeVisible()
     await expect(page.getByText('Title', { exact: true })).toBeVisible()
     await expect(page.getByText('alii-spiculum-spectaculum')).toBeVisible()
     await expect(page.getByText('Description', { exact: true })).toBeVisible()

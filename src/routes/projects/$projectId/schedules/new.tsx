@@ -42,7 +42,7 @@ function NewSchedule() {
 
   const queryClient = useQueryClient()
 
-  const { mutate, isPending } = useMutation({
+  const createScheduleMutation = useMutation({
     mutationFn: createSchedule,
     onSuccess: (schedule) => {
       queryClient.invalidateQueries({
@@ -122,10 +122,13 @@ function NewSchedule() {
           </CardHeader>
           <CardContent>
             <DataForm
-              isPending={isPending}
+              isPending={createScheduleMutation.isPending}
               subject='schedule'
               onSubmit={(inputs) =>
-                mutate({ projectId: params.projectId, ...inputs })
+                createScheduleMutation.mutate({
+                  projectId: params.projectId,
+                  ...inputs,
+                })
               }
             />
           </CardContent>

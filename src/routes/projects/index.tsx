@@ -43,7 +43,7 @@ function Projects() {
     title: debouncedSearch.title,
   }
 
-  const projectsQuery = useQuery({
+  const getProjectsQuery = useQuery({
     queryKey: ['projects', query],
     queryFn: () => getProjects(query),
     placeholderData: keepPreviousData,
@@ -75,10 +75,10 @@ function Projects() {
         </CardFooter>
       </Card>
       <DataTable
-        isFetching={projectsQuery.isFetching}
-        isPlaceholderData={projectsQuery.isPlaceholderData}
+        isFetching={getProjectsQuery.isFetching}
+        isPlaceholderData={getProjectsQuery.isPlaceholderData}
         subject='project'
-        data={projectsQuery.data?.content}
+        data={getProjectsQuery.data?.content}
         sorting={{
           state: [{ id: 'createdAt', desc: search.createdAt === 'DESC' }],
           onChange: ([{ desc }]) =>
@@ -105,7 +105,7 @@ function Projects() {
         pagination={{
           page: search.page,
           size: search.size,
-          total: projectsQuery.data?.total,
+          total: getProjectsQuery.data?.total,
           onChange: ({ page, size }) =>
             navigate({
               search: (search) => ({ ...search, page, size }),

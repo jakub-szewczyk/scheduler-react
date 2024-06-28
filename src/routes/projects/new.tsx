@@ -40,7 +40,7 @@ function NewProject() {
 
   const queryClient = useQueryClient()
 
-  const { mutate, isPending } = useMutation({
+  const createProjectMutation = useMutation({
     mutationFn: createProject,
     onSuccess: (project) => {
       queryClient.invalidateQueries({ queryKey: ['projects'] })
@@ -95,9 +95,9 @@ function NewProject() {
           </CardHeader>
           <CardContent>
             <DataForm
-              isPending={isPending}
+              isPending={createProjectMutation.isPending}
               subject='project'
-              onSubmit={mutate}
+              onSubmit={createProjectMutation.mutate}
             />
           </CardContent>
         </Card>

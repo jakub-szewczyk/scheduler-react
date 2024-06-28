@@ -13,17 +13,17 @@ const DataTabContent = ({ subject }: DataTabContentProps) => {
 
   const query = { projectId: params.projectId, size: DATA_TABLE_PREVIEW_SIZE }
 
-  const { data, isFetching, isPlaceholderData } = useQuery({
+  const subjectQuery = useQuery({
     queryKey: [subject, query],
     queryFn: () => subjectToQueryFn(subject)(query),
   })
 
   return (
     <DataTablePreview
-      isFetching={isFetching}
-      isPlaceholderData={isPlaceholderData}
+      isFetching={subjectQuery.isFetching}
+      isPlaceholderData={subjectQuery.isPlaceholderData}
       subject={subject}
-      data={data?.content}
+      data={subjectQuery.data?.content}
       projectId={params.projectId}
     />
   )

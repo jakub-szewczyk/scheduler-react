@@ -56,7 +56,7 @@ function Schedules() {
     title: debouncedSearch.title,
   }
 
-  const schedulesQuery = useQuery({
+  const getSchedulesQuery = useQuery({
     queryKey: ['projects', params.projectId, 'schedules', query],
     queryFn: () => getSchedules({ projectId: params.projectId, ...query }),
     placeholderData: keepPreviousData,
@@ -123,10 +123,10 @@ function Schedules() {
           </CardFooter>
         </Card>
         <DataTable
-          isFetching={schedulesQuery.isFetching}
-          isPlaceholderData={schedulesQuery.isPlaceholderData}
+          isFetching={getSchedulesQuery.isFetching}
+          isPlaceholderData={getSchedulesQuery.isPlaceholderData}
           subject='schedule'
-          data={schedulesQuery.data?.content}
+          data={getSchedulesQuery.data?.content}
           sorting={{
             state: [{ id: 'createdAt', desc: search.createdAt === 'DESC' }],
             onChange: ([{ desc }]) =>
@@ -153,7 +153,7 @@ function Schedules() {
           pagination={{
             page: search.page,
             size: search.size,
-            total: schedulesQuery.data?.total,
+            total: getSchedulesQuery.data?.total,
             onChange: ({ page, size }) =>
               navigate({
                 search: (search) => ({ ...search, page, size }),

@@ -42,12 +42,12 @@ function EditProject() {
 
   const queryClient = useQueryClient()
 
-  const { data, isLoading, isFetching, isPlaceholderData } = useQuery({
+  const getProjectQuery = useQuery({
     queryKey: ['projects', params.projectId],
     queryFn: () => getProject(params.projectId),
   })
 
-  const { mutate, isPending } = useMutation({
+  const updateProjectMutation = useMutation({
     mutationFn: updateProject,
     onSuccess: (project) => {
       queryClient.invalidateQueries({ queryKey: ['projects'] })
@@ -113,20 +113,25 @@ function EditProject() {
           </CardHeader>
           <CardContent>
             <DataForm
-              isLoading={isLoading}
-              isFetching={isFetching}
-              isPlaceholderData={isPlaceholderData}
-              isPending={isPending}
+              isLoading={getProjectQuery.isLoading}
+              isFetching={getProjectQuery.isFetching}
+              isPlaceholderData={getProjectQuery.isPlaceholderData}
+              isPending={updateProjectMutation.isPending}
               subject='project'
               values={
-                data
+                getProjectQuery.data
                   ? {
-                      title: data.title,
-                      description: data.description || '',
+                      title: getProjectQuery.data.title,
+                      description: getProjectQuery.data.description || '',
                     }
                   : undefined
               }
-              onSubmit={(inputs) => mutate({ id: params.projectId, ...inputs })}
+              onSubmit={(inputs) =>
+                updateProjectMutation.mutate({
+                  id: params.projectId,
+                  ...inputs,
+                })
+              }
             />
           </CardContent>
         </Card>

@@ -4,6 +4,7 @@ import { expect, test } from '@playwright/test'
 import {
   EMPTY_PAGINABLE_RESPONSE,
   PAGINABLE_RESPONSE,
+  SUBJECT,
 } from '../src/mocks/common'
 
 const BASE_APP_URL = process.env.BASE_APP_URL
@@ -458,5 +459,105 @@ test.describe('schedules page', () => {
     expect(page.url()).toBe(
       `${BASE_APP_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/schedules/${PAGINABLE_RESPONSE.content[0].id}`
     )
+  })
+})
+
+test.describe('new schedule page', () => {
+  test('rendering title and description', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}/schedules/new`)
+    await expect(
+      page.getByRole('heading', { name: 'New Schedule' })
+    ).toBeVisible()
+    await expect(page.getByRole('main')).toContainText(
+      "Set up your new schedule by entering a title and description. Choose a title that encapsulates the focus of your schedule and use the description to outline its key events and timelines. Once you're done, submit the form to start organizing your events. If configured, push notifications can be sent for upcoming events."
+    )
+  })
+
+  test('title being required', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(
+      `${VITE_BASE_API_URL}/projects/*/schedules`,
+      (route) =>
+        route.request().method() === 'POST' &&
+        route.fulfill({
+          json: {
+            id: faker.string.uuid(),
+            title: faker.lorem.slug(),
+            description: faker.lorem.sentences(),
+            createdAt: faker.date.past().toISOString(),
+          },
+        })
+    )
+    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}/schedules/new`)
+    await page.getByRole('button', { name: 'Submit' }).click()
+    await expect(page.getByText('This field is required')).toBeVisible()
+  })
+
+  test('creating schedule', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(
+      `${VITE_BASE_API_URL}/projects/*/schedules*`,
+      (route) =>
+        route.request().method() === 'GET' &&
+        route.fulfill({ json: PAGINABLE_RESPONSE })
+    )
+    const id = faker.string.uuid()
+    const title = faker.lorem.slug()
+    const description = faker.lorem.sentences()
+    const json = {
+      id,
+      title,
+      description,
+      createdAt: faker.date.past().toISOString(),
+    }
+    await page.route(
+      `${VITE_BASE_API_URL}/projects/*/schedules/*`,
+      (route) =>
+        route.request().method() === 'GET' &&
+        route.fulfill({
+          json,
+        })
+    )
+    await page.route(
+      `${VITE_BASE_API_URL}/projects/*/schedules`,
+      (route) =>
+        route.request().method() === 'POST' &&
+        route.fulfill({
+          json,
+        })
+    )
+    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}/schedules/new`)
+    await page.getByPlaceholder('Enter title').fill(title)
+    await page.getByPlaceholder('Enter description').fill(description)
+    const promise1 = page.waitForResponse(
+      (response) => response.request().method() === 'POST'
+    )
+    const promise2 = page.waitForResponse(
+      (response) => response.request().method() === 'GET'
+    )
+    await page.getByRole('button', { name: 'Submit' }).click()
+    expect((await promise1).request().method()).toBe('POST')
+    expect((await promise2).request().method()).toBe('GET')
+    expect(page.url()).toBe(
+      `${BASE_APP_URL}/projects/${SUBJECT.id}/schedules/${id}`
+    )
+    await expect(
+      page.getByText('Schedule created', { exact: true })
+    ).toBeVisible()
+    await expect(
+      page.getByText(`${title} has been successfully created`, {
+        exact: true,
+      })
+    ).toBeVisible()
   })
 })

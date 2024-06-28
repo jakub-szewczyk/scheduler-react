@@ -252,7 +252,7 @@ const DataTable = <Data extends Project & Schedule & Board & Note>({
    * - Unnecessary request when auto-navigating to the previous page.
    * - Invalid pending state indicator when using the "Delete selected" button.
    */
-  const deleteMutation = useMutation({
+  const deleteSubjectMutation = useMutation({
     mutationFn: subjectToDeleteMutationFn(subject)(params?.projectId || ''),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
@@ -355,12 +355,14 @@ const DataTable = <Data extends Project & Schedule & Board & Note>({
       <DeleteConfirmationDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        isPending={deleteMutation.isPending}
+        isPending={deleteSubjectMutation.isPending}
         subject={subject}
         rows={
           selectedRows.length > 0 ? selectedRows : targetRow ? [targetRow] : []
         }
-        onConfirm={(rows) => deleteMutation.mutate(rows.map((row) => row.id))}
+        onConfirm={(rows) =>
+          deleteSubjectMutation.mutate(rows.map((row) => row.id))
+        }
       />
     </>
   )
