@@ -115,7 +115,14 @@ const DataTable = <Data extends Project & Schedule & Board & Note>({
       enableSorting: false,
       header: 'Title',
       cell: ({ row }) => (
-        <Link className='hover:underline' to={`/${subject}s/${row.id}`}>
+        <Link
+          className='hover:underline'
+          to={
+            subject === 'project'
+              ? `/${subject}s/${row.id}`
+              : `/projects/${params.projectId}/${subject}s/${row.id}`
+          }
+        >
           {row.getValue('title')}
         </Link>
       ),
@@ -160,7 +167,13 @@ const DataTable = <Data extends Project & Schedule & Board & Note>({
                   Details
                 </div>
               ),
-              onClick: () => navigate({ to: `/${subject}s/${row.id}` }),
+              onClick: () =>
+                navigate({
+                  to:
+                    subject === 'project'
+                      ? `/${subject}s/${row.id}`
+                      : `/projects/${params.projectId}/${subject}s/${row.id}`,
+                }),
             },
             {
               children: (
@@ -169,7 +182,13 @@ const DataTable = <Data extends Project & Schedule & Board & Note>({
                   Edit
                 </div>
               ),
-              onClick: () => navigate({ to: `/${subject}s/${row.id}/edit` }),
+              onClick: () =>
+                navigate({
+                  to:
+                    subject === 'project'
+                      ? `/${subject}s/${row.id}/edit`
+                      : `/projects/${params.projectId}/${subject}s/${row.id}/edit`,
+                }),
             },
             {
               children: (
