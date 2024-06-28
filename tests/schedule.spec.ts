@@ -473,7 +473,7 @@ test.describe('new schedule page', () => {
       page.getByRole('heading', { name: 'New Schedule' })
     ).toBeVisible()
     await expect(page.getByRole('main')).toContainText(
-      "Set up your new schedule by entering a title and description. Choose a title that encapsulates the focus of your schedule and use the description to outline its key events and timelines. Once you're done, submit the form to start organizing your events. If configured, push notifications can be sent for upcoming events."
+      "Set up your new schedule by entering a title and description. Choose a title that encapsulates the focus of your schedule and use the description to outline its key events and timelines. Once you're done, submit the form to start organizing your events."
     )
   })
 
@@ -556,6 +556,131 @@ test.describe('new schedule page', () => {
     ).toBeVisible()
     await expect(
       page.getByText(`${title} has been successfully created`, {
+        exact: true,
+      })
+    ).toBeVisible()
+  })
+})
+
+test.describe('edit schedule page', () => {
+  test('rendering title and description', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    const id = faker.string.uuid()
+    await page.route(
+      `${VITE_BASE_API_URL}/projects/*/schedules/*`,
+      (route) =>
+        route.request().method() === 'GET' &&
+        route.fulfill({
+          json: {
+            id,
+            title: faker.lorem.slug(),
+            description: faker.lorem.sentences(),
+            createdAt: faker.date.past().toISOString(),
+          },
+        })
+    )
+    await page.goto(
+      `${BASE_APP_URL}/projects/${SUBJECT.id}/schedules/${id}/edit`
+    )
+    await expect(
+      page.getByRole('heading', { name: 'Edit Schedule' })
+    ).toBeVisible()
+    await expect(page.getByRole('main')).toContainText(
+      'Modify your existing schedule by updating the title and description. Adjust the title to reflect any changes in focus and use the description to detail revised key events and timelines. Once your updates are complete, submit the form to keep your schedule current.'
+    )
+  })
+
+  test('title being required', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    const id = faker.string.uuid()
+    await page.route(
+      `${VITE_BASE_API_URL}/projects/*/schedules/*`,
+      (route) =>
+        route.request().method() === 'GET' &&
+        route.fulfill({
+          json: {
+            id,
+            title: faker.lorem.slug(),
+            description: faker.lorem.sentences(),
+            createdAt: faker.date.past().toISOString(),
+          },
+        })
+    )
+    await page.goto(
+      `${BASE_APP_URL}/projects/${SUBJECT.id}/schedules/${id}/edit`
+    )
+    await page.getByPlaceholder('Enter title').clear()
+    await page.getByRole('button', { name: 'Submit' }).click()
+    await expect(page.getByText('This field is required')).toBeVisible()
+  })
+
+  test('updating schedule', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(
+      `${VITE_BASE_API_URL}/projects/*/schedules*`,
+      (route) =>
+        route.request().method() === 'GET' &&
+        route.fulfill({ json: PAGINABLE_RESPONSE })
+    )
+    const id = faker.string.uuid()
+    await page.route(
+      `${VITE_BASE_API_URL}/projects/${SUBJECT.id}/schedules/*`,
+      (route) =>
+        route.request().method() === 'GET' &&
+        route.fulfill({
+          json: {
+            id,
+            title: faker.lorem.slug(),
+            description: faker.lorem.sentences(),
+            createdAt: faker.date.past().toISOString(),
+          },
+        })
+    )
+    const title = faker.lorem.slug()
+    const description = faker.lorem.sentences()
+    await page.route(
+      `${VITE_BASE_API_URL}/projects/*/schedules/${id}`,
+      (route) =>
+        route.fulfill({
+          json: {
+            id,
+            title,
+            description,
+            createdAt: faker.date.past().toISOString(),
+          },
+        })
+    )
+    await page.goto(
+      `${BASE_APP_URL}/projects/${SUBJECT.id}/schedules/${id}/edit`
+    )
+    await page.getByPlaceholder('Enter title').fill(title)
+    await page.getByPlaceholder('Enter description').fill(description)
+    const promise1 = page.waitForResponse(
+      (response) => response.request().method() === 'PUT'
+    )
+    const promise2 = page.waitForResponse(
+      (response) => response.request().method() === 'GET'
+    )
+    await page.getByRole('button', { name: 'Submit' }).click()
+    expect((await promise1).request().method()).toBe('PUT')
+    expect((await promise2).request().method()).toBe('GET')
+    expect(page.url()).toBe(
+      `${BASE_APP_URL}/projects/${SUBJECT.id}/schedules/${id}`
+    )
+    await expect(
+      page.getByText('Schedule updated', { exact: true })
+    ).toBeVisible()
+    await expect(
+      page.getByText(`${title} has been successfully updated`, {
         exact: true,
       })
     ).toBeVisible()
