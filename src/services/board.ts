@@ -48,7 +48,7 @@ export const createBoard = ({
 // PUT /projects/:projectId/boards/:boardId
 type UpdateBoardPathParams = { projectId: Project['id']; boardId: Board['id'] }
 
-type UpdateBoardRequestBody = Pick<Board, 'id' | 'title' | 'description'>
+type UpdateBoardRequestBody = Pick<Board, 'title' | 'description'>
 
 export const updateBoard = ({
   projectId,
