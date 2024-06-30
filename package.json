@@ -16,6 +16,8 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.2.0",
+    "@fullcalendar/core": "^6.1.14",
+    "@fullcalendar/react": "^6.1.14",
     "@hookform/resolvers": "^3.6.0",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-avatar": "^1.0.4",
