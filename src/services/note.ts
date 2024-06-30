@@ -46,7 +46,7 @@ export const createNote = ({
 // PUT /projects/:projectId/notes/:noteId
 type UpdateNotePathParams = { projectId: Project['id']; noteId: Note['id'] }
 
-type UpdateNoteRequestBody = Pick<Note, 'id' | 'title' | 'description'>
+type UpdateNoteRequestBody = Pick<Note, 'title' | 'description'>
 
 export const updateNote = ({
   projectId,
