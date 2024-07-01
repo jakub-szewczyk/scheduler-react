@@ -32,6 +32,7 @@ import { Route as ProjectsProjectIdSchedulesScheduleIdEditImport } from './route
 import { Route as ProjectsProjectIdNotesNoteIdEditImport } from './routes/projects/$projectId/notes/$noteId/edit'
 import { Route as ProjectsProjectIdBoardsBoardIdEditImport } from './routes/projects/$projectId/boards/$boardId/edit'
 import { Route as ProjectsProjectIdSchedulesScheduleIdEventsIndexImport } from './routes/projects/$projectId/schedules/$scheduleId/events/index'
+import { Route as ProjectsProjectIdSchedulesScheduleIdEventsNewImport } from './routes/projects/$projectId/schedules/$scheduleId/events/new'
 
 // Create/Update Routes
 
@@ -150,6 +151,12 @@ const ProjectsProjectIdBoardsBoardIdEditRoute =
 const ProjectsProjectIdSchedulesScheduleIdEventsIndexRoute =
   ProjectsProjectIdSchedulesScheduleIdEventsIndexImport.update({
     path: '/projects/$projectId/schedules/$scheduleId/events/',
+    getParentRoute: () => rootRoute,
+  } as any)
+
+const ProjectsProjectIdSchedulesScheduleIdEventsNewRoute =
+  ProjectsProjectIdSchedulesScheduleIdEventsNewImport.update({
+    path: '/projects/$projectId/schedules/$scheduleId/events/new',
     getParentRoute: () => rootRoute,
   } as any)
 
@@ -297,6 +304,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsProjectIdSchedulesScheduleIdIndexImport
       parentRoute: typeof rootRoute
     }
+    '/projects/$projectId/schedules/$scheduleId/events/new': {
+      id: '/projects/$projectId/schedules/$scheduleId/events/new'
+      path: '/projects/$projectId/schedules/$scheduleId/events/new'
+      fullPath: '/projects/$projectId/schedules/$scheduleId/events/new'
+      preLoaderRoute: typeof ProjectsProjectIdSchedulesScheduleIdEventsNewImport
+      parentRoute: typeof rootRoute
+    }
     '/projects/$projectId/schedules/$scheduleId/events/': {
       id: '/projects/$projectId/schedules/$scheduleId/events/'
       path: '/projects/$projectId/schedules/$scheduleId/events'
@@ -330,6 +344,7 @@ export const routeTree = rootRoute.addChildren({
   ProjectsProjectIdBoardsBoardIdIndexRoute,
   ProjectsProjectIdNotesNoteIdIndexRoute,
   ProjectsProjectIdSchedulesScheduleIdIndexRoute,
+  ProjectsProjectIdSchedulesScheduleIdEventsNewRoute,
   ProjectsProjectIdSchedulesScheduleIdEventsIndexRoute,
 })
 
@@ -361,6 +376,7 @@ export const routeTree = rootRoute.addChildren({
         "/projects/$projectId/boards/$boardId/",
         "/projects/$projectId/notes/$noteId/",
         "/projects/$projectId/schedules/$scheduleId/",
+        "/projects/$projectId/schedules/$scheduleId/events/new",
         "/projects/$projectId/schedules/$scheduleId/events/"
       ]
     },
@@ -423,6 +439,9 @@ export const routeTree = rootRoute.addChildren({
     },
     "/projects/$projectId/schedules/$scheduleId/": {
       "filePath": "projects/$projectId/schedules/$scheduleId/index.tsx"
+    },
+    "/projects/$projectId/schedules/$scheduleId/events/new": {
+      "filePath": "projects/$projectId/schedules/$scheduleId/events/new.tsx"
     },
     "/projects/$projectId/schedules/$scheduleId/events/": {
       "filePath": "projects/$projectId/schedules/$scheduleId/events/index.tsx"

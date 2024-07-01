@@ -11,6 +11,10 @@ export const DATA_TABLE_PREVIEW_SIZE = 5
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs))
 
+/**
+ * TODO:
+ * Consider using `date-fns`.
+ */
 export const toDateFormat = (date: string) =>
   new Intl.DateTimeFormat('en-US', {
     day: 'numeric',
