@@ -98,12 +98,11 @@ function ScheduleDetails() {
         <Card>
           <CardHeader>
             <CardTitle>{pageTitle}</CardTitle>
-            {/* TODO: Update description */}
             <CardDescription>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolore
-              magni doloremque consequuntur voluptatibus quasi vero ullam quo
-              sed, ipsum possimus impedit eligendi omnis, ipsa iure aliquid
-              quidem veniam eaque recusandae!
+              Review the detailed information about the selected schedule,
+              including its creation date, title, and description. Use the
+              options below to edit the schedule or view the calendar to see
+              associated events.
             </CardDescription>
           </CardHeader>
           <CardFooter className='flex-col gap-2 sm:flex-row'>

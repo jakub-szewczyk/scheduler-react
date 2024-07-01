@@ -56,7 +56,6 @@ function Events() {
    * TODO:
    * Restyle.
    * Refactor.
-   * Handle loading state.
    */
   const getEventsQuery = useQuery({
     queryKey: [
@@ -141,12 +140,11 @@ function Events() {
         <Card>
           <CardHeader>
             <CardTitle>{pageTitle}</CardTitle>
-            {/* TODO: Update description */}
             <CardDescription>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolore
-              magni doloremque consequuntur voluptatibus quasi vero ullam quo
-              sed, ipsum possimus impedit eligendi omnis, ipsa iure aliquid
-              quidem veniam eaque recusandae!
+              This page provides an overview of all scheduled events related to
+              the project. You can view the events in a calendar format, see
+              details for each event, and add new events to keep the project
+              timeline up-to-date.
             </CardDescription>
           </CardHeader>
           <CardFooter>
