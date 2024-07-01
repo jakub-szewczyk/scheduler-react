@@ -18,9 +18,15 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { getEvents, getEventsSearchParamsSchema } from '@/services/event'
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { CirclePlus } from 'lucide-react'
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronsLeftIcon,
+  ChevronsRightIcon,
+  CirclePlus,
+} from 'lucide-react'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { useDocumentTitle } from 'usehooks-ts'
 
@@ -48,7 +54,9 @@ function Events() {
 
   /**
    * TODO:
-   * Handle pagination.
+   * Restyle.
+   * Refactor.
+   * Handle loading state.
    */
   const getEventsQuery = useQuery({
     queryKey: [
@@ -65,8 +73,11 @@ function Events() {
         scheduleId: params.scheduleId,
         ...search,
       }),
+    placeholderData: keepPreviousData,
     enabled: !!search.startAt && !!search.endAt,
   })
+
+  const pages = Math.ceil((getEventsQuery.data?.total || 0) / search.size)
 
   return (
     <div className='flex flex-col gap-y-12'>
@@ -158,7 +169,7 @@ function Events() {
         </Card>
       </div>
       <Card>
-        <CardContent className='h-[600px] pt-6'>
+        <CardContent className='h-[600px] pt-6 pb-4'>
           <Calendar
             events={getEventsQuery.data?.content.map((event) => ({
               title: event.title,
@@ -170,13 +181,93 @@ function Events() {
               navigate({
                 search: (search) => ({
                   ...search,
+                  page: 0,
+                  size: 10,
                   startAt: range.start.toISOString(),
                   endAt: range.end.toISOString(),
                 }),
+                replace: true,
               })
             }}
           />
         </CardContent>
+        <CardFooter className='justify-end'>
+          <div className='flex items-center gap-x-2'>
+            <div className='text-sm text-muted-foreground md:hidden'>
+              {search.page + 1}/{pages}
+            </div>
+            <div className='hidden text-sm text-muted-foreground whitespace-nowrap md:block'>
+              Page {search.page + 1} of {pages}
+            </div>
+            <div className='flex items-center gap-x-2'>
+              <Button
+                data-testid='first-page'
+                className='size-8'
+                size='icon'
+                variant='outline'
+                disabled={search.page === 0}
+                onClick={() =>
+                  navigate({
+                    search: (search) => ({ ...search, page: 0 }),
+                    replace: true,
+                  })
+                }
+              >
+                <ChevronsLeftIcon className='size-4' />
+              </Button>
+              <Button
+                data-testid='previous-page'
+                className='size-8'
+                size='icon'
+                variant='outline'
+                disabled={search.page === 0}
+                onClick={() =>
+                  navigate({
+                    search: (search) => ({ ...search, page: search.page! - 1 }),
+                    replace: true,
+                  })
+                }
+              >
+                <ChevronLeftIcon className='size-4' />
+              </Button>
+              <Button
+                data-testid='next-page'
+                className='size-8'
+                size='icon'
+                variant='outline'
+                disabled={search.page + 1 >= pages}
+                onClick={() =>
+                  navigate({
+                    search: (search) => ({ ...search, page: search.page! + 1 }),
+                    replace: true,
+                  })
+                }
+              >
+                <ChevronRightIcon className='size-4' />
+              </Button>
+              <Button
+                data-testid='last-page'
+                className='size-8'
+                size='icon'
+                variant='outline'
+                disabled={search.page + 1 >= pages}
+                onClick={() =>
+                  navigate({
+                    search: (search) => ({
+                      ...search,
+                      page: Math.ceil(
+                        (getEventsQuery.data?.total || 0) / search.size! - 1
+                      ),
+                    }),
+                    replace: true,
+                  })
+                }
+              >
+                <ChevronsRightIcon className='size-4' />
+              </Button>
+            </div>
+          </div>
+        </CardFooter>
       </Card>
     </div>
   )
