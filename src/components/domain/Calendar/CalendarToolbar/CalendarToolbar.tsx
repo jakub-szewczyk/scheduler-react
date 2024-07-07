@@ -14,10 +14,6 @@ const CalendarToolbar = ({
   onNavigate,
   ...props
 }: ToolbarProps) => {
-  useEffect(() => {
-    onView(view)
-  }, [view, onView])
-
   const params = useParams({
     from: '/projects/$projectId/schedules/$scheduleId/events/',
   })
@@ -32,6 +28,10 @@ const CalendarToolbar = ({
         'events',
       ],
     }) > 0
+
+  useEffect(() => {
+    onView(view)
+  }, [view, onView])
 
   return (
     <div className='flex items-center justify-between gap-x-2 mb-4' {...props}>

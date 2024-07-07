@@ -10,6 +10,12 @@ import {
 } from 'react-big-calendar'
 import CalendarToolbar from './CalendarToolbar/CalendarToolbar'
 
+declare module 'react-big-calendar' {
+  interface Event {
+    id: string
+  }
+}
+
 const localizer = dateFnsLocalizer({
   parse,
   format,
@@ -18,6 +24,10 @@ const localizer = dateFnsLocalizer({
   startOfWeek,
 })
 
+/**
+ * TODO:
+ * Improve navigation UX.
+ */
 const Calendar = (props: Omit<CalendarProps, 'localizer'>) => (
   <div className='h-[600px]'>
     <BigCalendar

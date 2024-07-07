@@ -165,6 +165,7 @@ function Events() {
         <CardContent className='pt-6 pb-4'>
           <Calendar
             events={getEventsQuery.data?.content.map((event) => ({
+              id: event.id,
               title: event.title,
               start: new Date(event.startsAt),
               end: new Date(event.endsAt),
@@ -182,6 +183,16 @@ function Events() {
                 replace: true,
               })
             }}
+            onSelectEvent={(event) =>
+              navigate({
+                to: '/projects/$projectId/schedules/$scheduleId/events/$eventId',
+                params: {
+                  projectId: params.projectId,
+                  scheduleId: params.scheduleId,
+                  eventId: event.id,
+                },
+              })
+            }
           />
         </CardContent>
         <CardFooter className='justify-end'>
