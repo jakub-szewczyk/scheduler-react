@@ -52,11 +52,6 @@ function Events() {
 
   const navigate = Route.useNavigate()
 
-  /**
-   * TODO:
-   * Restyle.
-   * Refactor.
-   */
   const getEventsQuery = useQuery({
     queryKey: [
       'projects',
@@ -167,7 +162,7 @@ function Events() {
         </Card>
       </div>
       <Card>
-        <CardContent className='h-[600px] pt-6 pb-4'>
+        <CardContent className='pt-6 pb-4'>
           <Calendar
             events={getEventsQuery.data?.content.map((event) => ({
               title: event.title,

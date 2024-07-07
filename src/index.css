@@ -99,3 +99,32 @@ html > body[data-scroll-locked] {
     opacity: 1;
   }
 }
+
+.rbc-month-view {
+  overflow: hidden;
+  border-radius: 6px;
+}
+
+.rbc-overlay {
+  border-radius: 6px;
+}
+
+.dark .rbc-now {
+  color: #020817;
+}
+
+.dark .rbc-off-range-bg {
+  background-color: hsl(var(--secondary));
+}
+
+.dark .rbc-today {
+  background-color: hsl(var(--muted-foreground));
+}
+
+.dark .rbc-show-more {
+  background-color: transparent;
+}
+
+.dark .rbc-overlay {
+  background-color: hsl(var(--popover));
+}

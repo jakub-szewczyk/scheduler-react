@@ -19,13 +19,15 @@ const localizer = dateFnsLocalizer({
 })
 
 const Calendar = (props: Omit<CalendarProps, 'localizer'>) => (
-  <BigCalendar
-    {...props}
-    popup
-    localizer={localizer}
-    views={{ month: true }}
-    components={{ toolbar: CalendarToolbar }}
-  />
+  <div className='h-[600px]'>
+    <BigCalendar
+      {...props}
+      popup
+      localizer={localizer}
+      views={{ month: true }}
+      components={{ toolbar: CalendarToolbar }}
+    />
+  </div>
 )
 
 export default Calendar

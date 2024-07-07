@@ -45,7 +45,9 @@ const CalendarToolbar = ({
             {format(date, 'yyyy')}
           </span>
         </Heading3>
-        {isFetching && <LoaderCircle className='size-4 animate-spin' />}
+        {isFetching && (
+          <LoaderCircle className='size-4 text-muted-foreground animate-spin' />
+        )}
       </div>
       <div className='flex items-center gap-x-2'>
         <Button size='sm' variant='outline' onClick={() => onNavigate('PREV')}>
