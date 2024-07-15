@@ -686,3 +686,86 @@ test.describe('edit schedule page', () => {
     ).toBeVisible()
   })
 })
+
+test.describe('schedule details page', () => {
+  test('rendering title and description', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(`${VITE_BASE_API_URL}/projects/*/schedules/*`, (route) =>
+      route.fulfill({ json: SUBJECT })
+    )
+    await page.goto(`projects/${SUBJECT.id}/schedules/${SUBJECT.id}`)
+    await expect(
+      page.getByRole('heading', { name: 'Schedule Details' })
+    ).toBeVisible()
+    await expect(page.getByRole('main')).toContainText(
+      'Review the detailed information about the selected schedule, including its creation date, title, and description. Use the options below to edit the schedule or view the calendar to see associated events.'
+    )
+  })
+
+  test('navigating to "Edit Schedule" page', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(`${VITE_BASE_API_URL}/projects/*schedules/*`, (route) =>
+      route.fulfill({ json: SUBJECT })
+    )
+    await page.goto(
+      `${BASE_APP_URL}/projects/${SUBJECT.id}/schedules/${SUBJECT.id}`
+    )
+    await page.getByRole('link', { name: 'Edit Schedule' }).click()
+    await expect(
+      page.getByRole('heading', { name: 'Edit Schedule' })
+    ).toBeVisible()
+    await expect(page.getByRole('main')).toContainText(
+      'Modify your existing schedule by updating the title and description. Adjust the title to reflect any changes in focus and use the description to detail revised key events and timelines. Once your updates are complete, submit the form to keep your schedule current.'
+    )
+  })
+
+  test('rendering schedule details', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(`${VITE_BASE_API_URL}/projects/*/schedules/*`, (route) =>
+      route.fulfill({ json: SUBJECT })
+    )
+    await page.goto(
+      `${BASE_APP_URL}/projects/${SUBJECT.id}/schedules/${SUBJECT.id}`
+    )
+    await expect(page.getByText('Created at')).toBeVisible()
+    await expect(page.getByText('August 7,')).toBeVisible()
+    await expect(page.getByText('Title', { exact: true })).toBeVisible()
+    await expect(page.getByText('alii-spiculum-spectaculum')).toBeVisible()
+    await expect(page.getByText('Description', { exact: true })).toBeVisible()
+    await expect(
+      page.getByText(
+        'Custodia curiositas tantum iusto. Undique cras suscipio alo cerno cattus apostolus omnis adsidue. Cogito depopulo cedo degenero defleo esse. Decimus sub ulterius ciminatio damno crastinus tres attollo. Tertius aiunt adstringo solutio subiungo beatae tergo. Tergiversatio stabilis caveo atrox corrumpo aegrus odio absque certe.'
+      )
+    ).toBeVisible()
+  })
+
+  test('navigating to "Events" page', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: BASE_APP_URL },
+    })
+    await page.route(
+      `${VITE_BASE_API_URL}/projects/*/schedules/*/events*`,
+      (route) => route.fulfill({ json: EMPTY_PAGINABLE_RESPONSE })
+    )
+    await page.route(`${VITE_BASE_API_URL}/projects/*/schedules/*`, (route) =>
+      route.fulfill({ json: SUBJECT })
+    )
+    await page.goto(
+      `${BASE_APP_URL}/projects/${SUBJECT.id}/schedules/${SUBJECT.id}`
+    )
+    await page.getByRole('link', { name: 'See the Calendar' }).click()
+    expect(page.url()).toMatch(
+      `${BASE_APP_URL}/projects/${SUBJECT.id}/schedules/${SUBJECT.id}/events`
+    )
+  })
+})
