@@ -24,10 +24,6 @@ const localizer = dateFnsLocalizer({
   startOfWeek,
 })
 
-/**
- * TODO:
- * Improve navigation UX.
- */
 const Calendar = (props: Omit<CalendarProps, 'localizer'>) => (
   <div className='h-[600px]'>
     <BigCalendar

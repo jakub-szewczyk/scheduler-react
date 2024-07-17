@@ -1,7 +1,7 @@
 import Heading3 from '@/components/typography/Heading3/Heading3'
 import { Button } from '@/components/ui/button'
 import { useIsFetching } from '@tanstack/react-query'
-import { useParams } from '@tanstack/react-router'
+import { useParams, useSearch } from '@tanstack/react-router'
 import { addMonths, format, subMonths } from 'date-fns'
 import { ChevronLeft, ChevronRight, LoaderCircle } from 'lucide-react'
 import { useEffect } from 'react'
@@ -18,6 +18,10 @@ const CalendarToolbar = ({
     from: '/projects/$projectId/schedules/$scheduleId/events/',
   })
 
+  const search = useSearch({
+    from: '/projects/$projectId/schedules/$scheduleId/events/',
+  })
+
   const isFetching =
     useIsFetching({
       queryKey: [
@@ -30,8 +34,9 @@ const CalendarToolbar = ({
     }) > 0
 
   useEffect(() => {
+    if (search.startAt && search.endAt) return
     onView(view)
-  }, [view, onView])
+  }, [search.startAt, search.endAt, view, onView])
 
   return (
     <div className='flex items-center justify-between gap-x-2 mb-4' {...props}>

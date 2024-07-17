@@ -17,6 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { calendarDefaultDate } from '@/modules/events'
 import { getEvents, getEventsSearchParamsSchema } from '@/services/event'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
@@ -164,6 +165,11 @@ function Events() {
       <Card>
         <CardContent className='pt-6 pb-4'>
           <Calendar
+            defaultDate={
+              search.startAt && search.endAt
+                ? calendarDefaultDate(search.startAt, search.endAt)
+                : new Date()
+            }
             events={getEventsQuery.data?.content.map((event) => ({
               id: event.id,
               title: event.title,

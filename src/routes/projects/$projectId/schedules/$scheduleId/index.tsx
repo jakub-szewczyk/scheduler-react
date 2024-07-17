@@ -145,7 +145,6 @@ function ScheduleDetails() {
           </CardFooter>
         </Card>
       </div>
-
       <Tabs defaultValue='details'>
         <TabsList>
           <TabsTrigger className='gap-x-2' value='details'>
