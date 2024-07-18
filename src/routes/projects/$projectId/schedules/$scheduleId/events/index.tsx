@@ -190,16 +190,17 @@ function Events() {
                 replace: true,
               })
             }}
-            onSelectEvent={(event) =>
-              navigate({
-                to: '/projects/$projectId/schedules/$scheduleId/events/$eventId',
-                params: {
-                  projectId: params.projectId,
-                  scheduleId: params.scheduleId,
-                  eventId: event.id,
-                },
-              })
-            }
+            // TODO: Handle navigation
+            // onSelectEvent={(event) =>
+            //   navigate({
+            //     to: '/projects/$projectId/schedules/$scheduleId/events/$eventId',
+            //     params: {
+            //       projectId: params.projectId,
+            //       scheduleId: params.scheduleId,
+            //       eventId: event.id,
+            //     },
+            //   })
+            // }
             onShowMore={console.log}
           />
         </CardContent>

@@ -42,8 +42,8 @@ function Root() {
           />
           <main
             className={cn(
-              'w-[calc(100vw-3.5rem)] min-h-[calc(100vh-3rem)] mt-12 ml-14 p-4 transition-all duration-200 sm:p-6',
-              !isSidebarCollapsed && 'w-[calc(100vw-13rem)] ml-52'
+              'ml-14 mt-12 min-h-[calc(100vh-3rem)] w-[calc(100vw-3.5rem)] p-4 transition-all duration-200 sm:p-6',
+              !isSidebarCollapsed && 'ml-52 w-[calc(100vw-13rem)]'
             )}
           >
             <Outlet />
@@ -51,7 +51,7 @@ function Root() {
         </div>
       </SignedIn>
       <SignedOut>
-        <main className='flex items-center justify-center h-screen p-4 sm:p-6'>
+        <main className='flex h-screen items-center justify-center p-4 sm:p-6'>
           <Outlet />
         </main>
       </SignedOut>
