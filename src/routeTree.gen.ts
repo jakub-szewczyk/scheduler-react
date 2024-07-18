@@ -110,7 +110,7 @@ const ProjectsProjectIdBoardsNewRoute = ProjectsProjectIdBoardsNewImport.update(
   {
     path: '/projects/$projectId/boards/new',
     getParentRoute: () => rootRoute,
-  } as any
+  } as any,
 )
 
 const ProjectsProjectIdSchedulesScheduleIdIndexRoute =

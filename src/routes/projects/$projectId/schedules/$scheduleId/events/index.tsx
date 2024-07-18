@@ -163,8 +163,9 @@ function Events() {
         </Card>
       </div>
       <Card>
-        <CardContent className='pt-6 pb-4'>
+        <CardContent className='pb-4 pt-6'>
           <Calendar
+            doShowMoreDrillDown={false}
             defaultDate={
               search.startAt && search.endAt
                 ? calendarDefaultDate(search.startAt, search.endAt)
@@ -199,6 +200,7 @@ function Events() {
                 },
               })
             }
+            onShowMore={console.log}
           />
         </CardContent>
         <CardFooter className='justify-end'>
@@ -206,7 +208,7 @@ function Events() {
             <div className='text-sm text-muted-foreground md:hidden'>
               {search.page + 1}/{pages}
             </div>
-            <div className='hidden text-sm text-muted-foreground whitespace-nowrap md:block'>
+            <div className='hidden whitespace-nowrap text-sm text-muted-foreground md:block'>
               Page {search.page + 1} of {pages}
             </div>
             <div className='flex items-center gap-x-2'>

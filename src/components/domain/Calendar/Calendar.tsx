@@ -8,6 +8,7 @@ import {
   CalendarProps,
   dateFnsLocalizer,
 } from 'react-big-calendar'
+import CalendarEvent from './CalendarEvent/CalendarEvent'
 import CalendarToolbar from './CalendarToolbar/CalendarToolbar'
 
 declare module 'react-big-calendar' {
@@ -25,13 +26,12 @@ const localizer = dateFnsLocalizer({
 })
 
 const Calendar = (props: Omit<CalendarProps, 'localizer'>) => (
-  <div className='h-[600px]'>
+  <div className='h-[600px] [&_.rbc-show-more]:!text-teal-600'>
     <BigCalendar
       {...props}
-      popup
       localizer={localizer}
       views={{ month: true }}
-      components={{ toolbar: CalendarToolbar }}
+      components={{ event: CalendarEvent, toolbar: CalendarToolbar }}
     />
   </div>
 )

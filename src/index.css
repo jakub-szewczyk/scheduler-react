@@ -81,12 +81,12 @@ body {
   overflow-x: hidden;
 }
 
-html.light > body > #root,
-html.dark > body > #root {
+html.light>body>#root,
+html.dark>body>#root {
   background-color: hsl(var(--muted) / 0.4);
 }
 
-html > body[data-scroll-locked] {
+html>body[data-scroll-locked] {
   margin-right: 0 !important;
 }
 
@@ -100,13 +100,18 @@ html > body[data-scroll-locked] {
   }
 }
 
-.rbc-month-view {
-  overflow: hidden;
-  border-radius: 6px;
+.rbc-event {
+  padding: 0 !important;
+  background-color: transparent !important;
 }
 
-.rbc-overlay {
-  border-radius: 6px;
+.rbc-month-view {
+  overflow: hidden;
+  border-radius: var(--radius);
+}
+
+.rbc-show-more {
+  color: hsl(var(--muted-foreground)) !important;
 }
 
 .dark .rbc-now {
@@ -123,8 +128,4 @@ html > body[data-scroll-locked] {
 
 .dark .rbc-show-more {
   background-color: transparent;
-}
-
-.dark .rbc-overlay {
-  background-color: hsl(var(--popover));
 }
