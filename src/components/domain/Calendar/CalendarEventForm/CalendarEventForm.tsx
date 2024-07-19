@@ -26,13 +26,17 @@ import { CalendarIcon, LoaderCircle, Send } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-// TODO: Improve date & time validation
-const formSchema = z.object({
-  title: z.string().min(1, 'This field is required').default(''),
-  description: z.string().default(''),
-  startsAt: z.date({ message: 'This field is required' }),
-  endsAt: z.date({ message: 'This field is required' }),
-})
+const formSchema = z
+  .object({
+    title: z.string().min(1, 'This field is required').default(''),
+    description: z.string().default(''),
+    startsAt: z.date({ message: 'This field is required' }),
+    endsAt: z.date({ message: 'This field is required' }),
+  })
+  .refine((schema) => schema.startsAt.getTime() <= schema.endsAt.getTime(), {
+    path: ['endsAt'],
+    message: 'The end date cannot precede the start date',
+  })
 
 type Inputs = z.infer<typeof formSchema>
 
@@ -57,6 +61,9 @@ const CalendarEventForm = ({
     values,
     resolver: zodResolver(formSchema),
   })
+
+  const startsAt = form.watch('startsAt')
+  const endsAt = form.watch('endsAt')
 
   const router = useRouter()
 
@@ -151,6 +158,10 @@ const CalendarEventForm = ({
                     <Calendar
                       initialFocus
                       mode='single'
+                      disabled={{
+                        before: new Date(),
+                        ...(endsAt && { after: endsAt }),
+                      }}
                       selected={field.value}
                       onSelect={field.onChange}
                     />
@@ -198,6 +209,9 @@ const CalendarEventForm = ({
                     <Calendar
                       initialFocus
                       mode='single'
+                      disabled={{
+                        before: startsAt || new Date(),
+                      }}
                       selected={field.value}
                       onSelect={field.onChange}
                     />
