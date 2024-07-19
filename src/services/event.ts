@@ -35,3 +35,39 @@ export const getEvents = ({
       params,
     }
   ).then(({ data }) => data)
+
+// GET /projects/:projectId/schedules/:scheduleId/events/:eventId
+type GetEventPathParams = {
+  projectId: Project['id']
+  scheduleId: Schedule['id']
+  eventId: Event['id']
+}
+
+export const getEvent = ({
+  projectId,
+  scheduleId,
+  eventId,
+}: GetEventPathParams) =>
+  api<Event>(
+    `/projects/${projectId}/schedules/${scheduleId}/events/${eventId}`
+  ).then(({ data }) => data)
+
+// POST /projects/:projectId/schedules/events
+type CreateEventPathParams = {
+  projectId: Project['id']
+  scheduleId: Schedule['id']
+}
+
+type CreateEventRequestBody = Pick<
+  Event,
+  'title' | 'description' | 'startsAt' | 'endsAt'
+>
+
+export const createEvent = ({
+  projectId,
+  scheduleId,
+  ...data
+}: CreateEventPathParams & CreateEventRequestBody) =>
+  api
+    .post<Event>(`projects/${projectId}/schedules/${scheduleId}/events`, data)
+    .then(({ data }) => data)
