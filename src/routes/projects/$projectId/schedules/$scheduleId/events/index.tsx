@@ -165,7 +165,6 @@ function Events() {
       <Card>
         <CardContent className='pb-4 pt-6'>
           <Calendar
-            doShowMoreDrillDown={false}
             defaultDate={
               search.startAt && search.endAt
                 ? calendarDefaultDate(search.startAt, search.endAt)
@@ -201,7 +200,6 @@ function Events() {
             //     },
             //   })
             // }
-            onShowMore={console.log}
           />
         </CardContent>
         <CardFooter className='justify-end'>
