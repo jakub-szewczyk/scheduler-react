@@ -21,7 +21,7 @@ import { TimePicker } from '@/components/ui/time-picker'
 import { cn } from '@/modules/common'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from '@tanstack/react-router'
-import { format } from 'date-fns'
+import { endOfDay, format } from 'date-fns'
 import { CalendarIcon, LoaderCircle, Send } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -213,10 +213,15 @@ const CalendarEventForm = ({
                         before: startsAt || new Date(),
                       }}
                       selected={field.value}
-                      onSelect={field.onChange}
+                      onSelect={(day, ...args) =>
+                        field.onChange(day ? endOfDay(day) : day, ...args)
+                      }
                     />
                     <div className='border-t border-border p-3'>
-                      <TimePicker date={field.value} setDate={field.onChange} />
+                      <TimePicker
+                        date={field.value || endOfDay(new Date())}
+                        setDate={field.onChange}
+                      />
                     </div>
                   </PopoverContent>
                 </Popover>

@@ -41,7 +41,6 @@ const Calendar = (props: Omit<CalendarProps, 'localizer'>) => {
         localizer={localizer}
         views={{ month: true }}
         doShowMoreDrillDown={false}
-        endAccessor={(event) => new Date(event.end!.getTime() + 1)}
         components={{ event: CalendarEvent, toolbar: CalendarToolbar }}
         messages={{
           // @ts-expect-error: should accept JSX.Element

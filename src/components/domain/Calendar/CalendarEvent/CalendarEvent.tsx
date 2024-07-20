@@ -15,7 +15,7 @@ const CalendarEvent = ({ title, event }: EventProps) => (
         className='h-7 w-full justify-start bg-teal-600 text-teal-950 hover:bg-teal-600/90'
         size='sm'
       >
-        {title}
+        <span className='truncate'>{title}</span>
       </Button>
     </PopoverTrigger>
     {event.start && event.end && (
@@ -45,7 +45,7 @@ const CalendarEvent = ({ title, event }: EventProps) => (
                   <Clock className='size-4' />
                 </dt>
                 <dd>
-                  {format(event.start, 'kk:mm')} - {format(event.end, 'kk:mm')}
+                  {format(event.start, 'HH:mm')} - {format(event.end, 'HH:mm')}
                 </dd>
               </div>
             </div>
@@ -56,8 +56,8 @@ const CalendarEvent = ({ title, event }: EventProps) => (
                   <CalendarClock className='size-4' />
                 </dt>
                 <dd>
-                  {format(event.start, 'E d MMM kk:mm')} -{' '}
-                  {format(event.end, 'E d MMM kk:mm')}
+                  {format(event.start, 'E d MMM HH:mm')} -{' '}
+                  {format(event.end, 'E d MMM HH:mm')}
                 </dd>
               </div>
             </>
