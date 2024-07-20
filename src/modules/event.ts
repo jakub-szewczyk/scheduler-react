@@ -1,3 +1,4 @@
+import { Event } from '@/types/event'
 import {
   addMonths,
   differenceInMonths,
@@ -6,6 +7,15 @@ import {
   startOfMonth,
 } from 'date-fns'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
+
+export const COLORS = ['BLUE', 'ORANGE', 'PURPLE', 'TEAL'] as const
+
+export const COLOR_VARIANTS: { [key in Event['color']]: string } = {
+  BLUE: 'bg-blue-200 text-blue-600 hover:bg-blue-200/90',
+  ORANGE: 'bg-orange-200 text-orange-600 hover:bg-orange-200/90',
+  PURPLE: 'bg-purple-200 text-purple-600 hover:bg-purple-200/90',
+  TEAL: 'bg-teal-200 text-teal-600 hover:bg-teal-200/90',
+}
 
 const monthsGap = (
   start: string | number | Date,

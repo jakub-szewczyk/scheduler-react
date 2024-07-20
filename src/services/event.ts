@@ -22,7 +22,7 @@ type GetEventsPathParams = {
   scheduleId: Schedule['id']
 }
 
-type GetEventsResponseBody = PaginableResponse<Event>
+export type GetEventsResponseBody = PaginableResponse<Event>
 
 export const getEvents = ({
   projectId,
@@ -60,7 +60,7 @@ type CreateEventPathParams = {
 
 type CreateEventRequestBody = Pick<
   Event,
-  'title' | 'description' | 'startsAt' | 'endsAt'
+  'title' | 'description' | 'startsAt' | 'endsAt' | 'color'
 >
 
 export const createEvent = ({

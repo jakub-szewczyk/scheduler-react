@@ -35,7 +35,7 @@ const Calendar = (props: Omit<CalendarProps, 'localizer'>) => {
   const [events, setEvents] = useState<Event[]>([])
 
   return (
-    <div className='h-[600px] [&_.rbc-show-more]:!text-teal-600'>
+    <div className='h-[600px]'>
       <BigCalendar
         {...props}
         localizer={localizer}

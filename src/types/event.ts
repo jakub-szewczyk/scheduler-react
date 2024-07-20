@@ -1,3 +1,4 @@
+import { COLORS } from '@/modules/event'
 import { z } from 'zod'
 
 export const eventSchema = z.object({
@@ -7,6 +8,7 @@ export const eventSchema = z.object({
   description: z.string().nullable(),
   startsAt: z.string().datetime(),
   endsAt: z.string().datetime(),
+  color: z.enum(COLORS),
 })
 
 export type Event = z.infer<typeof eventSchema>

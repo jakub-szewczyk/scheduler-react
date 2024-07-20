@@ -17,7 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { calendarDefaultDate } from '@/modules/events'
+import { calendarDefaultDate } from '@/modules/event'
 import { getEvents, getEventsSearchParamsSchema } from '@/services/event'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'

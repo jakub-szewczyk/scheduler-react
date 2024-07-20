@@ -172,6 +172,7 @@ function NewEvent() {
                   scheduleId: params.scheduleId,
                   startsAt: inputs.startsAt.toISOString(),
                   endsAt: inputs.endsAt.toISOString(),
+                  color: inputs.color,
                 })
               }
             />

@@ -15,10 +15,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { TimePicker } from '@/components/ui/time-picker'
 import { cn } from '@/modules/common'
+import { COLORS } from '@/modules/event'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from '@tanstack/react-router'
 import { endOfDay, format } from 'date-fns'
@@ -32,6 +34,11 @@ const formSchema = z
     description: z.string().default(''),
     startsAt: z.date({ message: 'This field is required' }),
     endsAt: z.date({ message: 'This field is required' }),
+    color: z
+      .enum(COLORS, {
+        required_error: 'This field is required',
+      })
+      .default('BLUE'),
   })
   .refine((schema) => schema.startsAt.getTime() <= schema.endsAt.getTime(), {
     path: ['endsAt'],
@@ -230,6 +237,62 @@ const CalendarEventForm = ({
             )}
           />
         </div>
+        <FormField
+          control={form.control}
+          name='color'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Color <span className='text-destructive'>*</span>
+              </FormLabel>
+              <FormControl>
+                <RadioGroup
+                  defaultValue={field.value || 'BLUE'}
+                  onValueChange={field.onChange}
+                >
+                  {/* TODO: Extract to component */}
+                  <FormItem>
+                    <FormLabel className='flex w-fit items-center gap-x-2 rounded-full border px-3 py-2 font-normal'>
+                      <FormControl>
+                        <RadioGroupItem value='BLUE' />
+                      </FormControl>
+                      <div className='size-5 rounded-full bg-blue-400' />
+                    </FormLabel>
+                  </FormItem>
+                  <FormItem>
+                    <FormLabel className='flex w-fit items-center gap-x-2 rounded-full border px-3 py-2 font-normal'>
+                      <FormControl>
+                        <RadioGroupItem value='ORANGE' />
+                      </FormControl>
+                      <div className='size-5 rounded-full bg-orange-400' />
+                    </FormLabel>
+                  </FormItem>
+                  <FormItem>
+                    <FormLabel className='flex w-fit items-center gap-x-2 rounded-full border px-3 py-2 font-normal'>
+                      <FormControl>
+                        <RadioGroupItem value='PURPLE' />
+                      </FormControl>
+                      <div className='size-5 rounded-full bg-purple-400' />
+                    </FormLabel>
+                  </FormItem>
+                  <FormItem>
+                    <FormLabel className='flex w-fit items-center gap-x-2 rounded-full border px-3 py-2 font-normal'>
+                      <FormControl>
+                        <RadioGroupItem value='TEAL' />
+                      </FormControl>
+                      <div className='size-5 rounded-full bg-teal-400' />
+                    </FormLabel>
+                  </FormItem>
+                </RadioGroup>
+              </FormControl>
+              <FormDescription>
+                Select the right color to easily distinguish various events on
+                your calendar
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <div className='flex gap-x-2'>
           <Button
             className='flex gap-x-2 sm:w-fit'
