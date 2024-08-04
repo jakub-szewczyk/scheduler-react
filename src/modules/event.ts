@@ -1,4 +1,4 @@
-import { Event } from '@/types/event'
+import { ColorClasses } from '@/types/event'
 import {
   addMonths,
   differenceInMonths,
@@ -10,7 +10,14 @@ import 'react-big-calendar/lib/css/react-big-calendar.css'
 
 export const COLORS = ['BLUE', 'ORANGE', 'PURPLE', 'TEAL'] as const
 
-export const COLOR_VARIANTS: { [key in Event['color']]: string } = {
+export const COLOR_CLASSES: ColorClasses = {
+  BLUE: 'bg-blue-400',
+  ORANGE: 'bg-orange-400',
+  PURPLE: 'bg-purple-400',
+  TEAL: 'bg-teal-400',
+}
+
+export const MUTED_COLOR_CLASSES: ColorClasses = {
   BLUE: 'bg-blue-200 text-blue-600 hover:bg-blue-200/90',
   ORANGE: 'bg-orange-200 text-orange-600 hover:bg-orange-200/90',
   PURPLE: 'bg-purple-200 text-purple-600 hover:bg-purple-200/90',

@@ -20,7 +20,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { TimePicker } from '@/components/ui/time-picker'
 import { cn } from '@/modules/common'
-import { COLORS } from '@/modules/event'
+import { COLORS, COLOR_CLASSES } from '@/modules/event'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from '@tanstack/react-router'
 import { endOfDay, format } from 'date-fns'
@@ -250,39 +250,21 @@ const CalendarEventForm = ({
                   defaultValue={field.value || 'BLUE'}
                   onValueChange={field.onChange}
                 >
-                  {/* TODO: Extract to component */}
-                  <FormItem>
-                    <FormLabel className='flex w-fit items-center gap-x-2 rounded-full border px-3 py-2 font-normal'>
-                      <FormControl>
-                        <RadioGroupItem value='BLUE' />
-                      </FormControl>
-                      <div className='size-5 rounded-full bg-blue-400' />
-                    </FormLabel>
-                  </FormItem>
-                  <FormItem>
-                    <FormLabel className='flex w-fit items-center gap-x-2 rounded-full border px-3 py-2 font-normal'>
-                      <FormControl>
-                        <RadioGroupItem value='ORANGE' />
-                      </FormControl>
-                      <div className='size-5 rounded-full bg-orange-400' />
-                    </FormLabel>
-                  </FormItem>
-                  <FormItem>
-                    <FormLabel className='flex w-fit items-center gap-x-2 rounded-full border px-3 py-2 font-normal'>
-                      <FormControl>
-                        <RadioGroupItem value='PURPLE' />
-                      </FormControl>
-                      <div className='size-5 rounded-full bg-purple-400' />
-                    </FormLabel>
-                  </FormItem>
-                  <FormItem>
-                    <FormLabel className='flex w-fit items-center gap-x-2 rounded-full border px-3 py-2 font-normal'>
-                      <FormControl>
-                        <RadioGroupItem value='TEAL' />
-                      </FormControl>
-                      <div className='size-5 rounded-full bg-teal-400' />
-                    </FormLabel>
-                  </FormItem>
+                  {COLORS.map((color) => (
+                    <FormItem key={color}>
+                      <FormLabel className='flex w-fit items-center gap-x-2 rounded-full border px-3 py-2 font-normal'>
+                        <FormControl>
+                          <RadioGroupItem value={color} />
+                        </FormControl>
+                        <div
+                          className={cn(
+                            'size-5 rounded-full',
+                            COLOR_CLASSES[color]
+                          )}
+                        />
+                      </FormLabel>
+                    </FormItem>
+                  ))}
                 </RadioGroup>
               </FormControl>
               <FormDescription>

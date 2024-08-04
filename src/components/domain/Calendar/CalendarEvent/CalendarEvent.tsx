@@ -5,7 +5,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { cn } from '@/modules/common'
-import { COLOR_VARIANTS } from '@/modules/event'
+import { MUTED_COLOR_CLASSES } from '@/modules/event'
 import { GetEventsResponseBody } from '@/services/event'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams, useSearch } from '@tanstack/react-router'
@@ -39,7 +39,7 @@ const CalendarEvent = ({ title, event }: EventProps) => {
     <Popover>
       <PopoverTrigger asChild>
         <Button
-          className={cn('h-7 w-full justify-start', COLOR_VARIANTS[color])}
+          className={cn('h-7 w-full justify-start', MUTED_COLOR_CLASSES[color])}
           size='sm'
         >
           <span className='truncate'>{title}</span>

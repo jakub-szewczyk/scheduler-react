@@ -12,3 +12,5 @@ export const eventSchema = z.object({
 })
 
 export type Event = z.infer<typeof eventSchema>
+
+export type ColorClasses = { [key in (typeof COLORS)[number]]: string }
