@@ -150,6 +150,7 @@ const CalendarEventForm = ({
                             !field.value && 'text-muted-foreground'
                           )}
                           variant='outline'
+                          disabled={isFetching && !isPlaceholderData}
                         >
                           <CalendarIcon className='mr-2 size-4 flex-shrink-0' />
                           {field.value ? (
@@ -201,6 +202,7 @@ const CalendarEventForm = ({
                             !field.value && 'text-muted-foreground'
                           )}
                           variant='outline'
+                          disabled={isFetching && !isPlaceholderData}
                         >
                           <CalendarIcon className='mr-2 size-4 flex-shrink-0' />
                           {field.value ? (
@@ -247,14 +249,17 @@ const CalendarEventForm = ({
               </FormLabel>
               <FormControl>
                 <RadioGroup
-                  defaultValue={field.value || 'BLUE'}
+                  value={isLoading ? undefined : field.value || 'BLUE'}
                   onValueChange={field.onChange}
                 >
                   {COLORS.map((color) => (
                     <FormItem key={color}>
                       <FormLabel className='flex w-fit items-center gap-x-2 rounded-full border px-3 py-2 font-normal'>
                         <FormControl>
-                          <RadioGroupItem value={color} />
+                          <RadioGroupItem
+                            value={color}
+                            disabled={isFetching && !isPlaceholderData}
+                          />
                         </FormControl>
                         <div
                           className={cn(
