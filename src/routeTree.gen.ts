@@ -33,7 +33,7 @@ import { Route as ProjectsProjectIdNotesNoteIdEditImport } from './routes/projec
 import { Route as ProjectsProjectIdBoardsBoardIdEditImport } from './routes/projects/$projectId/boards/$boardId/edit'
 import { Route as ProjectsProjectIdSchedulesScheduleIdEventsIndexImport } from './routes/projects/$projectId/schedules/$scheduleId/events/index'
 import { Route as ProjectsProjectIdSchedulesScheduleIdEventsNewImport } from './routes/projects/$projectId/schedules/$scheduleId/events/new'
-import { Route as ProjectsProjectIdSchedulesScheduleIdEventsEventIdIndexImport } from './routes/projects/$projectId/schedules/$scheduleId/events/$eventId/index'
+import { Route as ProjectsProjectIdSchedulesScheduleIdEventsEventIdEditImport } from './routes/projects/$projectId/schedules/$scheduleId/events/$eventId/edit'
 
 // Create/Update Routes
 
@@ -110,7 +110,7 @@ const ProjectsProjectIdBoardsNewRoute = ProjectsProjectIdBoardsNewImport.update(
   {
     path: '/projects/$projectId/boards/new',
     getParentRoute: () => rootRoute,
-  } as any,
+  } as any
 )
 
 const ProjectsProjectIdSchedulesScheduleIdIndexRoute =
@@ -161,9 +161,9 @@ const ProjectsProjectIdSchedulesScheduleIdEventsNewRoute =
     getParentRoute: () => rootRoute,
   } as any)
 
-const ProjectsProjectIdSchedulesScheduleIdEventsEventIdIndexRoute =
-  ProjectsProjectIdSchedulesScheduleIdEventsEventIdIndexImport.update({
-    path: '/projects/$projectId/schedules/$scheduleId/events/$eventId/',
+const ProjectsProjectIdSchedulesScheduleIdEventsEventIdEditRoute =
+  ProjectsProjectIdSchedulesScheduleIdEventsEventIdEditImport.update({
+    path: '/projects/$projectId/schedules/$scheduleId/events/$eventId/edit',
     getParentRoute: () => rootRoute,
   } as any)
 
@@ -325,11 +325,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsProjectIdSchedulesScheduleIdEventsIndexImport
       parentRoute: typeof rootRoute
     }
-    '/projects/$projectId/schedules/$scheduleId/events/$eventId/': {
-      id: '/projects/$projectId/schedules/$scheduleId/events/$eventId/'
-      path: '/projects/$projectId/schedules/$scheduleId/events/$eventId'
-      fullPath: '/projects/$projectId/schedules/$scheduleId/events/$eventId'
-      preLoaderRoute: typeof ProjectsProjectIdSchedulesScheduleIdEventsEventIdIndexImport
+    '/projects/$projectId/schedules/$scheduleId/events/$eventId/edit': {
+      id: '/projects/$projectId/schedules/$scheduleId/events/$eventId/edit'
+      path: '/projects/$projectId/schedules/$scheduleId/events/$eventId/edit'
+      fullPath: '/projects/$projectId/schedules/$scheduleId/events/$eventId/edit'
+      preLoaderRoute: typeof ProjectsProjectIdSchedulesScheduleIdEventsEventIdEditImport
       parentRoute: typeof rootRoute
     }
   }
@@ -360,7 +360,7 @@ export const routeTree = rootRoute.addChildren({
   ProjectsProjectIdSchedulesScheduleIdIndexRoute,
   ProjectsProjectIdSchedulesScheduleIdEventsNewRoute,
   ProjectsProjectIdSchedulesScheduleIdEventsIndexRoute,
-  ProjectsProjectIdSchedulesScheduleIdEventsEventIdIndexRoute,
+  ProjectsProjectIdSchedulesScheduleIdEventsEventIdEditRoute,
 })
 
 /* prettier-ignore-end */
@@ -393,7 +393,7 @@ export const routeTree = rootRoute.addChildren({
         "/projects/$projectId/schedules/$scheduleId/",
         "/projects/$projectId/schedules/$scheduleId/events/new",
         "/projects/$projectId/schedules/$scheduleId/events/",
-        "/projects/$projectId/schedules/$scheduleId/events/$eventId/"
+        "/projects/$projectId/schedules/$scheduleId/events/$eventId/edit"
       ]
     },
     "/": {
@@ -462,8 +462,8 @@ export const routeTree = rootRoute.addChildren({
     "/projects/$projectId/schedules/$scheduleId/events/": {
       "filePath": "projects/$projectId/schedules/$scheduleId/events/index.tsx"
     },
-    "/projects/$projectId/schedules/$scheduleId/events/$eventId/": {
-      "filePath": "projects/$projectId/schedules/$scheduleId/events/$eventId/index.tsx"
+    "/projects/$projectId/schedules/$scheduleId/events/$eventId/edit": {
+      "filePath": "projects/$projectId/schedules/$scheduleId/events/$eventId/edit.tsx"
     }
   }
 }

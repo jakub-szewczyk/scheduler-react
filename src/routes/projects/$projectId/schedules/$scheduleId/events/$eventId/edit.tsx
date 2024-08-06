@@ -16,24 +16,24 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { useToast } from '@/components/ui/use-toast'
-import { createEvent } from '@/services/event'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { getEvent, updateEvent } from '@/services/event'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { useDocumentTitle } from 'usehooks-ts'
 
-const pageTitle = 'New Event'
+const pageTitle = 'Edit Event'
 
 export const Route = createFileRoute(
-  '/projects/$projectId/schedules/$scheduleId/events/new'
+  '/projects/$projectId/schedules/$scheduleId/events/$eventId/edit'
 )({
   component: () => (
     <Protected>
-      <NewEvent />
+      <EditEvent />
     </Protected>
   ),
 })
 
-function NewEvent() {
+function EditEvent() {
   useDocumentTitle(`Scheduler - ${pageTitle}`)
 
   const params = Route.useParams()
@@ -44,8 +44,25 @@ function NewEvent() {
 
   const queryClient = useQueryClient()
 
-  const createEventMutation = useMutation({
-    mutationFn: createEvent,
+  const getEventQuery = useQuery({
+    queryKey: [
+      'projects',
+      params.projectId,
+      'schedules',
+      params.scheduleId,
+      'events',
+      params.eventId,
+    ],
+    queryFn: () =>
+      getEvent({
+        projectId: params.projectId,
+        scheduleId: params.scheduleId,
+        eventId: params.eventId,
+      }),
+  })
+
+  const updateEventMutation = useMutation({
+    mutationFn: updateEvent,
     onSuccess: (event) => {
       queryClient.invalidateQueries({
         queryKey: [
@@ -65,8 +82,8 @@ function NewEvent() {
         search: { page: 0, size: 0, title: '', createdAt: 'DESC' },
       })
       toast({
-        title: 'Event created',
-        description: `${event.title} has been successfully created`,
+        title: 'Event updated',
+        description: `${event.title} has been successfully updated`,
       })
     },
     onError: (error) =>
@@ -154,23 +171,38 @@ function NewEvent() {
           <CardHeader>
             <CardTitle>{pageTitle}</CardTitle>
             <CardDescription>
-              Create a new event by entering a title, description, start date,
-              end date and choosing a color. Choose a title that succinctly
-              describes the event and use the description to provide key details
-              and objectives. Set the start date and end date to define the
-              duration of the event. Select a color to categorize your event
-              visually. Once you're done, submit the form to add your event to
-              the calendar and keep your timeline organized.
+              Edit your event by updating the title, description, start date,
+              end date and choosing a new color if necessary. Ensure the title
+              succinctly describes the event, and use the description to provide
+              key details and objectives. Adjust the start date and end date to
+              redefine the duration of the event as needed. Select a color to
+              categorize your event visually. Once you're done, submit the form
+              to save your changes and keep your calendar up to date.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <CalendarEventForm
-              isPending={createEventMutation.isPending}
+              isLoading={getEventQuery.isLoading}
+              isFetching={getEventQuery.isFetching}
+              isPlaceholderData={getEventQuery.isPlaceholderData}
+              isPending={updateEventMutation.isPending}
+              values={
+                getEventQuery.data
+                  ? {
+                      title: getEventQuery.data.title,
+                      description: getEventQuery.data.description || '',
+                      startsAt: new Date(getEventQuery.data.startsAt),
+                      endsAt: new Date(getEventQuery.data.endsAt),
+                      color: getEventQuery.data.color,
+                    }
+                  : undefined
+              }
               onSubmit={(inputs) =>
-                createEventMutation.mutate({
+                updateEventMutation.mutate({
                   ...inputs,
                   projectId: params.projectId,
                   scheduleId: params.scheduleId,
+                  eventId: params.eventId,
                   startsAt: inputs.startsAt.toISOString(),
                   endsAt: inputs.endsAt.toISOString(),
                 })
@@ -182,3 +214,5 @@ function NewEvent() {
     </div>
   )
 }
+
+export default EditEvent

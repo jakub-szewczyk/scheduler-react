@@ -189,17 +189,6 @@ function Events() {
                 replace: true,
               })
             }}
-            // TODO: Handle navigation
-            // onSelectEvent={(event) =>
-            //   navigate({
-            //     to: '/projects/$projectId/schedules/$scheduleId/events/$eventId',
-            //     params: {
-            //       projectId: params.projectId,
-            //       scheduleId: params.scheduleId,
-            //       eventId: event.id,
-            //     },
-            //   })
-            // }
           />
         </CardContent>
         <CardFooter className='justify-end'>

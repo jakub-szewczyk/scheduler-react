@@ -71,3 +71,28 @@ export const createEvent = ({
   api
     .post<Event>(`projects/${projectId}/schedules/${scheduleId}/events`, data)
     .then(({ data }) => data)
+
+// PUT /projects/:projectId/schedules/events/:eventId
+type UpdateEventPathParams = {
+  projectId: Project['id']
+  scheduleId: Schedule['id']
+  eventId: Event['id']
+}
+
+type UpdateEventRequestBody = Pick<
+  Event,
+  'title' | 'description' | 'startsAt' | 'endsAt' | 'color'
+>
+
+export const updateEvent = ({
+  projectId,
+  scheduleId,
+  eventId,
+  ...data
+}: UpdateEventPathParams & UpdateEventRequestBody) =>
+  api
+    .put<Event>(
+      `projects/${projectId}/schedules/${scheduleId}/events/${eventId}`,
+      data
+    )
+    .then(({ data }) => data)
