@@ -96,3 +96,21 @@ export const updateEvent = ({
       data
     )
     .then(({ data }) => data)
+
+// DELETE /projects/:projectId/schedules/events/:eventId
+type DeleteEventPathParams = {
+  projectId: Project['id']
+  scheduleId: Schedule['id']
+  eventId: Event['id']
+}
+
+export const deleteEvent = ({
+  projectId,
+  scheduleId,
+  eventId,
+}: DeleteEventPathParams) =>
+  api
+    .delete<Event>(
+      `projects/${projectId}/schedules/${scheduleId}/events/${eventId}`
+    )
+    .then(({ data }) => data)
