@@ -10,9 +10,17 @@ import { GetEventsResponseBody, deleteEvent } from '@/services/event'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link, useParams, useSearch } from '@tanstack/react-router'
 import { format, isSameDay } from 'date-fns'
-import { Calendar, CalendarClock, Clock, Pencil, Trash } from 'lucide-react'
+import {
+  Bell,
+  Calendar,
+  CalendarClock,
+  Clock,
+  Pencil,
+  Trash,
+} from 'lucide-react'
 import { EventProps } from 'react-big-calendar'
 import { useBoolean } from 'usehooks-ts'
+import NotificationDescriptionDetails from '../../Notification/NotificationDescriptionDetails/NotificationDescriptionDetails'
 import CalendarEventDeleteConfirmationDialog from '../CalendarEventDeleteDialog/CalendarEventDeleteConfirmationDialog'
 
 const CalendarEvent = ({ title, event }: EventProps) => {
@@ -138,7 +146,11 @@ const CalendarEvent = ({ title, event }: EventProps) => {
                   </div>
                 </>
               )}
+              <NotificationDescriptionDetails event={event} />
             </dl>
+            <Button className='mt-4 w-full gap-x-2' size='sm' variant='outline'>
+              Notification Settings <Bell className='size-4' />
+            </Button>
           </PopoverContent>
         )}
       </Popover>
