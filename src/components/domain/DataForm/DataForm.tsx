@@ -66,7 +66,7 @@ const DataForm = ({
                 Title<span className='text-destructive'>*</span>
               </FormLabel>
               {isLoading ? (
-                <Skeleton className='w-full h-10' />
+                <Skeleton className='h-10 w-full' />
               ) : (
                 <FormControl>
                   <Input
@@ -92,7 +92,7 @@ const DataForm = ({
               <FormLabel>Description</FormLabel>
               <FormControl>
                 {isLoading ? (
-                  <Skeleton className='w-full h-20' />
+                  <Skeleton className='h-20 w-full' />
                 ) : (
                   <Textarea
                     className='resize-none'

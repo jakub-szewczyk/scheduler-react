@@ -146,7 +146,7 @@ const CalendarEventForm = ({
                       <PopoverTrigger asChild>
                         <Button
                           className={cn(
-                            'justify-start text-left font-normal',
+                            'justify-start text-left font-normal [&[aria-invalid="true"]]:border-destructive',
                             !field.value && 'text-muted-foreground'
                           )}
                           variant='outline'
@@ -198,7 +198,7 @@ const CalendarEventForm = ({
                       <PopoverTrigger asChild>
                         <Button
                           className={cn(
-                            'justify-start text-left font-normal',
+                            'justify-start text-left font-normal [&[aria-invalid="true"]]:border-destructive',
                             !field.value && 'text-muted-foreground'
                           )}
                           variant='outline'
