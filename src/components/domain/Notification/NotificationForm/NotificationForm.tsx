@@ -37,9 +37,10 @@ const formSchema = (event: Event) =>
       startsAt: z.date({ message: 'This field is required' }),
       isActive: z.boolean(),
     })
-    .refine((schema) => schema.startsAt.getTime() >= event.start!.getTime(), {
-      path: ['endsAt'],
-      message: 'The end date cannot precede the start date',
+    .refine((schema) => schema.startsAt.getTime() <= event.start!.getTime(), {
+      path: ['startsAt'],
+      message:
+        "Notification's start time cannot exceed the start time of the event",
     })
 
 type Inputs = z.infer<ReturnType<typeof formSchema>>
@@ -161,11 +162,8 @@ const NotificationForm = forwardRef<HTMLFormElement, NotificationFormProps>(
                     <Calendar
                       initialFocus
                       mode='single'
-                      // TODO
-                      // disabled={{
-                      //   before: new Date(),
-                      //   after: event.start,
-                      // }}
+                      disabled={{ after: event.start! }}
+                      defaultMonth={event.start}
                       selected={field.value}
                       onSelect={field.onChange}
                     />
@@ -174,6 +172,9 @@ const NotificationForm = forwardRef<HTMLFormElement, NotificationFormProps>(
                     </div>
                   </PopoverContent>
                 </Popover>
+                <FormDescription>
+                  The event starts on {format(event.start!, 'PPpp')}
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -192,10 +193,9 @@ const NotificationForm = forwardRef<HTMLFormElement, NotificationFormProps>(
                       isFetching && !isPlaceholderData && 'opacity-50'
                     )}
                   >
-                    {/* TODO */}
-                    <FormLabel>Lorem ipsum</FormLabel>
+                    <FormLabel>Enable Notification</FormLabel>
                     <FormDescription>
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit
+                      Turn this on to receive notifications for this event
                     </FormDescription>
                   </div>
                   <FormControl>

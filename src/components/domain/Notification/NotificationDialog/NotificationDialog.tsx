@@ -11,7 +11,7 @@ import {
 import { Notification } from '@/types/notification'
 import { DialogProps } from '@radix-ui/react-dialog'
 import { LoaderCircle, Send } from 'lucide-react'
-import { useRef } from 'react'
+import { ComponentProps, useRef } from 'react'
 import { Event as BigCalendarEvent } from 'react-big-calendar'
 import NotificationForm from '../NotificationForm/NotificationForm'
 
@@ -22,6 +22,7 @@ interface NotificationDialogProps extends DialogProps {
   isPending?: boolean
   event: BigCalendarEvent
   notification?: Notification | null
+  onSubmit: ComponentProps<typeof NotificationForm>['onSubmit']
 }
 
 const NotificationDialog = ({
@@ -31,6 +32,7 @@ const NotificationDialog = ({
   isPending,
   event,
   notification,
+  onSubmit,
   ...props
 }: NotificationDialogProps) => {
   const ref = useRef<HTMLFormElement>(null)
@@ -40,10 +42,9 @@ const NotificationDialog = ({
       <DialogContent>
         <DialogHeader className='overflow-x-hidden'>
           <DialogTitle>Notification settings</DialogTitle>
-          {/* TODO */}
           <DialogDescription>
-            Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint
-            cillum sint consectetur cupidatat.
+            Manage your notification preferences for this event. Customize when
+            and how you're alerted.
           </DialogDescription>
         </DialogHeader>
         <NotificationForm
@@ -62,7 +63,7 @@ const NotificationDialog = ({
                 }
               : undefined
           }
-          onSubmit={(inputs) => console.log(inputs)} // TODO
+          onSubmit={onSubmit}
         >
           <DialogFooter>
             <DialogClose asChild>

@@ -216,6 +216,7 @@ const CalendarEvent = ({ title, event }: EventProps) => {
         isPending={false} // TODO
         event={event}
         notification={getNotificationQuery.data}
+        onSubmit={console.log} // TODO
       />
     </>
   )

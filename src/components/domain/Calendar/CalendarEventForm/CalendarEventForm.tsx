@@ -218,9 +218,8 @@ const CalendarEventForm = ({
                     <Calendar
                       initialFocus
                       mode='single'
-                      disabled={{
-                        before: startsAt || new Date(),
-                      }}
+                      disabled={{ before: startsAt || new Date() }}
+                      defaultMonth={startsAt}
                       selected={field.value}
                       onSelect={(day, ...args) =>
                         field.onChange(day ? endOfDay(day) : day, ...args)
