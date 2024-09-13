@@ -7,7 +7,8 @@ import {
 import { cn } from '@/modules/common'
 import { MUTED_COLOR_CLASSES } from '@/modules/event'
 import { GetEventsResponseBody, deleteEvent } from '@/services/event'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { getNotification } from '@/services/notification'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useParams, useSearch } from '@tanstack/react-router'
 import { format, isSameDay } from 'date-fns'
 import {
@@ -20,15 +21,23 @@ import {
 } from 'lucide-react'
 import { EventProps } from 'react-big-calendar'
 import { useBoolean } from 'usehooks-ts'
-import NotificationDescriptionDetails from '../../Notification/NotificationDescriptionDetails/NotificationDescriptionDetails'
+import NotificationDetails from '../../Notification/NotificationDetails/NotificationDetails'
+import NotificationDialog from '../../Notification/NotificationDialog/NotificationDialog'
 import CalendarEventDeleteConfirmationDialog from '../CalendarEventDeleteDialog/CalendarEventDeleteConfirmationDialog'
 
 const CalendarEvent = ({ title, event }: EventProps) => {
   const {
-    value: isDialogOpen,
-    setValue: setIsDialogOpen,
-    setTrue: openDialog,
-    setFalse: closeDialog,
+    value: isDeleteDialogOpen,
+    setValue: setIsDeleteDialogOpen,
+    setTrue: openDeleteDialog,
+    setFalse: closeDeleteDialog,
+  } = useBoolean()
+
+  const {
+    value: isNotificationDialogOpen,
+    setValue: setIsNotificationDialogOpen,
+    setTrue: openNotificationDialog,
+    // setFalse: closeNotificationDialog,
   } = useBoolean()
 
   const params = useParams({
@@ -41,7 +50,7 @@ const CalendarEvent = ({ title, event }: EventProps) => {
 
   const queryClient = useQueryClient()
 
-  const getEventsQuery = queryClient.getQueryData<GetEventsResponseBody>([
+  const getEventsQueryData = queryClient.getQueryData<GetEventsResponseBody>([
     'projects',
     params.projectId,
     'schedules',
@@ -50,8 +59,15 @@ const CalendarEvent = ({ title, event }: EventProps) => {
     search,
   ])!
 
-  const { color } = getEventsQuery.content.find(({ id }) => id === event.id)!
+  const { color } = getEventsQueryData.content.find(
+    ({ id }) => id === event.id
+  )!
 
+  /**
+   * FIXME:
+   * Error after deleting an event from the "+x more" popover.
+   * It has something to do with the above color destructuring.
+   */
   const deleteEventMutation = useMutation({
     mutationFn: deleteEvent,
     onSuccess: () => {
@@ -64,8 +80,27 @@ const CalendarEvent = ({ title, event }: EventProps) => {
           'events',
         ],
       })
-      closeDialog()
+      closeDeleteDialog()
     },
+  })
+
+  const getNotificationQuery = useQuery({
+    queryKey: [
+      'projects',
+      params.projectId,
+      'schedules',
+      params.scheduleId,
+      'events',
+      event.id,
+      'notification',
+    ],
+    queryFn: () =>
+      getNotification({
+        projectId: params.projectId,
+        scheduleId: params.scheduleId,
+        eventId: event.id,
+      }),
+    enabled: isNotificationDialogOpen,
   })
 
   return (
@@ -109,7 +144,7 @@ const CalendarEvent = ({ title, event }: EventProps) => {
                     className='size-8'
                     size='icon'
                     variant='destructive'
-                    onClick={openDialog}
+                    onClick={openDeleteDialog}
                   >
                     <Trash className='size-4' />
                   </Button>
@@ -146,17 +181,22 @@ const CalendarEvent = ({ title, event }: EventProps) => {
                   </div>
                 </>
               )}
-              <NotificationDescriptionDetails event={event} />
+              <NotificationDetails event={event} />
             </dl>
-            <Button className='mt-4 w-full gap-x-2' size='sm' variant='outline'>
+            <Button
+              className='mt-4 w-full gap-x-2'
+              size='sm'
+              variant='outline'
+              onClick={openNotificationDialog}
+            >
               Notification Settings <Bell className='size-4' />
             </Button>
           </PopoverContent>
         )}
       </Popover>
       <CalendarEventDeleteConfirmationDialog
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
         isPending={deleteEventMutation.isPending}
         event={event}
         onConfirm={(event) =>
@@ -166,6 +206,16 @@ const CalendarEvent = ({ title, event }: EventProps) => {
             eventId: event.id,
           })
         }
+      />
+      <NotificationDialog
+        open={isNotificationDialogOpen}
+        onOpenChange={setIsNotificationDialogOpen}
+        isLoading={getNotificationQuery.isLoading}
+        isFetching={getNotificationQuery.isFetching}
+        isPlaceholderData={getNotificationQuery.isPlaceholderData}
+        isPending={false} // TODO
+        event={event}
+        notification={getNotificationQuery.data}
       />
     </>
   )

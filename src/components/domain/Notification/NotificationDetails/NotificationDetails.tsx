@@ -9,13 +9,11 @@ import { formatDistanceStrict } from 'date-fns'
 import { Bell } from 'lucide-react'
 import { Event } from 'react-big-calendar'
 
-interface NotificationDescriptionDetailsProps {
+interface NotificationDetailsProps {
   event: Event
 }
 
-const NotificationDescriptionDetails = ({
-  event,
-}: NotificationDescriptionDetailsProps) => {
+const NotificationDetails = ({ event }: NotificationDetailsProps) => {
   const params = useParams({
     from: '/projects/$projectId/schedules/$scheduleId/events/',
   })
@@ -107,4 +105,4 @@ const NotificationDescriptionDetails = ({
   )
 }
 
-export default NotificationDescriptionDetails
+export default NotificationDetails
