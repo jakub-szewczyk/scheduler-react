@@ -4,10 +4,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import { useToast } from '@/components/ui/use-toast'
 import { cn } from '@/modules/common'
 import { MUTED_COLOR_CLASSES } from '@/modules/event'
 import { GetEventsResponseBody, deleteEvent } from '@/services/event'
-import { getNotification } from '@/services/notification'
+import {
+  createNotification,
+  getNotification,
+  updateNotification,
+} from '@/services/notification'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useParams, useSearch } from '@tanstack/react-router'
 import { format, isSameDay } from 'date-fns'
@@ -37,7 +42,7 @@ const CalendarEvent = ({ title, event }: EventProps) => {
     value: isNotificationDialogOpen,
     setValue: setIsNotificationDialogOpen,
     setTrue: openNotificationDialog,
-    // setFalse: closeNotificationDialog,
+    setFalse: closeNotificationDialog,
   } = useBoolean()
 
   const params = useParams({
@@ -47,6 +52,8 @@ const CalendarEvent = ({ title, event }: EventProps) => {
   const search = useSearch({
     from: '/projects/$projectId/schedules/$scheduleId/events/',
   })
+
+  const { toast } = useToast()
 
   const queryClient = useQueryClient()
 
@@ -101,6 +108,62 @@ const CalendarEvent = ({ title, event }: EventProps) => {
         eventId: event.id,
       }),
     enabled: isNotificationDialogOpen,
+  })
+
+  const createNotificationMutation = useMutation({
+    mutationFn: createNotification,
+    onSuccess: (notification) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          'projects',
+          params.projectId,
+          'schedules',
+          params.scheduleId,
+          'events',
+          event.id,
+          'notification',
+        ],
+      })
+      closeNotificationDialog()
+      toast({
+        title: 'Notification created',
+        description: `${notification.title} has been successfully created`,
+      })
+    },
+    onError: (error) =>
+      toast({
+        variant: 'destructive',
+        title: 'Form submission failed',
+        description: error.response?.data?.[0]?.msg,
+      }),
+  })
+
+  const updateNotificationMutation = useMutation({
+    mutationFn: updateNotification,
+    onSuccess: (notification) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          'projects',
+          params.projectId,
+          'schedules',
+          params.scheduleId,
+          'events',
+          event.id,
+          'notification',
+        ],
+      })
+      closeNotificationDialog()
+      toast({
+        title: 'Notification updated',
+        description: `${notification.title} has been successfully updated`,
+      })
+    },
+    onError: (error) =>
+      toast({
+        variant: 'destructive',
+        title: 'Form submission failed',
+        description: error.response?.data?.[0]?.msg,
+      }),
   })
 
   return (
@@ -213,10 +276,29 @@ const CalendarEvent = ({ title, event }: EventProps) => {
         isLoading={getNotificationQuery.isLoading}
         isFetching={getNotificationQuery.isFetching}
         isPlaceholderData={getNotificationQuery.isPlaceholderData}
-        isPending={false} // TODO
+        isPending={
+          createNotificationMutation.isPending ||
+          updateNotificationMutation.isPending
+        }
         event={event}
         notification={getNotificationQuery.data}
-        onSubmit={console.log} // TODO
+        onSubmit={(inputs) =>
+          getNotificationQuery.data
+            ? updateNotificationMutation.mutate({
+                ...inputs,
+                projectId: params.projectId,
+                scheduleId: params.scheduleId,
+                eventId: event.id,
+                startsAt: inputs.startsAt.toISOString(),
+              })
+            : createNotificationMutation.mutate({
+                ...inputs,
+                projectId: params.projectId,
+                scheduleId: params.scheduleId,
+                eventId: event.id,
+                startsAt: inputs.startsAt.toISOString(),
+              })
+        }
       />
     </>
   )

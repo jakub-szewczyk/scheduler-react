@@ -77,6 +77,7 @@ const NotificationDialog = ({
             </DialogClose>
             <Button
               className='flex gap-x-2 sm:w-fit'
+              type='button'
               disabled={
                 isLoading || (isFetching && !isPlaceholderData) || isPending
               }
