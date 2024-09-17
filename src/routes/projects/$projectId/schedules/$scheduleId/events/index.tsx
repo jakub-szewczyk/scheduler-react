@@ -18,7 +18,9 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { calendarDefaultDate } from '@/modules/event'
+import { getPushSubscription, requestPermission } from '@/modules/notification'
 import { getEvents, getEventsSearchParamsSchema } from '@/services/event'
+import { createPushSubscription } from '@/services/push-subscription'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import {
@@ -29,7 +31,7 @@ import {
   CirclePlus,
 } from 'lucide-react'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
-import { useDocumentTitle } from 'usehooks-ts'
+import { useDocumentTitle, useLocalStorage } from 'usehooks-ts'
 
 const pageTitle = 'Events'
 
@@ -46,6 +48,9 @@ export const Route = createFileRoute(
 
 function Events() {
   useDocumentTitle(`Scheduler - ${pageTitle}`)
+
+  const [pushSubscription, setPushSubscription] =
+    useLocalStorage<PushSubscription | null>('pushSubscription', null)
 
   const params = Route.useParams()
 
@@ -70,6 +75,32 @@ function Events() {
       }),
     placeholderData: keepPreviousData,
     enabled: !!search.startAt && !!search.endAt,
+  })
+
+  useQuery({
+    queryKey: ['push-subscription'],
+    queryFn: async () => {
+      try {
+        await requestPermission()
+        const pushSubscription = await getPushSubscription()
+        setPushSubscription(pushSubscription)
+        return await createPushSubscription(pushSubscription)
+      } catch (error) {
+        return Promise.reject({
+          response: {
+            data: [
+              {
+                msg:
+                  (error as Error).message ||
+                  'Push notification registration failed. Try clearing site data and resetting permissions.',
+              },
+            ],
+          },
+        })
+      }
+    },
+    retryDelay: 0,
+    enabled: !pushSubscription,
   })
 
   const pages = Math.ceil((getEventsQuery.data?.total || 0) / search.size)

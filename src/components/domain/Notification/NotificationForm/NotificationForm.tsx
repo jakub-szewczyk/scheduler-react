@@ -162,7 +162,7 @@ const NotificationForm = forwardRef<HTMLFormElement, NotificationFormProps>(
                     <Calendar
                       initialFocus
                       mode='single'
-                      disabled={{ after: event.start! }}
+                      disabled={{ before: new Date(), after: event.start! }}
                       defaultMonth={event.start}
                       selected={field.value}
                       onSelect={field.onChange}
