@@ -8,9 +8,13 @@ Vite + React SPA ![GitHub Release](https://img.shields.io/github/v/release/jakub
 
 ## Todo
 
+- Dashboard.
+
 - Kanban board.
 
 - WYSIWYG editor.
+
+- CI/CD for build & deployment.
 
 ### Test
 
