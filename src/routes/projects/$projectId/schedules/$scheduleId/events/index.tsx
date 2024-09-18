@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/card'
 import { calendarDefaultDate } from '@/modules/event'
 import { getPushSubscription, requestPermission } from '@/modules/notification'
+import { toApiError } from '@/services/api'
 import { getEvents, getEventsSearchParamsSchema } from '@/services/event'
 import { createPushSubscription } from '@/services/push-subscription'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
@@ -88,17 +89,12 @@ function Events() {
         setPushSubscription(entity)
         return entity
       } catch (error) {
-        return Promise.reject({
-          response: {
-            data: [
-              {
-                msg:
-                  (error as Error).message ||
-                  'Push notification registration failed. Try clearing site data and resetting permissions.',
-              },
-            ],
-          },
-        })
+        return Promise.reject(
+          toApiError(
+            (error as Error).message ||
+              'Push notification registration failed. Try clearing site data and resetting permissions.'
+          )
+        )
       }
     },
     retryDelay: 0,
