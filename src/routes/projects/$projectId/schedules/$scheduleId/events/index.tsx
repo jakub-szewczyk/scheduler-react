@@ -82,9 +82,11 @@ function Events() {
     queryFn: async () => {
       try {
         await requestPermission()
-        const pushSubscription = await getPushSubscription()
-        setPushSubscription(pushSubscription)
-        return await createPushSubscription(pushSubscription)
+        const { entity } = await createPushSubscription(
+          await getPushSubscription()
+        )
+        setPushSubscription(entity)
+        return entity
       } catch (error) {
         return Promise.reject({
           response: {

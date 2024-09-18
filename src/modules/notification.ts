@@ -1,28 +1,19 @@
 import { registerServiceWorker } from './service-worker'
 
 const base64ToUint8Array = (base64: string) => {
-  const data = window.atob(
+  const data = atob(
     (base64 + '='.repeat((4 - (base64.length % 4)) % 4))
       .replace(/-/g, '+')
       .replace(/_/g, '/')
   )
-  const array = new Uint8Array(data.length)
-  for (let i = 0; i < data.length; ++i) {
-    array[i] = data.charCodeAt(i)
-  }
-  return array
+  return new Uint8Array(data.length).map((_, index) => data.charCodeAt(index))
 }
 
-export const requestPermission = () =>
-  new Promise((resolve, reject) => {
-    const permission = Notification.requestPermission(resolve)
-    if (permission) permission.then(resolve, reject)
-  }).then((permission) => {
-    if ((permission as NotificationPermission) !== 'granted')
-      throw new Error(
-        'Permission to display push notifications was not granted'
-      )
-  })
+export const requestPermission = async () => {
+  const permission = await Notification.requestPermission()
+  if (permission !== 'granted')
+    throw new Error('Permission to display push notifications was not granted')
+}
 
 export const getPushSubscription = async () =>
   (await registerServiceWorker())!.pushManager.subscribe({
