@@ -7,9 +7,9 @@ import dotenv from 'dotenv'
  */
 dotenv.config({ path: '.env.local' })
 
-const BASE_APP_URL = process.env.BASE_APP_URL
+const APP_BASE_URL = process.env.APP_BASE_URL
 
-if (!BASE_APP_URL) throw new Error('missing environment variable: BASE_APP_URL')
+if (!APP_BASE_URL) throw new Error('missing environment variable: APP_BASE_URL')
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -34,7 +34,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: BASE_APP_URL,
+    baseURL: APP_BASE_URL,
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
   },
@@ -101,7 +101,7 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: {
     command: 'npm run dev',
-    url: BASE_APP_URL,
+    url: APP_BASE_URL,
     reuseExistingServer: !process.env.CI,
   },
 })

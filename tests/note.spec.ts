@@ -7,26 +7,26 @@ import {
   SUBJECT,
 } from '../src/mocks/common'
 
-const BASE_APP_URL = process.env.BASE_APP_URL
+const APP_BASE_URL = process.env.APP_BASE_URL
 
-const VITE_BASE_API_URL = process.env.VITE_BASE_API_URL
+const VITE_API_BASE_URL = process.env.VITE_API_BASE_URL
 
-if (!BASE_APP_URL || !VITE_BASE_API_URL)
+if (!APP_BASE_URL || !VITE_API_BASE_URL)
   throw new Error(
-    'missing one of environment variables: [BASE_APP_URL, VITE_BASE_API_URL]'
+    'missing one of environment variables: [APP_BASE_URL, VITE_API_BASE_URL]'
   )
 
 test.describe('notes page', () => {
   test('rendering title and description', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/notes*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/notes*`, (route) =>
       route.fulfill({ json: EMPTY_PAGINABLE_RESPONSE })
     )
     await page.goto(
-      `${BASE_APP_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
+      `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
     )
     await expect(page.getByRole('heading', { name: 'Notes' })).toBeVisible()
     await expect(page.getByRole('main')).toContainText(
@@ -37,13 +37,13 @@ test.describe('notes page', () => {
   test('rendering empty table', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/notes*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/notes*`, (route) =>
       route.fulfill({ json: EMPTY_PAGINABLE_RESPONSE })
     )
     await page.goto(
-      `${BASE_APP_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
+      `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
     )
     await expect(page.getByRole('cell', { name: 'No results' })).toBeVisible()
   })
@@ -51,15 +51,15 @@ test.describe('notes page', () => {
   test('navigating to the next page', async ({ page, isMobile }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    const url = `${VITE_BASE_API_URL}/projects/*/notes*`
+    const url = `${VITE_API_BASE_URL}/projects/*/notes*`
     await page.route(url, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
     let promise = page.waitForResponse(url)
     await page.goto(
-      `${BASE_APP_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
+      `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
     )
     if (isMobile) {
       await expect(page.getByText('1/10')).toBeVisible()
@@ -80,15 +80,15 @@ test.describe('notes page', () => {
   test('navigating to the previous page', async ({ page, isMobile }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    const url = `${VITE_BASE_API_URL}/projects/*/notes*`
+    const url = `${VITE_API_BASE_URL}/projects/*/notes*`
     await page.route(url, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
     let promise = page.waitForResponse(url)
     await page.goto(
-      `${BASE_APP_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes?page=9`
+      `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes?page=9`
     )
     if (isMobile) {
       await expect(page.getByText('10/10')).toBeVisible()
@@ -109,15 +109,15 @@ test.describe('notes page', () => {
   test('navigating to the last page', async ({ page, isMobile }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    const url = `${VITE_BASE_API_URL}/projects/*/notes*`
+    const url = `${VITE_API_BASE_URL}/projects/*/notes*`
     await page.route(url, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
     let promise = page.waitForResponse(url)
     await page.goto(
-      `${BASE_APP_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
+      `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
     )
     if (isMobile) {
       await expect(page.getByText('1/10')).toBeVisible()
@@ -138,15 +138,15 @@ test.describe('notes page', () => {
   test('navigating to the first page', async ({ page, isMobile }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    const url = `${VITE_BASE_API_URL}/projects/*/notes*`
+    const url = `${VITE_API_BASE_URL}/projects/*/notes*`
     await page.route(url, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
     let promise = page.waitForResponse(url)
     await page.goto(
-      `${BASE_APP_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes?page=9`
+      `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes?page=9`
     )
     if (isMobile) {
       await expect(page.getByText('10/10')).toBeVisible()
@@ -167,15 +167,15 @@ test.describe('notes page', () => {
   test('increasing page size', async ({ page, isMobile }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    const url = `${VITE_BASE_API_URL}/projects/*/notes*`
+    const url = `${VITE_API_BASE_URL}/projects/*/notes*`
     await page.route(url, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
     let promise = page.waitForResponse(url)
     await page.goto(
-      `${BASE_APP_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
+      `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
     )
     expect((await promise).url().includes('size=10')).toBeTruthy()
     if (isMobile) {
@@ -215,15 +215,15 @@ test.describe('notes page', () => {
   test('sorting by creation date', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    const url = `${VITE_BASE_API_URL}/projects/*/notes*`
+    const url = `${VITE_API_BASE_URL}/projects/*/notes*`
     await page.route(url, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
     let promise = page.waitForResponse(url)
     await page.goto(
-      `${BASE_APP_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
+      `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
     )
     expect((await promise).url().includes('createdAt=DESC')).toBeTruthy()
     promise = page.waitForResponse(url)
@@ -234,15 +234,15 @@ test.describe('notes page', () => {
   test('searching by title', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    const url = `${VITE_BASE_API_URL}/projects/*/notes*`
+    const url = `${VITE_API_BASE_URL}/projects/*/notes*`
     await page.route(url, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
     let promise = page.waitForResponse(url)
     await page.goto(
-      `${BASE_APP_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
+      `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
     )
     expect((await promise).url().includes('title=')).toBeTruthy()
     promise = page.waitForResponse(url)
@@ -255,12 +255,12 @@ test.describe('notes page', () => {
   test('deleting one note', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects/*/notes*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*/notes*`, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*/notes/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*/notes/*`, (route) =>
       route.fulfill({
         json: {
           id: faker.string.uuid(),
@@ -271,7 +271,7 @@ test.describe('notes page', () => {
       })
     )
     await page.goto(
-      `${BASE_APP_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
+      `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
     )
     await page
       .getByRole('row', { name: 'socius-accusator-corona Tergo' })
@@ -297,12 +297,12 @@ test.describe('notes page', () => {
   test('deleting many notes', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects/*/notes*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*/notes*`, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*/notes/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*/notes/*`, (route) =>
       route.fulfill({
         json: {
           id: faker.string.uuid(),
@@ -313,7 +313,7 @@ test.describe('notes page', () => {
       })
     )
     await page.goto(
-      `${BASE_APP_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
+      `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
     )
     await page
       .getByRole('row', { name: 'socius-accusator-corona Tergo' })
@@ -343,12 +343,12 @@ test.describe('notes page', () => {
   test('navigating to "New Note" page', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects/*/notes*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*/notes*`, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*/notes/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*/notes/*`, (route) =>
       route.fulfill({
         json: {
           id: faker.string.uuid(),
@@ -359,24 +359,24 @@ test.describe('notes page', () => {
       })
     )
     await page.goto(
-      `${BASE_APP_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
+      `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
     )
     await page.getByRole('link', { name: 'New Note' }).click()
     expect(page.url()).toBe(
-      `${BASE_APP_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes/new`
+      `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes/new`
     )
   })
 
   test('navigating to "Edit Note" page', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects/*/notes*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*/notes*`, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
     const id = faker.string.uuid()
-    await page.route(`${VITE_BASE_API_URL}/projects/*/notes/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*/notes/*`, (route) =>
       route.fulfill({
         json: {
           id,
@@ -387,7 +387,7 @@ test.describe('notes page', () => {
       })
     )
     await page.goto(
-      `${BASE_APP_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
+      `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
     )
     await page
       .getByRole('row', { name: 'socius-accusator-corona Tergo' })
@@ -395,19 +395,19 @@ test.describe('notes page', () => {
       .click()
     await page.getByRole('menuitem', { name: 'Edit' }).click()
     expect(page.url()).toBe(
-      `${BASE_APP_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes/${PAGINABLE_RESPONSE.content[0].id}/edit`
+      `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes/${PAGINABLE_RESPONSE.content[0].id}/edit`
     )
   })
 
   test('navigating to "Note Details" page using a link', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects/*/notes*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*/notes*`, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*/notes/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*/notes/*`, (route) =>
       route.fulfill({
         json: {
           id: faker.string.uuid(),
@@ -418,11 +418,11 @@ test.describe('notes page', () => {
       })
     )
     await page.goto(
-      `${BASE_APP_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
+      `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
     )
     await page.getByRole('link', { name: 'socius-accusator-corona' }).click()
     expect(page.url()).toBe(
-      `${BASE_APP_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes/${PAGINABLE_RESPONSE.content[0].id}`
+      `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes/${PAGINABLE_RESPONSE.content[0].id}`
     )
   })
 
@@ -431,12 +431,12 @@ test.describe('notes page', () => {
   }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects/*/notes*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*/notes*`, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*/notes/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*/notes/*`, (route) =>
       route.fulfill({
         json: {
           id: faker.string.uuid(),
@@ -447,7 +447,7 @@ test.describe('notes page', () => {
       })
     )
     await page.goto(
-      `${BASE_APP_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
+      `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes`
     )
     await page
       .getByRole('row', { name: 'socius-accusator-corona Tergo' })
@@ -455,7 +455,7 @@ test.describe('notes page', () => {
       .click()
     await page.getByRole('menuitem', { name: 'Details' }).click()
     expect(page.url()).toBe(
-      `${BASE_APP_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes/${PAGINABLE_RESPONSE.content[0].id}`
+      `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/notes/${PAGINABLE_RESPONSE.content[0].id}`
     )
   })
 })
@@ -464,9 +464,9 @@ test.describe('new note page', () => {
   test('rendering title and description', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}/notes/new`)
+    await page.goto(`${APP_BASE_URL}/projects/${SUBJECT.id}/notes/new`)
     await expect(page.getByRole('heading', { name: 'New Note' })).toBeVisible()
     await expect(page.getByRole('main')).toContainText(
       "Create a new note by entering a title and description. Choose a title that captures the essence of your note, and use the description to elaborate on the key points or details. Once you're done, submit the form to save your note and keep your information organized."
@@ -476,10 +476,10 @@ test.describe('new note page', () => {
   test('title being required', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
     await page.route(
-      `${VITE_BASE_API_URL}/projects/*/notes`,
+      `${VITE_API_BASE_URL}/projects/*/notes`,
       (route) =>
         route.request().method() === 'POST' &&
         route.fulfill({
@@ -491,7 +491,7 @@ test.describe('new note page', () => {
           },
         })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}/notes/new`)
+    await page.goto(`${APP_BASE_URL}/projects/${SUBJECT.id}/notes/new`)
     await page.getByRole('button', { name: 'Submit' }).click()
     await expect(page.getByText('This field is required')).toBeVisible()
   })
@@ -499,10 +499,10 @@ test.describe('new note page', () => {
   test('creating note', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
     await page.route(
-      `${VITE_BASE_API_URL}/projects/*/notes*`,
+      `${VITE_API_BASE_URL}/projects/*/notes*`,
       (route) =>
         route.request().method() === 'GET' &&
         route.fulfill({ json: PAGINABLE_RESPONSE })
@@ -517,7 +517,7 @@ test.describe('new note page', () => {
       createdAt: faker.date.past().toISOString(),
     }
     await page.route(
-      `${VITE_BASE_API_URL}/projects/*/notes/*`,
+      `${VITE_API_BASE_URL}/projects/*/notes/*`,
       (route) =>
         route.request().method() === 'GET' &&
         route.fulfill({
@@ -525,14 +525,14 @@ test.describe('new note page', () => {
         })
     )
     await page.route(
-      `${VITE_BASE_API_URL}/projects/*/notes`,
+      `${VITE_API_BASE_URL}/projects/*/notes`,
       (route) =>
         route.request().method() === 'POST' &&
         route.fulfill({
           json,
         })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}/notes/new`)
+    await page.goto(`${APP_BASE_URL}/projects/${SUBJECT.id}/notes/new`)
     await page.getByPlaceholder('Enter title').fill(title)
     await page.getByPlaceholder('Enter description').fill(description)
     const promise1 = page.waitForResponse(
@@ -545,7 +545,7 @@ test.describe('new note page', () => {
     expect((await promise1).request().method()).toBe('POST')
     expect((await promise2).request().method()).toBe('GET')
     expect(page.url()).toBe(
-      `${BASE_APP_URL}/projects/${SUBJECT.id}/notes/${id}`
+      `${APP_BASE_URL}/projects/${SUBJECT.id}/notes/${id}`
     )
     await expect(page.getByText('Note created', { exact: true })).toBeVisible()
     await expect(
@@ -560,11 +560,11 @@ test.describe('edit note page', () => {
   test('rendering title and description', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
     const id = faker.string.uuid()
     await page.route(
-      `${VITE_BASE_API_URL}/projects/*/notes/*`,
+      `${VITE_API_BASE_URL}/projects/*/notes/*`,
       (route) =>
         route.request().method() === 'GET' &&
         route.fulfill({
@@ -576,7 +576,7 @@ test.describe('edit note page', () => {
           },
         })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}/notes/${id}/edit`)
+    await page.goto(`${APP_BASE_URL}/projects/${SUBJECT.id}/notes/${id}/edit`)
     await expect(page.getByRole('heading', { name: 'Edit Note' })).toBeVisible()
     await expect(page.getByRole('main')).toContainText(
       "Edit your note by updating its title and description. Adjust the title to better reflect the note's content, and revise the description to include any new details or changes. Once you're done, submit the form to save your updates and keep your notes current."
@@ -586,11 +586,11 @@ test.describe('edit note page', () => {
   test('title being required', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
     const id = faker.string.uuid()
     await page.route(
-      `${VITE_BASE_API_URL}/projects/*/notes/*`,
+      `${VITE_API_BASE_URL}/projects/*/notes/*`,
       (route) =>
         route.request().method() === 'GET' &&
         route.fulfill({
@@ -602,7 +602,7 @@ test.describe('edit note page', () => {
           },
         })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}/notes/${id}/edit`)
+    await page.goto(`${APP_BASE_URL}/projects/${SUBJECT.id}/notes/${id}/edit`)
     await page.getByPlaceholder('Enter title').clear()
     await page.getByRole('button', { name: 'Submit' }).click()
     await expect(page.getByText('This field is required')).toBeVisible()
@@ -611,17 +611,17 @@ test.describe('edit note page', () => {
   test('updating note', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
     await page.route(
-      `${VITE_BASE_API_URL}/projects/*/notes*`,
+      `${VITE_API_BASE_URL}/projects/*/notes*`,
       (route) =>
         route.request().method() === 'GET' &&
         route.fulfill({ json: PAGINABLE_RESPONSE })
     )
     const id = faker.string.uuid()
     await page.route(
-      `${VITE_BASE_API_URL}/projects/${SUBJECT.id}/notes/*`,
+      `${VITE_API_BASE_URL}/projects/${SUBJECT.id}/notes/*`,
       (route) =>
         route.request().method() === 'GET' &&
         route.fulfill({
@@ -635,7 +635,7 @@ test.describe('edit note page', () => {
     )
     const title = faker.lorem.slug()
     const description = faker.lorem.sentences()
-    await page.route(`${VITE_BASE_API_URL}/projects/*/notes/${id}`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*/notes/${id}`, (route) =>
       route.fulfill({
         json: {
           id,
@@ -645,7 +645,7 @@ test.describe('edit note page', () => {
         },
       })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}/notes/${id}/edit`)
+    await page.goto(`${APP_BASE_URL}/projects/${SUBJECT.id}/notes/${id}/edit`)
     await page.getByPlaceholder('Enter title').fill(title)
     await page.getByPlaceholder('Enter description').fill(description)
     const promise1 = page.waitForResponse(
@@ -658,7 +658,7 @@ test.describe('edit note page', () => {
     expect((await promise1).request().method()).toBe('PUT')
     expect((await promise2).request().method()).toBe('GET')
     expect(page.url()).toBe(
-      `${BASE_APP_URL}/projects/${SUBJECT.id}/notes/${id}`
+      `${APP_BASE_URL}/projects/${SUBJECT.id}/notes/${id}`
     )
     await expect(page.getByText('Note updated', { exact: true })).toBeVisible()
     await expect(

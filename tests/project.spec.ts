@@ -7,22 +7,22 @@ import {
   SUBJECT,
 } from '../src/mocks/common'
 
-const BASE_APP_URL = process.env.BASE_APP_URL
+const APP_BASE_URL = process.env.APP_BASE_URL
 
-const VITE_BASE_API_URL = process.env.VITE_BASE_API_URL
+const VITE_API_BASE_URL = process.env.VITE_API_BASE_URL
 
-if (!BASE_APP_URL || !VITE_BASE_API_URL)
+if (!APP_BASE_URL || !VITE_API_BASE_URL)
   throw new Error(
-    'missing one of environment variables: [BASE_APP_URL, VITE_BASE_API_URL]'
+    'missing one of environment variables: [APP_BASE_URL, VITE_API_BASE_URL]'
   )
 
 test.describe('projects page', () => {
   test('rendering title and description', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects*`, (route) =>
       route.fulfill({ json: EMPTY_PAGINABLE_RESPONSE })
     )
     await page.goto('/projects')
@@ -35,26 +35,26 @@ test.describe('projects page', () => {
   test('rendering empty table', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects*`, (route) =>
       route.fulfill({ json: EMPTY_PAGINABLE_RESPONSE })
     )
-    await page.goto(`${BASE_APP_URL}/projects`)
+    await page.goto(`${APP_BASE_URL}/projects`)
     await expect(page.getByRole('cell', { name: 'No results' })).toBeVisible()
   })
 
   test('navigating to the next page', async ({ page, isMobile }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    const url = `${VITE_BASE_API_URL}/projects*`
+    const url = `${VITE_API_BASE_URL}/projects*`
     await page.route(url, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
     let promise = page.waitForResponse(url)
-    await page.goto(`${BASE_APP_URL}/projects`)
+    await page.goto(`${APP_BASE_URL}/projects`)
     if (isMobile) {
       await expect(page.getByText('1/10')).toBeVisible()
     } else {
@@ -74,14 +74,14 @@ test.describe('projects page', () => {
   test('navigating to the previous page', async ({ page, isMobile }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    const url = `${VITE_BASE_API_URL}/projects*`
+    const url = `${VITE_API_BASE_URL}/projects*`
     await page.route(url, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
     let promise = page.waitForResponse(url)
-    await page.goto(`${BASE_APP_URL}/projects?page=9`)
+    await page.goto(`${APP_BASE_URL}/projects?page=9`)
     if (isMobile) {
       await expect(page.getByText('10/10')).toBeVisible()
     } else {
@@ -101,14 +101,14 @@ test.describe('projects page', () => {
   test('navigating to the last page', async ({ page, isMobile }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    const url = `${VITE_BASE_API_URL}/projects*`
+    const url = `${VITE_API_BASE_URL}/projects*`
     await page.route(url, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
     let promise = page.waitForResponse(url)
-    await page.goto(`${BASE_APP_URL}/projects`)
+    await page.goto(`${APP_BASE_URL}/projects`)
     if (isMobile) {
       await expect(page.getByText('1/10')).toBeVisible()
     } else {
@@ -128,14 +128,14 @@ test.describe('projects page', () => {
   test('navigating to the first page', async ({ page, isMobile }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    const url = `${VITE_BASE_API_URL}/projects*`
+    const url = `${VITE_API_BASE_URL}/projects*`
     await page.route(url, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
     let promise = page.waitForResponse(url)
-    await page.goto(`${BASE_APP_URL}/projects?page=9`)
+    await page.goto(`${APP_BASE_URL}/projects?page=9`)
     if (isMobile) {
       await expect(page.getByText('10/10')).toBeVisible()
     } else {
@@ -155,14 +155,14 @@ test.describe('projects page', () => {
   test('increasing page size', async ({ page, isMobile }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    const url = `${VITE_BASE_API_URL}/projects*`
+    const url = `${VITE_API_BASE_URL}/projects*`
     await page.route(url, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
     let promise = page.waitForResponse(url)
-    await page.goto(`${BASE_APP_URL}/projects`)
+    await page.goto(`${APP_BASE_URL}/projects`)
     expect((await promise).url().includes('size=10')).toBeTruthy()
     if (isMobile) {
       await expect(page.getByText('1/10')).toBeVisible()
@@ -201,14 +201,14 @@ test.describe('projects page', () => {
   test('sorting by creation date', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    const url = `${VITE_BASE_API_URL}/projects*`
+    const url = `${VITE_API_BASE_URL}/projects*`
     await page.route(url, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
     let promise = page.waitForResponse(url)
-    await page.goto(`${BASE_APP_URL}/projects`)
+    await page.goto(`${APP_BASE_URL}/projects`)
     expect((await promise).url().includes('createdAt=DESC')).toBeTruthy()
     promise = page.waitForResponse(url)
     await page.getByRole('button', { name: 'Created at' }).click()
@@ -218,14 +218,14 @@ test.describe('projects page', () => {
   test('searching by title', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    const url = `${VITE_BASE_API_URL}/projects*`
+    const url = `${VITE_API_BASE_URL}/projects*`
     await page.route(url, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
     let promise = page.waitForResponse(url)
-    await page.goto(`${BASE_APP_URL}/projects`)
+    await page.goto(`${APP_BASE_URL}/projects`)
     expect((await promise).url().includes('title=')).toBeTruthy()
     promise = page.waitForResponse(url)
     const slug = faker.lorem.slug()
@@ -237,12 +237,12 @@ test.describe('projects page', () => {
   test('deleting one project', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects*`, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*`, (route) =>
       route.fulfill({
         json: {
           id: faker.string.uuid(),
@@ -252,7 +252,7 @@ test.describe('projects page', () => {
         },
       })
     )
-    await page.goto(`${BASE_APP_URL}/projects`)
+    await page.goto(`${APP_BASE_URL}/projects`)
     await page
       .getByRole('row', { name: 'socius-accusator-corona Tergo' })
       .getByRole('button')
@@ -277,12 +277,12 @@ test.describe('projects page', () => {
   test('deleting many projects', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects*`, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*`, (route) =>
       route.fulfill({
         json: {
           id: faker.string.uuid(),
@@ -292,7 +292,7 @@ test.describe('projects page', () => {
         },
       })
     )
-    await page.goto(`${BASE_APP_URL}/projects`)
+    await page.goto(`${APP_BASE_URL}/projects`)
     await page
       .getByRole('row', { name: 'socius-accusator-corona Tergo' })
       .getByRole('checkbox')
@@ -321,12 +321,12 @@ test.describe('projects page', () => {
   test('navigating to "New Project" page', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects*`, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*`, (route) =>
       route.fulfill({
         json: {
           id: faker.string.uuid(),
@@ -336,7 +336,7 @@ test.describe('projects page', () => {
         },
       })
     )
-    await page.goto(`${BASE_APP_URL}/projects`)
+    await page.goto(`${APP_BASE_URL}/projects`)
     await page.getByRole('link', { name: 'New Project' }).click()
     await expect(
       page.getByRole('heading', { name: 'New Project' })
@@ -349,13 +349,13 @@ test.describe('projects page', () => {
   test('navigating to "Edit Project" page', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects*`, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
     const id = faker.string.uuid()
-    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*`, (route) =>
       route.fulfill({
         json: {
           id,
@@ -365,7 +365,7 @@ test.describe('projects page', () => {
         },
       })
     )
-    await page.goto(`${BASE_APP_URL}/projects`)
+    await page.goto(`${APP_BASE_URL}/projects`)
     await page
       .getByRole('row', { name: 'socius-accusator-corona Tergo' })
       .getByRole('button')
@@ -384,12 +384,12 @@ test.describe('projects page', () => {
   }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects*`, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*`, (route) =>
       route.fulfill({
         json: {
           id: faker.string.uuid(),
@@ -399,10 +399,10 @@ test.describe('projects page', () => {
         },
       })
     )
-    await page.goto(`${BASE_APP_URL}/projects`)
+    await page.goto(`${APP_BASE_URL}/projects`)
     await page.getByRole('link', { name: 'socius-accusator-corona' }).click()
     expect(page.url()).toBe(
-      `${BASE_APP_URL}/projects/89bd9d8d-69a6-474e-80f4-67cc8796ed15`
+      `${APP_BASE_URL}/projects/89bd9d8d-69a6-474e-80f4-67cc8796ed15`
     )
   })
 
@@ -411,12 +411,12 @@ test.describe('projects page', () => {
   }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects*`, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*`, (route) =>
       route.fulfill({
         json: {
           id: faker.string.uuid(),
@@ -426,14 +426,14 @@ test.describe('projects page', () => {
         },
       })
     )
-    await page.goto(`${BASE_APP_URL}/projects`)
+    await page.goto(`${APP_BASE_URL}/projects`)
     await page
       .getByRole('row', { name: 'socius-accusator-corona Tergo' })
       .getByRole('button')
       .click()
     await page.getByRole('menuitem', { name: 'Details' }).click()
     expect(page.url()).toBe(
-      `${BASE_APP_URL}/projects/89bd9d8d-69a6-474e-80f4-67cc8796ed15`
+      `${APP_BASE_URL}/projects/89bd9d8d-69a6-474e-80f4-67cc8796ed15`
     )
   })
 })
@@ -442,9 +442,9 @@ test.describe('new project page', () => {
   test('rendering title and description', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.goto(`${BASE_APP_URL}/projects/new`)
+    await page.goto(`${APP_BASE_URL}/projects/new`)
     await expect(
       page.getByRole('heading', { name: 'New Project' })
     ).toBeVisible()
@@ -456,10 +456,10 @@ test.describe('new project page', () => {
   test('title being required', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
     await page.route(
-      `${VITE_BASE_API_URL}/projects`,
+      `${VITE_API_BASE_URL}/projects`,
       (route) =>
         route.request().method() === 'POST' &&
         route.fulfill({
@@ -471,7 +471,7 @@ test.describe('new project page', () => {
           },
         })
     )
-    await page.goto(`${BASE_APP_URL}/projects/new`)
+    await page.goto(`${APP_BASE_URL}/projects/new`)
     await page.getByRole('button', { name: 'Submit' }).click()
     await expect(page.getByText('This field is required')).toBeVisible()
   })
@@ -479,10 +479,10 @@ test.describe('new project page', () => {
   test('creating project', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
     await page.route(
-      `${VITE_BASE_API_URL}/projects*`,
+      `${VITE_API_BASE_URL}/projects*`,
       (route) =>
         route.request().method() === 'GET' &&
         route.fulfill({ json: PAGINABLE_RESPONSE })
@@ -497,7 +497,7 @@ test.describe('new project page', () => {
       createdAt: faker.date.past().toISOString(),
     }
     await page.route(
-      `${VITE_BASE_API_URL}/projects/*`,
+      `${VITE_API_BASE_URL}/projects/*`,
       (route) =>
         route.request().method() === 'GET' &&
         route.fulfill({
@@ -505,14 +505,14 @@ test.describe('new project page', () => {
         })
     )
     await page.route(
-      `${VITE_BASE_API_URL}/projects`,
+      `${VITE_API_BASE_URL}/projects`,
       (route) =>
         route.request().method() === 'POST' &&
         route.fulfill({
           json,
         })
     )
-    await page.goto(`${BASE_APP_URL}/projects/new`)
+    await page.goto(`${APP_BASE_URL}/projects/new`)
     await page.getByPlaceholder('Enter title').fill(title)
     await page.getByPlaceholder('Enter description').fill(description)
     const promise1 = page.waitForResponse(
@@ -524,7 +524,7 @@ test.describe('new project page', () => {
     await page.getByRole('button', { name: 'Submit' }).click()
     expect((await promise1).request().method()).toBe('POST')
     expect((await promise2).request().method()).toBe('GET')
-    expect(page.url()).toBe(`${BASE_APP_URL}/projects/${id}`)
+    expect(page.url()).toBe(`${APP_BASE_URL}/projects/${id}`)
     await expect(
       page.getByText('Project created', { exact: true })
     ).toBeVisible()
@@ -540,11 +540,11 @@ test.describe('edit project page', () => {
   test('rendering title and description', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
     const id = faker.string.uuid()
     await page.route(
-      `${VITE_BASE_API_URL}/projects/*`,
+      `${VITE_API_BASE_URL}/projects/*`,
       (route) =>
         route.request().method() === 'GET' &&
         route.fulfill({
@@ -556,7 +556,7 @@ test.describe('edit project page', () => {
           },
         })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${id}/edit`)
+    await page.goto(`${APP_BASE_URL}/projects/${id}/edit`)
     await expect(
       page.getByRole('heading', { name: 'Edit Project' })
     ).toBeVisible()
@@ -568,11 +568,11 @@ test.describe('edit project page', () => {
   test('title being required', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
     const id = faker.string.uuid()
     await page.route(
-      `${VITE_BASE_API_URL}/projects/*`,
+      `${VITE_API_BASE_URL}/projects/*`,
       (route) =>
         route.request().method() === 'GET' &&
         route.fulfill({
@@ -584,7 +584,7 @@ test.describe('edit project page', () => {
           },
         })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${id}/edit`)
+    await page.goto(`${APP_BASE_URL}/projects/${id}/edit`)
     await page.getByPlaceholder('Enter title').clear()
     await page.getByRole('button', { name: 'Submit' }).click()
     await expect(page.getByText('This field is required')).toBeVisible()
@@ -593,17 +593,17 @@ test.describe('edit project page', () => {
   test('updating project', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
     await page.route(
-      `${VITE_BASE_API_URL}/projects*`,
+      `${VITE_API_BASE_URL}/projects*`,
       (route) =>
         route.request().method() === 'GET' &&
         route.fulfill({ json: PAGINABLE_RESPONSE })
     )
     const id = faker.string.uuid()
     await page.route(
-      `${VITE_BASE_API_URL}/projects/*`,
+      `${VITE_API_BASE_URL}/projects/*`,
       (route) =>
         route.request().method() === 'GET' &&
         route.fulfill({
@@ -617,7 +617,7 @@ test.describe('edit project page', () => {
     )
     const title = faker.lorem.slug()
     const description = faker.lorem.sentences()
-    await page.route(`${VITE_BASE_API_URL}/projects/${id}`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/${id}`, (route) =>
       route.fulfill({
         json: {
           id,
@@ -627,7 +627,7 @@ test.describe('edit project page', () => {
         },
       })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${id}/edit`)
+    await page.goto(`${APP_BASE_URL}/projects/${id}/edit`)
     await page.getByPlaceholder('Enter title').fill(title)
     await page.getByPlaceholder('Enter description').fill(description)
     const promise1 = page.waitForResponse(
@@ -639,7 +639,7 @@ test.describe('edit project page', () => {
     await page.getByRole('button', { name: 'Submit' }).click()
     expect((await promise1).request().method()).toBe('PUT')
     expect((await promise2).request().method()).toBe('GET')
-    expect(page.url()).toBe(`${BASE_APP_URL}/projects/${id}`)
+    expect(page.url()).toBe(`${APP_BASE_URL}/projects/${id}`)
     await expect(
       page.getByText('Project updated', { exact: true })
     ).toBeVisible()
@@ -655,9 +655,9 @@ test.describe('project details page', () => {
   test('rendering title and description', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*`, (route) =>
       route.fulfill({ json: SUBJECT })
     )
     await page.goto(`/projects/${SUBJECT.id}`)
@@ -672,12 +672,12 @@ test.describe('project details page', () => {
   test('navigating to "Edit Project" page', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*`, (route) =>
       route.fulfill({ json: SUBJECT })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.goto(`${APP_BASE_URL}/projects/${SUBJECT.id}`)
     await page.getByRole('link', { name: 'Edit Project' }).click()
     await expect(
       page.getByRole('heading', { name: 'Edit Project' })
@@ -690,12 +690,12 @@ test.describe('project details page', () => {
   test('rendering project details', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*`, (route) =>
       route.fulfill({ json: SUBJECT })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.goto(`${APP_BASE_URL}/projects/${SUBJECT.id}`)
     await expect(page.getByText('Created at')).toBeVisible()
     await expect(page.getByText('August 7,')).toBeVisible()
     await expect(page.getByText('Title', { exact: true })).toBeVisible()
@@ -711,16 +711,16 @@ test.describe('project details page', () => {
   test('previewing five latest schedules', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
     await page.route(
-      `${VITE_BASE_API_URL}/projects/*/schedules?size=5`,
+      `${VITE_API_BASE_URL}/projects/*/schedules?size=5`,
       (route) => route.fulfill({ json: PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*`, (route) =>
       route.fulfill({ json: SUBJECT })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.goto(`${APP_BASE_URL}/projects/${SUBJECT.id}`)
     await page.getByRole('tab', { name: 'Schedules' }).click()
     await Promise.all(
       PAGINABLE_RESPONSE.content.flatMap(({ title, description }) => [
@@ -733,15 +733,15 @@ test.describe('project details page', () => {
   test('previewing five latest boards', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects/*/boards?size=5`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*/boards?size=5`, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*`, (route) =>
       route.fulfill({ json: SUBJECT })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.goto(`${APP_BASE_URL}/projects/${SUBJECT.id}`)
     await page.getByRole('tab', { name: 'Boards' }).click()
     await Promise.all(
       PAGINABLE_RESPONSE.content.flatMap(({ title, description }) => [
@@ -754,15 +754,15 @@ test.describe('project details page', () => {
   test('previewing five latest notes', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects/*/notes?size=5`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*/notes?size=5`, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*`, (route) =>
       route.fulfill({ json: SUBJECT })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.goto(`${APP_BASE_URL}/projects/${SUBJECT.id}`)
     await page.getByRole('tab', { name: 'Notes' }).click()
     await Promise.all(
       PAGINABLE_RESPONSE.content.flatMap(({ title, description }) => [
@@ -777,19 +777,19 @@ test.describe('project details page', () => {
   }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
     await page.route(
-      `${VITE_BASE_API_URL}/projects/*/schedules?size=5`,
+      `${VITE_API_BASE_URL}/projects/*/schedules?size=5`,
       (route) => route.fulfill({ json: PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*`, (route) =>
       route.fulfill({ json: SUBJECT })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.goto(`${APP_BASE_URL}/projects/${SUBJECT.id}`)
     await page.getByRole('tab', { name: 'Schedules' }).click()
     await page.getByRole('link', { name: 'See full details' }).click()
-    expect(page.url()).toBe(`${BASE_APP_URL}/projects/${SUBJECT.id}/schedules`)
+    expect(page.url()).toBe(`${APP_BASE_URL}/projects/${SUBJECT.id}/schedules`)
   })
 
   test('navigating to "Schedules" page by "Navigate to the full page" link', async ({
@@ -797,60 +797,60 @@ test.describe('project details page', () => {
   }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
     await page.route(
-      `${VITE_BASE_API_URL}/projects/*/schedules?size=5`,
+      `${VITE_API_BASE_URL}/projects/*/schedules?size=5`,
       (route) => route.fulfill({ json: EMPTY_PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*`, (route) =>
       route.fulfill({ json: SUBJECT })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.goto(`${APP_BASE_URL}/projects/${SUBJECT.id}`)
     await page.getByRole('tab', { name: 'Schedules' }).click()
     await page.getByRole('link', { name: 'Navigate to the full page' }).click()
-    expect(page.url()).toBe(`${BASE_APP_URL}/projects/${SUBJECT.id}/schedules`)
+    expect(page.url()).toBe(`${APP_BASE_URL}/projects/${SUBJECT.id}/schedules`)
   })
 
   test('navigating to "Schedule Details" page', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
     await page.route(
-      `${VITE_BASE_API_URL}/projects/*/schedules?size=5`,
+      `${VITE_API_BASE_URL}/projects/*/schedules?size=5`,
       (route) => route.fulfill({ json: PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*`, (route) =>
       route.fulfill({ json: SUBJECT })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.goto(`${APP_BASE_URL}/projects/${SUBJECT.id}`)
     await page.getByRole('tab', { name: 'Schedules' }).click()
     await page
       .getByRole('link', { name: PAGINABLE_RESPONSE.content[0].title })
       .click()
     expect(page.url()).toBe(
-      `${BASE_APP_URL}/projects/${SUBJECT.id}/schedules/${PAGINABLE_RESPONSE.content[0].id}`
+      `${APP_BASE_URL}/projects/${SUBJECT.id}/schedules/${PAGINABLE_RESPONSE.content[0].id}`
     )
   })
 
   test('navigating to "New Schedule" page', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
     await page.route(
-      `${VITE_BASE_API_URL}/projects/*/schedules?size=5`,
+      `${VITE_API_BASE_URL}/projects/*/schedules?size=5`,
       (route) => route.fulfill({ json: EMPTY_PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*`, (route) =>
       route.fulfill({ json: SUBJECT })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.goto(`${APP_BASE_URL}/projects/${SUBJECT.id}`)
     await page.getByRole('tab', { name: 'Schedules' }).click()
     await page.getByRole('link', { name: 'Create your first entry' }).click()
     expect(page.url()).toBe(
-      `${BASE_APP_URL}/projects/${SUBJECT.id}/schedules/new`
+      `${APP_BASE_URL}/projects/${SUBJECT.id}/schedules/new`
     )
   })
 
@@ -859,18 +859,18 @@ test.describe('project details page', () => {
   }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects/*/boards?size=5`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*/boards?size=5`, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*`, (route) =>
       route.fulfill({ json: SUBJECT })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.goto(`${APP_BASE_URL}/projects/${SUBJECT.id}`)
     await page.getByRole('tab', { name: 'Boards' }).click()
     await page.getByRole('link', { name: 'See full details' }).click()
-    expect(page.url()).toBe(`${BASE_APP_URL}/projects/${SUBJECT.id}/boards`)
+    expect(page.url()).toBe(`${APP_BASE_URL}/projects/${SUBJECT.id}/boards`)
   })
 
   test('navigating to "Boards" page by "Navigate to the full page" link', async ({
@@ -878,56 +878,56 @@ test.describe('project details page', () => {
   }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects/*/boards?size=5`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*/boards?size=5`, (route) =>
       route.fulfill({ json: EMPTY_PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*`, (route) =>
       route.fulfill({ json: SUBJECT })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.goto(`${APP_BASE_URL}/projects/${SUBJECT.id}`)
     await page.getByRole('tab', { name: 'Boards' }).click()
     await page.getByRole('link', { name: 'Navigate to the full page' }).click()
-    expect(page.url()).toBe(`${BASE_APP_URL}/projects/${SUBJECT.id}/boards`)
+    expect(page.url()).toBe(`${APP_BASE_URL}/projects/${SUBJECT.id}/boards`)
   })
 
   test('navigating to "Board Details" page', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects/*/boards?size=5`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*/boards?size=5`, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*`, (route) =>
       route.fulfill({ json: SUBJECT })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.goto(`${APP_BASE_URL}/projects/${SUBJECT.id}`)
     await page.getByRole('tab', { name: 'Boards' }).click()
     await page
       .getByRole('link', { name: PAGINABLE_RESPONSE.content[0].title })
       .click()
     expect(page.url()).toBe(
-      `${BASE_APP_URL}/projects/${SUBJECT.id}/boards/${PAGINABLE_RESPONSE.content[0].id}`
+      `${APP_BASE_URL}/projects/${SUBJECT.id}/boards/${PAGINABLE_RESPONSE.content[0].id}`
     )
   })
 
   test('navigating to "New Board" page', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects/*/boards?size=5`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*/boards?size=5`, (route) =>
       route.fulfill({ json: EMPTY_PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*`, (route) =>
       route.fulfill({ json: SUBJECT })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.goto(`${APP_BASE_URL}/projects/${SUBJECT.id}`)
     await page.getByRole('tab', { name: 'Boards' }).click()
     await page.getByRole('link', { name: 'Create your first entry' }).click()
-    expect(page.url()).toBe(`${BASE_APP_URL}/projects/${SUBJECT.id}/boards/new`)
+    expect(page.url()).toBe(`${APP_BASE_URL}/projects/${SUBJECT.id}/boards/new`)
   })
 
   test('navigating to "Notes" page by "See full details" link', async ({
@@ -935,18 +935,18 @@ test.describe('project details page', () => {
   }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects/*/notes?size=5`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*/notes?size=5`, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*`, (route) =>
       route.fulfill({ json: SUBJECT })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.goto(`${APP_BASE_URL}/projects/${SUBJECT.id}`)
     await page.getByRole('tab', { name: 'Notes' }).click()
     await page.getByRole('link', { name: 'See full details' }).click()
-    expect(page.url()).toBe(`${BASE_APP_URL}/projects/${SUBJECT.id}/notes`)
+    expect(page.url()).toBe(`${APP_BASE_URL}/projects/${SUBJECT.id}/notes`)
   })
 
   test('navigating to "Notes" page by "Navigate to the full page" link', async ({
@@ -954,55 +954,55 @@ test.describe('project details page', () => {
   }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects/*/notes?size=5`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*/notes?size=5`, (route) =>
       route.fulfill({ json: EMPTY_PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*`, (route) =>
       route.fulfill({ json: SUBJECT })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.goto(`${APP_BASE_URL}/projects/${SUBJECT.id}`)
     await page.getByRole('tab', { name: 'Notes' }).click()
     await page.getByRole('link', { name: 'Navigate to the full page' }).click()
-    expect(page.url()).toBe(`${BASE_APP_URL}/projects/${SUBJECT.id}/notes`)
+    expect(page.url()).toBe(`${APP_BASE_URL}/projects/${SUBJECT.id}/notes`)
   })
 
   test('navigating to "Note Details" page', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects/*/notes?size=5`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*/notes?size=5`, (route) =>
       route.fulfill({ json: PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*`, (route) =>
       route.fulfill({ json: SUBJECT })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.goto(`${APP_BASE_URL}/projects/${SUBJECT.id}`)
     await page.getByRole('tab', { name: 'Notes' }).click()
     await page
       .getByRole('link', { name: PAGINABLE_RESPONSE.content[0].title })
       .click()
     expect(page.url()).toBe(
-      `${BASE_APP_URL}/projects/${SUBJECT.id}/notes/${PAGINABLE_RESPONSE.content[0].id}`
+      `${APP_BASE_URL}/projects/${SUBJECT.id}/notes/${PAGINABLE_RESPONSE.content[0].id}`
     )
   })
 
   test('navigating to "New Note" page', async ({ page }) => {
     await setupClerkTestingToken({
       page,
-      options: { frontendApiUrl: BASE_APP_URL },
+      options: { frontendApiUrl: APP_BASE_URL },
     })
-    await page.route(`${VITE_BASE_API_URL}/projects/*/notes?size=5`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*/notes?size=5`, (route) =>
       route.fulfill({ json: EMPTY_PAGINABLE_RESPONSE })
     )
-    await page.route(`${VITE_BASE_API_URL}/projects/*`, (route) =>
+    await page.route(`${VITE_API_BASE_URL}/projects/*`, (route) =>
       route.fulfill({ json: SUBJECT })
     )
-    await page.goto(`${BASE_APP_URL}/projects/${SUBJECT.id}`)
+    await page.goto(`${APP_BASE_URL}/projects/${SUBJECT.id}`)
     await page.getByRole('tab', { name: 'Notes' }).click()
     await page.getByRole('link', { name: 'Create your first entry' }).click()
-    expect(page.url()).toBe(`${BASE_APP_URL}/projects/${SUBJECT.id}/notes/new`)
+    expect(page.url()).toBe(`${APP_BASE_URL}/projects/${SUBJECT.id}/notes/new`)
   })
 })
