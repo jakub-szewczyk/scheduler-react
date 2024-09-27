@@ -49,6 +49,8 @@ export const DAYS = [
   'Saturday',
 ]
 
+const refDate = '2024-09-27T12:49:17.572Z'
+
 export const PAGINABLE_EVENTS_RESPONSE = {
   content: Array(total)
     .fill(null)
@@ -58,8 +60,8 @@ export const PAGINABLE_EVENTS_RESPONSE = {
       title: faker.lorem.slug(),
       description: faker.lorem.sentences(),
       createdAt: faker.date.past().toISOString(),
-      startsAt: faker.date.recent().toISOString(),
-      endsAt: faker.date.soon().toISOString(),
+      startsAt: faker.date.recent({ refDate }).toISOString(),
+      endsAt: faker.date.soon({ refDate }).toISOString(),
       color: 'BLUE',
     })),
   page,

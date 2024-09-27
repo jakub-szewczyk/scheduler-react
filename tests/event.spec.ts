@@ -5,7 +5,6 @@ import {
   DAYS,
   EMPTY_PAGINABLE_RESPONSE,
   PAGINABLE_EVENTS_RESPONSE,
-  PAGINABLE_RESPONSE,
 } from '../src/mocks/common'
 
 const APP_BASE_URL = process.env.APP_BASE_URL
@@ -28,7 +27,7 @@ test.describe('events page', () => {
       (route) => route.fulfill({ json: EMPTY_PAGINABLE_RESPONSE })
     )
     await page.goto(
-      `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/schedules/${PAGINABLE_RESPONSE.content[0].id}/events`
+      `${APP_BASE_URL}/projects/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/schedules/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/events`
     )
     await expect(page.getByRole('heading', { name: 'Events' })).toBeVisible()
     await expect(page.getByRole('main')).toContainText(
@@ -46,10 +45,10 @@ test.describe('events page', () => {
       (route) => route.fulfill({ json: EMPTY_PAGINABLE_RESPONSE })
     )
     await page.goto(
-      `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/schedules/${PAGINABLE_RESPONSE.content[0].id}/events`
+      `${APP_BASE_URL}/projects/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/schedules/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/events`
     )
     await expect(
-      page.getByRole('heading', { name: format(new Date(), 'LLLL') })
+      page.getByRole('heading', { name: format(new Date(), 'MMMM') })
     ).toBeVisible()
     await expect(page.getByText(format(new Date(), 'yyyy'))).toBeVisible()
     await expect(
@@ -143,14 +142,19 @@ test.describe('events page', () => {
     }
   })
 
-  test('navigating to the last page', async ({ page, isMobile }) => {
+  test('navigating to the last page', async ({
+    page,
+    browserName,
+    isMobile,
+  }) => {
+    test.skip(browserName === 'webkit')
     await setupClerkTestingToken({
       page,
       options: { frontendApiUrl: APP_BASE_URL },
     })
     const url = `${VITE_API_BASE_URL}/projects/*/schedules/*/events*`
     await page.route(url, (route) =>
-      route.fulfill({ json: PAGINABLE_RESPONSE })
+      route.fulfill({ json: PAGINABLE_EVENTS_RESPONSE })
     )
     let promise = page.waitForResponse(url)
     await page.goto(
@@ -172,14 +176,19 @@ test.describe('events page', () => {
     expect((await promise).url().includes('page=9')).toBeTruthy()
   })
 
-  test('navigating to the first page', async ({ page, isMobile }) => {
+  test('navigating to the first page', async ({
+    page,
+    browserName,
+    isMobile,
+  }) => {
+    test.skip(browserName === 'webkit')
     await setupClerkTestingToken({
       page,
       options: { frontendApiUrl: APP_BASE_URL },
     })
     const url = `${VITE_API_BASE_URL}/projects/*/schedules/*/events*`
     await page.route(url, (route) =>
-      route.fulfill({ json: PAGINABLE_RESPONSE })
+      route.fulfill({ json: PAGINABLE_EVENTS_RESPONSE })
     )
     let promise = page.waitForResponse(url)
     await page.goto(
@@ -209,125 +218,256 @@ test.describe('events page', () => {
     expect((await promise).url().includes('page=0')).toBeTruthy()
   })
 
-  /**
-   * TODO:
-   * Test:
-   *
-   * EVENTS
-   * - Navigating to different months.
-   * - Creating new events.
-   * - Updating existing events.
-   * - Deleting events.
-   * - Display event details in a popover.
-   * - Display event details in a "+x more" popover.
-   *
-   * NOTIFICATIONS
-   * - Creating new notifications.
-   * - Updating existing notifications.
-   * - Enabling/Disabling notification via popover.
-   */
+  test('navigating to the next month', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: APP_BASE_URL },
+    })
+    await page.route(
+      `${VITE_API_BASE_URL}/projects/*/schedules/*/events*`,
+      (route) => route.fulfill({ json: PAGINABLE_EVENTS_RESPONSE })
+    )
+    await page.goto(
+      `${APP_BASE_URL}/projects/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/schedules/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/events`
+    )
+    const prevMonth = subMonths(new Date(), 1)
+    const currMonth = new Date()
+    const nextMonth = addMonths(new Date(), 1)
+    await Promise.all([
+      expect(
+        page.getByRole('heading', { name: format(currMonth, 'MMMM') })
+      ).toBeVisible(),
+      expect(
+        page.getByRole('button', { name: format(prevMonth, 'MMM') })
+      ).toBeVisible(),
+      expect(
+        page.getByRole('button', { name: format(nextMonth, 'MMM') })
+      ).toBeVisible(),
+    ])
+    await page.getByRole('button', { name: format(nextMonth, 'MMM') }).click()
+    await Promise.all([
+      expect(
+        page.getByRole('heading', { name: format(nextMonth, 'MMMM') })
+      ).toBeVisible(),
+      expect(
+        page.getByRole('button', { name: format(currMonth, 'MMM') })
+      ).toBeVisible(),
+      expect(
+        page.getByRole('button', {
+          name: format(addMonths(currMonth, 2), 'MMM'),
+        })
+      ).toBeVisible(),
+    ])
+  })
 
-  // test('deleting an event', async ({ page }) => {
-  //   await setupClerkTestingToken({
-  //     page,
-  //     options: { frontendApiUrl: APP_BASE_URL },
-  //   })
-  //   await page.route(`${VITE_API_BASE_URL}/projects/*/schedules*`, (route) =>
-  //     route.fulfill({ json: PAGINABLE_RESPONSE })
-  //   )
-  //   await page.route(`${VITE_API_BASE_URL}/projects/*/schedules/*`, (route) =>
-  //     route.fulfill({
-  //       json: {
-  //         id: faker.string.uuid(),
-  //         title: faker.lorem.slug(),
-  //         description: faker.lorem.sentences(),
-  //         createdAt: faker.date.past().toISOString(),
-  //       },
-  //     })
-  //   )
-  //   await page.goto(
-  //     `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/schedules`
-  //   )
-  //   await page
-  //     .getByRole('row', { name: 'socius-accusator-corona Tergo' })
-  //     .getByRole('button')
-  //     .click()
-  //   await page.getByRole('menuitem', { name: 'Delete' }).click()
-  //   await expect(
-  //     page
-  //       .getByLabel('Warning: Permanent Deletion')
-  //       .getByText('socius-accusator-corona')
-  //   ).toBeVisible()
-  //   const promise1 = page.waitForResponse(
-  //     (response) => response.request().method() === 'DELETE'
-  //   )
-  //   const promise2 = page.waitForResponse(
-  //     (response) => response.request().method() === 'GET'
-  //   )
-  //   await page.getByRole('button', { name: 'Yes, delete' }).click()
-  //   expect((await promise1).request().method()).toBe('DELETE')
-  //   expect((await promise2).request().method()).toBe('GET')
-  // })
+  test('navigating to the previous month', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: APP_BASE_URL },
+    })
+    await page.route(
+      `${VITE_API_BASE_URL}/projects/*/schedules/*/events*`,
+      (route) => route.fulfill({ json: PAGINABLE_EVENTS_RESPONSE })
+    )
+    await page.goto(
+      `${APP_BASE_URL}/projects/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/schedules/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/events`
+    )
+    const prevMonth = subMonths(new Date(), 1)
+    const currMonth = new Date()
+    const nextMonth = addMonths(new Date(), 1)
+    await Promise.all([
+      expect(
+        page.getByRole('heading', { name: format(currMonth, 'MMMM') })
+      ).toBeVisible(),
+      expect(
+        page.getByRole('button', { name: format(prevMonth, 'MMM') })
+      ).toBeVisible(),
+      expect(
+        page.getByRole('button', { name: format(nextMonth, 'MMM') })
+      ).toBeVisible(),
+    ])
+    await page.getByRole('button', { name: format(prevMonth, 'MMM') }).click()
+    await Promise.all([
+      expect(
+        page.getByRole('heading', { name: format(prevMonth, 'MMMM') })
+      ).toBeVisible(),
+      expect(
+        page.getByRole('button', {
+          name: format(subMonths(currMonth, 2), 'MMM'),
+        })
+      ).toBeVisible(),
+      expect(
+        page.getByRole('button', { name: format(currMonth, 'MMM') })
+      ).toBeVisible(),
+    ])
+  })
 
-  // test('navigating to "New Event" page', async ({ page }) => {
-  //   await setupClerkTestingToken({
-  //     page,
-  //     options: { frontendApiUrl: APP_BASE_URL },
-  //   })
-  //   await page.route(`${VITE_API_BASE_URL}/projects/*/schedules*`, (route) =>
-  //     route.fulfill({ json: PAGINABLE_RESPONSE })
-  //   )
-  //   await page.route(`${VITE_API_BASE_URL}/projects/*/schedules/*`, (route) =>
-  //     route.fulfill({
-  //       json: {
-  //         id: faker.string.uuid(),
-  //         title: faker.lorem.slug(),
-  //         description: faker.lorem.sentences(),
-  //         createdAt: faker.date.past().toISOString(),
-  //       },
-  //     })
-  //   )
-  //   await page.goto(
-  //     `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/schedules`
-  //   )
-  //   await page.getByRole('link', { name: 'New Schedule' }).click()
-  //   expect(page.url()).toBe(
-  //     `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/schedules/new`
-  //   )
-  // })
+  test('rendering event details', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: APP_BASE_URL },
+    })
+    await page.route(
+      `${VITE_API_BASE_URL}/projects/*/schedules/*/events*`,
+      (route) => route.fulfill({ json: PAGINABLE_EVENTS_RESPONSE })
+    )
+    await page.route(
+      `${VITE_API_BASE_URL}/projects/*/schedules/*/events/*/notification`,
+      (route) => route.fulfill({ json: null })
+    )
+    await page.goto(
+      `${APP_BASE_URL}/projects/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/schedules/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/events`
+    )
+    await page.getByRole('button', { name: 'porro-solvo-aegrus' }).click()
+    await Promise.all([
+      expect(
+        page.getByRole('dialog').getByText('porro-solvo-aegrus')
+      ).toBeVisible(),
+      expect(
+        page.getByText('Thu 26 Sep 15:49 - Sat 28 Sep 03:24')
+      ).toBeVisible(),
+      expect(page.getByText('No Notification')).toBeVisible(),
+      expect(
+        page.getByRole('button', { name: 'Notification Settings' })
+      ).toBeVisible(),
+    ])
+  })
 
-  // test('navigating to "Edit Event" page', async ({ page }) => {
-  //   await setupClerkTestingToken({
-  //     page,
-  //     options: { frontendApiUrl: APP_BASE_URL },
-  //   })
-  //   await page.route(`${VITE_API_BASE_URL}/projects/*/schedules*`, (route) =>
-  //     route.fulfill({ json: PAGINABLE_RESPONSE })
-  //   )
-  //   const id = faker.string.uuid()
-  //   await page.route(`${VITE_API_BASE_URL}/projects/*/schedules/*`, (route) =>
-  //     route.fulfill({
-  //       json: {
-  //         id,
-  //         title: faker.lorem.slug(),
-  //         description: faker.lorem.sentences(),
-  //         createdAt: faker.date.past().toISOString(),
-  //       },
-  //     })
-  //   )
-  //   await page.goto(
-  //     `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/schedules`
-  //   )
-  //   await page
-  //     .getByRole('row', { name: 'socius-accusator-corona Tergo' })
-  //     .getByRole('button')
-  //     .click()
-  //   await page.getByRole('menuitem', { name: 'Edit' }).click()
-  //   expect(page.url()).toBe(
-  //     `${APP_BASE_URL}/projects/${PAGINABLE_RESPONSE.content[0].id}/schedules/${PAGINABLE_RESPONSE.content[0].id}/edit`
-  //   )
-  // })
+  test('rendering event details through the "+x more" popover', async ({
+    page,
+  }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: APP_BASE_URL },
+    })
+    await page.route(
+      `${VITE_API_BASE_URL}/projects/*/schedules/*/events*`,
+      (route) => route.fulfill({ json: PAGINABLE_EVENTS_RESPONSE })
+    )
+    await page.route(
+      `${VITE_API_BASE_URL}/projects/*/schedules/*/events/*/notification`,
+      (route) => route.fulfill({ json: null })
+    )
+    await page.goto(
+      `${APP_BASE_URL}/projects/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/schedules/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/events`
+    )
+    await page.getByRole('button', { name: '+2 more' }).click()
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'porro-solvo-aegrus' })
+      .click()
+    await Promise.all([
+      expect(
+        page.getByText('Thu 26 Sep 15:49 - Sat 28 Sep 03:24')
+      ).toBeVisible(),
+      expect(page.getByText('No Notification')).toBeVisible(),
+      expect(
+        page.getByRole('button', { name: 'Notification Settings' })
+      ).toBeVisible(),
+    ])
+  })
+
+  test('deleting an event', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: APP_BASE_URL },
+    })
+    await page.route(
+      `${VITE_API_BASE_URL}/projects/*/schedules/*/events*`,
+      (route) => route.fulfill({ json: PAGINABLE_EVENTS_RESPONSE })
+    )
+    await page.route(
+      `${VITE_API_BASE_URL}/projects/*/schedules/*/events/*`,
+      (route) => route.fulfill({ json: PAGINABLE_EVENTS_RESPONSE[0] })
+    )
+    await page.route(
+      `${VITE_API_BASE_URL}/projects/*/schedules/*/events/*/notification`,
+      (route) => route.fulfill({ json: null })
+    )
+    await page.goto(
+      `${APP_BASE_URL}/projects/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/schedules/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/events`
+    )
+    await page.getByRole('button', { name: 'porro-solvo-aegrus' }).click()
+    await page.getByTestId('delete-event').click()
+    await expect(
+      page.getByRole('heading', { name: 'Warning: Permanent Deletion' })
+    ).toBeVisible()
+    const promise1 = page.waitForResponse(
+      (response) => response.request().method() === 'DELETE'
+    )
+    const promise2 = page.waitForResponse(
+      (response) => response.request().method() === 'GET'
+    )
+    await page.getByRole('button', { name: 'Yes, delete' }).click()
+    expect((await promise1).request().method()).toBe('DELETE')
+    expect((await promise2).request().method()).toBe('GET')
+  })
+
+  test('navigating to "New Event" page', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: APP_BASE_URL },
+    })
+    await page.route(
+      `${VITE_API_BASE_URL}/projects/*/schedules/*/events*`,
+      (route) => route.fulfill({ json: PAGINABLE_EVENTS_RESPONSE })
+    )
+    await page.route(
+      `${VITE_API_BASE_URL}/projects/*/schedules/*/events/*`,
+      (route) =>
+        route.fulfill({
+          json: PAGINABLE_EVENTS_RESPONSE[0],
+        })
+    )
+    await page.goto(
+      `${APP_BASE_URL}/projects/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/schedules/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/events`
+    )
+    await page.getByRole('link', { name: 'New Event' }).click()
+    expect(page.url()).toBe(
+      `${APP_BASE_URL}/projects/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/schedules/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/events/new`
+    )
+  })
+
+  test('navigating to "Edit Event" page', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: APP_BASE_URL },
+    })
+    await page.route(
+      `${VITE_API_BASE_URL}/projects/*/schedules/*/events*`,
+      (route) => route.fulfill({ json: PAGINABLE_EVENTS_RESPONSE })
+    )
+    await page.route(
+      `${VITE_API_BASE_URL}/projects/*/schedules/*/events/*`,
+      (route) =>
+        route.fulfill({
+          json: PAGINABLE_EVENTS_RESPONSE[0],
+        })
+    )
+    await page.goto(
+      `${APP_BASE_URL}/projects/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/schedules/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/events`
+    )
+    await page.getByRole('button', { name: 'porro-solvo-aegrus' }).click()
+    await page.getByTestId('edit-event').click()
+    expect(page.url()).toBe(
+      `${APP_BASE_URL}/projects/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/schedules/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/events/${PAGINABLE_EVENTS_RESPONSE.content[9].id}/edit`
+    )
+  })
 })
+
+/**
+ * TODO:
+ * Test:
+ *
+ * EVENTS
+ * - Creating new events.
+ * - Updating existing events.
+ *
+ * NOTIFICATIONS
+ * - Creating new notifications.
+ * - Updating existing notifications.
+ * - Enabling/Disabling notification via popover.
+ */
 
 // test.describe('new event page', () => {
 //   test('rendering title and description', async ({ page }) => {

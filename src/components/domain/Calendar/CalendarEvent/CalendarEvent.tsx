@@ -187,6 +187,7 @@ const CalendarEvent = ({ title, event }: EventProps) => {
                 <dt className='truncate font-bold'>{event.title}</dt>
                 <dd className='flex gap-x-1'>
                   <Button
+                    data-testid='edit-event'
                     className='size-8'
                     size='icon'
                     variant='outline'
@@ -204,6 +205,7 @@ const CalendarEvent = ({ title, event }: EventProps) => {
                     </Link>
                   </Button>
                   <Button
+                    data-testid='delete-event'
                     className='size-8'
                     size='icon'
                     variant='destructive'
