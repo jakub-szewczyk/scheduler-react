@@ -84,7 +84,7 @@ const CalendarEventForm = ({
           control={form.control}
           name='title'
           render={({ field }) => (
-            <FormItem className='sm:max-w-[50%]'>
+            <FormItem data-testid='event-title' className='sm:max-w-[50%]'>
               <FormLabel>
                 Title<span className='text-destructive'>*</span>
               </FormLabel>
@@ -134,9 +134,12 @@ const CalendarEventForm = ({
             control={form.control}
             name='startsAt'
             render={({ field }) => (
-              <FormItem className='flex flex-col sm:w-1/2'>
+              <FormItem
+                data-testid='event-starts-at'
+                className='flex flex-col sm:w-1/2'
+              >
                 <FormLabel>
-                  Starts at <span className='text-destructive'>*</span>
+                  Starts at<span className='text-destructive'>*</span>
                 </FormLabel>
                 <Popover>
                   {isLoading ? (
@@ -186,9 +189,12 @@ const CalendarEventForm = ({
             control={form.control}
             name='endsAt'
             render={({ field }) => (
-              <FormItem className='flex flex-col sm:w-1/2'>
+              <FormItem
+                data-testid='event-ends-at'
+                className='flex flex-col sm:w-1/2'
+              >
                 <FormLabel>
-                  Ends at <span className='text-destructive'>*</span>
+                  Ends at<span className='text-destructive'>*</span>
                 </FormLabel>
                 <Popover>
                   {isLoading ? (
@@ -244,7 +250,7 @@ const CalendarEventForm = ({
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                Color <span className='text-destructive'>*</span>
+                Color<span className='text-destructive'>*</span>
               </FormLabel>
               <FormControl>
                 <RadioGroup

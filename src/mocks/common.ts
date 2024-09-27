@@ -49,6 +49,10 @@ export const DAYS = [
   'Saturday',
 ]
 
+/**
+ * TODO:
+ * Reuse `refDate` from above.
+ */
 const refDate = '2024-09-27T12:49:17.572Z'
 
 export const PAGINABLE_EVENTS_RESPONSE = {

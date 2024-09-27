@@ -132,7 +132,7 @@ const NotificationForm = forwardRef<HTMLFormElement, NotificationFormProps>(
             render={({ field }) => (
               <FormItem className='flex flex-col'>
                 <FormLabel>
-                  Starts at <span className='text-destructive'>*</span>
+                  Starts at<span className='text-destructive'>*</span>
                 </FormLabel>
                 <Popover>
                   {isLoading ? (
