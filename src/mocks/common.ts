@@ -1,6 +1,7 @@
 import { PaginableResponse } from '@/types/api'
 import { Project } from '@/types/project'
 import { faker } from '@faker-js/faker'
+import { format } from 'date-fns'
 
 export const EMPTY_PAGINABLE_RESPONSE: PaginableResponse<Project> = {
   content: [],
@@ -49,11 +50,7 @@ export const DAYS = [
   'Saturday',
 ]
 
-/**
- * TODO:
- * Reuse `refDate` from above.
- */
-const refDate = '2024-09-27T12:49:17.572Z'
+const refDate = `2024-${format(new Date(), 'MM')}-27T12:49:17.572Z`
 
 export const PAGINABLE_EVENTS_RESPONSE = {
   content: Array(total)

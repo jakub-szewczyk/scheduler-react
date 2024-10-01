@@ -319,13 +319,21 @@ test.describe('events page', () => {
     await page.goto(
       `${APP_BASE_URL}/projects/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/schedules/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/events`
     )
-    await page.getByRole('button', { name: 'porro-solvo-aegrus' }).click()
+    await page
+      .getByRole('button', { name: 'porro-solvo-aegrus' })
+      .first()
+      .click()
+    const { startsAt, endsAt } = PAGINABLE_EVENTS_RESPONSE.content.find(
+      ({ title }) => title === 'porro-solvo-aegrus'
+    )!
     await Promise.all([
       expect(
         page.getByRole('dialog').getByText('porro-solvo-aegrus')
       ).toBeVisible(),
       expect(
-        page.getByText('Thu 26 Sep 15:49 - Sat 28 Sep 03:24')
+        page.getByText(
+          `${format(startsAt, 'E d MMM HH:mm')} - ${format(endsAt, 'E d MMM HH:mm')}`
+        )
       ).toBeVisible(),
       expect(page.getByText('No Notification')).toBeVisible(),
       expect(
@@ -342,7 +350,7 @@ test.describe('events page', () => {
       options: { frontendApiUrl: APP_BASE_URL },
     })
     await page.route(
-      `${VITE_API_BASE_URL}/projects/*/schedules/*/events*`,
+      `${VITE_API_BASE_URL}/projects/*/schedules/*/events* `,
       (route) => route.fulfill({ json: PAGINABLE_EVENTS_RESPONSE })
     )
     await page.route(
@@ -356,10 +364,16 @@ test.describe('events page', () => {
     await page
       .getByRole('dialog')
       .getByRole('button', { name: 'porro-solvo-aegrus' })
+      .first()
       .click()
+    const { startsAt, endsAt } = PAGINABLE_EVENTS_RESPONSE.content.find(
+      ({ title }) => title === 'porro-solvo-aegrus'
+    )!
     await Promise.all([
       expect(
-        page.getByText('Thu 26 Sep 15:49 - Sat 28 Sep 03:24')
+        page.getByText(
+          `${format(startsAt, 'E d MMM HH:mm')} - ${format(endsAt, 'E d MMM HH:mm')}`
+        )
       ).toBeVisible(),
       expect(page.getByText('No Notification')).toBeVisible(),
       expect(
@@ -388,7 +402,10 @@ test.describe('events page', () => {
     await page.goto(
       `${APP_BASE_URL}/projects/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/schedules/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/events`
     )
-    await page.getByRole('button', { name: 'porro-solvo-aegrus' }).click()
+    await page
+      .getByRole('button', { name: 'porro-solvo-aegrus' })
+      .first()
+      .click()
     await page.getByTestId('delete-event').click()
     await expect(
       page.getByRole('heading', { name: 'Warning: Permanent Deletion' })
@@ -448,7 +465,10 @@ test.describe('events page', () => {
     await page.goto(
       `${APP_BASE_URL}/projects/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/schedules/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/events`
     )
-    await page.getByRole('button', { name: 'porro-solvo-aegrus' }).click()
+    await page
+      .getByRole('button', { name: 'porro-solvo-aegrus' })
+      .first()
+      .click()
     await page.getByTestId('edit-event').click()
     expect(page.url()).toBe(
       `${APP_BASE_URL}/projects/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/schedules/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/events/${PAGINABLE_EVENTS_RESPONSE.content[9].id}/edit`
@@ -513,6 +533,36 @@ test.describe('new event page', () => {
     ).toBeVisible()
   })
 
+  test('ends at preceding starts at', async ({ page }) => {
+    await page.goto(
+      `${APP_BASE_URL}/projects/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/schedules/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/events/new`
+    )
+    await page.getByLabel('Starts at*').click()
+    await page
+      .getByRole('gridcell', {
+        name: getDate(new Date()).toString(),
+        exact: true,
+      })
+      .first()
+      .click()
+    await page.getByLabel('Hours').type('12')
+    await page.getByLabel('Ends at*').click()
+    await page
+      .getByRole('gridcell', {
+        name: getDate(new Date()).toString(),
+        exact: true,
+      })
+      .first()
+      .click()
+    await page.getByLabel('Hours').type('11')
+    await page.getByRole('button', { name: 'Submit' }).click()
+    await expect(
+      page
+        .getByTestId('event-ends-at')
+        .getByText('The end date cannot precede the start date')
+    ).toBeVisible()
+  })
+
   test('creating event', async ({ page, browserName }) => {
     test.skip(browserName === 'webkit')
     await setupClerkTestingToken({
@@ -559,11 +609,12 @@ test.describe('new event page', () => {
     await page.getByLabel('Starts at*').click()
     await page
       .getByRole('gridcell', { name: getDate(new Date()).toString() })
+      .first()
       .click()
     await page.getByLabel('Ends at*').click()
     await page
       .getByRole('gridcell', { name: getDate(new Date()).toString() })
-      .nth(1)
+      .first()
       .click()
     const promise1 = page.waitForResponse(
       (response) => response.request().method() === 'POST'
@@ -586,141 +637,116 @@ test.describe('new event page', () => {
   })
 })
 
+test.describe('edit event page', () => {
+  test('rendering title and description', async ({ page }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: APP_BASE_URL },
+    })
+    const id = faker.string.uuid()
+    await page.route(
+      `${VITE_API_BASE_URL}/projects/*/schedules/*/events/*`,
+      (route) =>
+        route.request().method() === 'GET' &&
+        route.fulfill({
+          json: {
+            id,
+            title: faker.lorem.slug(),
+            description: faker.lorem.sentences(),
+            createdAt: faker.date.past().toISOString(),
+            startsAt: faker.date.recent().toISOString(),
+            endsAt: faker.date.recent().toISOString(),
+            color: 'BLUE',
+          },
+        })
+    )
+    await page.goto(
+      `${APP_BASE_URL}/projects/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/schedules/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/events/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/edit`
+    )
+    await expect(
+      page.getByRole('heading', { name: 'Edit Event' })
+    ).toBeVisible()
+    await expect(page.getByRole('main')).toContainText(
+      "Edit your event by updating the title, description, start date, end date and choosing a new color if necessary. Ensure the title succinctly describes the event, and use the description to provide key details and objectives. Adjust the start date and end date to redefine the duration of the event as needed. Select a color to categorize your event visually. Once you're done, submit the form to save your changes and keep your calendar up to date."
+    )
+  })
+
+  test('updating event', async ({ page, browserName }) => {
+    await setupClerkTestingToken({
+      page,
+      options: { frontendApiUrl: APP_BASE_URL },
+    })
+    await page.route(
+      `${VITE_API_BASE_URL}/projects/*/schedules/*/events*`,
+      (route) =>
+        route.request().method() === 'GET' &&
+        route.fulfill({ json: PAGINABLE_EVENTS_RESPONSE })
+    )
+    const id = faker.string.uuid()
+    await page.route(
+      `${VITE_API_BASE_URL}/projects/*/schedules/*/events/*`,
+      (route) =>
+        route.request().method() === 'GET' &&
+        route.fulfill({
+          json: {
+            id,
+            title: faker.lorem.slug(),
+            description: faker.lorem.sentences(),
+            createdAt: faker.date.past().toISOString(),
+            startsAt: faker.date.recent().toISOString(),
+            endsAt: faker.date.recent().toISOString(),
+            color: 'BLUE',
+          },
+        })
+    )
+    const title = faker.lorem.slug()
+    const description = faker.lorem.sentences()
+    await page.route(
+      `${VITE_API_BASE_URL}/projects/*/schedules/*/events/${id}`,
+      (route) =>
+        route.fulfill({
+          json: {
+            id,
+            title,
+            description,
+            createdAt: faker.date.past().toISOString(),
+            startsAt: faker.date.recent().toISOString(),
+            endsAt: faker.date.recent().toISOString(),
+            color: 'BLUE',
+          },
+        })
+    )
+    await page.goto(
+      `${APP_BASE_URL}/projects/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/schedules/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/events/${id}/edit`
+    )
+    await page.getByPlaceholder('Enter title').fill(title)
+    await page.getByPlaceholder('Enter description').fill(description)
+    const promise1 = page.waitForResponse(
+      (response) => response.request().method() === 'PUT'
+    )
+    const promise2 = page.waitForResponse(
+      (response) => response.request().method() === 'GET'
+    )
+    await page.getByRole('button', { name: 'Submit' }).click()
+    expect((await promise1).request().method()).toBe('PUT')
+    expect((await promise2).request().method()).toBe('GET')
+    expect(page.url()).toContain(
+      `${APP_BASE_URL}/projects/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/schedules/${PAGINABLE_EVENTS_RESPONSE.content[0].id}/events`
+    )
+    await expect(page.getByText('Event updated', { exact: true })).toBeVisible()
+    if (browserName !== 'chromium')
+      await expect(
+        page.getByText(`${title} has been successfully updated`, {
+          exact: true,
+        })
+      ).toBeVisible()
+  })
+})
+
 /**
  * TODO:
  * Test:
- *
- * EVENTS
- * - Validating `startsAt` and `endsAt` dates.
- * - Updating existing events.
- *
- * NOTIFICATIONS
  * - Creating new notifications.
  * - Updating existing notifications.
- * - Enabling/Disabling notification via popover.
+ * - Enabling/Disabling notifications via popover.
  */
-
-// test.describe('edit event page', () => {
-//   test('rendering title and description', async ({ page }) => {
-//     await setupClerkTestingToken({
-//       page,
-//       options: { frontendApiUrl: APP_BASE_URL },
-//     })
-//     const id = faker.string.uuid()
-//     await page.route(
-//       `${VITE_API_BASE_URL}/projects/*/schedules/*`,
-//       (route) =>
-//         route.request().method() === 'GET' &&
-//         route.fulfill({
-//           json: {
-//             id,
-//             title: faker.lorem.slug(),
-//             description: faker.lorem.sentences(),
-//             createdAt: faker.date.past().toISOString(),
-//           },
-//         })
-//     )
-//     await page.goto(
-//       `${APP_BASE_URL}/projects/${SUBJECT.id}/schedules/${id}/edit`
-//     )
-//     await expect(
-//       page.getByRole('heading', { name: 'Edit Schedule' })
-//     ).toBeVisible()
-//     await expect(page.getByRole('main')).toContainText(
-//       'Modify your existing schedule by updating the title and description. Adjust the title to reflect any changes in focus and use the description to detail revised key events and timelines. Once your updates are complete, submit the form to keep your schedule current.'
-//     )
-//   })
-//
-//   test('title being required', async ({ page }) => {
-//     await setupClerkTestingToken({
-//       page,
-//       options: { frontendApiUrl: APP_BASE_URL },
-//     })
-//     const id = faker.string.uuid()
-//     await page.route(
-//       `${VITE_API_BASE_URL}/projects/*/schedules/*`,
-//       (route) =>
-//         route.request().method() === 'GET' &&
-//         route.fulfill({
-//           json: {
-//             id,
-//             title: faker.lorem.slug(),
-//             description: faker.lorem.sentences(),
-//             createdAt: faker.date.past().toISOString(),
-//           },
-//         })
-//     )
-//     await page.goto(
-//       `${APP_BASE_URL}/projects/${SUBJECT.id}/schedules/${id}/edit`
-//     )
-//     await page.getByPlaceholder('Enter title').clear()
-//     await page.getByRole('button', { name: 'Submit' }).click()
-//     await expect(page.getByText('This field is required')).toBeVisible()
-//   })
-//
-//   test('updating schedule', async ({ page }) => {
-//     await setupClerkTestingToken({
-//       page,
-//       options: { frontendApiUrl: APP_BASE_URL },
-//     })
-//     await page.route(
-//       `${VITE_API_BASE_URL}/projects/*/schedules*`,
-//       (route) =>
-//         route.request().method() === 'GET' &&
-//         route.fulfill({ json: PAGINABLE_RESPONSE })
-//     )
-//     const id = faker.string.uuid()
-//     await page.route(
-//       `${VITE_API_BASE_URL}/projects/${SUBJECT.id}/schedules/*`,
-//       (route) =>
-//         route.request().method() === 'GET' &&
-//         route.fulfill({
-//           json: {
-//             id,
-//             title: faker.lorem.slug(),
-//             description: faker.lorem.sentences(),
-//             createdAt: faker.date.past().toISOString(),
-//           },
-//         })
-//     )
-//     const title = faker.lorem.slug()
-//     const description = faker.lorem.sentences()
-//     await page.route(
-//       `${VITE_API_BASE_URL}/projects/*/schedules/${id}`,
-//       (route) =>
-//         route.fulfill({
-//           json: {
-//             id,
-//             title,
-//             description,
-//             createdAt: faker.date.past().toISOString(),
-//           },
-//         })
-//     )
-//     await page.goto(
-//       `${APP_BASE_URL}/projects/${SUBJECT.id}/schedules/${id}/edit`
-//     )
-//     await page.getByPlaceholder('Enter title').fill(title)
-//     await page.getByPlaceholder('Enter description').fill(description)
-//     const promise1 = page.waitForResponse(
-//       (response) => response.request().method() === 'PUT'
-//     )
-//     const promise2 = page.waitForResponse(
-//       (response) => response.request().method() === 'GET'
-//     )
-//     await page.getByRole('button', { name: 'Submit' }).click()
-//     expect((await promise1).request().method()).toBe('PUT')
-//     expect((await promise2).request().method()).toBe('GET')
-//     expect(page.url()).toBe(
-//       `${APP_BASE_URL}/projects/${SUBJECT.id}/schedules/${id}`
-//     )
-//     await expect(
-//       page.getByText('Schedule updated', { exact: true })
-//     ).toBeVisible()
-//     await expect(
-//       page.getByText(`${title} has been successfully updated`, {
-//         exact: true,
-//       })
-//     ).toBeVisible()
-//   })
-// })
