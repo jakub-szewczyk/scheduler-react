@@ -742,11 +742,3 @@ test.describe('edit event page', () => {
       ).toBeVisible()
   })
 })
-
-/**
- * TODO:
- * Test:
- * - Creating new notifications.
- * - Updating existing notifications.
- * - Enabling/Disabling notifications via popover.
- */
