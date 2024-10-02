@@ -14,7 +14,7 @@ export const getBoardsSearchParamsSchema = z.object({
 
 export type GetBoardsSearchParams = z.infer<typeof getBoardsSearchParamsSchema>
 
-type GetBoardsPathParams = { projectId: Board['id'] }
+type GetBoardsPathParams = { projectId: Project['id'] }
 
 type GetBoardsResponseBody = PaginableResponse<Board>
 

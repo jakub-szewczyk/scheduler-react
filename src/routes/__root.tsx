@@ -4,19 +4,9 @@ import Sidebar from '@/components/layout/Sidebar/Sidebar'
 import { Toaster } from '@/components/ui/toaster'
 import { cn } from '@/modules/common'
 import { SignedIn, SignedOut, UserButton } from '@clerk/clerk-react'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { Outlet, createRootRoute } from '@tanstack/react-router'
 import { useLocalStorage } from 'usehooks-ts'
-// import { Suspense, lazy } from 'react'
-// import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-
-// const TanStackRouterDevtools =
-//   process.env.NODE_ENV === 'production'
-//     ? () => null
-//     : lazy(() =>
-//         import('@tanstack/router-devtools').then((res) => ({
-//           default: res.TanStackRouterDevtools,
-//         }))
-//       )
 
 export const Route = createRootRoute({
   component: Root,
@@ -56,10 +46,7 @@ function Root() {
         </main>
       </SignedOut>
       <Toaster />
-      {/* <ReactQueryDevtools />
-           <Suspense>
-           <TanStackRouterDevtools />
-           </Suspense> */}
+      <ReactQueryDevtools />
     </>
   )
 }
