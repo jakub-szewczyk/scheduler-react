@@ -1,16 +1,10 @@
-import { DraggableLocation } from 'react-beautiful-dnd'
-import { Status } from './status'
+import { z } from 'zod'
 
-export interface Board {
-  id: string
-  createdAt: string
-  name: string
-  statuses: Status[]
-}
+export const boardSchema = z.object({
+  id: z.string().uuid(),
+  createdAt: z.string().datetime(),
+  title: z.string().min(1),
+  description: z.string().nullable(),
+})
 
-export type InitialValues = { name: string }
-
-export type DropResultLocation = {
-  source: DraggableLocation
-  destination: DraggableLocation
-}
+export type Board = z.infer<typeof boardSchema>

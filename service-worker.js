@@ -1,10 +1,9 @@
-/* eslint-disable no-restricted-globals */
 self.addEventListener('push', (event) => {
   if (!event.data) return
-  const payload = event.data.json()
+  const { title, body } = event.data.json()
   event.waitUntil(
-    self.registration.showNotification(payload.title, {
-      body: payload.body,
+    self.registration.showNotification(title, {
+      body,
       icon: '/icon.svg',
       badge: '/icon.svg',
     })

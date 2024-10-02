@@ -1,63 +1,72 @@
+import { PaginableResponse } from '@/types/api'
 import { Board } from '@/types/board'
-import api from './api'
-import { PaginatedResponse } from '@/types/api'
+import { Project } from '@/types/project'
+import { z } from 'zod'
+import { api } from './api'
 
-interface GetBoardsParams {
-  projectId: string
-  page?: number
-  size?: number
-  name?: string
-}
+// GET /projects/:projectId/boards
+export const getBoardsSearchParamsSchema = z.object({
+  page: z.number().int().nonnegative().catch(0),
+  size: z.number().int().nonnegative().catch(10),
+  title: z.string().catch(''),
+  createdAt: z.enum(['ASC', 'DESC']).catch('DESC'),
+})
 
-type GetBoardsResponse = PaginatedResponse<
-  Pick<Board, 'id' | 'createdAt' | 'name'>[]
->
+export type GetBoardsSearchParams = z.infer<typeof getBoardsSearchParamsSchema>
 
-export const getBoards = ({ projectId, ...params }: GetBoardsParams) =>
-  api<GetBoardsResponse>(`/projects/${projectId}/boards`, { params }).then(
-    ({ data }) => data
-  )
+type GetBoardsPathParams = { projectId: Board['id'] }
 
-interface GetBoardParams {
-  projectId: string
-  boardId: string
-}
+type GetBoardsResponseBody = PaginableResponse<Board>
 
-export const getBoard = ({ projectId, boardId }: GetBoardParams) =>
+export const getBoards = ({
+  projectId,
+  ...params
+}: GetBoardsPathParams & Partial<GetBoardsSearchParams>) =>
+  api<GetBoardsResponseBody>(`/projects/${projectId}/boards`, {
+    params,
+  }).then(({ data }) => data)
+
+// GET /projects/:projectId/boards/:boardId
+type GetBoardPathParams = { projectId: Project['id']; boardId: Board['id'] }
+
+export const getBoard = ({ projectId, boardId }: GetBoardPathParams) =>
   api<Board>(`/projects/${projectId}/boards/${boardId}`).then(
     ({ data }) => data
   )
 
-interface CreateBoardPayload {
-  projectId: string
-  name: string
-}
+// POST /projects/:projectId/boards
+type CreateBoardPathParams = { projectId: Project['id'] }
 
-export const createBoard = ({ projectId, name }: CreateBoardPayload) =>
+type CreateBoardRequestBody = Pick<Board, 'title' | 'description'>
+
+export const createBoard = ({
+  projectId,
+  ...data
+}: CreateBoardPathParams & CreateBoardRequestBody) =>
+  api.post<Board>(`projects/${projectId}/boards`, data).then(({ data }) => data)
+
+// PUT /projects/:projectId/boards/:boardId
+type UpdateBoardPathParams = { projectId: Project['id']; boardId: Board['id'] }
+
+type UpdateBoardRequestBody = Pick<Board, 'title' | 'description'>
+
+export const updateBoard = ({
+  projectId,
+  boardId,
+  ...data
+}: UpdateBoardPathParams & UpdateBoardRequestBody) =>
   api
-    .post<Pick<Board, 'id' | 'createdAt' | 'name'>>(
-      `/projects/${projectId}/boards`,
-      { name }
-    )
+    .put<Board>(`/projects/${projectId}/boards/${boardId}`, data)
     .then(({ data }) => data)
 
-interface UpdateBoardPayload {
-  projectId: string
-  boardId: string
-  name: string
-}
+// DELETE /projects/:projectId/boards/:boardId
+type DeleteBoardPathParams = { projectId: Project['id']; boardId: Board['id'] }
 
-export const updateBoard = ({ projectId, boardId, name }: UpdateBoardPayload) =>
-  api
-    .put<Board>(`/projects/${projectId}/boards/${boardId}`, { name })
-    .then(({ data }) => data)
-
-interface DeleteBoardPayload {
-  projectId: string
-  boardId: string
-}
-
-export const deleteBoard = ({ projectId, boardId }: DeleteBoardPayload) =>
+const deleteBoard = ({ projectId, boardId }: DeleteBoardPathParams) =>
   api
     .delete<Board>(`/projects/${projectId}/boards/${boardId}`)
     .then(({ data }) => data)
+
+export const deleteBoards =
+  (projectId: Project['id']) => (boardIds: Board['id'][]) =>
+    Promise.all(boardIds.map((boardId) => deleteBoard({ projectId, boardId })))

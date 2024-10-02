@@ -1,23 +1,10 @@
-import { EditorState, RawDraftContentState } from 'draft-js'
+import { z } from 'zod'
 
-export interface Note {
-  id: string
-  name: string
-  createdAt: string
-  editorState: EditorState | RawDraftContentState
-}
+export const noteSchema = z.object({
+  id: z.string().uuid(),
+  createdAt: z.string().datetime(),
+  title: z.string().min(1),
+  description: z.string().nullable(),
+})
 
-export type InitialValues = { name: string }
-
-export type DraftBlockStyleType =
-  | 'unstyled'
-  | 'header-one'
-  | 'header-two'
-  | 'header-three'
-  | 'header-four'
-  | 'header-five'
-  | 'header-six'
-  | 'unordered-list-item'
-  | 'ordered-list-item'
-  | 'blockquote'
-  | 'code-block'
+export type Note = z.infer<typeof noteSchema>

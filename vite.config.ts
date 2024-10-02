@@ -1,16 +1,14 @@
-/// <reference types="vitest" />
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tsconfigPaths from 'vite-plugin-tsconfig-paths'
+import { TanStackRouterVite } from "@tanstack/router-vite-plugin";
+import react from "@vitejs/plugin-react";
+import path from "path";
+import { defineConfig } from "vite";
 
+// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), tsconfigPaths()],
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: './src/tests/setup.ts',
+  plugins: [react(), TanStackRouterVite()],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
   },
-  define: {
-    _global: {},
-  },
-})
+});

@@ -1,10 +1,10 @@
-import { Row } from './row'
+import { z } from 'zod'
 
-export interface Schedule {
-  id: string
-  createdAt: string
-  name: string
-  rows: Row[]
-}
+export const scheduleSchema = z.object({
+  id: z.string().uuid(),
+  createdAt: z.string().datetime(),
+  title: z.string().min(1),
+  description: z.string().nullable(),
+})
 
-export type InitialValues = { name: string }
+export type Schedule = z.infer<typeof scheduleSchema>

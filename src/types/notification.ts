@@ -1,11 +1,12 @@
-export interface NotificationConfiguration {
-  notification: 0 | 5 | 10 | 15 | 'custom'
-  time: string | null
-  title: string
-}
+import { z } from 'zod'
 
-export interface Notification {
-  time: string
-  active: boolean
-  title?: string
-}
+export const notificationSchema = z.object({
+  id: z.string().uuid(),
+  createdAt: z.string().datetime(),
+  title: z.string().min(1),
+  description: z.string().nullable(),
+  startsAt: z.string().datetime(),
+  isActive: z.boolean(),
+})
+
+export type Notification = z.infer<typeof notificationSchema>

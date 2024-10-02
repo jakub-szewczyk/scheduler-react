@@ -1,61 +1,70 @@
+import { PaginableResponse } from '@/types/api'
 import { Note } from '@/types/note'
-import api from './api'
-import { PaginatedResponse } from '@/types/api'
+import { Project } from '@/types/project'
+import { z } from 'zod'
+import { api } from './api'
 
-interface GetNotesParams {
-  projectId: string
-  page?: number
-  size?: number
-  name?: string
-}
+// GET /projects/:projectId/boards
+export const getNotesSearchParamsSchema = z.object({
+  page: z.number().int().nonnegative().catch(0),
+  size: z.number().int().nonnegative().catch(10),
+  title: z.string().catch(''),
+  createdAt: z.enum(['ASC', 'DESC']).catch('DESC'),
+})
 
-type GetNotesResponse = PaginatedResponse<
-  Pick<Note, 'id' | 'createdAt' | 'name'>[]
->
+export type GetNotesSearchParams = z.infer<typeof getNotesSearchParamsSchema>
 
-export const getNotes = ({ projectId, ...params }: GetNotesParams) =>
-  api<GetNotesResponse>(`/projects/${projectId}/notes`, { params }).then(
-    ({ data }) => data
-  )
+type GetNotesPathParams = { projectId: Project['id'] }
 
-interface GetNoteParams {
-  projectId: string
-  noteId: string
-}
+type GetNotesResponseBody = PaginableResponse<Note>
 
-export const getNote = ({ projectId, noteId }: GetNoteParams) =>
+export const getNotes = ({
+  projectId,
+  ...params
+}: GetNotesPathParams & Partial<GetNotesSearchParams>) =>
+  api<GetNotesResponseBody>(`/projects/${projectId}/notes`, {
+    params,
+  }).then(({ data }) => data)
+
+// GET /projects/:projectId/notes/:noteId
+type GetNotePathParams = { projectId: Project['id']; noteId: Note['id'] }
+
+export const getNote = ({ projectId, noteId }: GetNotePathParams) =>
   api<Note>(`/projects/${projectId}/notes/${noteId}`).then(({ data }) => data)
 
-interface CreateNotePayload {
-  projectId: string
-  name: string
-}
+// POST /projects/:projectId/notes
+type CreateNotePathParams = { projectId: Project['id'] }
 
-export const createNote = ({ projectId, name }: CreateNotePayload) =>
+type CreateNoteRequestBody = Pick<Note, 'title' | 'description'>
+
+export const createNote = ({
+  projectId,
+  ...data
+}: CreateNotePathParams & CreateNoteRequestBody) =>
+  api.post<Note>(`projects/${projectId}/notes`, data).then(({ data }) => data)
+
+// PUT /projects/:projectId/notes/:noteId
+type UpdateNotePathParams = { projectId: Project['id']; noteId: Note['id'] }
+
+type UpdateNoteRequestBody = Pick<Note, 'title' | 'description'>
+
+export const updateNote = ({
+  projectId,
+  noteId,
+  ...data
+}: UpdateNotePathParams & UpdateNoteRequestBody) =>
   api
-    .post<Pick<Note, 'id' | 'createdAt' | 'name'>>(
-      `/projects/${projectId}/notes`,
-      { name }
-    )
+    .put<Note>(`/projects/${projectId}/notes/${noteId}`, data)
     .then(({ data }) => data)
 
-interface UpdateNotePayload {
-  projectId: string
-  noteId: string
-  name: string
-}
+// DELETE /projects/:projectId/notes/:noteId
+type DeleteNotePathParams = { projectId: Project['id']; noteId: Note['id'] }
 
-export const updateNote = ({ projectId, noteId, name }: UpdateNotePayload) =>
-  api
-    .put<Note>(`/projects/${projectId}/notes/${noteId}`, { name })
-    .then(({ data }) => data)
-
-interface DeleteNotePayload {
-  projectId: string
-  noteId: string
-}
-
-export const deleteNote = ({ projectId, noteId }: DeleteNotePayload) =>
+const deleteNote = ({ projectId, noteId }: DeleteNotePathParams) =>
   api
     .delete<Note>(`/projects/${projectId}/notes/${noteId}`)
     .then(({ data }) => data)
+
+export const deleteNotes =
+  (projectId: Project['id']) => (noteIds: Note['id'][]) =>
+    Promise.all(noteIds.map((noteId) => deleteNote({ projectId, noteId })))

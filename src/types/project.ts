@@ -1,8 +1,10 @@
-export interface Project {
-  id: string
-  createdAt: string
-  name: string
-  description?: string | null
-}
+import { z } from 'zod'
 
-export type InitialValues = { name: string; description: string }
+export const projectSchema = z.object({
+  id: z.string().uuid(),
+  createdAt: z.string().datetime(),
+  title: z.string().min(1),
+  description: z.string().nullable(),
+})
+
+export type Project = z.infer<typeof projectSchema>

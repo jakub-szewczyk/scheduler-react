@@ -1,45 +1,21 @@
 # Scheduler
 
-Schedule your tasks with ease!
+Vite + React SPA ![GitHub Release](https://img.shields.io/github/v/release/jakub-szewczyk/scheduler-react) ![GitHub commit activity](https://img.shields.io/github/commit-activity/w/jakub-szewczyk/scheduler-react)
 
-## Features
+## Resources
 
-### Multiple project management
-
-![](/public/screenshots/1.png)
-
-### Take notes with the built-in editor
-
-![](/public/screenshots/2.png)
-
-### Drag and drop your tasks on a kanban board
-
-![](/public/screenshots/3.png)
-
-### Schedule your tasks and meetings
-
-![](/public/screenshots/4.png)
+- [Live demo](https://scheduler-react.jakubszewczyk.com.pl)
 
 ## Todo
 
-- Increase test coverage.
+- Dashboard.
 
-- Server side persistance layer.
+- Kanban board.
 
-- Flickering save/rename text inside upsert dialogs.
+- WYSIWYG editor.
 
-## Known issues
+- CI/CD for build & deployment.
 
-### Kanban board - invalid menu position
+### Test
 
-Kanban scrollbar somehow collides with the MUI `<Menu />` component, resulting in an invalid menu position and unnecessary scroll restoration. Unknown steps to reproduce. The bug appears when opening the status or issue context menu.
-
-### Kanban board - shaky drag animation
-
-Steps to reproduce:
-
-1. Make sure the kanban board is vertically scrollable.
-
-2. Grab any issue item and drag it to the bottom.
-
-3. Observe dragged element shaking.
+- Notifications.
