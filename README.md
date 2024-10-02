@@ -4,8 +4,6 @@ Vite + React SPA ![GitHub Release](https://img.shields.io/github/v/release/jakub
 
 ## Resources
 
-- [Live demo](https://scheduler-react.jakubszewczyk.com.pl)
-
 ## Todo
 
 - Dashboard.
