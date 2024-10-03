@@ -1,5 +1,5 @@
 import Protected from '@/components/common/Protected/Protected'
-import KanbanColumn from '@/components/domain/Kanban/KanbanColumn/KanbanColumn'
+import KanbanStatus from '@/components/domain/Kanban/KanbanStatus/KanbanStatus'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -156,11 +156,11 @@ function Statuses() {
       </div>
       <div className='flex gap-x-4 overflow-x-auto'>
         {match(getStatusesQuery)
-          .with({ status: 'pending' }, () =>
-            Array(5)
+          .with({ status: 'pending' }, { status: 'error' }, () =>
+            Array(10)
               .fill(null)
               .map((_, index) => (
-                <KanbanColumn
+                <KanbanStatus
                   key={index}
                   className='h-full w-[350px] flex-shrink-0'
                   status='pending'
@@ -171,7 +171,7 @@ function Statuses() {
             <>
               {data.pages.flatMap((page) =>
                 page.content.map((status) => (
-                  <KanbanColumn
+                  <KanbanStatus
                     key={status.id}
                     className='h-full w-[350px] flex-shrink-0'
                     status='success'
@@ -180,7 +180,7 @@ function Statuses() {
                 ))
               )}
               {getStatusesQuery.hasNextPage && (
-                <KanbanColumn
+                <KanbanStatus
                   ref={ref}
                   className='h-full w-[350px] flex-shrink-0'
                   status='pending'
@@ -188,7 +188,6 @@ function Statuses() {
               )}
             </>
           ))
-          .with({ status: 'error' }, () => null)
           .exhaustive()}
       </div>
     </div>
