@@ -17,9 +17,13 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { getStatuses } from '@/services/status'
+import { Status } from '@/types/status'
+import { DndContext, DragOverlay } from '@dnd-kit/core'
+import { SortableContext } from '@dnd-kit/sortable'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { CirclePlus } from 'lucide-react'
+import { useState } from 'react'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { match } from 'ts-pattern'
 import { useDocumentTitle, useIntersectionObserver } from 'usehooks-ts'
@@ -38,6 +42,10 @@ export const Route = createFileRoute(
 
 function Statuses() {
   useDocumentTitle(`Scheduler - ${pageTitle}`)
+
+  const [draggedStatusId, setDraggedStatusId] = useState<Status['id'] | null>(
+    null
+  )
 
   const params = Route.useParams()
 
@@ -162,32 +170,51 @@ function Statuses() {
               .map((_, index) => (
                 <KanbanStatus
                   key={index}
-                  className='h-full w-[350px] flex-shrink-0'
+                  className='w-[350px] flex-shrink-0'
                   status='pending'
                 />
               ))
           )
-          .with({ status: 'success' }, ({ data }) => (
-            <>
-              {data.pages.flatMap((page) =>
-                page.content.map((status) => (
+          .with({ status: 'success' }, ({ data }) => {
+            const statuses = data.pages.flatMap((page) => page.content)
+            return (
+              <>
+                <DndContext
+                  onDragStart={(event) =>
+                    setDraggedStatusId(event.active.id as Status['id'])
+                  }
+                  onDragEnd={() => setDraggedStatusId(null)}
+                >
+                  <SortableContext items={statuses.map((status) => status.id)}>
+                    {statuses.map((status) => (
+                      <KanbanStatus
+                        key={status.id}
+                        className='w-[350px] flex-shrink-0'
+                        status='success'
+                        {...status}
+                      />
+                    ))}
+                  </SortableContext>
+                  <DragOverlay>
+                    <KanbanStatus
+                      className='w-[350px] flex-shrink-0 ring-2 ring-ring'
+                      status='success'
+                      {...statuses.find(
+                        (status) => status.id === draggedStatusId
+                      )!}
+                    />
+                  </DragOverlay>
+                </DndContext>
+                {getStatusesQuery.hasNextPage && (
                   <KanbanStatus
-                    key={status.id}
-                    className='h-full w-[350px] flex-shrink-0'
-                    status='success'
-                    {...status}
+                    ref={ref}
+                    className='w-[350px] flex-shrink-0'
+                    status='pending'
                   />
-                ))
-              )}
-              {getStatusesQuery.hasNextPage && (
-                <KanbanStatus
-                  ref={ref}
-                  className='h-full w-[350px] flex-shrink-0'
-                  status='pending'
-                />
-              )}
-            </>
-          ))
+                )}
+              </>
+            )
+          })
           .exhaustive()}
       </div>
     </div>
