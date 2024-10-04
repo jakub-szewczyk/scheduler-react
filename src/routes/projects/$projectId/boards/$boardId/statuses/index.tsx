@@ -17,13 +17,10 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { getStatuses } from '@/services/status'
-import { Status } from '@/types/status'
-import { DndContext, DragOverlay } from '@dnd-kit/core'
-import { SortableContext } from '@dnd-kit/sortable'
+import { DragDropContext, Droppable } from '@hello-pangea/dnd'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { CirclePlus } from 'lucide-react'
-import { useState } from 'react'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { match } from 'ts-pattern'
 import { useDocumentTitle, useIntersectionObserver } from 'usehooks-ts'
@@ -42,10 +39,6 @@ export const Route = createFileRoute(
 
 function Statuses() {
   useDocumentTitle(`Scheduler - ${pageTitle}`)
-
-  const [draggedStatusId, setDraggedStatusId] = useState<Status['id'] | null>(
-    null
-  )
 
   const params = Route.useParams()
 
@@ -162,61 +155,57 @@ function Statuses() {
           </CardFooter>
         </Card>
       </div>
-      <div className='flex gap-x-4 overflow-x-auto'>
-        {match(getStatusesQuery)
-          .with({ status: 'pending' }, { status: 'error' }, () =>
-            Array(10)
-              .fill(null)
-              .map((_, index) => (
-                <KanbanStatus
-                  key={index}
-                  className='w-[350px] flex-shrink-0'
-                  status='pending'
-                />
-              ))
-          )
-          .with({ status: 'success' }, ({ data }) => {
-            const statuses = data.pages.flatMap((page) => page.content)
-            return (
-              <>
-                <DndContext
-                  onDragStart={(event) =>
-                    setDraggedStatusId(event.active.id as Status['id'])
-                  }
-                  onDragEnd={() => setDraggedStatusId(null)}
-                >
-                  <SortableContext items={statuses.map((status) => status.id)}>
-                    {statuses.map((status) => (
+      <DragDropContext onDragEnd={console.log}>
+        <Droppable droppableId='board' type='board' direction='horizontal'>
+          {({ innerRef, placeholder, droppableProps }) => (
+            <div
+              className='flex overflow-auto'
+              ref={innerRef}
+              {...droppableProps}
+            >
+              {match(getStatusesQuery)
+                .with({ status: 'pending' }, { status: 'error' }, () =>
+                  Array(10)
+                    .fill(null)
+                    .map((_, index) => (
                       <KanbanStatus
-                        key={status.id}
+                        key={index}
+                        index={index}
                         className='w-[350px] flex-shrink-0'
-                        status='success'
-                        {...status}
+                        status='pending'
                       />
-                    ))}
-                  </SortableContext>
-                  <DragOverlay>
-                    <KanbanStatus
-                      className='w-[350px] flex-shrink-0 ring-2 ring-ring'
-                      status='success'
-                      {...statuses.find(
-                        (status) => status.id === draggedStatusId
-                      )!}
-                    />
-                  </DragOverlay>
-                </DndContext>
-                {getStatusesQuery.hasNextPage && (
-                  <KanbanStatus
-                    ref={ref}
-                    className='w-[350px] flex-shrink-0'
-                    status='pending'
-                  />
-                )}
-              </>
-            )
-          })
-          .exhaustive()}
-      </div>
+                    ))
+                )
+                .with({ status: 'success' }, ({ data }) => {
+                  const statuses = data.pages.flatMap((page) => page.content)
+                  return (
+                    <>
+                      {statuses.map((status, index) => (
+                        <KanbanStatus
+                          key={status.id}
+                          index={index}
+                          className='w-[350px] flex-shrink-0'
+                          status='success'
+                          {...status}
+                        />
+                      ))}
+                      {getStatusesQuery.hasNextPage && (
+                        <KanbanStatus
+                          ref={ref}
+                          index={statuses.length}
+                          className='w-[350px] flex-shrink-0'
+                          status='pending'
+                        />
+                      )}
+                    </>
+                  )
+                })
+                .exhaustive()}
+              {placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
     </div>
   )
 }

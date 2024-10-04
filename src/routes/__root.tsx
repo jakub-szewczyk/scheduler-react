@@ -32,7 +32,7 @@ function Root() {
           />
           <main
             className={cn(
-              'ml-14 mt-12 min-h-[calc(100vh-3rem)] w-[calc(100vw-3.5rem)] p-4 transition-[width,margin] duration-300 sm:p-6',
+              'ml-14 mt-12 min-h-[calc(100vh-3rem)] w-[calc(100vw-3.5rem)] min-w-0 p-4 transition-[width,margin] duration-300 sm:p-6',
               !isSidebarCollapsed && 'ml-52 w-[calc(100vw-13rem)]'
             )}
           >
