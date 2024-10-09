@@ -1,3 +1,4 @@
+import StrictModeDroppable from '@/components/common/StrictModeDroppable/StrictModeDroppable'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -9,11 +10,11 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/modules/common'
 import { getIssues } from '@/services/issue'
-import { Draggable, Droppable } from '@hello-pangea/dnd'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { useParams } from '@tanstack/react-router'
 import { GripVertical } from 'lucide-react'
 import { ComponentProps, forwardRef } from 'react'
+import { Draggable } from 'react-beautiful-dnd'
 import { match } from 'ts-pattern'
 import { useIntersectionObserver } from 'usehooks-ts'
 import KanbanIssue from '../KanbanIssue/KanbanIssue'
@@ -57,6 +58,7 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
       queryFn: ({ pageParam }) =>
         getIssues({
           page: pageParam,
+          size: 1_000_000,
           projectId: params.projectId,
           boardId: params.boardId,
           statusId: statusId!,
@@ -124,13 +126,13 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
                     .exhaustive()}
                 </div>
               </CardHeader>
-              <Droppable
+              <StrictModeDroppable
                 droppableId={statusId || `status-${props.index}`}
                 type='status'
               >
                 {({ innerRef, placeholder, droppableProps }) => (
                   <CardContent
-                    className='flex h-[75vh] flex-col overflow-y-auto'
+                    className='flex flex-col space-y-2'
                     ref={innerRef}
                     {...droppableProps}
                   >
@@ -192,7 +194,7 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
                     {placeholder}
                   </CardContent>
                 )}
-              </Droppable>
+              </StrictModeDroppable>
             </Card>
           </div>
         )}

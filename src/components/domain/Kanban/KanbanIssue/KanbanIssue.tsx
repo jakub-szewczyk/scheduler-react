@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/modules/common'
-import { Draggable } from '@hello-pangea/dnd'
+import { Draggable } from 'react-beautiful-dnd'
 import { GripVertical } from 'lucide-react'
 import { ComponentProps, forwardRef } from 'react'
 import { match } from 'ts-pattern'

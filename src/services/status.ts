@@ -16,7 +16,7 @@ type GetStatusesSearchParams = z.infer<typeof getStatusesSearchParamsSchema>
 
 type GetStatusesPathParams = { projectId: Project['id']; boardId: Board['id'] }
 
-type GetStatusesResponseBody = PaginableResponse<Status>
+export type GetStatusesResponseBody = PaginableResponse<Status>
 
 export const getStatuses = ({
   projectId,
@@ -27,3 +27,29 @@ export const getStatuses = ({
     `/projects/${projectId}/boards/${boardId}/statuses`,
     { params }
   ).then(({ data }) => data)
+
+// PUT /projects/:projectId/boards/:boardId/statuses/:statusId
+type GetUpdateStatusPathParams = {
+  projectId: Project['id']
+  boardId: Board['id']
+  statusId: Status['id']
+}
+
+type GetUpdateStatusRequestBody = Pick<Status, 'title' | 'description'> &
+  Partial<{
+    prevStatusId: Status['id']
+    nextStatusId: Status['id']
+  }>
+
+export const updateStatus = ({
+  projectId,
+  boardId,
+  statusId,
+  ...data
+}: GetUpdateStatusPathParams & GetUpdateStatusRequestBody) =>
+  api
+    .put<Status>(
+      `/projects/${projectId}/boards/${boardId}/statuses/${statusId}`,
+      data
+    )
+    .then(({ data }) => data)

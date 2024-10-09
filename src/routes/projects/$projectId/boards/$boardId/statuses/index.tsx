@@ -1,4 +1,5 @@
 import Protected from '@/components/common/Protected/Protected'
+import StrictModeDroppable from '@/components/common/StrictModeDroppable/StrictModeDroppable'
 import KanbanStatus from '@/components/domain/Kanban/KanbanStatus/KanbanStatus'
 import {
   Breadcrumb,
@@ -16,11 +17,23 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { getStatuses } from '@/services/status'
-import { DragDropContext, Droppable } from '@hello-pangea/dnd'
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { PAGE_SIZE } from '@/modules/status'
+import {
+  GetStatusesResponseBody,
+  getStatuses,
+  updateStatus,
+} from '@/services/status'
+import { Status } from '@/types/status'
+import {
+  InfiniteData,
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
+import { produce } from 'immer'
 import { CirclePlus } from 'lucide-react'
+import { DragDropContext } from 'react-beautiful-dnd'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { match } from 'ts-pattern'
 import { useDocumentTitle, useIntersectionObserver } from 'usehooks-ts'
@@ -42,23 +55,32 @@ function Statuses() {
 
   const params = Route.useParams()
 
+  const queryClient = useQueryClient()
+
+  const queryKey = [
+    'projects',
+    params.projectId,
+    'boards',
+    params.boardId,
+    'statuses',
+  ]
+
   const getStatusesQuery = useInfiniteQuery({
-    queryKey: [
-      'projects',
-      params.projectId,
-      'boards',
-      params.boardId,
-      'statuses',
-    ],
+    queryKey,
     initialPageParam: 0,
     queryFn: ({ pageParam }) =>
       getStatuses({
         page: pageParam,
+        size: PAGE_SIZE,
         projectId: params.projectId,
         boardId: params.boardId,
       }),
     getNextPageParam: (page) =>
       (page.page + 1) * page.size < page.total ? page.page + 1 : null,
+  })
+
+  const updateStatusMutation = useMutation({
+    mutationFn: updateStatus,
   })
 
   const { ref } = useIntersectionObserver({
@@ -155,11 +177,99 @@ function Statuses() {
           </CardFooter>
         </Card>
       </div>
-      <DragDropContext onDragEnd={console.log}>
-        <Droppable droppableId='board' type='board' direction='horizontal'>
+      <DragDropContext
+        onDragEnd={({ source, destination }) => {
+          if (
+            !destination ||
+            (source.droppableId === destination.droppableId &&
+              source.index === destination.index)
+          )
+            return
+          if (
+            source.droppableId === 'board' &&
+            destination.droppableId === 'board'
+          ) {
+            const sourcePageIndex = Math.floor(source.index / PAGE_SIZE)
+            const sourceContentIndex = source.index % PAGE_SIZE
+            const sourceStatus =
+              getStatusesQuery.data!.pages[sourcePageIndex].content[
+                sourceContentIndex
+              ]
+            /**
+             * NOTE:
+             * The destination status can be either to the left or right of the dropped status,
+             * depending on the drag direction (left-to-right or right-to-left).
+             */
+            const destinationPageIndex = Math.floor(
+              destination.index / PAGE_SIZE
+            )
+            const destinationContentIndex = destination.index % PAGE_SIZE
+            // const destinationStatus =
+            //   getStatusesQuery.data!.pages[destinationPageIndex].content[
+            //     destinationContentIndex
+            //   ]
+            const isLeftToRight = source.index < destination.index
+            const isRightToLeft = source.index > destination.index
+            const prevPageIndex = Math.floor(
+              (destination.index - +isRightToLeft) / PAGE_SIZE
+            )
+            const prevContentIndex =
+              (destination.index - +isRightToLeft) % PAGE_SIZE
+            const nextPageIndex = Math.floor(
+              (destination.index + +isLeftToRight) / PAGE_SIZE
+            )
+            const nextContentIndex =
+              (destination.index + +isLeftToRight) % PAGE_SIZE
+            const prevStatus: Status | undefined =
+              getStatusesQuery.data!.pages[prevPageIndex]?.content[
+                prevContentIndex
+              ]
+            const nextStatus: Status | undefined =
+              getStatusesQuery.data!.pages[nextPageIndex]?.content[
+                nextContentIndex
+              ]
+            console.log('prevStatus', prevStatus)
+            console.log('nextStatus', nextStatus)
+            // TODO: Inspect back-end bug & handle optimistic updates
+            updateStatusMutation.mutate({
+              projectId: params.projectId,
+              boardId: params.boardId,
+              statusId: sourceStatus.id,
+              title: sourceStatus.title,
+              description: sourceStatus.description,
+              ...(prevStatus && { prevStatusId: prevStatus.id }),
+              ...(nextStatus && { nextStatusId: nextStatus.id }),
+            })
+            return queryClient.setQueryData<
+              InfiniteData<GetStatusesResponseBody, number>
+            >(queryKey, (getStatusesQueryData) =>
+              produce(getStatusesQueryData, (draft) => {
+                if (!draft) return draft
+                const [status] = draft.pages[sourcePageIndex].content.splice(
+                  sourceContentIndex,
+                  1
+                )
+                draft.pages[destinationPageIndex].content.splice(
+                  destinationContentIndex,
+                  0,
+                  status
+                )
+              })
+            )
+          }
+          if (source.droppableId === destination.droppableId)
+            return console.log('ISSUE WITHIN')
+          return console.log('ISSUE BETWEEN')
+        }}
+      >
+        <StrictModeDroppable
+          droppableId='board'
+          type='board'
+          direction='horizontal'
+        >
           {({ innerRef, placeholder, droppableProps }) => (
             <div
-              className='flex overflow-auto'
+              className='flex space-x-4 overflow-auto'
               ref={innerRef}
               {...droppableProps}
             >
@@ -204,7 +314,7 @@ function Statuses() {
               {placeholder}
             </div>
           )}
-        </Droppable>
+        </StrictModeDroppable>
       </DragDropContext>
     </div>
   )
