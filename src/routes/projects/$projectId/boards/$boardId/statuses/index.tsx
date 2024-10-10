@@ -33,7 +33,7 @@ import {
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { produce } from 'immer'
 import { CirclePlus } from 'lucide-react'
-import { DragDropContext } from 'react-beautiful-dnd'
+import { DragDropContext, OnDragEndResponder } from 'react-beautiful-dnd'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { match } from 'ts-pattern'
 import { useDocumentTitle, useIntersectionObserver } from 'usehooks-ts'
@@ -89,6 +89,100 @@ function Statuses() {
       !getStatusesQuery.isFetching &&
       getStatusesQuery.fetchNextPage(),
   })
+
+  /**
+   * NOTE:
+   * The destination status can be either to the left or right of the dropped status,
+   * depending on the drag direction (left-to-right or right-to-left).
+   */
+  const handleDragEnd: OnDragEndResponder = ({ source, destination }) => {
+    if (
+      !destination ||
+      (source.droppableId === destination.droppableId &&
+        source.index === destination.index)
+    )
+      return
+    // NOTE: Dragging statuses
+    if (source.droppableId === 'board' && destination.droppableId === 'board') {
+      const sourcePageIndex = Math.floor(source.index / PAGE_SIZE)
+      const sourceContentIndex = source.index % PAGE_SIZE
+      const sourceStatus =
+        getStatusesQuery.data!.pages[sourcePageIndex].content[
+          sourceContentIndex
+        ]
+      const destinationPageIndex = Math.floor(destination.index / PAGE_SIZE)
+      const destinationContentIndex = destination.index % PAGE_SIZE
+      // const destinationStatus =
+      //   getStatusesQuery.data!.pages[destinationPageIndex].content[
+      //     destinationContentIndex
+      //   ]
+      const isLeftToRight = source.index < destination.index
+      const isRightToLeft = source.index > destination.index
+      const prevPageIndex = Math.floor(
+        (destination.index - +isRightToLeft) / PAGE_SIZE
+      )
+      const prevContentIndex = (destination.index - +isRightToLeft) % PAGE_SIZE
+      const nextPageIndex = Math.floor(
+        (destination.index + +isLeftToRight) / PAGE_SIZE
+      )
+      const nextContentIndex = (destination.index + +isLeftToRight) % PAGE_SIZE
+      const prevStatus: Status | undefined =
+        getStatusesQuery.data!.pages[prevPageIndex]?.content[prevContentIndex]
+      const nextStatus: Status | undefined =
+        getStatusesQuery.data!.pages[nextPageIndex]?.content[nextContentIndex]
+      queryClient.setQueryData<InfiniteData<GetStatusesResponseBody, number>>(
+        queryKey,
+        (getStatusesQueryData) =>
+          produce(getStatusesQueryData, (draft) => {
+            if (!draft) return draft
+            const [status] = draft.pages[sourcePageIndex].content.splice(
+              sourceContentIndex,
+              1
+            )
+            draft.pages[destinationPageIndex].content.splice(
+              destinationContentIndex,
+              0,
+              status
+            )
+          })
+      )
+      return updateStatusMutation.mutate(
+        {
+          projectId: params.projectId,
+          boardId: params.boardId,
+          statusId: sourceStatus.id,
+          title: sourceStatus.title,
+          description: sourceStatus.description,
+          ...(prevStatus && { prevStatusId: prevStatus.id }),
+          ...(nextStatus && { nextStatusId: nextStatus.id }),
+        },
+        {
+          onError: () =>
+            queryClient.setQueryData<
+              InfiniteData<GetStatusesResponseBody, number>
+            >(queryKey, (getStatusesQueryData) =>
+              produce(getStatusesQueryData, (draft) => {
+                if (!draft) return draft
+                const [status] = draft.pages[
+                  destinationPageIndex
+                ].content.splice(destinationContentIndex, 1)
+                draft.pages[sourcePageIndex].content.splice(
+                  sourceContentIndex,
+                  0,
+                  status
+                )
+              })
+            ),
+          onSettled: () => queryClient.invalidateQueries({ queryKey }),
+        }
+      )
+    }
+    // NOTE: Dragging issues within a status
+    if (source.droppableId === destination.droppableId)
+      return console.log('ISSUE WITHIN')
+    // NOTE: Dragging issues between statuses
+    return console.log('ISSUE BETWEEN')
+  }
 
   return (
     <div className='flex flex-col gap-y-12'>
@@ -177,91 +271,7 @@ function Statuses() {
           </CardFooter>
         </Card>
       </div>
-      <DragDropContext
-        onDragEnd={({ source, destination }) => {
-          if (
-            !destination ||
-            (source.droppableId === destination.droppableId &&
-              source.index === destination.index)
-          )
-            return
-          if (
-            source.droppableId === 'board' &&
-            destination.droppableId === 'board'
-          ) {
-            const sourcePageIndex = Math.floor(source.index / PAGE_SIZE)
-            const sourceContentIndex = source.index % PAGE_SIZE
-            const sourceStatus =
-              getStatusesQuery.data!.pages[sourcePageIndex].content[
-                sourceContentIndex
-              ]
-            /**
-             * NOTE:
-             * The destination status can be either to the left or right of the dropped status,
-             * depending on the drag direction (left-to-right or right-to-left).
-             */
-            const destinationPageIndex = Math.floor(
-              destination.index / PAGE_SIZE
-            )
-            const destinationContentIndex = destination.index % PAGE_SIZE
-            // const destinationStatus =
-            //   getStatusesQuery.data!.pages[destinationPageIndex].content[
-            //     destinationContentIndex
-            //   ]
-            const isLeftToRight = source.index < destination.index
-            const isRightToLeft = source.index > destination.index
-            const prevPageIndex = Math.floor(
-              (destination.index - +isRightToLeft) / PAGE_SIZE
-            )
-            const prevContentIndex =
-              (destination.index - +isRightToLeft) % PAGE_SIZE
-            const nextPageIndex = Math.floor(
-              (destination.index + +isLeftToRight) / PAGE_SIZE
-            )
-            const nextContentIndex =
-              (destination.index + +isLeftToRight) % PAGE_SIZE
-            const prevStatus: Status | undefined =
-              getStatusesQuery.data!.pages[prevPageIndex]?.content[
-                prevContentIndex
-              ]
-            const nextStatus: Status | undefined =
-              getStatusesQuery.data!.pages[nextPageIndex]?.content[
-                nextContentIndex
-              ]
-            console.log('prevStatus', prevStatus)
-            console.log('nextStatus', nextStatus)
-            // TODO: Inspect back-end bug & handle optimistic updates
-            updateStatusMutation.mutate({
-              projectId: params.projectId,
-              boardId: params.boardId,
-              statusId: sourceStatus.id,
-              title: sourceStatus.title,
-              description: sourceStatus.description,
-              ...(prevStatus && { prevStatusId: prevStatus.id }),
-              ...(nextStatus && { nextStatusId: nextStatus.id }),
-            })
-            return queryClient.setQueryData<
-              InfiniteData<GetStatusesResponseBody, number>
-            >(queryKey, (getStatusesQueryData) =>
-              produce(getStatusesQueryData, (draft) => {
-                if (!draft) return draft
-                const [status] = draft.pages[sourcePageIndex].content.splice(
-                  sourceContentIndex,
-                  1
-                )
-                draft.pages[destinationPageIndex].content.splice(
-                  destinationContentIndex,
-                  0,
-                  status
-                )
-              })
-            )
-          }
-          if (source.droppableId === destination.droppableId)
-            return console.log('ISSUE WITHIN')
-          return console.log('ISSUE BETWEEN')
-        }}
-      >
+      <DragDropContext onDragEnd={handleDragEnd}>
         <StrictModeDroppable
           droppableId='board'
           type='board'
