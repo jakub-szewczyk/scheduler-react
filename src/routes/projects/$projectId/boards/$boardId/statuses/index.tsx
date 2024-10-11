@@ -18,11 +18,13 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { PAGE_SIZE } from '@/modules/status'
+import { GetIssuesResponseBody, updateIssue } from '@/services/issue'
 import {
   GetStatusesResponseBody,
   getStatuses,
   updateStatus,
 } from '@/services/status'
+import { Issue } from '@/types/issue'
 import { Status } from '@/types/status'
 import {
   InfiniteData,
@@ -57,7 +59,7 @@ function Statuses() {
 
   const queryClient = useQueryClient()
 
-  const queryKey = [
+  const statusesQueryKey = [
     'projects',
     params.projectId,
     'boards',
@@ -66,7 +68,7 @@ function Statuses() {
   ]
 
   const getStatusesQuery = useInfiniteQuery({
-    queryKey,
+    queryKey: statusesQueryKey,
     initialPageParam: 0,
     queryFn: ({ pageParam }) =>
       getStatuses({
@@ -79,9 +81,9 @@ function Statuses() {
       (page.page + 1) * page.size < page.total ? page.page + 1 : null,
   })
 
-  const updateStatusMutation = useMutation({
-    mutationFn: updateStatus,
-  })
+  const updateStatusMutation = useMutation({ mutationFn: updateStatus })
+
+  const updateIssueMutation = useMutation({ mutationFn: updateIssue })
 
   const { ref } = useIntersectionObserver({
     onChange: (isIntersecting) =>
@@ -102,36 +104,31 @@ function Statuses() {
         source.index === destination.index)
     )
       return
+    const sourcePageIndex = Math.floor(source.index / PAGE_SIZE)
+    const sourceContentIndex = source.index % PAGE_SIZE
+    const destinationPageIndex = Math.floor(destination.index / PAGE_SIZE)
+    const destinationContentIndex = destination.index % PAGE_SIZE
+    const isAscDrag = source.index < destination.index
+    const prevPageIndex = Math.floor(
+      (destination.index - +!isAscDrag) / PAGE_SIZE
+    )
+    const nextPageIndex = Math.floor(
+      (destination.index + +isAscDrag) / PAGE_SIZE
+    )
+    const nextContentIndex = (destination.index + +isAscDrag) % PAGE_SIZE
+    const prevContentIndex = (destination.index - +!isAscDrag) % PAGE_SIZE
     // NOTE: Dragging statuses
     if (source.droppableId === 'board' && destination.droppableId === 'board') {
-      const sourcePageIndex = Math.floor(source.index / PAGE_SIZE)
-      const sourceContentIndex = source.index % PAGE_SIZE
       const sourceStatus =
         getStatusesQuery.data!.pages[sourcePageIndex].content[
           sourceContentIndex
         ]
-      const destinationPageIndex = Math.floor(destination.index / PAGE_SIZE)
-      const destinationContentIndex = destination.index % PAGE_SIZE
-      // const destinationStatus =
-      //   getStatusesQuery.data!.pages[destinationPageIndex].content[
-      //     destinationContentIndex
-      //   ]
-      const isLeftToRight = source.index < destination.index
-      const isRightToLeft = source.index > destination.index
-      const prevPageIndex = Math.floor(
-        (destination.index - +isRightToLeft) / PAGE_SIZE
-      )
-      const prevContentIndex = (destination.index - +isRightToLeft) % PAGE_SIZE
-      const nextPageIndex = Math.floor(
-        (destination.index + +isLeftToRight) / PAGE_SIZE
-      )
-      const nextContentIndex = (destination.index + +isLeftToRight) % PAGE_SIZE
       const prevStatus: Status | undefined =
         getStatusesQuery.data!.pages[prevPageIndex]?.content[prevContentIndex]
       const nextStatus: Status | undefined =
         getStatusesQuery.data!.pages[nextPageIndex]?.content[nextContentIndex]
       queryClient.setQueryData<InfiniteData<GetStatusesResponseBody, number>>(
-        queryKey,
+        statusesQueryKey,
         (getStatusesQueryData) =>
           produce(getStatusesQueryData, (draft) => {
             if (!draft) return draft
@@ -160,7 +157,7 @@ function Statuses() {
           onError: () =>
             queryClient.setQueryData<
               InfiniteData<GetStatusesResponseBody, number>
-            >(queryKey, (getStatusesQueryData) =>
+            >(statusesQueryKey, (getStatusesQueryData) =>
               produce(getStatusesQueryData, (draft) => {
                 if (!draft) return draft
                 const [status] = draft.pages[
@@ -173,13 +170,77 @@ function Statuses() {
                 )
               })
             ),
-          onSettled: () => queryClient.invalidateQueries({ queryKey }),
+          onSettled: () =>
+            queryClient.invalidateQueries({
+              queryKey: statusesQueryKey,
+              exact: true,
+            }),
         }
       )
     }
     // NOTE: Dragging issues within a status
-    if (source.droppableId === destination.droppableId)
-      return console.log('ISSUE WITHIN')
+    if (source.droppableId === destination.droppableId) {
+      const issuesQueryKey = [...statusesQueryKey, source.droppableId, 'issues']
+      const getIssuesQueryData =
+        queryClient.getQueryData<InfiniteData<GetIssuesResponseBody, number>>(
+          issuesQueryKey
+        )
+      const sourceIssue =
+        getIssuesQueryData!.pages[sourcePageIndex].content[sourceContentIndex]
+      const prevIssue: Issue | undefined =
+        getIssuesQueryData!.pages[prevPageIndex]?.content[prevContentIndex]
+      const nextIssue: Issue | undefined =
+        getIssuesQueryData!.pages[nextPageIndex]?.content[nextContentIndex]
+      queryClient.setQueryData<InfiniteData<GetIssuesResponseBody, number>>(
+        issuesQueryKey,
+        (getIssuesQueryData) =>
+          produce(getIssuesQueryData, (draft) => {
+            if (!draft) return draft
+            const [issue] = draft.pages[sourcePageIndex].content.splice(
+              sourceContentIndex,
+              1
+            )
+            draft.pages[destinationPageIndex].content.splice(
+              destinationContentIndex,
+              0,
+              issue
+            )
+          })
+      )
+      return updateIssueMutation.mutate(
+        {
+          projectId: params.projectId,
+          boardId: params.boardId,
+          statusId: source.droppableId,
+          issueId: sourceIssue.id,
+          title: sourceIssue.title,
+          description: sourceIssue.description,
+          priority: sourceIssue.priority,
+          ...(prevIssue && { prevIssueId: prevIssue.id }),
+          ...(nextIssue && { nextIssueId: nextIssue.id }),
+        },
+        {
+          onError: () =>
+            queryClient.setQueryData<
+              InfiniteData<GetIssuesResponseBody, number>
+            >(issuesQueryKey, (getIssuesQueryData) =>
+              produce(getIssuesQueryData, (draft) => {
+                if (!draft) return draft
+                const [issue] = draft.pages[
+                  destinationPageIndex
+                ].content.splice(destinationContentIndex, 1)
+                draft.pages[sourcePageIndex].content.splice(
+                  sourceContentIndex,
+                  0,
+                  issue
+                )
+              })
+            ),
+          onSettled: () =>
+            queryClient.invalidateQueries({ queryKey: issuesQueryKey }),
+        }
+      )
+    }
     // NOTE: Dragging issues between statuses
     return console.log('ISSUE BETWEEN')
   }
@@ -290,8 +351,8 @@ function Statuses() {
                     .map((_, index) => (
                       <KanbanStatus
                         key={index}
-                        index={index}
                         className='w-[350px] flex-shrink-0'
+                        index={index}
                         status='pending'
                       />
                     ))
@@ -303,8 +364,8 @@ function Statuses() {
                       {statuses.map((status, index) => (
                         <KanbanStatus
                           key={status.id}
-                          index={index}
                           className='w-[350px] flex-shrink-0'
+                          index={index}
                           status='success'
                           {...status}
                         />
@@ -312,8 +373,8 @@ function Statuses() {
                       {getStatusesQuery.hasNextPage && (
                         <KanbanStatus
                           ref={ref}
-                          index={statuses.length}
                           className='w-[350px] flex-shrink-0'
+                          index={statuses.length}
                           status='pending'
                         />
                       )}

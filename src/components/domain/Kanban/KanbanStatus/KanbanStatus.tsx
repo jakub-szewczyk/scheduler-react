@@ -54,6 +54,7 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
         params.boardId,
         'statuses',
         statusId,
+        'issues',
       ],
       queryFn: ({ pageParam }) =>
         getIssues({

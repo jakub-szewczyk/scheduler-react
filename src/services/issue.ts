@@ -21,7 +21,7 @@ type GetIssuesPathParams = {
   statusId: Status['id']
 }
 
-type GetIssuesResponseBody = PaginableResponse<Issue>
+export type GetIssuesResponseBody = PaginableResponse<Issue>
 
 export const getIssues = ({
   projectId,
@@ -35,3 +35,35 @@ export const getIssues = ({
       params,
     }
   ).then(({ data }) => data)
+
+// PUT /projects/:projectId/boards/:boardId/statuses/:statusId/issues/:issueId
+type GetUpdateIssuePathParams = {
+  projectId: Project['id']
+  boardId: Board['id']
+  statusId: Status['id']
+  issueId: Issue['id']
+}
+
+type GetUpdateIssueRequestBody = Pick<
+  Issue,
+  'title' | 'description' | 'priority'
+> &
+  Partial<{
+    prevIssueUd: Issue['id']
+    nextIssueUd: Issue['id']
+    newStatusId: Status['id']
+  }>
+
+export const updateIssue = ({
+  projectId,
+  boardId,
+  statusId,
+  issueId,
+  ...data
+}: GetUpdateIssuePathParams & GetUpdateIssueRequestBody) =>
+  api
+    .put<Issue>(
+      `/projects/${projectId}/boards/${boardId}/statuses/${statusId}/issues/${issueId}`,
+      data
+    )
+    .then(({ data }) => data)
