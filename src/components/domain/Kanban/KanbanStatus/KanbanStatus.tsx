@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { cn } from '@/modules/common'
+import { PAGE_SIZE, cn } from '@/modules/common'
 import { getIssues } from '@/services/issue'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { useParams } from '@tanstack/react-router'
@@ -47,6 +47,7 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
     })
 
     const getIssuesQuery = useInfiniteQuery({
+      // eslint-disable-next-line @tanstack/query/exhaustive-deps
       queryKey: [
         'projects',
         params.projectId,
@@ -59,7 +60,7 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
       queryFn: ({ pageParam }) =>
         getIssues({
           page: pageParam,
-          size: 1_000_000,
+          size: PAGE_SIZE,
           projectId: params.projectId,
           boardId: params.boardId,
           statusId: statusId!,
@@ -81,6 +82,7 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
       <Draggable
         draggableId={statusId || `status-${props.index}`}
         index={props.index}
+        isDragDisabled={!statusId}
       >
         {({ innerRef, draggableProps, dragHandleProps }) => (
           <div ref={innerRef} {...draggableProps}>

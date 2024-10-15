@@ -43,9 +43,7 @@ const NotificationDetails = ({ event }: NotificationDetailsProps) => {
   const toggleNotificationMutation = useMutation({
     mutationFn: toggleNotification,
     onMutate: async () => {
-      await queryClient.cancelQueries({
-        queryKey,
-      })
+      await queryClient.cancelQueries({ queryKey })
       const notification = queryClient.getQueryData(queryKey)
       queryClient.setQueryData(queryKey, (notification: Notification) => ({
         ...notification,

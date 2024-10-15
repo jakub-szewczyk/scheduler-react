@@ -17,7 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { PAGE_SIZE } from '@/modules/status'
+import { PAGE_SIZE } from '@/modules/common'
 import { GetIssuesResponseBody, updateIssue } from '@/services/issue'
 import {
   GetStatusesResponseBody,
@@ -69,7 +69,6 @@ function Statuses() {
 
   const getStatusesQuery = useInfiniteQuery({
     queryKey: statusesQueryKey,
-    initialPageParam: 0,
     queryFn: ({ pageParam }) =>
       getStatuses({
         page: pageParam,
@@ -79,6 +78,7 @@ function Statuses() {
       }),
     getNextPageParam: (page) =>
       (page.page + 1) * page.size < page.total ? page.page + 1 : null,
+    initialPageParam: 0,
   })
 
   const updateStatusMutation = useMutation({ mutationFn: updateStatus })
@@ -242,7 +242,100 @@ function Statuses() {
       )
     }
     // NOTE: Dragging issues between statuses
-    return console.log('ISSUE BETWEEN')
+    const sourceIssuesQueryKey = [
+      ...statusesQueryKey,
+      source.droppableId,
+      'issues',
+    ]
+    const destinationIssuesQueryKey = [
+      ...statusesQueryKey,
+      destination.droppableId,
+      'issues',
+    ]
+    const getSourceIssuesQueryData =
+      queryClient.getQueryData<InfiniteData<GetIssuesResponseBody, number>>(
+        sourceIssuesQueryKey
+      )
+    const getDestinationIssuesQueryData = queryClient.getQueryData<
+      InfiniteData<GetIssuesResponseBody, number>
+    >(destinationIssuesQueryKey)
+    const sourceIssue =
+      getSourceIssuesQueryData!.pages[sourcePageIndex].content[
+        sourceContentIndex
+      ]
+    const prevIssue: Issue | undefined =
+      getDestinationIssuesQueryData!.pages[destinationPageIndex].content[
+        destinationContentIndex - 1
+      ]
+    const nextIssue: Issue | undefined =
+      getDestinationIssuesQueryData!.pages[destinationPageIndex].content[
+        destinationContentIndex
+      ]
+    queryClient.setQueryData<InfiniteData<GetIssuesResponseBody, number>>(
+      sourceIssuesQueryKey,
+      (getIssuesQueryData) =>
+        produce(getIssuesQueryData, (draft) => {
+          if (!draft) return draft
+          draft.pages[sourcePageIndex].content.splice(sourceContentIndex, 1)
+        })
+    )
+    queryClient.setQueryData<InfiniteData<GetIssuesResponseBody, number>>(
+      destinationIssuesQueryKey,
+      (getIssuesQueryData) =>
+        produce(getIssuesQueryData, (draft) => {
+          if (!draft) return draft
+          draft.pages[destinationPageIndex].content.splice(
+            destinationContentIndex,
+            0,
+            sourceIssue
+          )
+        })
+    )
+    updateIssueMutation.mutate(
+      {
+        projectId: params.projectId,
+        boardId: params.boardId,
+        statusId: source.droppableId,
+        issueId: sourceIssue.id,
+        title: sourceIssue.title,
+        description: sourceIssue.description,
+        priority: sourceIssue.priority,
+        ...(prevIssue && { prevIssueId: prevIssue.id }),
+        ...(nextIssue && { nextIssueId: nextIssue.id }),
+        newStatusId: destination.droppableId,
+      },
+      {
+        onError: () => {
+          queryClient.setQueryData<InfiniteData<GetIssuesResponseBody, number>>(
+            sourceIssuesQueryKey,
+            (getIssuesQueryData) =>
+              produce(getIssuesQueryData, (draft) => {
+                if (!draft) return draft
+                draft.pages[sourcePageIndex].content.splice(
+                  sourceContentIndex,
+                  0,
+                  sourceIssue
+                )
+              })
+          )
+          queryClient.setQueryData<InfiniteData<GetIssuesResponseBody, number>>(
+            destinationIssuesQueryKey,
+            (getIssuesQueryData) =>
+              produce(getIssuesQueryData, (draft) => {
+                if (!draft) return draft
+                draft.pages[destinationPageIndex].content.splice(
+                  destinationContentIndex,
+                  1
+                )
+              })
+          )
+        },
+        onSettled: () => {
+          queryClient.invalidateQueries({ queryKey: sourceIssuesQueryKey })
+          queryClient.invalidateQueries({ queryKey: destinationIssuesQueryKey })
+        },
+      }
+    )
   }
 
   return (

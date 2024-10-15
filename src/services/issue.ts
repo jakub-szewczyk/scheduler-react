@@ -64,6 +64,6 @@ export const updateIssue = ({
   api
     .put<Issue>(
       `/projects/${projectId}/boards/${boardId}/statuses/${statusId}/issues/${issueId}`,
-      data
+      { ...data, statusId: data.newStatusId }
     )
     .then(({ data }) => data)

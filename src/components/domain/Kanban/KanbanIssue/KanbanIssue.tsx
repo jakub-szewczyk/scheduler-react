@@ -7,9 +7,9 @@ import {
 } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/modules/common'
-import { Draggable } from 'react-beautiful-dnd'
 import { GripVertical } from 'lucide-react'
 import { ComponentProps, forwardRef } from 'react'
+import { Draggable } from 'react-beautiful-dnd'
 import { match } from 'ts-pattern'
 
 type KanbanIssueProps = ComponentProps<'div'> & { index: number } & (
@@ -34,6 +34,7 @@ const KanbanIssue = forwardRef<HTMLDivElement, KanbanIssueProps>(
       <Draggable
         draggableId={issueId || `issue-${props.index}`}
         index={props.index}
+        isDragDisabled={!issueId}
       >
         {({ innerRef, draggableProps, dragHandleProps }) => (
           <div ref={innerRef} {...draggableProps}>

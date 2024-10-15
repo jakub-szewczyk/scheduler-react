@@ -7,6 +7,8 @@ import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { match } from 'ts-pattern'
 
+export const PAGE_SIZE = 10
+
 export const DATA_TABLE_PREVIEW_SIZE = 5
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs))
