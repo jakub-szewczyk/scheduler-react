@@ -135,7 +135,7 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
               >
                 {({ innerRef, placeholder, droppableProps }) => (
                   <CardContent
-                    className='flex flex-col space-y-2'
+                    className='flex flex-col'
                     ref={innerRef}
                     {...droppableProps}
                   >
@@ -146,6 +146,7 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
                           .map((_, index) => (
                             <KanbanIssue
                               key={index}
+                              className='mb-2'
                               index={index}
                               status='pending'
                             />
@@ -162,6 +163,7 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
                                 .map((_, index) => (
                                   <KanbanIssue
                                     key={index}
+                                    className='mb-2'
                                     index={index}
                                     status='pending'
                                   />
@@ -176,6 +178,7 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
                                 {issues.map((issue, index) => (
                                   <KanbanIssue
                                     key={issue.id}
+                                    className='mb-2'
                                     index={index}
                                     status='success'
                                     {...issue}
@@ -184,6 +187,7 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
                                 {getIssuesQuery.hasNextPage && (
                                   <KanbanIssue
                                     ref={issueRef}
+                                    className='mb-2'
                                     index={issues.length}
                                     status='pending'
                                   />

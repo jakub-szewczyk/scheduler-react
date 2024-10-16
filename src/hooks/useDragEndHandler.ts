@@ -13,11 +13,10 @@ import {
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query'
+import { useParams } from '@tanstack/react-router'
 import { produce } from 'immer'
 import { OnDragEndResponder } from 'react-beautiful-dnd'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
-
-import { useParams } from '@tanstack/react-router'
 
 const useDragEndHandler = () => {
   const params = useParams({

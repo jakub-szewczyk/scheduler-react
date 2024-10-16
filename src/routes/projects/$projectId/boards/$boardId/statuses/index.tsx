@@ -171,7 +171,7 @@ function Statuses() {
         >
           {({ innerRef, placeholder, droppableProps }) => (
             <div
-              className='flex space-x-4 overflow-auto'
+              className='flex overflow-auto'
               ref={innerRef}
               {...droppableProps}
             >
@@ -182,7 +182,7 @@ function Statuses() {
                     .map((_, index) => (
                       <KanbanStatus
                         key={index}
-                        className='w-[350px] flex-shrink-0'
+                        className='mx-2 w-[350px] flex-shrink-0'
                         index={index}
                         status='pending'
                       />
@@ -195,7 +195,7 @@ function Statuses() {
                       {statuses.map((status, index) => (
                         <KanbanStatus
                           key={status.id}
-                          className='w-[350px] flex-shrink-0'
+                          className='mx-2 w-[350px] flex-shrink-0'
                           index={index}
                           status='success'
                           {...status}
@@ -204,7 +204,7 @@ function Statuses() {
                       {getStatusesQuery.hasNextPage && (
                         <KanbanStatus
                           ref={ref}
-                          className='w-[350px] flex-shrink-0'
+                          className='mx-2 w-[350px] flex-shrink-0'
                           index={statuses.length}
                           status='pending'
                         />
