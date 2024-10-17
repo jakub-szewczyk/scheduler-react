@@ -31,6 +31,8 @@ const useDragEndHandler = () => {
     'statuses',
   ]
 
+  const queryClient = useQueryClient()
+
   const getStatusesQuery = useInfiniteQuery({
     queryKey: statusesQueryKey,
     queryFn: ({ pageParam }) =>
@@ -44,8 +46,6 @@ const useDragEndHandler = () => {
       (page.page + 1) * page.size < page.total ? page.page + 1 : null,
     initialPageParam: 0,
   })
-
-  const queryClient = useQueryClient()
 
   const updateStatusMutation = useMutation({ mutationFn: updateStatus })
 

@@ -28,6 +28,27 @@ export const getStatuses = ({
     { params }
   ).then(({ data }) => data)
 
+// POST /projects/:projectId/boards/:boardId/statuses
+type GetCreateStatusPathParams = {
+  projectId: Project['id']
+  boardId: Board['id']
+}
+
+type GetCreateStatusRequestBody = Pick<Status, 'title' | 'description'> &
+  Partial<{
+    prevStatusId: Status['id']
+    nextStatusId: Status['id']
+  }>
+
+export const createStatus = ({
+  projectId,
+  boardId,
+  ...data
+}: GetCreateStatusPathParams & GetCreateStatusRequestBody) =>
+  api
+    .post<Status>(`/projects/${projectId}/boards/${boardId}/statuses`, data)
+    .then(({ data }) => data)
+
 // PUT /projects/:projectId/boards/:boardId/statuses/:statusId
 type GetUpdateStatusPathParams = {
   projectId: Project['id']

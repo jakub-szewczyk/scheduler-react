@@ -10,7 +10,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { PAGE_SIZE, cn } from '@/modules/common'
 import { getIssues } from '@/services/issue'
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useIsFetching } from '@tanstack/react-query'
 import { useParams } from '@tanstack/react-router'
 import { GripVertical } from 'lucide-react'
 import { ComponentProps, forwardRef } from 'react'
@@ -71,6 +71,16 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
       enabled: !!statusId,
     })
 
+    const isFetching = !!useIsFetching({
+      queryKey: [
+        'projects',
+        params.projectId,
+        'boards',
+        params.boardId,
+        'statuses',
+      ],
+    })
+
     const { ref: issueRef } = useIntersectionObserver({
       onChange: (isIntersecting) =>
         isIntersecting &&
@@ -92,7 +102,7 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
                   className='size-8 flex-shrink-0 cursor-grab'
                   size='icon'
                   variant='ghost'
-                  disabled={!statusId}
+                  disabled={!statusId || isFetching}
                   {...dragHandleProps}
                 >
                   <GripVertical className='size-6' />
@@ -105,7 +115,12 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
                       </div>
                     ))
                     .with({ status: 'success' }, (props) => (
-                      <CardTitle className='truncate text-xl'>
+                      <CardTitle
+                        className={cn(
+                          'truncate text-xl',
+                          isFetching && 'opacity-50'
+                        )}
+                      >
                         {props.title}
                       </CardTitle>
                     ))
@@ -120,7 +135,8 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
                       <CardDescription
                         className={cn(
                           'invisible truncate',
-                          props.description && 'visible'
+                          props.description && 'visible',
+                          isFetching && 'opacity-50'
                         )}
                       >
                         {props.description || 'DESCRIPTION'}
