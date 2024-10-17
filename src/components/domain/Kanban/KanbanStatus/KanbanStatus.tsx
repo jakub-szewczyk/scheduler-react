@@ -12,23 +12,42 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/use-toast'
 import { PAGE_SIZE, cn } from '@/modules/common'
 import { getIssues } from '@/services/issue'
-import { deleteStatus, updateStatus } from '@/services/status'
+import {
+  GetStatusesResponseBody,
+  createStatus,
+  deleteStatus,
+  updateStatus,
+} from '@/services/status'
+import { Status } from '@/types/status'
 import { IS_STORYBOOK } from '@/utils/storybook'
 import {
+  InfiniteData,
   useInfiniteQuery,
   useIsFetching,
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query'
 import { useParams } from '@tanstack/react-router'
-import { GripVertical, MoreHorizontal, Pencil, Trash } from 'lucide-react'
+import {
+  ArrowLeft,
+  ArrowRight,
+  GripVertical,
+  MoreHorizontal,
+  Pencil,
+  Plus,
+  Trash,
+} from 'lucide-react'
 import { ComponentProps, forwardRef } from 'react'
 import { Draggable } from 'react-beautiful-dnd'
 import { match } from 'ts-pattern'
@@ -61,10 +80,31 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
     const statusId = props.status === 'success' ? props.id : undefined
 
     const {
-      value: isSheetOpen,
-      setValue: setIsSheetOpen,
-      setTrue: openSheet,
-      setFalse: closeSheet,
+      value: isUpdateSheetOpen,
+      setValue: setIsUpdateSheetOpen,
+      setTrue: openUpdateSheet,
+      setFalse: closeUpdateSheet,
+    } = useBoolean()
+
+    const {
+      value: isCreateSheetOpen,
+      setValue: setIsCreateSheetOpen,
+      setTrue: openCreateSheet,
+      setFalse: closeCreateSheet,
+    } = useBoolean()
+
+    const {
+      value: isInsertLeftSheetOpen,
+      setValue: setIsInsertLeftSheetOpen,
+      setTrue: openInsertLeftSheet,
+      setFalse: closeInsertLeftSheet,
+    } = useBoolean()
+
+    const {
+      value: isInsertRightSheetOpen,
+      setValue: setIsInsertRightSheetOpen,
+      setTrue: openInsertRightSheet,
+      setFalse: closeInsertRightSheet,
     } = useBoolean()
 
     const {
@@ -124,10 +164,38 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
             'statuses',
           ],
         })
-        closeSheet()
+        closeUpdateSheet()
         toast({
           title: 'Status updated',
           description: `${status.title} has been successfully updated`,
+        })
+      },
+      onError: (error) =>
+        toast({
+          variant: 'destructive',
+          title: 'Form submission failed',
+          description: error.response?.data?.[0]?.msg,
+        }),
+    })
+
+    const createStatusMutation = useMutation({
+      mutationFn: createStatus,
+      onSuccess: (status) => {
+        queryClient.invalidateQueries({
+          queryKey: [
+            'projects',
+            params.projectId,
+            'boards',
+            params.boardId,
+            'statuses',
+          ],
+        })
+        closeCreateSheet()
+        closeInsertLeftSheet()
+        closeInsertRightSheet()
+        toast({
+          title: 'Status created',
+          description: `${status.title} has been successfully created`,
         })
       },
       onError: (error) =>
@@ -228,17 +296,50 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
                         <DropdownMenuContent align='start'>
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={openSheet}>
-                            <div className='flex items-center justify-center gap-x-2'>
-                              <Pencil className='size-4' />
-                              Edit
-                            </div>
+                          <DropdownMenuItem
+                            className='gap-x-2'
+                            onClick={openUpdateSheet}
+                          >
+                            <Pencil className='size-4' />
+                            Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={openDeleteDialog}>
-                            <div className='flex items-center justify-center gap-x-2 text-destructive'>
-                              <Trash className='size-4' />
-                              Delete
-                            </div>
+                          <DropdownMenuItem className='gap-x-2'>
+                            <Plus className='size-4' />
+                            Insert issue
+                          </DropdownMenuItem>
+                          <DropdownMenuSub>
+                            <DropdownMenuSubTrigger
+                              className='gap-x-2'
+                              onClick={openCreateSheet}
+                            >
+                              <Plus className='size-4' />
+                              Insert status
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuPortal>
+                              <DropdownMenuSubContent>
+                                <DropdownMenuItem
+                                  className='gap-x-2'
+                                  onClick={openInsertLeftSheet}
+                                >
+                                  <ArrowLeft className='size-4' />
+                                  Insert status left
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  className='gap-x-2'
+                                  onClick={openInsertRightSheet}
+                                >
+                                  <ArrowRight className='size-4' />
+                                  Insert status right
+                                </DropdownMenuItem>
+                              </DropdownMenuSubContent>
+                            </DropdownMenuPortal>
+                          </DropdownMenuSub>
+                          <DropdownMenuItem
+                            className='gap-x-2 text-destructive'
+                            onClick={openDeleteDialog}
+                          >
+                            <Trash className='size-4' />
+                            Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -341,8 +442,8 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
           )}
         </Draggable>
         <KanbanSheet
-          open={isSheetOpen}
-          onOpenChange={setIsSheetOpen}
+          open={isUpdateSheetOpen}
+          onOpenChange={setIsUpdateSheetOpen}
           isPending={updateStatusMutation.isPending}
           type='update-status'
           values={match(props)
@@ -364,6 +465,78 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
               description: inputs.description,
             })
           }
+        />
+        <KanbanSheet
+          open={isCreateSheetOpen}
+          onOpenChange={setIsCreateSheetOpen}
+          isPending={createStatusMutation.isPending}
+          type='create-status'
+          onSubmit={(inputs) =>
+            createStatusMutation.mutate({
+              projectId: params.projectId!,
+              boardId: params.boardId!,
+              title: inputs.title,
+              description: inputs.description,
+            })
+          }
+        />
+        <KanbanSheet
+          open={isInsertLeftSheetOpen}
+          onOpenChange={setIsInsertLeftSheetOpen}
+          isPending={createStatusMutation.isPending}
+          type='create-status'
+          onSubmit={(inputs) => {
+            const getStatusesQueryData = queryClient.getQueryData<
+              InfiniteData<GetStatusesResponseBody, number>
+            >([
+              'projects',
+              params.projectId,
+              'boards',
+              params.boardId,
+              'statuses',
+            ])
+            const statuses = getStatusesQueryData!.pages.flatMap(
+              (page) => page.content
+            )
+            const prevStatus: Status | undefined = statuses[props.index - 1]
+            createStatusMutation.mutate({
+              projectId: params.projectId!,
+              boardId: params.boardId!,
+              title: inputs.title,
+              description: inputs.description,
+              prevStatusId: prevStatus?.id,
+              nextStatusId: statusId,
+            })
+          }}
+        />
+        <KanbanSheet
+          open={isInsertRightSheetOpen}
+          onOpenChange={setIsInsertRightSheetOpen}
+          isPending={createStatusMutation.isPending}
+          type='create-status'
+          onSubmit={(inputs) => {
+            const getStatusesQueryData = queryClient.getQueryData<
+              InfiniteData<GetStatusesResponseBody, number>
+            >([
+              'projects',
+              params.projectId,
+              'boards',
+              params.boardId,
+              'statuses',
+            ])
+            const statuses = getStatusesQueryData!.pages.flatMap(
+              (page) => page.content
+            )
+            const nextStatus: Status | undefined = statuses[props.index + 1]
+            createStatusMutation.mutate({
+              projectId: params.projectId!,
+              boardId: params.boardId!,
+              title: inputs.title,
+              description: inputs.description,
+              prevStatusId: statusId,
+              nextStatusId: nextStatus?.id,
+            })
+          }}
         />
         <KanbanStatusDeleteConfirmationDialog
           open={isDeleteDialogOpen}

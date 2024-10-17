@@ -44,16 +44,12 @@ type KanbanSheetProps = DialogProps & {
         values: Inputs
         onSubmit: (inputs: Inputs) => void
       }
-    | { type: 'insert-status-before'; onSubmit: (inputs: Inputs) => void }
-    | { type: 'insert-status-after'; onSubmit: (inputs: Inputs) => void }
     | { type: 'create-issue'; onSubmit: (inputs: Inputs) => void }
     | {
         type: 'update-issue'
         values: Inputs
         onSubmit: (inputs: Inputs) => void
       }
-    | { type: 'insert-issue-before'; onSubmit: (inputs: Inputs) => void }
-    | { type: 'insert-issue-after'; onSubmit: (inputs: Inputs) => void }
   )
 
 const KanbanSheet = ({
@@ -65,28 +61,18 @@ const KanbanSheet = ({
 }: KanbanSheetProps) => {
   const form = useForm<Inputs>({
     values: match(props)
-      .with(
-        { type: 'create-status' },
-        { type: 'insert-status-before' },
-        { type: 'insert-status-after' },
-        () => ({
-          title: '',
-          description: '',
-        })
-      )
+      .with({ type: 'create-status' }, () => ({
+        title: '',
+        description: '',
+      }))
       .with({ type: 'update-status' }, (props) => ({
         title: props.values.title,
         description: props.values.description,
       }))
-      .with(
-        { type: 'create-issue' },
-        { type: 'insert-issue-before' },
-        { type: 'insert-issue-after' },
-        () => ({
-          title: '',
-          description: '',
-        })
-      )
+      .with({ type: 'create-issue' }, () => ({
+        title: '',
+        description: '',
+      }))
       .with({ type: 'update-issue' }, (props) => ({
         title: props.values.title,
         description: props.values.description,
@@ -101,19 +87,9 @@ const KanbanSheet = ({
         <SheetHeader>
           <SheetTitle>
             {match(props.type)
-              .with(
-                'create-status',
-                'insert-status-before',
-                'insert-status-after',
-                () => 'New Status'
-              )
+              .with('create-status', () => 'New Status')
               .with('update-status', () => 'Edit Status')
-              .with(
-                'create-issue',
-                'insert-issue-before',
-                'insert-issue-after',
-                () => 'New Issue'
-              )
+              .with('create-issue', () => 'New Issue')
               .with('update-issue', () => 'Edit Issue')
               .exhaustive()}
           </SheetTitle>
@@ -121,8 +97,6 @@ const KanbanSheet = ({
             {match(props.type)
               .with(
                 'create-status',
-                'insert-status-before',
-                'insert-status-after',
                 () =>
                   'Create a new status by entering a title and optional description. Choose a title that clearly represents the stage (e.g., "To Do," "In Progress"). Use the description for additional details or guidelines. Submit to add the status to your Kanban board.'
               )
@@ -131,12 +105,7 @@ const KanbanSheet = ({
                 () =>
                   'Edit the status by updating the title or optional description. Ensure the title clearly represents the stage (e.g., "To Do," "In Progress"). Use the description to add or modify details and guidelines. Submit to save your changes to the Kanban board.'
               )
-              .with(
-                'create-issue',
-                'insert-issue-before',
-                'insert-issue-after',
-                () => 'TODO'
-              )
+              .with('create-issue', () => 'TODO')
               .with('update-issue', () => 'TODO')
               .exhaustive()}
           </SheetDescription>
@@ -147,19 +116,9 @@ const KanbanSheet = ({
               className='flex flex-col gap-y-6'
               onSubmit={form.handleSubmit(
                 match(props)
-                  .with(
-                    { type: 'create-status' },
-                    { type: 'insert-status-before' },
-                    { type: 'insert-status-after' },
-                    (props) => props.onSubmit
-                  )
+                  .with({ type: 'create-status' }, (props) => props.onSubmit)
                   .with({ type: 'update-status' }, (props) => props.onSubmit)
-                  .with(
-                    { type: 'create-issue' },
-                    { type: 'insert-issue-before' },
-                    { type: 'insert-issue-after' },
-                    (props) => props.onSubmit
-                  )
+                  .with({ type: 'create-issue' }, (props) => props.onSubmit)
                   .with({ type: 'update-issue' }, (props) => props.onSubmit)
                   .exhaustive()
               )}
@@ -186,20 +145,8 @@ const KanbanSheet = ({
                     <FormDescription>
                       This value has to be unique. There can only be one{' '}
                       {match(props.type)
-                        .with(
-                          'create-status',
-                          'update-status',
-                          'insert-status-before',
-                          'insert-status-after',
-                          () => 'status'
-                        )
-                        .with(
-                          'create-issue',
-                          'update-issue',
-                          'insert-issue-before',
-                          'insert-issue-after',
-                          () => 'issue'
-                        )
+                        .with('create-status', 'update-status', () => 'status')
+                        .with('create-issue', 'update-issue', () => 'issue')
                         .exhaustive()}{' '}
                       associated with this title.
                     </FormDescription>
