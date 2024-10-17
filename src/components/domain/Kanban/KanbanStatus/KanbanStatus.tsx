@@ -19,7 +19,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/use-toast'
 import { PAGE_SIZE, cn } from '@/modules/common'
 import { getIssues } from '@/services/issue'
-import { updateStatus } from '@/services/status'
+import { deleteStatus, updateStatus } from '@/services/status'
 import { IS_STORYBOOK } from '@/utils/storybook'
 import {
   useInfiniteQuery,
@@ -35,10 +35,11 @@ import { match } from 'ts-pattern'
 import { useBoolean, useIntersectionObserver } from 'usehooks-ts'
 import KanbanIssue from '../KanbanIssue/KanbanIssue'
 import KanbanSheet from '../KanbanSheet/KanbanSheet'
+import KanbanStatusDeleteConfirmationDialog from '../KanbanStatusDeleteConfirmationDialog/KanbanStatusDeleteConfirmationDialog'
 
 const SIZE = 10
 
-type KanbanStatusProps = Omit<ComponentProps<'div'>, 'id'> & {
+type KanbanStatusProps = Omit<ComponentProps<'div'>, 'id' | 'title'> & {
   index: number
 } & (
     | {
@@ -64,6 +65,13 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
       setValue: setIsSheetOpen,
       setTrue: openSheet,
       setFalse: closeSheet,
+    } = useBoolean()
+
+    const {
+      value: isDeleteDialogOpen,
+      setValue: setIsDeleteDialogOpen,
+      setTrue: openDeleteDialog,
+      setFalse: closeDeleteDialog,
     } = useBoolean()
 
     const params = useParams(
@@ -128,6 +136,23 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
           title: 'Form submission failed',
           description: error.response?.data?.[0]?.msg,
         }),
+    })
+
+    const deleteStatusMutation = useMutation({
+      mutationFn: deleteStatus,
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: [
+            'projects',
+            params.projectId,
+            'boards',
+            params.boardId,
+            'statuses',
+          ],
+          predicate: (query) => !query.options.queryKey?.includes(statusId),
+        })
+        closeDeleteDialog()
+      },
     })
 
     const isFetching = !!useIsFetching({
@@ -209,7 +234,7 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
                               Edit
                             </div>
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={openDeleteDialog}>
                             <div className='flex items-center justify-center gap-x-2 text-destructive'>
                               <Trash className='size-4' />
                               Delete
@@ -337,6 +362,26 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
               statusId: statusId!,
               title: inputs.title,
               description: inputs.description,
+            })
+          }
+        />
+        <KanbanStatusDeleteConfirmationDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          isPending={deleteStatusMutation.isPending}
+          status={match(props)
+            .with({ status: 'pending' }, { status: 'error' }, () => ({
+              title: '',
+            }))
+            .with({ status: 'success' }, (props) => ({
+              title: props.title,
+            }))
+            .exhaustive()}
+          onConfirm={() =>
+            deleteStatusMutation.mutate({
+              projectId: params.projectId!,
+              boardId: params.boardId!,
+              statusId: statusId!,
             })
           }
         />

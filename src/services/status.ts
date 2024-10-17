@@ -74,3 +74,21 @@ export const updateStatus = ({
       data
     )
     .then(({ data }) => data)
+
+// DELETE /projects/:projectId/boards/:boardId/statuses/:statusId
+type GetDeleteStatusPathParams = {
+  projectId: Project['id']
+  boardId: Board['id']
+  statusId: Status['id']
+}
+
+export const deleteStatus = ({
+  projectId,
+  boardId,
+  statusId,
+}: GetDeleteStatusPathParams) =>
+  api
+    .delete<Status>(
+      `/projects/${projectId}/boards/${boardId}/statuses/${statusId}`
+    )
+    .then(({ data }) => data)

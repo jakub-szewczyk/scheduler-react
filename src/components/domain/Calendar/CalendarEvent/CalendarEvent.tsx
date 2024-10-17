@@ -28,7 +28,7 @@ import { EventProps } from 'react-big-calendar'
 import { useBoolean } from 'usehooks-ts'
 import NotificationDetails from '../../Notification/NotificationDetails/NotificationDetails'
 import NotificationDialog from '../../Notification/NotificationDialog/NotificationDialog'
-import CalendarEventDeleteConfirmationDialog from '../CalendarEventDeleteDialog/CalendarEventDeleteConfirmationDialog'
+import CalendarEventDeleteConfirmationDialog from '../CalendarEventDeleteConfirmationDialog/CalendarEventDeleteConfirmationDialog'
 
 const CalendarEvent = ({ title, event }: EventProps) => {
   const {
