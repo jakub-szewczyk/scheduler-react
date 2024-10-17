@@ -7,12 +7,21 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
 import { PAGE_SIZE, cn } from '@/modules/common'
 import { getIssues } from '@/services/issue'
+import { IS_STORYBOOK } from '@/utils/storybook'
 import { useInfiniteQuery, useIsFetching } from '@tanstack/react-query'
 import { useParams } from '@tanstack/react-router'
-import { GripVertical } from 'lucide-react'
+import { GripVertical, MoreHorizontal, Pencil, Trash } from 'lucide-react'
 import { ComponentProps, forwardRef } from 'react'
 import { Draggable } from 'react-beautiful-dnd'
 import { match } from 'ts-pattern'
@@ -42,9 +51,14 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
   (props, statusRef) => {
     const statusId = props.status === 'success' ? props.id : undefined
 
-    const params = useParams({
-      from: '/projects/$projectId/boards/$boardId/statuses/',
-    })
+    const params = useParams(
+      IS_STORYBOOK
+        ? { strict: false }
+        : {
+            strict: true,
+            from: '/projects/$projectId/boards/$boardId/statuses/',
+          }
+    )
 
     const getIssuesQuery = useInfiniteQuery({
       // eslint-disable-next-line @tanstack/query/exhaustive-deps
@@ -61,14 +75,14 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
         getIssues({
           page: pageParam,
           size: PAGE_SIZE,
-          projectId: params.projectId,
-          boardId: params.boardId,
+          projectId: params.projectId!,
+          boardId: params.boardId!,
           statusId: statusId!,
         }),
       getNextPageParam: (page) =>
         (page.page + 1) * page.size < page.total ? page.page + 1 : null,
       initialPageParam: 0,
-      enabled: !!statusId,
+      enabled: !!statusId && !IS_STORYBOOK,
     })
 
     const isFetching = !!useIsFetching({
@@ -108,23 +122,52 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
                   <GripVertical className='size-6' />
                 </Button>
                 <div className='!mt-0 w-full space-y-1.5 truncate'>
-                  {match(props)
-                    .with({ status: 'pending' }, { status: 'error' }, () => (
-                      <div className='h-7'>
-                        <Skeleton className='h-5' />
-                      </div>
-                    ))
-                    .with({ status: 'success' }, (props) => (
-                      <CardTitle
-                        className={cn(
-                          'truncate text-xl',
-                          isFetching && 'opacity-50'
-                        )}
-                      >
-                        {props.title}
-                      </CardTitle>
-                    ))
-                    .exhaustive()}
+                  <div className='flex items-center justify-between'>
+                    {match(props)
+                      .with({ status: 'pending' }, { status: 'error' }, () => (
+                        <div className='h-7 w-[82.5%]'>
+                          <Skeleton className='h-5 w-full' />
+                        </div>
+                      ))
+                      .with({ status: 'success' }, (props) => (
+                        <CardTitle
+                          className={cn(
+                            'truncate text-xl',
+                            isFetching && 'opacity-50'
+                          )}
+                        >
+                          {props.title}
+                        </CardTitle>
+                      ))
+                      .exhaustive()}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          className='size-8 flex-shrink-0 p-0'
+                          disabled={!statusId || isFetching}
+                          variant='ghost'
+                        >
+                          <MoreHorizontal className='size-4' />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align='start'>
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem>
+                          <div className='flex items-center justify-center gap-x-2'>
+                            <Pencil className='size-4' />
+                            Edit
+                          </div>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <div className='flex items-center justify-center gap-x-2 text-destructive'>
+                            <Trash className='size-4' />
+                            Delete
+                          </div>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                   {match(props)
                     .with({ status: 'pending' }, { status: 'error' }, () => (
                       <div className='h-5'>

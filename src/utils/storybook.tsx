@@ -17,6 +17,8 @@ declare module '@storybook/types' {
   }
 }
 
+export const IS_STORYBOOK = import.meta.env.STORYBOOK
+
 export const withRouter = (
   Story: PartialStoryFn,
   { parameters }: StoryContext
