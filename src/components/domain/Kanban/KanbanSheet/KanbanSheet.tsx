@@ -10,6 +10,13 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
   Sheet,
   SheetContent,
   SheetDescription,
@@ -18,19 +25,27 @@ import {
 } from '@/components/ui/sheet'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
+import { prioritySchema } from '@/types/issue'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { DialogProps } from '@radix-ui/react-dialog'
+import { capitalize } from 'lodash/fp'
 import { LoaderCircle, Send } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { match } from 'ts-pattern'
 import { z } from 'zod'
 
-const formSchema = z.object({
+const statusFormSchema = z.object({
   title: z.string().min(1, 'This field is required'),
   description: z.string(),
 })
 
-type Inputs = z.infer<typeof formSchema>
+const issueFormSchema = statusFormSchema.extend({
+  priority: prioritySchema,
+})
+
+type StatusInputs = z.infer<typeof statusFormSchema>
+
+type IssueInputs = z.infer<typeof issueFormSchema>
 
 type KanbanSheetProps = DialogProps & {
   isLoading?: boolean
@@ -38,17 +53,17 @@ type KanbanSheetProps = DialogProps & {
   isFetching?: boolean
   isPlaceholderData?: boolean
 } & (
-    | { type: 'create-status'; onSubmit: (inputs: Inputs) => void }
+    | { type: 'create-status'; onSubmit: (inputs: StatusInputs) => void }
     | {
         type: 'update-status'
-        values: Inputs
-        onSubmit: (inputs: Inputs) => void
+        values: StatusInputs
+        onSubmit: (inputs: StatusInputs) => void
       }
-    | { type: 'create-issue'; onSubmit: (inputs: Inputs) => void }
+    | { type: 'create-issue'; onSubmit: (inputs: IssueInputs) => void }
     | {
         type: 'update-issue'
-        values: Inputs
-        onSubmit: (inputs: Inputs) => void
+        values: IssueInputs
+        onSubmit: (inputs: IssueInputs) => void
       }
   )
 
@@ -59,7 +74,7 @@ const KanbanSheet = ({
   isPending,
   ...props
 }: KanbanSheetProps) => {
-  const form = useForm<Inputs>({
+  const form = useForm<StatusInputs | IssueInputs>({
     values: match(props)
       .with({ type: 'create-status' }, () => ({
         title: '',
@@ -72,13 +87,20 @@ const KanbanSheet = ({
       .with({ type: 'create-issue' }, () => ({
         title: '',
         description: '',
+        priority: 'MEDIUM',
       }))
       .with({ type: 'update-issue' }, (props) => ({
         title: props.values.title,
         description: props.values.description,
+        priority: props.values.priority,
       }))
       .exhaustive(),
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(
+      match(props.type)
+        .with('create-status', 'update-status', () => statusFormSchema)
+        .with('create-issue', 'update-issue', () => issueFormSchema)
+        .exhaustive()
+    ),
   })
 
   return (
@@ -115,11 +137,15 @@ const KanbanSheet = ({
             <form
               className='flex flex-col gap-y-6'
               onSubmit={form.handleSubmit(
+                // @ts-expect-error exhaustive
                 match(props)
-                  .with({ type: 'create-status' }, (props) => props.onSubmit)
-                  .with({ type: 'update-status' }, (props) => props.onSubmit)
-                  .with({ type: 'create-issue' }, (props) => props.onSubmit)
-                  .with({ type: 'update-issue' }, (props) => props.onSubmit)
+                  .with(
+                    { type: 'create-status' },
+                    { type: 'update-status' },
+                    { type: 'create-issue' },
+                    { type: 'update-issue' },
+                    (props) => props.onSubmit
+                  )
                   .exhaustive()
               )}
             >
@@ -176,6 +202,46 @@ const KanbanSheet = ({
                   </FormItem>
                 )}
               />
+              {(props.type === 'create-issue' ||
+                props.type === 'update-issue') && (
+                <FormField
+                  control={form.control}
+                  name='priority'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Priority<span className='text-destructive'>*</span>
+                      </FormLabel>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder='Assign priority' />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {prioritySchema.options.map((priority) => (
+                            <SelectItem
+                              key={priority}
+                              className='[&>span:last-of-type]:w-full'
+                              value={priority}
+                            >
+                              <div className='flex w-full items-center justify-between gap-x-2'>
+                                {capitalize(priority)}
+                                {/* TODO */}
+                                <div className='mr-1.5 size-2 rounded-full bg-destructive' />
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
               <Button
                 className='flex gap-x-2 sm:w-fit'
                 type='submit'

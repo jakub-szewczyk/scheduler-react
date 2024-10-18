@@ -22,7 +22,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/use-toast'
 import { PAGE_SIZE, cn } from '@/modules/common'
-import { getIssues } from '@/services/issue'
+import { createIssue, getIssues } from '@/services/issue'
 import {
   GetStatusesResponseBody,
   createStatus,
@@ -80,38 +80,45 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
     const statusId = props.status === 'success' ? props.id : undefined
 
     const {
-      value: isUpdateSheetOpen,
-      setValue: setIsUpdateSheetOpen,
-      setTrue: openUpdateSheet,
-      setFalse: closeUpdateSheet,
+      value: isUpdateStatusSheetOpen,
+      setValue: setIsUpdateStatusSheetOpen,
+      setTrue: openUpdateStatusSheet,
+      setFalse: closeUpdateStatusSheet,
     } = useBoolean()
 
     const {
-      value: isCreateSheetOpen,
-      setValue: setIsCreateSheetOpen,
-      setTrue: openCreateSheet,
-      setFalse: closeCreateSheet,
+      value: isInsertIssueSheetOpen,
+      setValue: setIsInsertIssueSheetOpen,
+      setTrue: openInsertIssueSheet,
+      setFalse: closeInsertIssueSheet,
     } = useBoolean()
 
     const {
-      value: isInsertLeftSheetOpen,
-      setValue: setIsInsertLeftSheetOpen,
-      setTrue: openInsertLeftSheet,
-      setFalse: closeInsertLeftSheet,
+      value: isInsertStatusSheetOpen,
+      setValue: setIsInsertStatusSheetOpen,
+      setTrue: openInsertStatusSheet,
+      setFalse: closeInsertStatusSheet,
     } = useBoolean()
 
     const {
-      value: isInsertRightSheetOpen,
-      setValue: setIsInsertRightSheetOpen,
-      setTrue: openInsertRightSheet,
-      setFalse: closeInsertRightSheet,
+      value: isInsertLeftStatusSheetOpen,
+      setValue: setIsInsertLeftStatusSheetOpen,
+      setTrue: openInsertLeftStatusSheet,
+      setFalse: closeInsertLeftStatusSheet,
     } = useBoolean()
 
     const {
-      value: isDeleteDialogOpen,
-      setValue: setIsDeleteDialogOpen,
-      setTrue: openDeleteDialog,
-      setFalse: closeDeleteDialog,
+      value: isInsertRightStatusSheetOpen,
+      setValue: setIsInsertRightStatusSheetOpen,
+      setTrue: openInsertRightStatusSheet,
+      setFalse: closeInsertRightStatusSheet,
+    } = useBoolean()
+
+    const {
+      value: isDeleteStatusDialogOpen,
+      setValue: setIsDeleteStatusDialogOpen,
+      setTrue: openDeleteStatusDialog,
+      setFalse: closeDeleteStatusDialog,
     } = useBoolean()
 
     const params = useParams(
@@ -164,10 +171,38 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
             'statuses',
           ],
         })
-        closeUpdateSheet()
+        closeUpdateStatusSheet()
         toast({
           title: 'Status updated',
           description: `${status.title} has been successfully updated`,
+        })
+      },
+      onError: (error) =>
+        toast({
+          variant: 'destructive',
+          title: 'Form submission failed',
+          description: error.response?.data?.[0]?.msg,
+        }),
+    })
+
+    const createIssueMutation = useMutation({
+      mutationFn: createIssue,
+      onSuccess: (issue) => {
+        queryClient.invalidateQueries({
+          queryKey: [
+            'projects',
+            params.projectId,
+            'boards',
+            params.boardId,
+            'statuses',
+            statusId,
+            'issues',
+          ],
+        })
+        closeInsertIssueSheet()
+        toast({
+          title: 'Issue created',
+          description: `${issue.title} has been successfully created`,
         })
       },
       onError: (error) =>
@@ -190,9 +225,9 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
             'statuses',
           ],
         })
-        closeCreateSheet()
-        closeInsertLeftSheet()
-        closeInsertRightSheet()
+        closeInsertStatusSheet()
+        closeInsertLeftStatusSheet()
+        closeInsertRightStatusSheet()
         toast({
           title: 'Status created',
           description: `${status.title} has been successfully created`,
@@ -219,7 +254,7 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
           ],
           predicate: (query) => !query.options.queryKey?.includes(statusId),
         })
-        closeDeleteDialog()
+        closeDeleteStatusDialog()
       },
     })
 
@@ -298,19 +333,22 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             className='gap-x-2'
-                            onClick={openUpdateSheet}
+                            onClick={openUpdateStatusSheet}
                           >
                             <Pencil className='size-4' />
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem className='gap-x-2'>
+                          <DropdownMenuItem
+                            className='gap-x-2'
+                            onClick={openInsertIssueSheet}
+                          >
                             <Plus className='size-4' />
                             Insert issue
                           </DropdownMenuItem>
                           <DropdownMenuSub>
                             <DropdownMenuSubTrigger
                               className='gap-x-2'
-                              onClick={openCreateSheet}
+                              onClick={openInsertStatusSheet}
                             >
                               <Plus className='size-4' />
                               Insert status
@@ -319,14 +357,14 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
                               <DropdownMenuSubContent>
                                 <DropdownMenuItem
                                   className='gap-x-2'
-                                  onClick={openInsertLeftSheet}
+                                  onClick={openInsertLeftStatusSheet}
                                 >
                                   <ArrowLeft className='size-4' />
                                   Insert status left
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   className='gap-x-2'
-                                  onClick={openInsertRightSheet}
+                                  onClick={openInsertRightStatusSheet}
                                 >
                                   <ArrowRight className='size-4' />
                                   Insert status right
@@ -336,7 +374,7 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
                           </DropdownMenuSub>
                           <DropdownMenuItem
                             className='gap-x-2 text-destructive'
-                            onClick={openDeleteDialog}
+                            onClick={openDeleteStatusDialog}
                           >
                             <Trash className='size-4' />
                             Delete
@@ -442,8 +480,8 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
           )}
         </Draggable>
         <KanbanSheet
-          open={isUpdateSheetOpen}
-          onOpenChange={setIsUpdateSheetOpen}
+          open={isUpdateStatusSheetOpen}
+          onOpenChange={setIsUpdateStatusSheetOpen}
           isPending={updateStatusMutation.isPending}
           type='update-status'
           values={match(props)
@@ -467,8 +505,24 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
           }
         />
         <KanbanSheet
-          open={isCreateSheetOpen}
-          onOpenChange={setIsCreateSheetOpen}
+          open={isInsertIssueSheetOpen}
+          onOpenChange={setIsInsertIssueSheetOpen}
+          isPending={createIssueMutation.isPending}
+          type='create-issue'
+          onSubmit={(inputs) =>
+            createIssueMutation.mutate({
+              projectId: params.projectId!,
+              boardId: params.boardId!,
+              statusId: statusId!,
+              title: inputs.title,
+              description: inputs.description,
+              priority: inputs.priority,
+            })
+          }
+        />
+        <KanbanSheet
+          open={isInsertStatusSheetOpen}
+          onOpenChange={setIsInsertStatusSheetOpen}
           isPending={createStatusMutation.isPending}
           type='create-status'
           onSubmit={(inputs) =>
@@ -481,8 +535,8 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
           }
         />
         <KanbanSheet
-          open={isInsertLeftSheetOpen}
-          onOpenChange={setIsInsertLeftSheetOpen}
+          open={isInsertLeftStatusSheetOpen}
+          onOpenChange={setIsInsertLeftStatusSheetOpen}
           isPending={createStatusMutation.isPending}
           type='create-status'
           onSubmit={(inputs) => {
@@ -510,8 +564,8 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
           }}
         />
         <KanbanSheet
-          open={isInsertRightSheetOpen}
-          onOpenChange={setIsInsertRightSheetOpen}
+          open={isInsertRightStatusSheetOpen}
+          onOpenChange={setIsInsertRightStatusSheetOpen}
           isPending={createStatusMutation.isPending}
           type='create-status'
           onSubmit={(inputs) => {
@@ -539,8 +593,8 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
           }}
         />
         <KanbanStatusDeleteConfirmationDialog
-          open={isDeleteDialogOpen}
-          onOpenChange={setIsDeleteDialogOpen}
+          open={isDeleteStatusDialogOpen}
+          onOpenChange={setIsDeleteStatusDialogOpen}
           isPending={deleteStatusMutation.isPending}
           status={match(props)
             .with({ status: 'pending' }, { status: 'error' }, () => ({

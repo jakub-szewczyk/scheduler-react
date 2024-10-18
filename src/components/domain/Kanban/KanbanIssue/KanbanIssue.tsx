@@ -5,9 +5,32 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/modules/common'
-import { GripVertical } from 'lucide-react'
+import { IS_STORYBOOK } from '@/utils/storybook'
+import { useIsFetching } from '@tanstack/react-query'
+import { useParams } from '@tanstack/react-router'
+import {
+  ArrowDown,
+  ArrowUp,
+  GripVertical,
+  MoreHorizontal,
+  Pencil,
+  Plus,
+  Trash,
+} from 'lucide-react'
 import { ComponentProps, forwardRef } from 'react'
 import { Draggable } from 'react-beautiful-dnd'
 import { match } from 'ts-pattern'
@@ -30,6 +53,25 @@ const KanbanIssue = forwardRef<HTMLDivElement, KanbanIssueProps>(
   (props, ref) => {
     const issueId = props.status === 'success' ? props.id : undefined
 
+    const params = useParams(
+      IS_STORYBOOK
+        ? { strict: false }
+        : {
+            strict: true,
+            from: '/projects/$projectId/boards/$boardId/statuses/',
+          }
+    )
+
+    const isFetching = !!useIsFetching({
+      queryKey: [
+        'projects',
+        params.projectId,
+        'boards',
+        params.boardId,
+        'statuses',
+      ],
+    })
+
     return (
       <Draggable
         draggableId={issueId || `issue-${props.index}`}
@@ -47,24 +89,87 @@ const KanbanIssue = forwardRef<HTMLDivElement, KanbanIssueProps>(
                   className='size-8 flex-shrink-0 cursor-grab hover:bg-primary-foreground/80'
                   size='icon'
                   variant='ghost'
-                  disabled={!issueId}
+                  disabled={!issueId || isFetching}
                   {...dragHandleProps}
                 >
                   <GripVertical className='size-6' />
                 </Button>
                 <div className='!mt-0 w-full space-y-1.5 truncate'>
-                  {match(props)
-                    .with({ status: 'pending' }, { status: 'error' }, () => (
-                      <div className='h-6'>
-                        <Skeleton className='h-4 bg-background' />
-                      </div>
-                    ))
-                    .with({ status: 'success' }, (props) => (
-                      <CardTitle className='truncate text-base font-semibold'>
-                        {props.title}
-                      </CardTitle>
-                    ))
-                    .exhaustive()}
+                  <div className='flex items-center justify-between'>
+                    {match(props)
+                      .with({ status: 'pending' }, { status: 'error' }, () => (
+                        <div className='h-6 w-[82.5%]'>
+                          <Skeleton className='h-4 bg-background' />
+                        </div>
+                      ))
+                      .with({ status: 'success' }, (props) => (
+                        <CardTitle
+                          className={cn(
+                            'truncate text-base font-semibold',
+                            isFetching && 'opacity-50'
+                          )}
+                        >
+                          {props.title}
+                        </CardTitle>
+                      ))
+                      .exhaustive()}
+                    <DropdownMenu modal={false}>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          className='size-8 flex-shrink-0 p-0'
+                          disabled={!issueId || isFetching}
+                          variant='ghost'
+                        >
+                          <MoreHorizontal className='size-4' />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align='start'>
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          className='gap-x-2'
+                          // onClick={openUpdateSheet}
+                        >
+                          <Pencil className='size-4' />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuSub>
+                          <DropdownMenuSubTrigger
+                            className='gap-x-2'
+                            // onClick={openCreateSheet}
+                          >
+                            <Plus className='size-4' />
+                            Insert issue
+                          </DropdownMenuSubTrigger>
+                          <DropdownMenuPortal>
+                            <DropdownMenuSubContent>
+                              <DropdownMenuItem
+                                className='gap-x-2'
+                                // onClick={openInsertAboveSheet}
+                              >
+                                <ArrowUp className='size-4' />
+                                Insert issue above
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className='gap-x-2'
+                                // onClick={openInsertBelowSheet}
+                              >
+                                <ArrowDown className='size-4' />
+                                Insert issue below
+                              </DropdownMenuItem>
+                            </DropdownMenuSubContent>
+                          </DropdownMenuPortal>
+                        </DropdownMenuSub>
+                        <DropdownMenuItem
+                          className='gap-x-2 text-destructive'
+                          // onClick={openDeleteDialog}
+                        >
+                          <Trash className='size-4' />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                   {match(props)
                     .with({ status: 'pending' }, { status: 'error' }, () => (
                       <div className='h-5'>
@@ -75,7 +180,8 @@ const KanbanIssue = forwardRef<HTMLDivElement, KanbanIssueProps>(
                       <CardDescription
                         className={cn(
                           'invisible truncate',
-                          props.description && 'visible'
+                          props.description && 'visible',
+                          isFetching && 'opacity-50'
                         )}
                       >
                         {props.description || 'DESCRIPTION'}

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-const prioritySchema = z.enum([
+export const prioritySchema = z.enum([
   'TRIVIAL',
   'MINOR',
   'LOW',

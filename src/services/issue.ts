@@ -36,6 +36,35 @@ export const getIssues = ({
     }
   ).then(({ data }) => data)
 
+// POST /projects/:projectId/boards/:boardId/statuses/:statusId/issues
+type GetCreateIssuePathParams = {
+  projectId: Project['id']
+  boardId: Board['id']
+  statusId: Status['id']
+}
+
+type GetCreateIssueRequestBody = Pick<
+  Issue,
+  'title' | 'description' | 'priority'
+> &
+  Partial<{
+    prevIssueId: Issue['id']
+    nextIssueId: Issue['id']
+  }>
+
+export const createIssue = ({
+  projectId,
+  boardId,
+  statusId,
+  ...data
+}: GetCreateIssuePathParams & GetCreateIssueRequestBody) =>
+  api
+    .post<Issue>(
+      `/projects/${projectId}/boards/${boardId}/statuses/${statusId}/issues`,
+      data
+    )
+    .then(({ data }) => data)
+
 // PUT /projects/:projectId/boards/:boardId/statuses/:statusId/issues/:issueId
 type GetUpdateIssuePathParams = {
   projectId: Project['id']
@@ -49,8 +78,8 @@ type GetUpdateIssueRequestBody = Pick<
   'title' | 'description' | 'priority'
 > &
   Partial<{
-    prevIssueUd: Issue['id']
-    nextIssueUd: Issue['id']
+    prevIssueId: Issue['id']
+    nextIssueId: Issue['id']
     newStatusId: Status['id']
   }>
 
