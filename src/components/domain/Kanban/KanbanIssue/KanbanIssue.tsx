@@ -18,10 +18,19 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { cn } from '@/modules/common'
+import { priorityColor } from '@/modules/issue'
+import { Issue } from '@/types/issue'
 import { IS_STORYBOOK } from '@/utils/storybook'
 import { useIsFetching } from '@tanstack/react-query'
 import { useParams } from '@tanstack/react-router'
+import { capitalize } from 'lodash/fp'
 import {
   ArrowDown,
   ArrowUp,
@@ -41,8 +50,9 @@ type KanbanIssueProps = ComponentProps<'div'> & { index: number } & (
       }
     | {
         status: 'success'
-        title: string
-        description?: string | null
+        title: Issue['title']
+        description?: Issue['description']
+        priority: Issue['priority']
       }
     | {
         status: 'error'
@@ -84,7 +94,7 @@ const KanbanIssue = forwardRef<HTMLDivElement, KanbanIssueProps>(
               ref={ref}
               className={cn('flex-shrink-0 bg-secondary', props.className)}
             >
-              <CardHeader className='flex-row gap-x-2 p-4'>
+              <CardHeader className='flex-row p-4'>
                 <Button
                   className='size-8 flex-shrink-0 cursor-grab hover:bg-primary-foreground/80'
                   size='icon'
@@ -95,7 +105,7 @@ const KanbanIssue = forwardRef<HTMLDivElement, KanbanIssueProps>(
                   <GripVertical className='size-6' />
                 </Button>
                 <div className='!mt-0 w-full space-y-1.5 truncate'>
-                  <div className='flex items-center justify-between'>
+                  <div className='flex items-center justify-between gap-x-2'>
                     {match(props)
                       .with({ status: 'pending' }, { status: 'error' }, () => (
                         <div className='h-6 w-[82.5%]'>
@@ -103,20 +113,39 @@ const KanbanIssue = forwardRef<HTMLDivElement, KanbanIssueProps>(
                         </div>
                       ))
                       .with({ status: 'success' }, (props) => (
-                        <CardTitle
-                          className={cn(
-                            'truncate text-base font-semibold',
-                            isFetching && 'opacity-50'
-                          )}
-                        >
-                          {props.title}
-                        </CardTitle>
+                        <div className='flex items-center truncate'>
+                          <TooltipProvider delayDuration={100}>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className='p-2'>
+                                  <div
+                                    className={cn(
+                                      'size-2 flex-shrink-0 rounded-full',
+                                      priorityColor(props.priority)
+                                    )}
+                                  />
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {capitalize(props.priority)}
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          <CardTitle
+                            className={cn(
+                              'truncate text-base font-semibold',
+                              isFetching && 'opacity-50'
+                            )}
+                          >
+                            {props.title}
+                          </CardTitle>
+                        </div>
                       ))
                       .exhaustive()}
                     <DropdownMenu modal={false}>
                       <DropdownMenuTrigger asChild>
                         <Button
-                          className='size-8 flex-shrink-0 p-0'
+                          className='size-8 flex-shrink-0 p-0 hover:bg-primary-foreground/80'
                           disabled={!issueId || isFetching}
                           variant='ghost'
                         >

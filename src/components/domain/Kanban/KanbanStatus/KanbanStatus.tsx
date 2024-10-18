@@ -296,7 +296,7 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
                     <GripVertical className='size-6' />
                   </Button>
                   <div className='!mt-0 w-full space-y-1.5 truncate'>
-                    <div className='flex items-center justify-between'>
+                    <div className='flex items-center justify-between gap-x-2'>
                       {match(props)
                         .with(
                           { status: 'pending' },

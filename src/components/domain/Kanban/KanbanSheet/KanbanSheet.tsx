@@ -25,6 +25,8 @@ import {
 } from '@/components/ui/sheet'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
+import { cn } from '@/modules/common'
+import { priorityColor } from '@/modules/issue'
 import { prioritySchema } from '@/types/issue'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { DialogProps } from '@radix-ui/react-dialog'
@@ -127,8 +129,16 @@ const KanbanSheet = ({
                 () =>
                   'Edit the status by updating the title or optional description. Ensure the title clearly represents the stage (e.g., "To Do," "In Progress"). Use the description to add or modify details and guidelines. Submit to save your changes to the Kanban board.'
               )
-              .with('create-issue', () => 'TODO')
-              .with('update-issue', () => 'TODO')
+              .with(
+                'create-issue',
+                () =>
+                  "Create a new issue by entering a title, description, and selecting a priority level. Choose a title that clearly summarizes the issue. Use the description to provide key details or context. Set the priority to indicate the issue's urgency. Submit to add the issue to the selected status on your Kanban board."
+              )
+              .with(
+                'update-issue',
+                () =>
+                  'Edit the issue by updating the title, description, or priority level. Ensure the title clearly summarizes the issue. Use the description to adjust key details or context, and modify the priority to reflect its urgency. Submit to save your changes on the Kanban board.'
+              )
               .exhaustive()}
           </SheetDescription>
         </SheetHeader>
@@ -230,8 +240,12 @@ const KanbanSheet = ({
                             >
                               <div className='flex w-full items-center justify-between gap-x-2'>
                                 {capitalize(priority)}
-                                {/* TODO */}
-                                <div className='mr-1.5 size-2 rounded-full bg-destructive' />
+                                <div
+                                  className={cn(
+                                    'mr-1.5 size-2 rounded-full',
+                                    priorityColor(priority)
+                                  )}
+                                />
                               </div>
                             </SelectItem>
                           ))}
