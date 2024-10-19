@@ -454,6 +454,7 @@ const KanbanStatus = forwardRef<HTMLDivElement, KanbanStatusProps>(
                                       className='mb-2'
                                       index={index}
                                       status='success'
+                                      statusId={statusId!}
                                       {...issue}
                                     />
                                   ))}
