@@ -27,11 +27,16 @@ import {
 import { useToast } from '@/components/ui/use-toast'
 import { cn } from '@/modules/common'
 import { priorityColor } from '@/modules/issue'
-import { updateIssue } from '@/services/issue'
+import {
+  GetIssuesResponseBody,
+  createIssue,
+  updateIssue,
+} from '@/services/issue'
 import { Issue, Priority } from '@/types/issue'
 import { Status } from '@/types/status'
 import { IS_STORYBOOK } from '@/utils/storybook'
 import {
+  InfiniteData,
   useIsFetching,
   useMutation,
   useQueryClient,
@@ -72,12 +77,34 @@ type KanbanIssueProps = ComponentProps<'div'> & { index: number } & (
 const KanbanIssue = forwardRef<HTMLDivElement, KanbanIssueProps>(
   (props, ref) => {
     const issueId = props.status === 'success' ? props.id : undefined
+    const statusId = props.status === 'success' ? props.statusId : undefined
 
     const {
       value: isUpdateIssueSheetOpen,
       setValue: setIsUpdateIssueSheetOpen,
       setTrue: openUpdateIssueSheet,
       setFalse: closeUpdateIssueSheet,
+    } = useBoolean()
+
+    const {
+      value: isInsertIssueSheetOpen,
+      setValue: setIsInsertIssueSheetOpen,
+      setTrue: openInsertIssueSheet,
+      setFalse: closeInsertIssueSheet,
+    } = useBoolean()
+
+    const {
+      value: isInsertAboveIssueSheetOpen,
+      setValue: setIsInsertAboveIssueSheetOpen,
+      setTrue: openInsertAboveIssueSheet,
+      setFalse: closeInsertAboveIssueSheet,
+    } = useBoolean()
+
+    const {
+      value: isInsertBelowIssueSheetOpen,
+      setValue: setIsInsertBelowIssueSheetOpen,
+      setTrue: openInsertBelowIssueSheet,
+      setFalse: closeInsertBelowIssueSheet,
     } = useBoolean()
 
     const params = useParams(
@@ -103,7 +130,7 @@ const KanbanIssue = forwardRef<HTMLDivElement, KanbanIssueProps>(
             'boards',
             params.boardId,
             'statuses',
-            props.status === 'success' ? props.statusId : undefined,
+            statusId,
             'issues',
           ],
         })
@@ -111,6 +138,36 @@ const KanbanIssue = forwardRef<HTMLDivElement, KanbanIssueProps>(
         toast({
           title: 'Issue updated',
           description: `${issue.title} has been successfully updated`,
+        })
+      },
+      onError: (error) =>
+        toast({
+          variant: 'destructive',
+          title: 'Form submission failed',
+          description: error.response?.data?.[0]?.msg,
+        }),
+    })
+
+    const createIssueMutation = useMutation({
+      mutationFn: createIssue,
+      onSuccess: (issue) => {
+        queryClient.invalidateQueries({
+          queryKey: [
+            'projects',
+            params.projectId,
+            'boards',
+            params.boardId,
+            'statuses',
+            statusId,
+            'issues',
+          ],
+        })
+        closeInsertIssueSheet()
+        closeInsertAboveIssueSheet()
+        closeInsertBelowIssueSheet()
+        toast({
+          title: 'Issue created',
+          description: `${issue.title} has been successfully created`,
         })
       },
       onError: (error) =>
@@ -217,17 +274,26 @@ const KanbanIssue = forwardRef<HTMLDivElement, KanbanIssueProps>(
                             Edit
                           </DropdownMenuItem>
                           <DropdownMenuSub>
-                            <DropdownMenuSubTrigger className='gap-x-2'>
+                            <DropdownMenuSubTrigger
+                              className='gap-x-2'
+                              onClick={openInsertIssueSheet}
+                            >
                               <Plus className='size-4' />
                               Insert issue
                             </DropdownMenuSubTrigger>
                             <DropdownMenuPortal>
                               <DropdownMenuSubContent>
-                                <DropdownMenuItem className='gap-x-2'>
+                                <DropdownMenuItem
+                                  className='gap-x-2'
+                                  onClick={openInsertAboveIssueSheet}
+                                >
                                   <ArrowUp className='size-4' />
                                   Insert issue above
                                 </DropdownMenuItem>
-                                <DropdownMenuItem className='gap-x-2'>
+                                <DropdownMenuItem
+                                  className='gap-x-2'
+                                  onClick={openInsertBelowIssueSheet}
+                                >
                                   <ArrowDown className='size-4' />
                                   Insert issue below
                                 </DropdownMenuItem>
@@ -293,6 +359,88 @@ const KanbanIssue = forwardRef<HTMLDivElement, KanbanIssueProps>(
               priority: inputs.priority,
             })
           }
+        />
+        <KanbanSheet
+          open={isInsertIssueSheetOpen}
+          onOpenChange={setIsInsertIssueSheetOpen}
+          isPending={createIssueMutation.isPending}
+          type='create-issue'
+          onSubmit={(inputs) =>
+            createIssueMutation.mutate({
+              projectId: params.projectId!,
+              boardId: params.boardId!,
+              statusId: statusId!,
+              title: inputs.title,
+              description: inputs.description,
+              priority: inputs.priority,
+            })
+          }
+        />
+        <KanbanSheet
+          open={isInsertAboveIssueSheetOpen}
+          onOpenChange={setIsInsertAboveIssueSheetOpen}
+          isPending={createIssueMutation.isPending}
+          type='create-issue'
+          onSubmit={(inputs) => {
+            const getIssuesQueryData = queryClient.getQueryData<
+              InfiniteData<GetIssuesResponseBody, number>
+            >([
+              'projects',
+              params.projectId,
+              'boards',
+              params.boardId,
+              'statuses',
+              statusId,
+              'issues',
+            ])
+            const issues = getIssuesQueryData!.pages.flatMap(
+              (page) => page.content
+            )
+            const prevIssue: Issue | undefined = issues[props.index - 1]
+            createIssueMutation.mutate({
+              projectId: params.projectId!,
+              boardId: params.boardId!,
+              statusId: statusId!,
+              title: inputs.title,
+              description: inputs.description,
+              priority: inputs.priority,
+              prevIssueId: prevIssue?.id,
+              nextIssueId: issueId,
+            })
+          }}
+        />
+        <KanbanSheet
+          open={isInsertBelowIssueSheetOpen}
+          onOpenChange={setIsInsertBelowIssueSheetOpen}
+          isPending={createIssueMutation.isPending}
+          type='create-issue'
+          onSubmit={(inputs) => {
+            const getIssuesQueryData = queryClient.getQueryData<
+              InfiniteData<GetIssuesResponseBody, number>
+            >([
+              'projects',
+              params.projectId,
+              'boards',
+              params.boardId,
+              'statuses',
+              statusId,
+              'issues',
+            ])
+            const issues = getIssuesQueryData!.pages.flatMap(
+              (page) => page.content
+            )
+            const nextIssue: Issue | undefined = issues[props.index + 1]
+            createIssueMutation.mutate({
+              projectId: params.projectId!,
+              boardId: params.boardId!,
+              statusId: statusId!,
+              title: inputs.title,
+              description: inputs.description,
+              priority: inputs.priority,
+              prevIssueId: issueId,
+              nextIssueId: nextIssue?.id,
+            })
+          }}
         />
       </>
     )
