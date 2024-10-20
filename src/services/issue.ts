@@ -96,3 +96,23 @@ export const updateIssue = ({
       { ...data, statusId: data.newStatusId }
     )
     .then(({ data }) => data)
+
+// DELETE /projects/:projectId/boards/:boardId/statuses/:statusId/issues/:issueId
+type GetDeleteIssuePathParams = {
+  projectId: Project['id']
+  boardId: Board['id']
+  statusId: Status['id']
+  issueId: Issue['id']
+}
+
+export const deleteIssue = ({
+  projectId,
+  boardId,
+  statusId,
+  issueId,
+}: GetDeleteIssuePathParams) =>
+  api
+    .delete<Issue>(
+      `/projects/${projectId}/boards/${boardId}/statuses/${statusId}/issues/${issueId}`
+    )
+    .then(({ data }) => data)

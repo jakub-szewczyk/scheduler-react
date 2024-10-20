@@ -30,6 +30,7 @@ import { priorityColor } from '@/modules/issue'
 import {
   GetIssuesResponseBody,
   createIssue,
+  deleteIssue,
   updateIssue,
 } from '@/services/issue'
 import { Issue, Priority } from '@/types/issue'
@@ -57,6 +58,7 @@ import { Draggable } from 'react-beautiful-dnd'
 import { match } from 'ts-pattern'
 import { useBoolean } from 'usehooks-ts'
 import KanbanSheet from '../KanbanSheet/KanbanSheet'
+import KanbanIssueDeleteConfirmationDialog from '../KanbanIssueDeleteConfirmationDialog/KanbanIssueDeleteConfirmationDialog'
 
 type KanbanIssueProps = ComponentProps<'div'> & { index: number } & (
     | {
@@ -105,6 +107,13 @@ const KanbanIssue = forwardRef<HTMLDivElement, KanbanIssueProps>(
       setValue: setIsInsertBelowIssueSheetOpen,
       setTrue: openInsertBelowIssueSheet,
       setFalse: closeInsertBelowIssueSheet,
+    } = useBoolean()
+
+    const {
+      value: isDeleteIssueDialogOpen,
+      setValue: setIsDeleteIssueDialogOpen,
+      setTrue: openDeleteIssueDialog,
+      setFalse: closeDeleteIssueDialog,
     } = useBoolean()
 
     const params = useParams(
@@ -176,6 +185,24 @@ const KanbanIssue = forwardRef<HTMLDivElement, KanbanIssueProps>(
           title: 'Form submission failed',
           description: error.response?.data?.[0]?.msg,
         }),
+    })
+
+    const deleteIssueMutation = useMutation({
+      mutationFn: deleteIssue,
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: [
+            'projects',
+            params.projectId,
+            'boards',
+            params.boardId,
+            'statuses',
+            statusId,
+            'issues',
+          ],
+        })
+        closeDeleteIssueDialog()
+      },
     })
 
     const isFetching = !!useIsFetching({
@@ -300,7 +327,10 @@ const KanbanIssue = forwardRef<HTMLDivElement, KanbanIssueProps>(
                               </DropdownMenuSubContent>
                             </DropdownMenuPortal>
                           </DropdownMenuSub>
-                          <DropdownMenuItem className='gap-x-2 text-destructive'>
+                          <DropdownMenuItem
+                            className='gap-x-2 text-destructive'
+                            onClick={openDeleteIssueDialog}
+                          >
                             <Trash className='size-4' />
                             Delete
                           </DropdownMenuItem>
@@ -441,6 +471,27 @@ const KanbanIssue = forwardRef<HTMLDivElement, KanbanIssueProps>(
               nextIssueId: nextIssue?.id,
             })
           }}
+        />
+        <KanbanIssueDeleteConfirmationDialog
+          open={isDeleteIssueDialogOpen}
+          onOpenChange={setIsDeleteIssueDialogOpen}
+          isPending={deleteIssueMutation.isPending}
+          issue={match(props)
+            .with({ status: 'pending' }, { status: 'error' }, () => ({
+              title: '',
+            }))
+            .with({ status: 'success' }, (props) => ({
+              title: props.title,
+            }))
+            .exhaustive()}
+          onConfirm={() =>
+            deleteIssueMutation.mutate({
+              projectId: params.projectId!,
+              boardId: params.boardId!,
+              statusId: statusId!,
+              issueId: issueId!,
+            })
+          }
         />
       </>
     )
