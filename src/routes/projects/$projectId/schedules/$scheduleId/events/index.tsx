@@ -146,7 +146,6 @@ function Events() {
               <BreadcrumbLink asChild>
                 <Link
                   to='/projects/$projectId/schedules/$scheduleId'
-                  search={{ page: 0, size: 10, title: '', createdAt: 'DESC' }}
                   params={{
                     projectId: params.projectId,
                     scheduleId: params.scheduleId,
