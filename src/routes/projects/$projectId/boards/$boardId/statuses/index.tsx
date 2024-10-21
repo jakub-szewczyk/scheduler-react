@@ -1,3 +1,4 @@
+import EmptyCard from '@/components/common/EmptyCard/EmptyCard'
 import Protected from '@/components/common/Protected/Protected'
 import Kanban from '@/components/domain/Kanban/Kanban'
 import KanbanSheet from '@/components/domain/Kanban/KanbanSheet/KanbanSheet'
@@ -161,7 +162,7 @@ function Statuses() {
             </CardFooter>
           </Card>
         </div>
-        <Kanban />
+        <Kanban empty={<EmptyCard onClick={openSheet} />} />
       </div>
       <KanbanSheet
         open={isSheetOpen}

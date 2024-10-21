@@ -4,12 +4,17 @@ import { PAGE_SIZE } from '@/modules/common'
 import { getStatuses } from '@/services/status'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { useParams } from '@tanstack/react-router'
+import { ReactNode } from 'react'
 import { DragDropContext } from 'react-beautiful-dnd'
 import { match } from 'ts-pattern'
 import { useIntersectionObserver } from 'usehooks-ts'
 import KanbanStatus from './KanbanStatus/KanbanStatus'
 
-const Kanban = () => {
+interface KanbanProps {
+  empty?: ReactNode
+}
+
+const Kanban = ({ empty = null }: KanbanProps) => {
   const params = useParams({
     from: '/projects/$projectId/boards/$boardId/statuses/',
   })
@@ -73,6 +78,7 @@ const Kanban = () => {
               )
               .with({ status: 'success' }, ({ data }) => {
                 const statuses = data.pages.flatMap((page) => page.content)
+                if (statuses.length === 0) return empty
                 return (
                   <>
                     {statuses.map((status, index) => (
