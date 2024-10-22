@@ -124,7 +124,7 @@ function ScheduleDetails() {
                   scheduleId: params.scheduleId,
                 }}
               >
-                See the Calendar <CalendarClock className='size-4' />
+                Open Calendar <CalendarClock className='size-4' />
               </Link>
             </Button>
             <Button
@@ -166,7 +166,7 @@ function ScheduleDetails() {
                   <dt className='font-bold'>Created at</dt>
                   <dd>
                     {getScheduleQuery.isLoading ? (
-                      <Skeleton className='max-w-xs h-5' />
+                      <Skeleton className='h-5 max-w-xs' />
                     ) : (
                       getScheduleQuery.data?.createdAt &&
                       toDateFormat(getScheduleQuery.data.createdAt)
@@ -177,7 +177,7 @@ function ScheduleDetails() {
                   <dt className='font-bold'>Title</dt>
                   <dd>
                     {getScheduleQuery.isLoading ? (
-                      <Skeleton className='max-w-screen-sm h-5' />
+                      <Skeleton className='h-5 max-w-screen-sm' />
                     ) : (
                       getScheduleQuery.data?.title
                     )}

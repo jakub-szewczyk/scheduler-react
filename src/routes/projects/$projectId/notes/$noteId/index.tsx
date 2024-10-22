@@ -116,7 +116,7 @@ function NoteDetails() {
                   noteId: params.noteId,
                 }}
               >
-                Go to Editor <FileType2 className='size-4' />
+                Open Editor <FileType2 className='size-4' />
               </Link>
             </Button>
             <Button

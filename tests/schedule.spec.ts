@@ -763,7 +763,7 @@ test.describe('schedule details page', () => {
     await page.goto(
       `${APP_BASE_URL}/projects/${SUBJECT.id}/schedules/${SUBJECT.id}`
     )
-    await page.getByRole('link', { name: 'See the Calendar' }).click()
+    await page.getByRole('link', { name: 'Open Calendar' }).click()
     expect(page.url()).toMatch(
       `${APP_BASE_URL}/projects/${SUBJECT.id}/schedules/${SUBJECT.id}/events`
     )

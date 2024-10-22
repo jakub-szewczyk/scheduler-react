@@ -122,7 +122,7 @@ function BoardDetails() {
                   boardId: params.boardId,
                 }}
               >
-                View the Kanban <SquareKanban className='size-4' />
+                Open Kanban <SquareKanban className='size-4' />
               </Link>
             </Button>
             <Button

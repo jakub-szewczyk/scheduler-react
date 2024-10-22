@@ -9,6 +9,7 @@ import { identity } from 'lodash/fp'
 import {
   Bold,
   Braces,
+  CloudUpload,
   Code,
   Heading1,
   Heading2,
@@ -268,11 +269,17 @@ const WYSIWYGEditor = () => {
             <Heading6 className='size-4' />
           </ToggleGroupItem>
         </ToggleGroup>
+        {false && (
+          <div className='ml-auto flex animate-pulse items-center gap-x-2 text-sm'>
+            <CloudUpload className='size-4' />
+            Syncing...
+          </div>
+        )}
       </CardHeader>
       <CardContent>
         <div
           className={cn(
-            'cursor-text rounded-lg border border-input text-sm [&:has(:focus-visible)]:outline-none [&:has(:focus-visible)]:ring-2 [&:has(:focus-visible)]:ring-ring [&:has(:focus-visible)]:ring-offset-2 [&_.public-DraftEditor-content]:min-h-[600px] [&_.public-DraftEditor-content]:px-3 [&_.public-DraftEditor-content]:py-2 [&_.public-DraftEditorPlaceholder-root]:left-3 [&_.public-DraftEditorPlaceholder-root]:top-2 [&_.public-DraftEditorPlaceholder-root]:hidden [&_.public-DraftEditorPlaceholder-root]:text-muted-foreground [&_h1]:text-4xl [&_h1]:font-extrabold [&_h2]:text-3xl [&_h2]:font-semibold [&_h3]:text-2xl [&_h3]:font-semibold [&_h4]:text-xl [&_h4]:font-semibold [&_h5]:text-lg [&_h5]:font-semibold [&_h6]:text-base [&_h6]:font-semibold',
+            'cursor-text rounded-lg border border-input text-sm [&:has(:focus-visible)]:outline-none [&:has(:focus-visible)]:ring-2 [&:has(:focus-visible)]:ring-ring [&:has(:focus-visible)]:ring-offset-2 [&:has(:focus-visible)]:dark:ring-offset-0 [&_.public-DraftEditor-content]:min-h-[600px] [&_.public-DraftEditor-content]:px-3 [&_.public-DraftEditor-content]:py-2 [&_.public-DraftEditor-content_blockquote]:my-4 [&_.public-DraftEditor-content_blockquote]:border-l-4 [&_.public-DraftEditor-content_blockquote]:border-l-accent-foreground [&_.public-DraftEditor-content_blockquote]:bg-secondary [&_.public-DraftEditor-content_blockquote]:px-3 [&_.public-DraftEditor-content_blockquote]:py-2 [&_.public-DraftEditorPlaceholder-root]:left-3 [&_.public-DraftEditorPlaceholder-root]:top-2 [&_.public-DraftEditorPlaceholder-root]:hidden [&_.public-DraftEditorPlaceholder-root]:text-muted-foreground [&_h1]:text-4xl [&_h1]:font-extrabold [&_h2]:text-3xl [&_h2]:font-semibold [&_h3]:text-2xl [&_h3]:font-semibold [&_h4]:text-xl [&_h4]:font-semibold [&_h5]:text-lg [&_h5]:font-semibold [&_h6]:text-base [&_h6]:font-semibold',
             (editorState.getCurrentContent().hasText() ||
               editorState
                 .getCurrentContent()
