@@ -28,7 +28,9 @@ interface DataTablePreviewProps<Data> {
   projectId: string
 }
 
-const DataTablePreview = <Data extends Project & Schedule & Board & Note>({
+const DataTablePreview = <
+  Data extends Project & Schedule & Board & Omit<Note, 'content'>,
+>({
   isFetching,
   isPlaceholderData,
   subject,
@@ -97,13 +99,13 @@ const DataTablePreview = <Data extends Project & Schedule & Board & Note>({
           .map((_, index) => (
             <TableRow key={index}>
               <TableCell>
-                <Skeleton className='w-full h-4' />
+                <Skeleton className='h-4 w-full' />
               </TableCell>
               <TableCell>
-                <Skeleton className='w-full h-4' />
+                <Skeleton className='h-4 w-full' />
               </TableCell>
               <TableCell>
-                <Skeleton className='w-full h-4' />
+                <Skeleton className='h-4 w-full' />
               </TableCell>
             </TableRow>
           ))

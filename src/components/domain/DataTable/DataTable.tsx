@@ -59,7 +59,9 @@ interface DataTableProps<Data> {
   }
 }
 
-const DataTable = <Data extends Project & Schedule & Board & Note>({
+const DataTable = <
+  Data extends Project & Schedule & Board & Omit<Note, 'content'>,
+>({
   className,
   isFetching,
   isPlaceholderData,
@@ -144,9 +146,9 @@ const DataTable = <Data extends Project & Schedule & Board & Note>({
         >
           Created at
           {column.getIsSorted() === 'asc' ? (
-            <ArrowUp className='size-4 ml-2' />
+            <ArrowUp className='ml-2 size-4' />
           ) : (
-            <ArrowDown className='size-4 ml-2' />
+            <ArrowDown className='ml-2 size-4' />
           )}
         </Button>
       ),
@@ -275,7 +277,7 @@ const DataTable = <Data extends Project & Schedule & Board & Note>({
   return (
     <>
       <div className={className}>
-        <div className='flex items-center justify-between gap-x-2 gap-y-4 mb-4'>
+        <div className='mb-4 flex items-center justify-between gap-x-2 gap-y-4'>
           <TableSearch table={table} />
           {selectedRows.length > 0 && (
             <Button
@@ -289,7 +291,7 @@ const DataTable = <Data extends Project & Schedule & Board & Note>({
             </Button>
           )}
         </div>
-        <div className='border rounded-md bg-background'>
+        <div className='rounded-md border bg-background'>
           <Table className='min-w-[36rem]'>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -328,7 +330,7 @@ const DataTable = <Data extends Project & Schedule & Board & Note>({
                         isPlaceholderData &&
                         !cell.id.includes('check') &&
                         !cell.id.includes('actions') ? (
-                          <Skeleton className='w-full h-4' />
+                          <Skeleton className='h-4 w-full' />
                         ) : (
                           flexRender(
                             cell.column.columnDef.cell,
@@ -347,7 +349,7 @@ const DataTable = <Data extends Project & Schedule & Board & Note>({
             </TableBody>
           </Table>
         </div>
-        <div className='flex items-center justify-between gap-x-2 mt-4'>
+        <div className='mt-4 flex items-center justify-between gap-x-2'>
           <SelectedRowsIndicator table={table} />
           <Pagination className='ml-auto' table={table} />
         </div>

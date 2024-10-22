@@ -1,10 +1,11 @@
 import { PaginableResponse } from '@/types/api'
 import { Note } from '@/types/note'
 import { Project } from '@/types/project'
+import { RawDraftContentState } from 'draft-js'
 import { z } from 'zod'
 import { api } from './api'
 
-// GET /projects/:projectId/boards
+// GET /projects/:projectId/notes
 export const getNotesSearchParamsSchema = z.object({
   page: z.number().int().nonnegative().catch(0),
   size: z.number().int().nonnegative().catch(10),
@@ -55,6 +56,23 @@ export const updateNote = ({
 }: UpdateNotePathParams & UpdateNoteRequestBody) =>
   api
     .put<Note>(`/projects/${projectId}/notes/${noteId}`, data)
+    .then(({ data }) => data)
+
+// PATCH /projects/:projectId/notes/:noteId
+type UpdateContentPathParams = {
+  projectId: Project['id']
+  noteId: Note['id']
+}
+
+type UpdateContentRequestBody = { editorState: RawDraftContentState }
+
+export const updateContent = ({
+  projectId,
+  noteId,
+  editorState,
+}: UpdateContentPathParams & UpdateContentRequestBody) =>
+  api
+    .patch<Note>(`/projects/${projectId}/notes/${noteId}/content`, editorState)
     .then(({ data }) => data)
 
 // DELETE /projects/:projectId/notes/:noteId

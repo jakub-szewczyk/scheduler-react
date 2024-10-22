@@ -1,8 +1,14 @@
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Toggle } from '@/components/ui/toggle'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { useToast } from '@/components/ui/use-toast'
 import { cn } from '@/modules/common'
+import { deserialize, serialize } from '@/modules/note'
+import { getNote, updateContent } from '@/services/note'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useParams } from '@tanstack/react-router'
 import { DraftHandleValue, Editor, EditorState, RichUtils } from 'draft-js'
 import 'draft-js/dist/Draft.css'
 import { identity } from 'lodash/fp'
@@ -20,8 +26,10 @@ import {
   Italic,
   List,
   ListOrdered,
+  LoaderCircle,
   Minus,
   Quote,
+  Save,
   SpellCheck,
   Strikethrough,
   Underline,
@@ -29,13 +37,46 @@ import {
 import { useState } from 'react'
 
 const WYSIWYGEditor = () => {
-  const [editorState, setEditorState] = useState(() =>
-    EditorState.createEmpty()
-  )
   const [spellCheck, setSpellCheck] = useState(true)
 
-  const text = editorState.getCurrentContent().getPlainText()
-  const words = text.trim().split(/\s+/).filter(identity)
+  const params = useParams({
+    from: '/projects/$projectId/notes/$noteId/editor',
+  })
+
+  const { toast } = useToast()
+
+  const queryClient = useQueryClient()
+
+  const queryKey = [
+    'projects',
+    params.projectId,
+    'notes',
+    params.noteId,
+    'content',
+  ]
+
+  // TODO:
+  // Refactor.
+  // Disable refetch on window focus.
+  const { data: editorState } = useQuery({
+    queryKey,
+    queryFn: () =>
+      getNote({ projectId: params.projectId, noteId: params.noteId }).then(
+        (note) => deserialize(note.content)
+      ),
+    initialData: EditorState.createEmpty(),
+  })
+
+  const updateContentMutation = useMutation({
+    mutationFn: updateContent,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey })
+      toast({
+        title: "Note's content updated",
+        description: 'Changes have been successfully saved',
+      })
+    },
+  })
 
   const handleKeyCommand = (
     command: string,
@@ -43,11 +84,14 @@ const WYSIWYGEditor = () => {
   ): DraftHandleValue => {
     const newEditorState = RichUtils.handleKeyCommand(editorState, command)
     if (newEditorState) {
-      setEditorState(newEditorState)
+      queryClient.setQueryData<EditorState>(queryKey, () => newEditorState)
       return 'handled'
     }
     return 'not-handled'
   }
+
+  const text = editorState.getCurrentContent().getPlainText()
+  const words = text.trim().split(/\s+/).filter(identity)
 
   return (
     <Card>
@@ -74,8 +118,8 @@ const WYSIWYGEditor = () => {
             value='BOLD'
             onMouseDown={(event) => {
               event.preventDefault()
-              setEditorState((editorState) =>
-                RichUtils.toggleInlineStyle(editorState, 'BOLD')
+              queryClient.setQueryData<EditorState>(queryKey, (editorState) =>
+                RichUtils.toggleInlineStyle(editorState!, 'BOLD')
               )
             }}
           >
@@ -85,8 +129,8 @@ const WYSIWYGEditor = () => {
             value='ITALIC'
             onMouseDown={(event) => {
               event.preventDefault()
-              setEditorState((editorState) =>
-                RichUtils.toggleInlineStyle(editorState, 'ITALIC')
+              queryClient.setQueryData<EditorState>(queryKey, (editorState) =>
+                RichUtils.toggleInlineStyle(editorState!, 'ITALIC')
               )
             }}
           >
@@ -96,8 +140,8 @@ const WYSIWYGEditor = () => {
             value='UNDERLINE'
             onMouseDown={(event) => {
               event.preventDefault()
-              setEditorState((editorState) =>
-                RichUtils.toggleInlineStyle(editorState, 'UNDERLINE')
+              queryClient.setQueryData<EditorState>(queryKey, (editorState) =>
+                RichUtils.toggleInlineStyle(editorState!, 'UNDERLINE')
               )
             }}
           >
@@ -107,8 +151,8 @@ const WYSIWYGEditor = () => {
             value='STRIKETHROUGH'
             onMouseDown={(event) => {
               event.preventDefault()
-              setEditorState((editorState) =>
-                RichUtils.toggleInlineStyle(editorState, 'STRIKETHROUGH')
+              queryClient.setQueryData<EditorState>(queryKey, (editorState) =>
+                RichUtils.toggleInlineStyle(editorState!, 'STRIKETHROUGH')
               )
             }}
           >
@@ -118,8 +162,8 @@ const WYSIWYGEditor = () => {
             value='CODE'
             onMouseDown={(event) => {
               event.preventDefault()
-              setEditorState((editorState) =>
-                RichUtils.toggleInlineStyle(editorState, 'CODE')
+              queryClient.setQueryData<EditorState>(queryKey, (editorState) =>
+                RichUtils.toggleInlineStyle(editorState!, 'CODE')
               )
             }}
           >
@@ -140,8 +184,8 @@ const WYSIWYGEditor = () => {
             value='ordered-list-item'
             onMouseDown={(event) => {
               event.preventDefault()
-              setEditorState((editorState) =>
-                RichUtils.toggleBlockType(editorState, 'ordered-list-item')
+              queryClient.setQueryData<EditorState>(queryKey, (editorState) =>
+                RichUtils.toggleBlockType(editorState!, 'ordered-list-item')
               )
             }}
           >
@@ -151,8 +195,8 @@ const WYSIWYGEditor = () => {
             value='unordered-list-item'
             onMouseDown={(event) => {
               event.preventDefault()
-              setEditorState((editorState) =>
-                RichUtils.toggleBlockType(editorState, 'unordered-list-item')
+              queryClient.setQueryData<EditorState>(queryKey, (editorState) =>
+                RichUtils.toggleBlockType(editorState!, 'unordered-list-item')
               )
             }}
           >
@@ -162,8 +206,8 @@ const WYSIWYGEditor = () => {
             value='blockquote'
             onMouseDown={(event) => {
               event.preventDefault()
-              setEditorState((editorState) =>
-                RichUtils.toggleBlockType(editorState, 'blockquote')
+              queryClient.setQueryData<EditorState>(queryKey, (editorState) =>
+                RichUtils.toggleBlockType(editorState!, 'blockquote')
               )
             }}
           >
@@ -173,8 +217,8 @@ const WYSIWYGEditor = () => {
             value='code-block'
             onMouseDown={(event) => {
               event.preventDefault()
-              setEditorState((editorState) =>
-                RichUtils.toggleBlockType(editorState, 'code-block')
+              queryClient.setQueryData<EditorState>(queryKey, (editorState) =>
+                RichUtils.toggleBlockType(editorState!, 'code-block')
               )
             }}
           >
@@ -195,8 +239,8 @@ const WYSIWYGEditor = () => {
             value='unstyled'
             onMouseDown={(event) => {
               event.preventDefault()
-              setEditorState((editorState) =>
-                RichUtils.toggleBlockType(editorState, 'unstyled')
+              queryClient.setQueryData<EditorState>(queryKey, (editorState) =>
+                RichUtils.toggleBlockType(editorState!, 'unstyled')
               )
             }}
           >
@@ -206,8 +250,8 @@ const WYSIWYGEditor = () => {
             value='header-one'
             onMouseDown={(event) => {
               event.preventDefault()
-              setEditorState((editorState) =>
-                RichUtils.toggleBlockType(editorState, 'header-one')
+              queryClient.setQueryData<EditorState>(queryKey, (editorState) =>
+                RichUtils.toggleBlockType(editorState!, 'header-one')
               )
             }}
           >
@@ -217,8 +261,8 @@ const WYSIWYGEditor = () => {
             value='header-two'
             onMouseDown={(event) => {
               event.preventDefault()
-              setEditorState((editorState) =>
-                RichUtils.toggleBlockType(editorState, 'header-two')
+              queryClient.setQueryData<EditorState>(queryKey, (editorState) =>
+                RichUtils.toggleBlockType(editorState!, 'header-two')
               )
             }}
           >
@@ -228,8 +272,8 @@ const WYSIWYGEditor = () => {
             value='header-three'
             onMouseDown={(event) => {
               event.preventDefault()
-              setEditorState((editorState) =>
-                RichUtils.toggleBlockType(editorState, 'header-three')
+              queryClient.setQueryData<EditorState>(queryKey, (editorState) =>
+                RichUtils.toggleBlockType(editorState!, 'header-three')
               )
             }}
           >
@@ -239,8 +283,8 @@ const WYSIWYGEditor = () => {
             value='header-four'
             onMouseDown={(event) => {
               event.preventDefault()
-              setEditorState((editorState) =>
-                RichUtils.toggleBlockType(editorState, 'header-four')
+              queryClient.setQueryData<EditorState>(queryKey, (editorState) =>
+                RichUtils.toggleBlockType(editorState!, 'header-four')
               )
             }}
           >
@@ -250,8 +294,8 @@ const WYSIWYGEditor = () => {
             value='header-five'
             onMouseDown={(event) => {
               event.preventDefault()
-              setEditorState((editorState) =>
-                RichUtils.toggleBlockType(editorState, 'header-five')
+              queryClient.setQueryData<EditorState>(queryKey, (editorState) =>
+                RichUtils.toggleBlockType(editorState!, 'header-five')
               )
             }}
           >
@@ -261,14 +305,33 @@ const WYSIWYGEditor = () => {
             value='header-six'
             onMouseDown={(event) => {
               event.preventDefault()
-              setEditorState((editorState) =>
-                RichUtils.toggleBlockType(editorState, 'header-six')
+              queryClient.setQueryData<EditorState>(queryKey, (editorState) =>
+                RichUtils.toggleBlockType(editorState!, 'header-six')
               )
             }}
           >
             <Heading6 className='size-4' />
           </ToggleGroupItem>
         </ToggleGroup>
+        <Button
+          className='ml-auto gap-x-2'
+          variant='secondary'
+          disabled={updateContentMutation.isPending}
+          onClick={() =>
+            updateContentMutation.mutate({
+              projectId: params.projectId,
+              noteId: params.noteId,
+              editorState: serialize(editorState),
+            })
+          }
+        >
+          Save changes
+          {updateContentMutation.isPending ? (
+            <LoaderCircle className='size-4 animate-spin' />
+          ) : (
+            <Save className='size-4' />
+          )}
+        </Button>
         {false && (
           <div className='ml-auto flex animate-pulse items-center gap-x-2 text-sm'>
             <CloudUpload className='size-4' />
@@ -291,7 +354,9 @@ const WYSIWYGEditor = () => {
         >
           <Editor
             editorState={editorState}
-            onChange={setEditorState}
+            onChange={(editorState) =>
+              queryClient.setQueryData<EditorState>(queryKey, editorState)
+            }
             spellCheck={spellCheck}
             placeholder='Enter your note here...'
             handleKeyCommand={handleKeyCommand}
