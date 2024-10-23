@@ -12,7 +12,7 @@ import { useParams } from '@tanstack/react-router'
 import { DraftHandleValue, Editor, EditorState, RichUtils } from 'draft-js'
 import 'draft-js/dist/Draft.css'
 import { identity } from 'lodash/fp'
-import { CloudUpload, LoaderCircle, Save, SpellCheck } from 'lucide-react'
+import { LoaderCircle, Save, SpellCheck } from 'lucide-react'
 import { useState } from 'react'
 import WYSIWYGEditorToggleGroupItem from './WYSIWYGEditorToggleGroupItem/WYSIWYGEditorToggleGroupItem'
 
@@ -35,7 +35,7 @@ const WYSIWYGEditor = () => {
     'content',
   ]
 
-  const { data: editorState } = useQuery({
+  const { data: editorState, isFetching } = useQuery({
     queryKey,
     queryFn: () =>
       getNote({ projectId: params.projectId, noteId: params.noteId }).then(
@@ -144,7 +144,7 @@ const WYSIWYGEditor = () => {
         <Button
           className='ml-auto gap-x-2'
           variant='secondary'
-          disabled={updateContentMutation.isPending}
+          disabled={isFetching || updateContentMutation.isPending}
           onClick={() =>
             updateContentMutation.mutate({
               projectId: params.projectId,
@@ -154,18 +154,12 @@ const WYSIWYGEditor = () => {
           }
         >
           Save changes
-          {updateContentMutation.isPending ? (
+          {isFetching || updateContentMutation.isPending ? (
             <LoaderCircle className='size-4 animate-spin' />
           ) : (
             <Save className='size-4' />
           )}
         </Button>
-        {false && (
-          <div className='ml-auto flex animate-pulse items-center gap-x-2 text-sm'>
-            <CloudUpload className='size-4' />
-            Syncing...
-          </div>
-        )}
       </CardHeader>
       <CardContent>
         <div
