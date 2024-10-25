@@ -8,12 +8,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
-      APP_BASE_URL: ${{vars.APP_BASE_URL}}
       VITE_API_BASE_URL: ${{vars.VITE_API_BASE_URL}}
+      VITE_CLERK_PUBLISHABLE_KEY: ${{secrets.VITE_CLERK_PUBLISHABLE_KEY}}
+      APP_BASE_URL: ${{vars.APP_BASE_URL}}
       CLERK_SECRET_KEY: ${{secrets.CLERK_SECRET_KEY}}
       TEST_ACCOUNT_EMAIL: ${{secrets.TEST_ACCOUNT_EMAIL}}
       TEST_ACCOUNT_PASSWORD: ${{secrets.TEST_ACCOUNT_PASSWORD}}
-      VITE_CLERK_PUBLISHABLE_KEY: ${{secrets.VITE_CLERK_PUBLISHABLE_KEY}}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
