@@ -13,7 +13,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "prettify": "prettier ./src/**/*.{ts,tsx} --write",
     "prepare": "husky || true",
-    "release": "dotenv -e .env.prod -- release-it"
+    "release": "dotenv -e .env.local -- release-it"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.2.0",
