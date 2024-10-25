@@ -12,7 +12,8 @@
     "check": "tsc --noEmit",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "prettify": "prettier ./src/**/*.{ts,tsx} --write",
-    "prepare": "husky || true"
+    "prepare": "husky || true",
+    "release": "dotenv -e .env.prod -- release-it"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.2.0",
@@ -88,6 +89,7 @@
     "@typescript-eslint/parser": "^7.2.0",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.19",
+    "dotenv-cli": "^7.4.2",
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
@@ -97,6 +99,7 @@
     "postcss": "^8.4.38",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.5",
+    "release-it": "^17.10.0",
     "storybook": "^8.1.5",
     "tailwindcss": "^3.4.3",
     "typescript": "^5.2.2",
