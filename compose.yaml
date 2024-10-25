@@ -1,6 +1,6 @@
 services:
-  scheduler-prod:
-    container_name: scheduler-prod
+  scheduler-react:
+    container_name: scheduler-react
     build:
       args:
         VITE_API_BASE_URL: ${VITE_API_BASE_URL}
