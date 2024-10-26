@@ -23,3 +23,24 @@ jobs:
           platforms: linux/amd64,linux/arm64/v8
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:${{ github.ref_name }}
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      SSH_KEY: ${{ secrets.SSH_KEY }}
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      VERSION: ${{ github.ref_name }}
+    steps:
+      - run: |
+          mkdir ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/github
+          chmod 600 ~/.ssh/github
+          cat >> ~/.ssh/config << END
+          Host github
+            HostName $SSH_HOST
+            User $SSH_USER
+            IdentityFile ~/.ssh/github
+            StrictHostKeyChecking no
+          END
+      - run: ssh -i ~/.ssh/github github 'cd /docker/scheduler-react && echo VERSION=${{ github.ref_name }} > .env && sudo docker compose up -d'
