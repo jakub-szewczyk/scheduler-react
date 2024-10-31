@@ -32,18 +32,20 @@ import { getNotes } from '@/services/note'
 import { getProjects } from '@/services/project'
 import { getSchedules } from '@/services/schedule'
 import { useUser } from '@clerk/clerk-react'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import {
-  keepPreviousData,
-  useInfiniteQuery,
-  useQuery,
-} from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
-import { formatRelative } from 'date-fns'
-import { Check, ChevronsUpDown } from 'lucide-react'
+  Check,
+  ChevronsUpDown,
+  FolderSearch,
+  Frown,
+  LoaderCircle,
+} from 'lucide-react'
 import { useState } from 'react'
 import { Pie, PieChart, Sector } from 'recharts'
 import { PieSectorDataItem } from 'recharts/types/polar/Pie'
-import { useDocumentTitle } from 'usehooks-ts'
+import { match } from 'ts-pattern'
+import { useBoolean, useDocumentTitle } from 'usehooks-ts'
 
 const pageTitle = 'Dashboard'
 
@@ -58,8 +60,13 @@ export const Route = createFileRoute('/')({
 function Dashboard() {
   useDocumentTitle(`Scheduler - ${pageTitle}`)
 
-  const [isOpen, setIsOpen] = useState(false)
   const [projectId, setProjectId] = useState('')
+
+  const {
+    value: isProjectComboboxOpen,
+    setValue: setIsProjectComboboxOpen,
+    setFalse: closeProjectCombobox,
+  } = useBoolean()
 
   const { user } = useUser()
 
@@ -75,7 +82,7 @@ function Dashboard() {
     initialPageParam: 0,
   })
 
-  const { data: totals } = useQuery({
+  const getSubjectsQuery = useQuery({
     queryKey: ['projects', projectId, 'subject'],
     queryFn: () =>
       Promise.all([
@@ -83,29 +90,19 @@ function Dashboard() {
         getBoards({ projectId }),
         getNotes({ projectId }),
       ]),
-    placeholderData: keepPreviousData,
     enabled: !!projectId,
     select: (subjects) => subjects.map((subject) => subject.total),
   })
 
   const projects = getProjectsQuery.data?.pages.flatMap((page) => page.content)
 
-  // const hasTotals = !!(totals && totals.some((total) => total !== 0))
-
   return (
     <div className='flex flex-col gap-y-12'>
       <Card>
         <CardHeader>
-          <CardTitle className='flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5'>
-            <span className='truncate'>
-              {greeting()}
-              {user?.firstName && `, ${user.firstName}`} 👋
-            </span>
-            {user?.lastSignInAt && (
-              <span className='text-xs font-normal text-muted-foreground'>
-                Last signed in: {formatRelative(user.lastSignInAt, new Date())}
-              </span>
-            )}
+          <CardTitle className='truncate'>
+            {greeting()}
+            {user?.firstName && `, ${user.firstName}`} 👋
           </CardTitle>
           <CardDescription>
             Your projects await your brilliance. Dive into the creative process,
@@ -125,13 +122,16 @@ function Dashboard() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Popover open={isOpen} onOpenChange={setIsOpen}>
+          <Popover
+            open={isProjectComboboxOpen}
+            onOpenChange={setIsProjectComboboxOpen}
+          >
             <PopoverTrigger asChild>
               <Button
                 className='w-full max-w-[13.625rem] justify-between'
                 variant='outline'
                 role='combobox'
-                aria-expanded={isOpen}
+                aria-expanded={isProjectComboboxOpen}
               >
                 {projectId ? (
                   <span className='truncate'>
@@ -158,7 +158,7 @@ function Dashboard() {
                         value={project.id}
                         onSelect={(value) => {
                           setProjectId(value === projectId ? '' : value)
-                          setIsOpen(false)
+                          closeProjectCombobox()
                         }}
                       >
                         <Check
@@ -177,60 +177,116 @@ function Dashboard() {
               </Command>
             </PopoverContent>
           </Popover>
-          <ChartContainer
-            className='mx-auto aspect-square max-h-60'
-            config={{
-              schedules: { label: 'Schedules' },
-              boards: { label: 'Boards' },
-              notes: { label: 'Notes' },
-            }}
-          >
-            <PieChart>
-              {totals && (
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent hideLabel />}
-                />
-              )}
-              <Pie
-                nameKey='subject'
-                dataKey='total'
-                data={[
-                  {
-                    subject: 'schedules',
-                    total: totals?.[0],
-                    fill: '#fb923c',
-                  },
-                  {
-                    subject: 'boards',
-                    total: totals?.[1],
-                    fill: '#c084fc',
-                  },
-                  { subject: 'notes', total: totals?.[2], fill: '#2dd4bf' },
-                ]}
-                blendStroke
-                innerRadius={60}
-                activeShape={({
-                  outerRadius = 0,
-                  ...props
-                }: PieSectorDataItem) => (
-                  <Sector {...props} outerRadius={outerRadius + 8} />
-                )}
-              />
-            </PieChart>
-          </ChartContainer>
+          {!projectId ? (
+            <div className='flex h-60 flex-col items-center justify-center gap-y-2'>
+              <FolderSearch className='size-8 text-muted-foreground' />
+              <span className='text-center text-sm text-muted-foreground'>
+                Choose a project from the dropdown to display its entry counts
+              </span>
+            </div>
+          ) : (
+            match(getSubjectsQuery)
+              .with({ status: 'pending' }, { status: 'error' }, () => (
+                <div className='flex h-60 flex-col items-center justify-center gap-y-2'>
+                  <LoaderCircle className='size-8 animate-spin text-muted-foreground' />
+                  <span className='text-center text-sm text-muted-foreground'>
+                    Loading...
+                  </span>
+                </div>
+              ))
+              .with({ status: 'success' }, ({ data: totals }) =>
+                totals.every((total) => total === 0) ? (
+                  <div className='flex h-60 flex-col items-center justify-center gap-y-2'>
+                    <Frown className='size-8 text-muted-foreground' />
+                    <span className='text-center text-sm text-muted-foreground'>
+                      It looks like this project is empty. Start by adding{' '}
+                      <Button className='h-fit p-0' variant='link' asChild>
+                        <Link
+                          to='/projects/$projectId/schedules/new'
+                          params={{ projectId }}
+                        >
+                          schedules
+                        </Link>
+                      </Button>
+                      ,{' '}
+                      <Button className='h-fit p-0' variant='link' asChild>
+                        <Link
+                          to='/projects/$projectId/boards/new'
+                          params={{ projectId }}
+                        >
+                          boards
+                        </Link>
+                      </Button>
+                      , or{' '}
+                      <Button className='h-fit p-0' variant='link' asChild>
+                        <Link
+                          to='/projects/$projectId/notes/new'
+                          params={{ projectId }}
+                        >
+                          notes
+                        </Link>
+                      </Button>{' '}
+                      to help you get started!
+                    </span>
+                  </div>
+                ) : (
+                  <ChartContainer
+                    className='mx-auto aspect-square max-h-60'
+                    config={{
+                      schedules: { label: 'Schedules' },
+                      boards: { label: 'Boards' },
+                      notes: { label: 'Notes' },
+                    }}
+                  >
+                    <PieChart>
+                      {totals && (
+                        <ChartTooltip
+                          cursor={false}
+                          content={<ChartTooltipContent hideLabel />}
+                        />
+                      )}
+                      <Pie
+                        nameKey='subject'
+                        dataKey='total'
+                        data={[
+                          {
+                            subject: 'schedules',
+                            total: totals?.[0],
+                            fill: '#fb923c',
+                          },
+                          {
+                            subject: 'boards',
+                            total: totals?.[1],
+                            fill: '#c084fc',
+                          },
+                          {
+                            subject: 'notes',
+                            total: totals?.[2],
+                            fill: '#2dd4bf',
+                          },
+                        ]}
+                        blendStroke
+                        innerRadius={60}
+                        activeShape={ActiveShape}
+                      />
+                    </PieChart>
+                  </ChartContainer>
+                )
+              )
+              .exhaustive()
+          )}
         </CardContent>
         <CardFooter className='flex-wrap gap-x-4'>
           <div className='flex items-center gap-x-2'>
-            <span className='block size-3 rounded bg-[#fb923c]' />
+            <span className='block size-3 rounded bg-orange-400' />
             <span className='text-sm text-muted-foreground'>Schedules</span>
           </div>
           <div className='flex items-center gap-x-2'>
-            <span className='block size-3 rounded bg-[#c084fc]' />
+            <span className='block size-3 rounded bg-purple-400' />
             <span className='text-sm text-muted-foreground'>Boards</span>
           </div>
           <div className='flex items-center gap-x-2'>
-            <span className='block size-3 rounded bg-[#2dd4bf]' />
+            <span className='block size-3 rounded bg-teal-400' />
             <span className='text-sm text-muted-foreground'>Notes</span>
           </div>
         </CardFooter>
@@ -238,3 +294,7 @@ function Dashboard() {
     </div>
   )
 }
+
+const ActiveShape = ({ outerRadius = 0, ...props }: PieSectorDataItem) => (
+  <Sector {...props} outerRadius={outerRadius + 8} />
+)
