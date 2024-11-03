@@ -231,7 +231,7 @@ function Dashboard() {
                   </div>
                 ) : (
                   <ChartContainer
-                    className='mx-auto aspect-square max-h-60'
+                    className='mx-auto aspect-square max-h-60 [&_svg]:overflow-visible'
                     config={{
                       schedules: { label: 'Schedules' },
                       boards: { label: 'Boards' },
@@ -246,24 +246,37 @@ function Dashboard() {
                         />
                       )}
                       <Pie
+                        label
                         nameKey='subject'
                         dataKey='total'
                         data={[
-                          {
-                            subject: 'schedules',
-                            total: totals?.[0],
-                            fill: '#fb923c',
-                          },
-                          {
-                            subject: 'boards',
-                            total: totals?.[1],
-                            fill: '#c084fc',
-                          },
-                          {
-                            subject: 'notes',
-                            total: totals?.[2],
-                            fill: '#2dd4bf',
-                          },
+                          ...(totals?.[0]
+                            ? [
+                                {
+                                  subject: 'schedules',
+                                  total: totals[0],
+                                  fill: '#fb923c',
+                                },
+                              ]
+                            : []),
+                          ...(totals?.[1]
+                            ? [
+                                {
+                                  subject: 'boards',
+                                  total: totals[1],
+                                  fill: '#c084fc',
+                                },
+                              ]
+                            : []),
+                          ...(totals?.[2]
+                            ? [
+                                {
+                                  subject: 'notes',
+                                  total: totals[2],
+                                  fill: '#2dd4bf',
+                                },
+                              ]
+                            : []),
                         ]}
                         blendStroke
                         innerRadius={60}
