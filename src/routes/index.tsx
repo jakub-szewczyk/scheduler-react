@@ -47,6 +47,7 @@ import { PieSectorDataItem } from 'recharts/types/polar/Pie'
 import { match } from 'ts-pattern'
 import {
   useBoolean,
+  useDebounceValue,
   useDocumentTitle,
   useIntersectionObserver,
 } from 'usehooks-ts'
@@ -65,6 +66,9 @@ function Dashboard() {
   useDocumentTitle(`Scheduler - ${pageTitle}`)
 
   const [projectId, setProjectId] = useState('')
+  const [projectTitle, setProjectTitle] = useState('')
+
+  const [debouncedProjectTitle] = useDebounceValue(projectTitle, 500)
 
   const {
     value: isProjectComboboxOpen,
@@ -75,18 +79,18 @@ function Dashboard() {
   const { user } = useUser()
 
   const getProjectsQuery = useInfiniteQuery({
-    queryKey: ['projects', 'infinite'],
+    queryKey: ['projects', { title: debouncedProjectTitle }, 'infinite'],
     queryFn: ({ pageParam }) =>
       getProjects({
         page: pageParam,
         size: PAGE_SIZE,
+        title: debouncedProjectTitle,
       }),
     getNextPageParam: (page) =>
       (page.page + 1) * page.size < page.total ? page.page + 1 : null,
     initialPageParam: 0,
   })
 
-  // TODO: Handle searching
   const getSubjectsQuery = useQuery({
     queryKey: ['projects', projectId, 'subject'],
     queryFn: () =>
@@ -119,8 +123,8 @@ function Dashboard() {
           <CardDescription>
             Your projects await your brilliance. Dive into the creative process,
             explore new ideas, and watch your visions come to life. Embrace the
-            possibilities ahead, and let’s turn today into a canvas for
-            inspiration and accomplishment. Here’s to making strides and
+            possibilities ahead, and let's turn today into a canvas for
+            inspiration and accomplishment. Here's to making strides and
             achieving your goals!
           </CardDescription>
         </CardHeader>
@@ -159,10 +163,18 @@ function Dashboard() {
               </Button>
             </PopoverTrigger>
             <PopoverContent className='w-[13.625rem] p-0'>
-              <Command>
-                <CommandInput placeholder='Search project...' />
+              <Command shouldFilter={false}>
+                <CommandInput
+                  placeholder='Search project...'
+                  value={projectTitle}
+                  onValueChange={setProjectTitle}
+                />
                 <CommandList>
-                  <CommandEmpty>No project found</CommandEmpty>
+                  {projects && projects.length === 0 && (
+                    <CommandEmpty className='pt-2 text-center text-sm'>
+                      No project found
+                    </CommandEmpty>
+                  )}
                   <CommandGroup>
                     {projects?.map((project) => (
                       <CommandItem
@@ -184,7 +196,8 @@ function Dashboard() {
                         {project.title}
                       </CommandItem>
                     ))}
-                    {getProjectsQuery.hasNextPage && (
+                    {(getProjectsQuery.isLoading ||
+                      getProjectsQuery.hasNextPage) && (
                       <CommandItem ref={ref}>
                         <LoaderCircle className='mx-auto size-4 animate-spin' />
                       </CommandItem>
