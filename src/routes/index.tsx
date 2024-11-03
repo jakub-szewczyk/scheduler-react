@@ -45,7 +45,11 @@ import { useState } from 'react'
 import { Pie, PieChart, Sector } from 'recharts'
 import { PieSectorDataItem } from 'recharts/types/polar/Pie'
 import { match } from 'ts-pattern'
-import { useBoolean, useDocumentTitle } from 'usehooks-ts'
+import {
+  useBoolean,
+  useDocumentTitle,
+  useIntersectionObserver,
+} from 'usehooks-ts'
 
 const pageTitle = 'Dashboard'
 
@@ -82,6 +86,7 @@ function Dashboard() {
     initialPageParam: 0,
   })
 
+  // TODO: Handle searching
   const getSubjectsQuery = useQuery({
     queryKey: ['projects', projectId, 'subject'],
     queryFn: () =>
@@ -94,13 +99,20 @@ function Dashboard() {
     select: (subjects) => subjects.map((subject) => subject.total),
   })
 
+  const { ref } = useIntersectionObserver({
+    onChange: (isIntersecting) =>
+      isIntersecting &&
+      !getProjectsQuery.isFetching &&
+      getProjectsQuery.fetchNextPage(),
+  })
+
   const projects = getProjectsQuery.data?.pages.flatMap((page) => page.content)
 
   return (
     <div className='flex flex-col gap-y-12'>
       <Card>
         <CardHeader>
-          <CardTitle className='truncate'>
+          <CardTitle>
             {greeting()}
             {user?.firstName && `, ${user.firstName}`} 👋
           </CardTitle>
@@ -172,6 +184,11 @@ function Dashboard() {
                         {project.title}
                       </CommandItem>
                     ))}
+                    {getProjectsQuery.hasNextPage && (
+                      <CommandItem ref={ref}>
+                        <LoaderCircle className='mx-auto size-4 animate-spin' />
+                      </CommandItem>
+                    )}
                   </CommandGroup>
                 </CommandList>
               </Command>
