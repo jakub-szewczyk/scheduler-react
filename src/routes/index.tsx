@@ -31,6 +31,7 @@ import { getBoards } from '@/services/board'
 import { getNotes } from '@/services/note'
 import { getProjects } from '@/services/project'
 import { getSchedules } from '@/services/schedule'
+import { Project } from '@/types/project'
 import { useUser } from '@clerk/clerk-react'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
@@ -65,7 +66,7 @@ export const Route = createFileRoute('/')({
 function Dashboard() {
   useDocumentTitle(`Scheduler - ${pageTitle}`)
 
-  const [projectId, setProjectId] = useState('')
+  const [project, setProject] = useState<Project>()
   const [projectTitle, setProjectTitle] = useState('')
 
   const [debouncedProjectTitle] = useDebounceValue(projectTitle, 500)
@@ -92,14 +93,14 @@ function Dashboard() {
   })
 
   const getSubjectsQuery = useQuery({
-    queryKey: ['projects', projectId, 'subject'],
+    queryKey: ['projects', project, 'subject'],
     queryFn: () =>
       Promise.all([
-        getSchedules({ projectId }),
-        getBoards({ projectId }),
-        getNotes({ projectId }),
+        getSchedules({ projectId: project!.id }),
+        getBoards({ projectId: project!.id }),
+        getNotes({ projectId: project!.id }),
       ]),
-    enabled: !!projectId,
+    enabled: !!project,
     select: (subjects) => subjects.map((subject) => subject.total),
   })
 
@@ -149,13 +150,8 @@ function Dashboard() {
                 role='combobox'
                 aria-expanded={isProjectComboboxOpen}
               >
-                {projectId ? (
-                  <span className='truncate'>
-                    {
-                      projects?.find((project) => project.id === projectId)
-                        ?.title
-                    }
-                  </span>
+                {project ? (
+                  <span className='truncate'>{project.title}</span>
                 ) : (
                   <span className='text-muted-foreground'>Select project</span>
                 )}
@@ -176,24 +172,26 @@ function Dashboard() {
                     </CommandEmpty>
                   )}
                   <CommandGroup>
-                    {projects?.map((project) => (
+                    {projects?.map(({ id, title }) => (
                       <CommandItem
-                        key={project.id}
-                        value={project.id}
+                        key={id}
+                        value={id}
                         onSelect={(value) => {
-                          setProjectId(value === projectId ? '' : value)
+                          setProject(
+                            value === project?.id
+                              ? undefined
+                              : projects.find((project) => project.id === value)
+                          )
                           closeProjectCombobox()
                         }}
                       >
                         <Check
                           className={cn(
                             'mr-2 size-4',
-                            projectId === project.id
-                              ? 'opacity-100'
-                              : 'opacity-0'
+                            id === project?.id ? 'opacity-100' : 'opacity-0'
                           )}
                         />
-                        {project.title}
+                        {title}
                       </CommandItem>
                     ))}
                     {(getProjectsQuery.isLoading ||
@@ -207,7 +205,7 @@ function Dashboard() {
               </Command>
             </PopoverContent>
           </Popover>
-          {!projectId ? (
+          {!project ? (
             <div className='flex h-60 flex-col items-center justify-center gap-y-2'>
               <FolderSearch className='size-8 text-muted-foreground' />
               <span className='text-center text-sm text-muted-foreground'>
@@ -233,7 +231,7 @@ function Dashboard() {
                       <Button className='h-fit p-0' variant='link' asChild>
                         <Link
                           to='/projects/$projectId/schedules/new'
-                          params={{ projectId }}
+                          params={{ projectId: project.id }}
                         >
                           schedules
                         </Link>
@@ -242,7 +240,7 @@ function Dashboard() {
                       <Button className='h-fit p-0' variant='link' asChild>
                         <Link
                           to='/projects/$projectId/boards/new'
-                          params={{ projectId }}
+                          params={{ projectId: project.id }}
                         >
                           boards
                         </Link>
@@ -251,7 +249,7 @@ function Dashboard() {
                       <Button className='h-fit p-0' variant='link' asChild>
                         <Link
                           to='/projects/$projectId/notes/new'
-                          params={{ projectId }}
+                          params={{ projectId: project.id }}
                         >
                           notes
                         </Link>
