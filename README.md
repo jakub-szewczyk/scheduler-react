@@ -10,7 +10,7 @@ Vite + React SPA ![GitHub Release](https://img.shields.io/github/v/release/jakub
 
 ### Manage multiple projects
 
-View, create, edit and delete projects
+View, create, edit, and delete projects
 
 ![project list](https://github.com/user-attachments/assets/8d1b2f27-35bd-4386-a43a-4cb5f2ea394a)
 ![new project](https://github.com/user-attachments/assets/2ea81393-a38a-4713-9bce-5946a1b3d294)
@@ -19,7 +19,7 @@ View, create, edit and delete projects
 
 ### Schedule meetings & events
 
-Use the calendar to view, create, edit and delete events
+Use the calendar to view, create, edit, and delete events
 
 ![calendar](https://github.com/user-attachments/assets/f3383b96-17fd-41be-b530-b12e4a38d78c)
 ![event popup](https://github.com/user-attachments/assets/bbd14cec-ab09-4dd9-a756-14537afeb466)
@@ -34,8 +34,15 @@ Manage push notifications to remind you of your meetings
 
 ### Manage tasks on a Kanban board
 
+View, create, edit, and delete statuses & issues
+
 ![create status](https://github.com/user-attachments/assets/f8edba09-4ff2-4621-9386-b7a370b16399)
 ![kanban board](https://github.com/user-attachments/assets/5a639bb8-43b9-45c1-8d0c-ad5ce81f291a)
+![kanban board](https://github.com/user-attachments/assets/47f9d93b-5d41-425b-9171-8dbb7646bd45)
+
+### Take notes on things that matter
+
+![WYSIWYG editor](https://github.com/user-attachments/assets/53bd3392-f80f-45c1-aeae-99689cbdbc1c)
 
 ## Todo
 
